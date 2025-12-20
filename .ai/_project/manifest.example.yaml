@@ -1,0 +1,103 @@
+# .ai/_project/manifest.yaml
+#
+# ╔══════════════════════════════════════════════════════════════════╗
+# ║ LAYER: PROJECT                                                   ║
+# ║ STATUS: Example - Copy and customize for your project           ║
+# ╠══════════════════════════════════════════════════════════════════╣
+# ║ This is an EXAMPLE manifest. Copy to manifest.yaml and edit.     ║
+# ║ Framework commands READ this file to understand context.         ║
+# ║ If something isn't here, the AI should ASK - not assume.        ║
+# ╚══════════════════════════════════════════════════════════════════╝
+
+# ============================================================
+# PROJECT IDENTITY
+# ============================================================
+project:
+  name: "My Project"
+  description: "Brief description of the project"
+  root: "${PWD}"  # Or absolute path
+
+# ============================================================
+# REPOSITORIES
+# ============================================================
+# List ALL repositories. This is the complete list.
+# The AI should not assume other repos exist.
+repos:
+  - name: backend
+    path: ./backend
+    description: "Main API service"
+    tech: [typescript, node, sequelize, postgresql]
+
+  - name: frontend
+    path: ./frontend
+    description: "Web application"
+    tech: [react, typescript, vite]
+
+# ============================================================
+# MCP INTEGRATIONS
+# ============================================================
+mcps:
+  # MCPs that are definitely available
+  available:
+    - name: sql-query
+      description: "Query the database"
+      notes: "May require VPN connection"
+
+    - name: notification-server
+      description: "Send Discord notifications"
+
+  # MCPs that might be available (check before using)
+  optional:
+    - name: context7
+      description: "Fetch library documentation"
+
+# ============================================================
+# CONVENTIONS
+# ============================================================
+conventions:
+  # Commit message rules
+  commits:
+    no_coauthor: true           # Never include co-author attribution
+    require_jira: true          # Require JIRA ticket in commit
+    pattern: "type(scope): description"
+    types: [feat, fix, chore, refactor, test, docs]
+
+  # Branch naming
+  branches:
+    pattern: "{jira}-{short-description}"
+    examples:
+      - "PROJ-123-fix-auth-bug"
+      - "PROJ-456-add-user-endpoint"
+
+  # JIRA configuration
+  jira:
+    prefix: "PROJ"
+    url: "https://company.atlassian.net"
+
+  # Code style (optional, for reference)
+  code:
+    language: typescript
+    style_guide: "ESLint + Prettier"
+    test_framework: jest
+
+# ============================================================
+# AGENT PREFERENCES
+# ============================================================
+agents:
+  # Preferred agents for different tasks
+  exploration: Explore
+  architecture: feature-dev:code-architect
+  review: feature-dev:code-reviewer
+
+  # Agent-specific settings
+  explore:
+    default_thoroughness: "very thorough"
+
+# ============================================================
+# NOTIFICATIONS (optional)
+# ============================================================
+notifications:
+  on_task_create: true
+  on_task_done: true
+  on_error: true
+  mention_user: false

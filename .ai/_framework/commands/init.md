@@ -1,0 +1,345 @@
+<!--
+╔══════════════════════════════════════════════════════════════════╗
+║ LAYER: FRAMEWORK                                                 ║
+║ COMMAND: /init                                                   ║
+║ STATUS: Complete                                                 ║
+╠══════════════════════════════════════════════════════════════════╣
+║ PURPOSE: Bootstrap the three-layer system for a new project      ║
+╚══════════════════════════════════════════════════════════════════╝
+-->
+
+# /init - Bootstrap New Project
+
+## Description
+
+Set up the three-layer AI task framework for a new project. This command gathers project information, explores the codebase, and creates all necessary configuration files.
+
+## Usage
+
+```
+/init                    # Bootstrap from scratch
+/init --minimal          # Skip exploration, just create structure
+```
+
+## Workflow
+
+```
+1. ASK QUESTIONS
+   • Project name and description
+   • What repos/services exist?
+   • What's the tech stack?
+   • What MCPs are available?
+   • Commit/branch conventions?
+   • JIRA prefix (or LOCAL)?
+
+2. EXPLORE CODEBASE (unless --minimal)
+   • Launch Explore agents on discovered repos
+   • Identify patterns, key files, structure
+   • Detect tech stack automatically
+   • Find existing documentation
+
+3. BUILD LAYERS
+   • Create _project/manifest.yaml from answers
+   • Create _project/structure.md from exploration
+   • Seed docs/ with initial READMEs per repo
+   • Create docs/_completed_tasks.md (empty)
+   • Generate context.md from all pieces
+   • Generate INDEX.md
+   • Create tasks/ folder structure
+
+4. OUTPUT SUMMARY
+   • What was created
+   • Suggested next steps
+   • How to use the system
+```
+
+## Implementation
+
+### Step 0: Orientation
+
+Check that the `.ai/_framework/` directory exists (the framework has been copied to the project).
+
+If NOT found:
+```
+Framework not found. Please copy the .ai/ directory from the ai-framework
+repository to your project first, then run /init again.
+```
+
+If found, announce:
+```
+╔══════════════════════════════════════════════════════════════════╗
+║ AI TASK FRAMEWORK - INITIALIZATION                               ║
+╚══════════════════════════════════════════════════════════════════╝
+
+I'll help you set up the AI Task Framework for this project.
+Let me gather some information first.
+```
+
+### Step 1: Gather Information
+
+Ask the following questions. Accept answers conversationally - the user can answer multiple questions at once.
+
+**Q1: Project Identity**
+```
+What's the project name and a brief description?
+```
+
+**Q2: Repositories**
+```
+What repositories/services are in this project?
+For each, I need:
+- Name (e.g., backend, frontend, mobile)
+- Path relative to project root (e.g., ./backend)
+- Brief description
+- Tech stack (e.g., typescript, react, node, postgresql)
+```
+
+**Q3: MCPs**
+```
+What MCP integrations are available? Common ones include:
+- sql-query (database access)
+- notification-server (Discord notifications)
+- context7 (library documentation)
+- playwright (browser automation)
+
+List any that are definitely available, and any that might be available optionally.
+```
+
+**Q4: Conventions**
+```
+What conventions does the team follow?
+
+Commits:
+- Pattern? (e.g., "type(scope): description")
+- Require JIRA ticket?
+- Co-author attribution allowed?
+
+Branches:
+- Pattern? (e.g., "{jira}-{short-description}")
+
+JIRA:
+- Prefix? (e.g., "PROJ", or "LOCAL" if not using JIRA)
+- URL? (if applicable)
+```
+
+**Q5: Preferences (Optional)**
+```
+Any preferences for how I should work?
+- Preferred exploration depth (quick/medium/very thorough)?
+- Should I send notifications for task events?
+- Any special instructions?
+```
+
+Collect all answers before proceeding.
+
+### Step 2: Explore Codebase (Optional)
+
+Skip this step if `--minimal` was specified or user requests to skip.
+
+For each repository identified:
+
+1. Launch an Explore agent:
+   ```
+   Explore {repo.name} repository at {repo.path}:
+   - Identify project structure and key directories
+   - Find main entry points
+   - Detect frameworks and libraries in use
+   - Note any existing documentation
+   - Identify testing patterns
+   - Find configuration files
+   ```
+
+2. Compile exploration findings into a summary per repo.
+
+### Step 3: Create Project Layer
+
+Create `.ai/_project/manifest.yaml` using the gathered information.
+
+Template:
+```yaml
+# .ai/_project/manifest.yaml
+#
+# ╔══════════════════════════════════════════════════════════════════╗
+# ║ LAYER: PROJECT                                                   ║
+# ║ STATUS: Generated by /init on {YYYY-MM-DD}                       ║
+# ╠══════════════════════════════════════════════════════════════════╣
+# ║ This is the project manifest. Commands READ this file.           ║
+# ║ Edit manually or run /enhance to update.                         ║
+# ╚══════════════════════════════════════════════════════════════════╝
+
+# ============================================================
+# PROJECT IDENTITY
+# ============================================================
+project:
+  name: "{project_name}"
+  description: "{project_description}"
+  root: "{project_root}"
+
+# ============================================================
+# REPOSITORIES
+# ============================================================
+repos:
+{for each repo}
+  - name: {repo.name}
+    path: {repo.path}
+    description: "{repo.description}"
+    tech: [{repo.tech}]
+{/for}
+
+# ============================================================
+# MCP INTEGRATIONS
+# ============================================================
+mcps:
+  available:
+{for each mcp in available}
+    - name: {mcp.name}
+      description: "{mcp.description}"
+{/for}
+  optional:
+{for each mcp in optional}
+    - name: {mcp.name}
+      description: "{mcp.description}"
+{/for}
+
+# ============================================================
+# CONVENTIONS
+# ============================================================
+conventions:
+  commits:
+    no_coauthor: {true/false}
+    require_jira: {true/false}
+    pattern: "{pattern}"
+    types: [feat, fix, chore, refactor, test, docs]
+
+  branches:
+    pattern: "{pattern}"
+
+  jira:
+    prefix: "{prefix}"
+    url: "{url}"
+
+# ============================================================
+# AGENT PREFERENCES
+# ============================================================
+agents:
+  exploration: Explore
+  explore:
+    default_thoroughness: "{thoroughness}"
+
+# ============================================================
+# NOTIFICATIONS
+# ============================================================
+notifications:
+  on_task_create: {true/false}
+  on_task_done: {true/false}
+  on_error: true
+  mention_user: false
+```
+
+### Step 4: Create Domain Layer
+
+**4a. Create docs/_completed_tasks.md:**
+```markdown
+# Completed Tasks Log
+
+Tasks completed in this project, for reference and learning.
+
+| Date | Task | Summary |
+|------|------|---------|
+| _No tasks completed yet_ | | |
+```
+
+**4b. Create docs/_shared/README.md:**
+```markdown
+# Shared Documentation
+
+Cross-cutting patterns and conventions used across repositories.
+
+## Contents
+
+_Add documentation as you learn patterns that apply across repos._
+```
+
+**4c. Create docs/_architecture/README.md:**
+```markdown
+# Architecture Documentation
+
+System-level architecture and design decisions.
+
+## Contents
+
+_Add architecture documentation as the system evolves._
+```
+
+**4d. Create per-repo documentation** (if exploration was done):
+For each repo, create `docs/{repo.name}/README.md`:
+```markdown
+# {repo.name} Documentation
+
+## Overview
+
+{repo.description}
+
+## Tech Stack
+
+{list of technologies}
+
+## Key Files
+
+{findings from exploration}
+
+## Patterns
+
+{patterns identified during exploration}
+```
+
+### Step 5: Create Task Structure
+
+Ensure these directories exist:
+- `.ai/tasks/todo/`
+- `.ai/tasks/in_progress/`
+- `.ai/tasks/done/`
+
+### Step 6: Generate context.md
+
+Create `.ai/context.md` from the template at `_framework/templates/context.md`, filling in all values from the manifest and current state.
+
+### Step 7: Update INDEX.md
+
+Update `.ai/INDEX.md` to reflect any new documentation created. Add entries to the Documentation table for each repo doc created.
+
+### Step 8: Output Summary
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║ INITIALIZATION COMPLETE                                          ║
+╚══════════════════════════════════════════════════════════════════╝
+
+Created:
+  ✓ .ai/_project/manifest.yaml     - Project configuration
+  ✓ .ai/context.md                 - Entry point for AI sessions
+  ✓ .ai/tasks/                     - Task management structure
+  ✓ .ai/docs/_completed_tasks.md   - Task history log
+  ✓ .ai/docs/_shared/              - Cross-cutting documentation
+  ✓ .ai/docs/_architecture/        - System architecture docs
+{if repos explored}
+  ✓ .ai/docs/{repo}/              - Per-repo documentation
+{/if}
+
+Next Steps:
+  1. Review .ai/_project/manifest.yaml and adjust if needed
+  2. Use /task-create to start your first task
+  3. Use /help to see all available commands
+
+Quick Reference:
+  • /task-create     Create a new development task
+  • /task-status     View all tasks
+  • /help            Show all commands
+```
+
+Then stop. Do not proceed further.
+
+## Output
+
+- Fully configured `.ai/` directory
+- Ready-to-use task management system

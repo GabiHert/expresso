@@ -1,0 +1,30 @@
+# Task Status Index
+#
+# ╔══════════════════════════════════════════════════════════════════╗
+# ║ LAYER: TASK                                                      ║
+# ║ STATUS: Auto-managed - Updated by framework commands            ║
+# ╠══════════════════════════════════════════════════════════════════╣
+# ║ This file tracks all work items for quick reference.             ║
+# ║ Files live in todo/, in_progress/, done/ folders.               ║
+# ║ Commands update this file when moving work items.                ║
+# ╚══════════════════════════════════════════════════════════════════╝
+
+task: "{JIRA}"
+title: "{Title}"
+created: "{YYYY-MM-DD}"
+updated: "{YYYY-MM-DD}"
+
+# Summary counts (auto-updated)
+summary:
+  total: 0
+  todo: 0
+  in_progress: 0
+  done: 0
+
+# Work items list
+work_items:
+  - id: "01"
+    name: "{Work item name}"
+    repo: "{repo-name}"
+    status: todo  # todo | in_progress | done
+    file: "todo/01-{name}.md"
