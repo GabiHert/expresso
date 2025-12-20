@@ -31,6 +31,7 @@ Set up the three-layer AI task framework for a new project. This command gathers
    • What MCPs are available?
    • Commit/branch conventions?
    • JIRA prefix (or LOCAL)?
+   • Which AI tool? (Claude Code, Cursor, Other)
 
 2. EXPLORE CODEBASE (unless --minimal)
    • Launch Explore agents on discovered repos
@@ -47,10 +48,15 @@ Set up the three-layer AI task framework for a new project. This command gathers
    • Generate INDEX.md
    • Create tasks/ folder structure
 
-4. OUTPUT SUMMARY
+4. INSTALL COMMANDS
+   • Create .claude/commands/ or .cursor/commands/
+   • Register all 13 slash commands
+   • Commands become immediately available
+
+5. OUTPUT SUMMARY
    • What was created
+   • Commands installed
    • Suggested next steps
-   • How to use the system
 ```
 
 ## Implementation
@@ -122,7 +128,15 @@ JIRA:
 - URL? (if applicable)
 ```
 
-**Q5: Preferences (Optional)**
+**Q5: AI Tool**
+```
+Which AI tool are you using?
+  1. Claude Code (CLI)
+  2. Cursor
+  3. Other (manual setup)
+```
+
+**Q6: Preferences (Optional)**
 ```
 Any preferences for how I should work?
 - Preferred exploration depth (quick/medium/very thorough)?
@@ -300,15 +314,140 @@ Ensure these directories exist:
 - `.ai/tasks/in_progress/`
 - `.ai/tasks/done/`
 
-### Step 6: Generate context.md
+### Step 6: Install Commands
+
+Based on the AI tool selected in Q5, install the framework commands.
+
+**For Claude Code (Option 1):**
+
+Create command skill files in `.claude/commands/` directory:
+
+```bash
+mkdir -p .claude/commands
+```
+
+For each framework command, create a skill file that references our command prompt:
+
+**`.claude/commands/init.md`:**
+```markdown
+Follow the instructions in .ai/_framework/commands/init.md
+```
+
+**`.claude/commands/task-create.md`:**
+```markdown
+Follow the instructions in .ai/_framework/commands/task-create.md
+
+Arguments: $ARGUMENTS
+```
+
+**`.claude/commands/task-start.md`:**
+```markdown
+Follow the instructions in .ai/_framework/commands/task-start.md
+
+Arguments: $ARGUMENTS
+```
+
+**`.claude/commands/task-work.md`:**
+```markdown
+Follow the instructions in .ai/_framework/commands/task-work.md
+
+Arguments: $ARGUMENTS
+```
+
+**`.claude/commands/task-done.md`:**
+```markdown
+Follow the instructions in .ai/_framework/commands/task-done.md
+
+Arguments: $ARGUMENTS
+```
+
+**`.claude/commands/task-status.md`:**
+```markdown
+Follow the instructions in .ai/_framework/commands/task-status.md
+
+Arguments: $ARGUMENTS
+```
+
+**`.claude/commands/task-resume.md`:**
+```markdown
+Follow the instructions in .ai/_framework/commands/task-resume.md
+
+Arguments: $ARGUMENTS
+```
+
+**`.claude/commands/task-review.md`:**
+```markdown
+Follow the instructions in .ai/_framework/commands/task-review.md
+
+Arguments: $ARGUMENTS
+```
+
+**`.claude/commands/task-explore.md`:**
+```markdown
+Follow the instructions in .ai/_framework/commands/task-explore.md
+
+Arguments: $ARGUMENTS
+```
+
+**`.claude/commands/document.md`:**
+```markdown
+Follow the instructions in .ai/_framework/commands/document.md
+
+Arguments: $ARGUMENTS
+```
+
+**`.claude/commands/enhance.md`:**
+```markdown
+Follow the instructions in .ai/_framework/commands/enhance.md
+
+Arguments: $ARGUMENTS
+```
+
+**`.claude/commands/help.md`:**
+```markdown
+Follow the instructions in .ai/_framework/commands/help.md
+
+Arguments: $ARGUMENTS
+```
+
+**`.claude/commands/command-create.md`:**
+```markdown
+Follow the instructions in .ai/_framework/commands/command-create.md
+
+Arguments: $ARGUMENTS
+```
+
+**For Cursor (Option 2):**
+
+Create command files in `.cursor/commands/` directory:
+
+```bash
+mkdir -p .cursor/commands
+```
+
+Create the same command files as above, but in `.cursor/commands/` instead.
+
+**For Other (Option 3):**
+
+Inform the user:
+```
+Commands are available in .ai/_framework/commands/
+
+To use them, reference the command file when invoking:
+  "Run /task-create following .ai/_framework/commands/task-create.md"
+
+Or configure your AI tool to recognize these as slash commands.
+```
+
+### Step 7: Generate context.md
 
 Create `.ai/context.md` from the template at `_framework/templates/context.md`, filling in all values from the manifest and current state.
 
-### Step 7: Update INDEX.md
+### Step 8: Update INDEX.md
 
 Update `.ai/INDEX.md` to reflect any new documentation created. Add entries to the Documentation table for each repo doc created.
 
-### Step 8: Output Summary
+### Step 9: Output Summary
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
@@ -326,10 +465,25 @@ Created:
   ✓ .ai/docs/{repo}/              - Per-repo documentation
 {/if}
 
+Commands Installed:
+{if Claude Code}
+  ✓ .claude/commands/             - 13 slash commands registered
+    Available: /init, /task-create, /task-start, /task-work,
+               /task-done, /task-status, /task-resume, /task-review,
+               /task-explore, /document, /enhance, /help, /command-create
+{/if}
+{if Cursor}
+  ✓ .cursor/commands/             - 13 slash commands registered
+{/if}
+{if Other}
+  ℹ Commands available in .ai/_framework/commands/
+    Invoke manually: "Follow .ai/_framework/commands/{command}.md"
+{/if}
+
 Next Steps:
   1. Review .ai/_project/manifest.yaml and adjust if needed
-  2. Use /task-create to start your first task
-  3. Use /help to see all available commands
+  2. Try /help to verify commands are working
+  3. Use /task-create to start your first task
 
 Quick Reference:
   • /task-create     Create a new development task
