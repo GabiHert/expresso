@@ -32,6 +32,7 @@ Set up the three-layer AI task framework for a new project. This command gathers
    • Commit/branch conventions?
    • JIRA prefix (or LOCAL)?
    • Which AI tool? (Claude Code, Cursor, Other)
+   • Track customizations in ai-framework repo?
 
 2. EXPLORE CODEBASE (unless --minimal)
    • Launch Explore agents on discovered repos
@@ -53,9 +54,15 @@ Set up the three-layer AI task framework for a new project. This command gathers
    • Register all 13 slash commands
    • Commands become immediately available
 
-5. OUTPUT SUMMARY
+5. CREATE PROJECT BRANCH (if tracking enabled)
+   • Create branch project/{project-name} in ai-framework
+   • Configure remote for syncing and pushing
+   • Enable version control for custom commands
+
+6. OUTPUT SUMMARY
    • What was created
    • Commands installed
+   • Version control status
    • Suggested next steps
 ```
 
@@ -136,7 +143,24 @@ Which AI tool are you using?
   3. Other (manual setup)
 ```
 
-**Q6: Preferences (Optional)**
+**Q6: Framework Version Control**
+```
+Do you want to track project-specific customizations in the ai-framework repository?
+
+This creates a branch for your project where custom commands (created with /command-create)
+can be versioned and shared.
+
+Options:
+  1. Yes - Create branch "project/{project-name}" (Recommended)
+  2. Yes - Custom branch name
+  3. No - Don't track (local only)
+
+If yes, provide:
+  - GitHub repo URL (default: GabiHert/ai-framework)
+  - Branch name (default: project/{project-name-slug})
+```
+
+**Q7: Preferences (Optional)**
 ```
 Any preferences for how I should work?
 - Preferred exploration depth (quick/medium/very thorough)?
@@ -248,6 +272,14 @@ notifications:
   on_task_done: {true/false}
   on_error: true
   mention_user: false
+
+# ============================================================
+# FRAMEWORK VERSION CONTROL
+# ============================================================
+framework:
+  repo: "{github_repo_url}"           # e.g., "GabiHert/ai-framework"
+  branch: "{project_branch}"          # e.g., "project/my-project"
+  track_customizations: {true/false}  # Push custom commands to branch
 ```
 
 ### Step 4: Create Domain Layer
@@ -447,7 +479,63 @@ Create `.ai/context.md` from the template at `_framework/templates/context.md`, 
 
 Update `.ai/INDEX.md` to reflect any new documentation created. Add entries to the Documentation table for each repo doc created.
 
-### Step 9: Output Summary
+### Step 9: Create Project Branch (If Tracking Enabled)
+
+If user chose to track customizations (Q6 option 1 or 2):
+
+**9a. Configure remote:**
+```bash
+# Check if inside the .ai directory
+cd .ai
+
+# Initialize git if not already
+git init 2>/dev/null || true
+
+# Add ai-framework as remote (or verify it exists)
+git remote add ai-framework https://github.com/{repo_url}.git 2>/dev/null || \
+git remote set-url ai-framework https://github.com/{repo_url}.git
+
+# Fetch latest
+git fetch ai-framework main
+```
+
+**9b. Create project branch:**
+```bash
+# Create branch from main
+git checkout -b {project_branch} ai-framework/main
+
+# Push and set upstream
+git push -u ai-framework {project_branch}
+```
+
+**9c. Announce success:**
+```
+╔══════════════════════════════════════════════════════════════════╗
+║ PROJECT BRANCH CREATED                                           ║
+╚══════════════════════════════════════════════════════════════════╝
+
+Repository: {repo_url}
+Branch: {project_branch}
+
+Your project-specific customizations (commands, templates) will be
+tracked in this branch. To sync with framework updates:
+
+  cd .ai
+  git fetch ai-framework main
+  git merge ai-framework/main
+
+To push custom commands after using /command-create:
+
+  cd .ai
+  git add .
+  git commit -m "feat: add custom command"
+  git push ai-framework {project_branch}
+```
+
+**If user chose not to track (option 3):**
+Skip this step and note in output that customizations are local only.
+
+### Step 10: Output Summary
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
@@ -478,6 +566,18 @@ Commands Installed:
 {if Other}
   ℹ Commands available in .ai/_framework/commands/
     Invoke manually: "Follow .ai/_framework/commands/{command}.md"
+{/if}
+
+{if tracking enabled}
+Version Control:
+  ✓ Project branch created        - {project_branch}
+  ✓ Remote configured             - ai-framework → {repo_url}
+
+  Sync framework updates:  git fetch ai-framework main && git merge ai-framework/main
+  Push customizations:     git push ai-framework {project_branch}
+{else}
+Version Control:
+  ℹ Local only - customizations not tracked in remote repository
 {/if}
 
 Next Steps:
