@@ -67,11 +67,45 @@
 
 ## Documentation
 
+### Shared Patterns
+| Pattern | Location | Description |
+|---------|----------|-------------|
+| Sequelize | [docs/_shared/sequelize-patterns.md](./docs/_shared/sequelize-patterns.md) | Sequelize ORM conventions |
+| NATS Events | [docs/_shared/nats-events.md](./docs/_shared/nats-events.md) | Event messaging patterns |
+
+### Architecture
 | Topic | Location | Description |
 |-------|----------|-------------|
-| _shared/ | [docs/_shared/](./docs/_shared/) | Cross-cutting patterns |
-| _architecture/ | [docs/_architecture/](./docs/_architecture/) | System architecture |
+| Overview | [docs/_architecture/overview.md](./docs/_architecture/overview.md) | System architecture, service map |
+
+### Repository Documentation
+| Repo | Location | Description |
+|------|----------|-------------|
+| backend | [docs/backend/](./docs/backend/) | Backend monorepo docs |
+| backend/modules | [docs/backend/modules.md](./docs/backend/modules.md) | ~200 modules guide |
+| backend/entity_transfers | [docs/backend/entity_transfers/](./docs/backend/entity_transfers/) | Entity transfer feature |
+| frontend | [docs/frontend/](./docs/frontend/) | Frontend React app |
+| admin | [docs/admin/](./docs/admin/) | Admin dashboard |
+| peo | [docs/peo/](./docs/peo/) | PEO service |
+| peo/entity_transfers | [docs/peo/entity_transfers/](./docs/peo/entity_transfers/) | Entity transfer handlers |
+| peo/hris_integration | [docs/peo/hris_integration/](./docs/peo/hris_integration/) | HRIS integration (BambooHR, Hibob, Workday) |
+| payroll-processing-api | [docs/payroll-processing-api/](./docs/payroll-processing-api/) | Payroll processing |
+| benefits | [docs/benefits/](./docs/benefits/) | Benefits service |
+| playwright-automation | [docs/playwright-automation/](./docs/playwright-automation/) | E2E testing framework |
+
+### History
+| Document | Location | Description |
+|----------|----------|-------------|
+| Completed Tasks | [docs/_completed_tasks.md](./docs/_completed_tasks.md) | Task history with learnings |
+
+## Tasks
+
+| Status | Location |
+|--------|----------|
+| Todo | [tasks/todo/](./tasks/todo/) |
+| In Progress | [tasks/in_progress/](./tasks/in_progress/) |
+| Done | [tasks/done/](./tasks/done/) |
 
 ---
 
-_Last Updated: 2024-12-19_
+_Last Updated: 2025-12-22_

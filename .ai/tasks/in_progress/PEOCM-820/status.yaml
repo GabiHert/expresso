@@ -1,0 +1,25 @@
+# Task Status Index
+task: "PEOCM-820"
+title: "Add EntityTransfer enum value to PeoContractOrigin database enum"
+created: "2025-12-22"
+updated: "2025-12-22"
+
+summary:
+  total: 2
+  todo: 0
+  in_progress: 0
+  done: 2
+
+work_items:
+  - id: "01"
+    name: "Add entity_transfer to database enum"
+    repo: "peo"
+    status: done
+    file: "done/01-add-entity-transfer-enum-migration.md"
+
+  - id: "02"
+    name: "Update code to use EntityTransfer origin"
+    repo: "backend"
+    status: done
+    file: "done/02-update-code-use-entity-transfer.md"
+
