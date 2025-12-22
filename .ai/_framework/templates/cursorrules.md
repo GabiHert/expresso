@@ -71,6 +71,7 @@ This project uses the AI Task Framework. Key commands:
 - `/ask` - Answer questions using documentation first
 - `/task-explore` - Explore codebase for context
 - `/task-start` - Begin working on a task
+- `/ai-sync` - Sync .ai/ folder with git (commit, push, pull, merge main)
 - `/help` - Show all commands
 
 See `.ai/_framework/commands/` for full command definitions.
