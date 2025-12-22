@@ -44,6 +44,7 @@
 | /task-status | [commands/task-status.md](./_framework/commands/task-status.md) | View dashboard |
 | /task-review | [commands/task-review.md](./_framework/commands/task-review.md) | Code review |
 | /task-explore | [commands/task-explore.md](./_framework/commands/task-explore.md) | Explore code |
+| /ask | [commands/ask.md](./_framework/commands/ask.md) | Answer questions (docs first) |
 | /document | [commands/document.md](./_framework/commands/document.md) | Create docs |
 | /help | [commands/help.md](./_framework/commands/help.md) | Show available commands |
 | /command-create | [commands/command-create.md](./_framework/commands/command-create.md) | Create new framework command |
@@ -58,6 +59,13 @@
 | Task Status | [templates/status.yaml](./_framework/templates/status.yaml) | Work items index |
 | Work Item | [templates/work-item.md](./_framework/templates/work-item.md) | Work item |
 | Repo README | [templates/repo-readme.md](./_framework/templates/repo-readme.md) | Repo docs |
+| Cursor Rules | [templates/cursorrules.md](./_framework/templates/cursorrules.md) | Cursor IDE config |
+
+## Agent Configuration
+
+| Resource | Location | Description |
+|----------|----------|-------------|
+| Agent Behavior | [agent-behavior.md](./_framework/agent-behavior.md) | AI agent instructions |
 
 ## Project Configuration
 

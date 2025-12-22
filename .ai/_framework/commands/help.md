@@ -41,6 +41,7 @@ Display available commands grouped by category.
 ║   /task-review Run code review                                   ║
 ║                                                                   ║
 ║ EXPLORATION                                                       ║
+║   /ask         Answer questions (docs first)                     ║
 ║   /task-explore Explore codebase for context                     ║
 ║                                                                   ║
 ║ DOCUMENTATION                                                     ║
@@ -85,6 +86,7 @@ Output the following categorized command reference:
 ║   /task-review Run code review                                   ║
 ║                                                                   ║
 ║ EXPLORATION                                                       ║
+║   /ask         Answer questions (docs first)                     ║
 ║   /task-explore Explore codebase for context                     ║
 ║                                                                   ║
 ║ DOCUMENTATION                                                     ║
@@ -116,8 +118,8 @@ When user provides `/help <command>`:
    Command '/{command}' not found.
 
    Available commands: init, enhance, task-create, task-start, task-resume,
-   task-work, task-done, task-status, task-review, task-explore, document,
-   help, command-create
+   task-work, task-done, task-status, task-review, task-explore, ask,
+   document, help, command-create
 
    Use /help to see all commands with descriptions.
    ```
