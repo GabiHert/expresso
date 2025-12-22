@@ -50,6 +50,7 @@ Display available commands grouped by category.
 ║ META                                                              ║
 ║   /help           Show this help (or /help <cmd> for details)   ║
 ║   /command-create Create a new framework command                 ║
+║   /ai-sync        Sync .ai/ folder with git repository           ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║ START: Read .ai/context.md for project overview                 ║
 ║ NAV:   See .ai/INDEX.md for full navigation                     ║
@@ -95,6 +96,7 @@ Output the following categorized command reference:
 ║ META                                                              ║
 ║   /help           Show this help (or /help <cmd> for details)   ║
 ║   /command-create Create a new framework command                 ║
+║   /ai-sync        Sync .ai/ folder with git repository           ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║ START: Read .ai/context.md for project overview                 ║
 ║ NAV:   See .ai/INDEX.md for full navigation                     ║
@@ -119,7 +121,7 @@ When user provides `/help <command>`:
 
    Available commands: init, enhance, task-create, task-start, task-resume,
    task-work, task-done, task-status, task-review, task-explore, ask,
-   document, help, command-create
+   document, help, command-create, ai-sync
 
    Use /help to see all commands with descriptions.
    ```
