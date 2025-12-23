@@ -48,6 +48,7 @@
 | /document | [commands/document.md](./_framework/commands/document.md) | Create docs |
 | /help | [commands/help.md](./_framework/commands/help.md) | Show available commands |
 | /command-create | [commands/command-create.md](./_framework/commands/command-create.md) | Create new framework command |
+| /command-extend | [commands/command-extend.md](./_framework/commands/command-extend.md) | Extend commands at project level |
 | /ai-sync | [commands/ai-sync.md](./_framework/commands/ai-sync.md) | Sync .ai/ with git repo |
 
 ## Templates

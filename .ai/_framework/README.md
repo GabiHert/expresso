@@ -40,6 +40,7 @@ A reusable, three-layer system for AI-assisted development workflows.
 | `/document` | Create documentation |
 | `/help` | Show available commands |
 | `/command-create` | Create new framework command |
+| `/command-extend` | Extend commands at project level |
 
 ## Templates
 
@@ -92,12 +93,12 @@ Tasks contain work items organized by status:
 
 ## Status
 
-All 13 commands are fully implemented with step-by-step prompts that guide the AI through each workflow.
+All 14 commands are fully implemented with step-by-step prompts that guide the AI through each workflow.
 
 ## Implementation Checklist
 
 - [x] Core directory structure
-- [x] Command implementations (13 commands)
+- [x] Command implementations (14 commands)
 - [x] Template files (6 templates)
 - [x] Framework README
 - [x] Complete command prompts
