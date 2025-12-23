@@ -149,6 +149,20 @@ After task creation:
 
 ## Implementation
 
+### Questioning Strategy (AI-Agnostic)
+
+This command gathers information through questions. Use the appropriate method for your environment:
+
+**Claude Code (structured questions available):**
+Use the `AskUserQuestion` tool with options for guided selection.
+
+**Cursor / Other Editors (plain prompts):**
+Use markdown prompts and wait for free-form user responses.
+
+Each step below shows both formats. Use whichever matches your environment.
+
+---
+
 ### Step 0: Orientation
 
 1. Read `.ai/_project/manifest.yaml` to understand project context.
@@ -180,6 +194,29 @@ Extensions auto-merge when you run the base command.
 - If not found, list available commands and ask for valid name
 
 **If no command name:**
+
+<details>
+<summary>📘 Claude Code (structured)</summary>
+
+```
+AskUserQuestion:
+  question: "Which framework command do you want to extend?"
+  header: "Command"
+  options:
+    - label: "task-create"
+      description: "Create a new development task"
+    - label: "task-work"
+      description: "Implement work items"
+    - label: "task-start"
+      description: "Begin working on a task"
+    - label: "task-review"
+      description: "Run code review"
+```
+</details>
+
+<details>
+<summary>📙 Cursor / Plain (markdown prompt)</summary>
+
 ```
 Which framework command do you want to extend?
 
@@ -195,6 +232,7 @@ Available commands:
 
 Command to extend: /
 ```
+</details>
 
 ### Step 2: Read Base Command
 
@@ -223,6 +261,31 @@ Extensible Points:
 
 ### Step 3: Gather Context
 
+<details>
+<summary>📘 Claude Code (structured)</summary>
+
+```
+AskUserQuestion:
+  question: "What type of context should be injected into the orientation phase?"
+  header: "Context"
+  multiSelect: true
+  options:
+    - label: "TDD/BDD workflow"
+      description: "Tests must be written first, use testing agents"
+    - label: "API documentation"
+      description: "OpenAPI specs required for API changes"
+    - label: "Custom agents"
+      description: "Use specific agents for exploration/review"
+    - label: "Custom (describe)"
+      description: "I'll describe my own context"
+```
+
+If user selects options, follow up for details on each.
+</details>
+
+<details>
+<summary>📙 Cursor / Plain (markdown prompt)</summary>
+
 ```
 CONTEXT INJECTION
 
@@ -235,8 +298,40 @@ Examples:
 
 Your context (or 'skip' to skip this section):
 ```
+</details>
 
 ### Step 4: Gather Agents
+
+<details>
+<summary>📘 Claude Code (structured)</summary>
+
+```
+AskUserQuestion (Question 1):
+  question: "Which agent should handle exploration phases?"
+  header: "Exploration"
+  options:
+    - label: "Default (Explore)"
+      description: "Use the standard Explore agent"
+    - label: "feature-dev:code-explorer"
+      description: "Feature development explorer with deeper analysis"
+    - label: "Custom agent"
+      description: "I'll specify a custom agent"
+
+AskUserQuestion (Question 2):
+  question: "Which agent should handle review phases?"
+  header: "Review"
+  options:
+    - label: "Default (code-reviewer)"
+      description: "Use the standard code-reviewer agent"
+    - label: "feature-dev:code-reviewer"
+      description: "Feature development reviewer with stricter checks"
+    - label: "Custom agent"
+      description: "I'll specify a custom agent"
+```
+</details>
+
+<details>
+<summary>📙 Cursor / Plain (markdown prompt)</summary>
 
 ```
 CUSTOM AGENTS
@@ -257,8 +352,34 @@ Review Phase:
 Additional agents to invoke:
   (e.g., "Run BDD validator after exploration")
 ```
+</details>
 
 ### Step 5: Gather Pre-Hooks
+
+<details>
+<summary>📘 Claude Code (structured)</summary>
+
+```
+AskUserQuestion:
+  question: "What should happen BEFORE the base command workflow starts?"
+  header: "Pre-Hooks"
+  multiSelect: true
+  options:
+    - label: "Check for tests/specs"
+      description: "Verify existing tests or BDD specs before proceeding"
+    - label: "Validate branch"
+      description: "Check branch naming conventions"
+    - label: "Check prerequisites"
+      description: "Verify required files or dependencies exist"
+    - label: "None"
+      description: "No pre-hooks needed"
+```
+
+If user selects hooks, follow up for specific details on each.
+</details>
+
+<details>
+<summary>📙 Cursor / Plain (markdown prompt)</summary>
 
 ```
 PRE-HOOKS
@@ -272,8 +393,41 @@ Examples:
 
 Pre-hooks (describe steps, or 'none'):
 ```
+</details>
 
 ### Step 6: Gather Step Overrides
+
+<details>
+<summary>📘 Claude Code (structured)</summary>
+
+```
+AskUserQuestion:
+  question: "Do you want to override any steps in the base workflow?"
+  header: "Overrides"
+  options:
+    - label: "Yes, select steps"
+      description: "I want to replace specific workflow steps"
+    - label: "No overrides"
+      description: "Keep all base workflow steps as-is"
+```
+
+If "Yes", present the base workflow steps and ask:
+```
+AskUserQuestion:
+  question: "Which steps do you want to override?"
+  header: "Steps"
+  multiSelect: true
+  options:
+    - label: "Step {N}: {name}"
+      description: "{brief description of what it does}"
+    # ... dynamic based on base command
+```
+
+For each selected step, ask for the replacement workflow.
+</details>
+
+<details>
+<summary>📙 Cursor / Plain (markdown prompt)</summary>
 
 ```
 STEP OVERRIDES
@@ -298,8 +452,34 @@ Original behavior:
 Your replacement workflow:
 (describe what should happen instead)
 ```
+</details>
 
 ### Step 7: Gather Post-Hooks
+
+<details>
+<summary>📘 Claude Code (structured)</summary>
+
+```
+AskUserQuestion:
+  question: "What should happen AFTER the base command workflow completes?"
+  header: "Post-Hooks"
+  multiSelect: true
+  options:
+    - label: "Generate test skeletons"
+      description: "Create test file placeholders with TODOs"
+    - label: "Update documentation"
+      description: "Auto-update relevant docs"
+    - label: "Run validations"
+      description: "Execute additional checks or linting"
+    - label: "None"
+      description: "No post-hooks needed"
+```
+
+If user selects hooks, follow up for specific details on each.
+</details>
+
+<details>
+<summary>📙 Cursor / Plain (markdown prompt)</summary>
 
 ```
 POST-HOOKS
@@ -313,10 +493,12 @@ Examples:
 
 Post-hooks (describe steps, or 'none'):
 ```
+</details>
 
 ### Step 8: Confirm Extension
 
-Present summary:
+Present the summary, then ask for confirmation:
+
 ```
 ╔══════════════════════════════════════════════════════════════════╗
 ║ EXTENSION SUMMARY                                                ║
@@ -341,9 +523,30 @@ STEP OVERRIDES
 
 POST-HOOKS
 {list or "None"}
-
-Create this extension? (y/n)
 ```
+
+<details>
+<summary>📘 Claude Code (structured)</summary>
+
+```
+AskUserQuestion:
+  question: "Does this extension configuration look correct?"
+  header: "Confirm"
+  options:
+    - label: "Yes, create it"
+      description: "Proceed with creating the extension file"
+    - label: "No, make changes"
+      description: "Go back and modify the configuration"
+```
+</details>
+
+<details>
+<summary>📙 Cursor / Plain (markdown prompt)</summary>
+
+```
+Create this extension? (y/n, or describe changes needed)
+```
+</details>
 
 ### Step 9: Create Extension File
 
