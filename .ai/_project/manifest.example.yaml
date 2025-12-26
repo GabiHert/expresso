@@ -69,6 +69,21 @@ conventions:
       - "PROJ-123-fix-auth-bug"
       - "PROJ-456-add-user-endpoint"
 
+  # Git worktrees (for isolated task work)
+  worktrees:
+    enabled: true                               # Worktree support for --worktree flag
+    base_path: "../worktrees"                   # Base directory for worktrees (relative to project root)
+    pattern: "{TICKET}/{repo}"                  # Directory pattern within base_path
+    base_branch: "origin/master"                # Branch to create worktree from
+    symlinks:                                   # Symlinks to create in each worktree (relative to project root)
+      - ".ai"
+      - ".claude"
+      - ".cursor"
+    # Example: /task-start PROJ-123 --worktree creates:
+    #   ../worktrees/PROJ-123/backend/  (worktree of backend repo)
+    #   ../worktrees/PROJ-123/frontend/ (worktree of frontend repo)
+    #   Each with symlinks: .ai -> ../../../.ai, etc.
+
   # JIRA configuration
   jira:
     prefix: "PROJ"
