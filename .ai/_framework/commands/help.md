@@ -41,6 +41,7 @@ Display available commands grouped by category.
 ║   /task-review Run code review                                   ║
 ║                                                                   ║
 ║ EXPLORATION                                                       ║
+║   /ask         Answer questions (docs first)                     ║
 ║   /task-explore Explore codebase for context                     ║
 ║                                                                   ║
 ║ DOCUMENTATION                                                     ║
@@ -49,6 +50,8 @@ Display available commands grouped by category.
 ║ META                                                              ║
 ║   /help           Show this help (or /help <cmd> for details)   ║
 ║   /command-create Create a new framework command                 ║
+║   /command-extend Extend commands at project level               ║
+║   /ai-sync        Sync .ai/ folder with git repository           ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║ START: Read .ai/context.md for project overview                 ║
 ║ NAV:   See .ai/INDEX.md for full navigation                     ║
@@ -85,6 +88,7 @@ Output the following categorized command reference:
 ║   /task-review Run code review                                   ║
 ║                                                                   ║
 ║ EXPLORATION                                                       ║
+║   /ask         Answer questions (docs first)                     ║
 ║   /task-explore Explore codebase for context                     ║
 ║                                                                   ║
 ║ DOCUMENTATION                                                     ║
@@ -93,6 +97,8 @@ Output the following categorized command reference:
 ║ META                                                              ║
 ║   /help           Show this help (or /help <cmd> for details)   ║
 ║   /command-create Create a new framework command                 ║
+║   /command-extend Extend commands at project level               ║
+║   /ai-sync        Sync .ai/ folder with git repository           ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║ START: Read .ai/context.md for project overview                 ║
 ║ NAV:   See .ai/INDEX.md for full navigation                     ║
@@ -116,8 +122,8 @@ When user provides `/help <command>`:
    Command '/{command}' not found.
 
    Available commands: init, enhance, task-create, task-start, task-resume,
-   task-work, task-done, task-status, task-review, task-explore, document,
-   help, command-create
+   task-work, task-done, task-status, task-review, task-explore, ask,
+   document, help, command-create, command-extend, ai-sync
 
    Use /help to see all commands with descriptions.
    ```

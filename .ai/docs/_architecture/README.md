@@ -14,11 +14,9 @@ This directory contains high-level architecture documentation.
 
 ## Contents
 
-<!-- Add architecture docs here as they are created -->
-
 | Document | Description |
 |----------|-------------|
-| _None yet_ | Use `/document` to add architecture docs |
+| [overview.md](./overview.md) | High-level architecture, service map, technologies |
 
 ## What Belongs Here
 

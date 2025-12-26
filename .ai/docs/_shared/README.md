@@ -14,11 +14,10 @@ This directory contains documentation for patterns that span multiple repositori
 
 ## Contents
 
-<!-- Add shared patterns here as they are documented -->
-
 | Pattern | Description |
 |---------|-------------|
-| _None yet_ | Use `/document` to add shared patterns |
+| [sequelize-patterns.md](./sequelize-patterns.md) | Sequelize ORM patterns used across services |
+| [nats-events.md](./nats-events.md) | NATS JetStream event-driven architecture |
 
 ## When to Add Here
 
