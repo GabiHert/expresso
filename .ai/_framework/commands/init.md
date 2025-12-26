@@ -33,6 +33,7 @@ Set up the three-layer AI task framework for a new project. This command gathers
    • JIRA prefix (or LOCAL)?
    • Which AI tool? (Claude Code, Cursor, Other)
    • Track customizations in ai-framework repo?
+   • Use lightweight model for simple commands?
 
 2. EXPLORE CODEBASE (unless --minimal)
    • Launch Explore agents on discovered repos
@@ -53,6 +54,11 @@ Set up the three-layer AI task framework for a new project. This command gathers
    • Create .claude/commands/ or .cursor/commands/
    • Register all 13 slash commands
    • Commands become immediately available
+
+4b. CREATE LIGHTWEIGHT AGENTS (Claude Code only)
+   • Create .claude/agents/ for cost-optimized commands
+   • task-status, help, ai-sync use Haiku model
+   • ~70% cost savings for simple operations
 
 5. CREATE PROJECT BRANCH (if tracking enabled)
    • Create branch project/{project-name} in ai-framework
@@ -168,6 +174,24 @@ Any preferences for how I should work?
 - Any special instructions?
 ```
 
+**Q8: Lightweight Commands (Claude Code only)**
+```
+Some commands are simple and don't need the most powerful model.
+Would you like to use a faster/cheaper model (Haiku) for these?
+
+Recommended lightweight commands:
+  • task-status  - View task dashboard
+  • help         - Show available commands
+  • ai-sync      - Sync .ai folder with git
+
+Options:
+  1. Yes - Use Haiku for recommended commands (Recommended, ~70% cost savings)
+  2. Yes - Let me choose which commands
+  3. No  - Use default model for all commands
+```
+
+If option 2, show all available commands and let user select which should be lightweight.
+
 Collect all answers before proceeding.
 
 ### Step 2: Explore Codebase (Optional)
@@ -280,6 +304,26 @@ framework:
   repo: "{github_repo_url}"           # e.g., "GabiHert/ai-framework"
   branch: "{project_branch}"          # e.g., "project/my-project"
   track_customizations: {true/false}  # Push custom commands to branch
+
+# ============================================================
+# MODEL OPTIMIZATION (Claude Code only)
+# ============================================================
+# Commands that use a faster/cheaper model via subagents
+lightweight_commands:
+  enabled: {true/false}
+  model: haiku                        # haiku or sonnet
+  commands:                           # Commands to run on lightweight model
+{for each lightweight_command}
+    - {command_name}
+{/for}
+
+# ============================================================
+# AUTO-SYNC
+# ============================================================
+# Automatically sync .ai/ changes after each command
+auto_sync:
+  enabled: true                       # Auto-commit and push after commands
+  use_agent: true                     # Use lightweight ai-sync agent (Haiku)
 ```
 
 ### Step 4: Create Domain Layer
@@ -471,6 +515,40 @@ To use them, reference the command file when invoking:
 Or configure your AI tool to recognize these as slash commands.
 ```
 
+### Step 6b: Create Lightweight Subagents (Claude Code only)
+
+**Skip this step if:**
+- User selected Cursor or Other in Q5
+- User selected option 3 (No) in Q8
+
+**If lightweight commands are enabled (Q8 option 1 or 2):**
+
+Create the `.claude/agents/` directory:
+```bash
+mkdir -p .claude/agents
+```
+
+For each command in the lightweight_commands list, create a subagent file.
+
+**Agent templates are located at:** `.ai/_framework/templates/agents/`
+
+**Default lightweight agents to create:**
+
+Copy from templates to `.claude/agents/`:
+```bash
+cp .ai/_framework/templates/agents/task-status.md .claude/agents/
+cp .ai/_framework/templates/agents/help.md .claude/agents/
+cp .ai/_framework/templates/agents/ai-sync.md .claude/agents/
+```
+
+**For custom lightweight commands**, use the generic template:
+- Template: `.ai/_framework/templates/agents/lightweight-agent.md`
+- Copy and replace `{command-name}` with the actual command name
+- Adjust `tools` list based on what the command needs
+
+**Note:** The slash commands (e.g., `/task-status`) still work and use the default model.
+To use the lightweight version, invoke the subagent: "Use the task-status agent to show status"
+
 ### Step 7: Generate context.md
 
 Create `.ai/context.md` from the template at `_framework/templates/context.md`, filling in all values from the manifest and current state.
@@ -566,6 +644,15 @@ Commands Installed:
 {if Other}
   ℹ Commands available in .ai/_framework/commands/
     Invoke manually: "Follow .ai/_framework/commands/{command}.md"
+{/if}
+
+{if Claude Code AND lightweight_commands enabled}
+Lightweight Agents (Haiku):
+  ✓ .claude/agents/               - Cost-optimized subagents
+    Agents: {list of lightweight commands}
+
+  Usage: "Use the {agent-name} agent to..."
+  Savings: ~70% compared to Opus for simple operations
 {/if}
 
 {if tracking enabled}

@@ -436,4 +436,19 @@ Quick Commands:
   • /task-status                View dashboard
 ```
 
+### Step 10: Auto-Sync (if enabled)
+
+Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
+
+**If auto_sync is enabled:**
+
+Use the ai-sync agent (lightweight/Haiku) to commit and push changes:
+```
+Use the ai-sync agent to sync the .ai folder changes
+```
+
+This ensures task creation is tracked in version control automatically.
+
+**If auto_sync is disabled:** Skip this step.
+
 Then stop. Do not proceed further.
