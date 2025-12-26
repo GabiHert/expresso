@@ -1,7 +1,7 @@
 <!--
 ╔══════════════════════════════════════════════════════════════════╗
 ║ LAYER: TASK                                                      ║
-║ LOCATION: .ai/tasks/in_progress/PEOCM-819/                        ║
+║ LOCATION: .ai/tasks/done/PEOCM-819/                               ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║ BEFORE WORKING ON THIS TASK:                                     ║
 ║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)           ║

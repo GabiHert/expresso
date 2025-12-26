@@ -59,6 +59,11 @@ See `status.yaml` for full index.
 | 06 | Backend EntityTransferRepository update | backend | done |
 | 07 | Backend tech ops GET endpoints | backend | done |
 | 08 | Unit tests | backend, peo | done |
+| 10 | Fix new_employment_payroll_setting_id type (UUID → TEXT) | peo | todo |
+| 11 | Fix new_pto_policy_id type (VARCHAR → UUID) | peo | todo |
+| 12 | Fix new_work_location_id type (VARCHAR → UUID) | peo | todo |
+| 13 | Fix new_contract_oid type (VARCHAR(100) → VARCHAR(20)) | peo | todo |
+| 14 | Fix requester_profile_public_id type (INTEGER → UUID) | peo | todo |
 | 09 | End-to-end testing | backend, peo | todo |
 
 ## Branches
@@ -148,6 +153,27 @@ Created 3 tables in PEO service:
 - Deployment order is critical (PEO before backend)
 - Existing transfers without DB records will fail on resume
 - Need to test with production-like data volumes
+
+## Schema Type Issues (CRITICAL)
+
+During exploration, the following type mismatches were discovered:
+
+### peo_employee_transfers (main table)
+
+| Field | Current Type | Should Be | Severity | Issue |
+|-------|--------------|-----------|----------|-------|
+| `requester_profile_public_id` | INTEGER | UUID | **CRITICAL** | Column name says "public_id" but type is INTEGER. `profile.public_id` is UUID. Semantic mismatch - misleading column name. |
+
+### peo_employee_transfer_items (items table)
+
+| Field | Current Type | Should Be | Severity | Issue |
+|-------|--------------|-----------|----------|-------|
+| `new_employment_payroll_setting_id` | UUID | TEXT | **CRITICAL** | `employment.payroll_settings.id` uses mixed formats (UUIDs + CUIDs like `clu6rwbbl0km9uu01oxe3xts9`). UUID type CANNOT store CUIDs - will cause INSERT failures. |
+| `new_pto_policy_id` | VARCHAR(64) | UUID | Medium | `time_off.policies.uid` is UUID. Works but loses type safety. |
+| `new_work_location_id` | VARCHAR(100) | UUID | Medium | `entity_work_locations.public_id` is UUID. Works but loses type safety. |
+| `new_contract_oid` | VARCHAR(100) | VARCHAR(20) | Low | Inconsistent with `base_contract_oid` in same table and `peo_contracts.deel_contract_oid`. |
+
+Work items 10-14 address these issues.
 
 ## Testing Strategy
 

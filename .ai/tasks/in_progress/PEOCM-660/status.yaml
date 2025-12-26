@@ -54,6 +54,36 @@ work_items:
     repo: backend, peo
     status: done
 
+  - id: "10"
+    name: Fix new_employment_payroll_setting_id type (UUID → TEXT)
+    repo: peo
+    status: done
+    file: done/10-fix-payroll-setting-id-type.md
+
+  - id: "11"
+    name: Fix new_pto_policy_id type (VARCHAR → UUID)
+    repo: peo
+    status: done
+    file: done/11-fix-pto-policy-id-type.md
+
+  - id: "12"
+    name: Fix new_work_location_id type (VARCHAR → UUID)
+    repo: peo
+    status: done
+    file: done/12-fix-work-location-id-type.md
+
+  - id: "13"
+    name: Fix new_contract_oid type (VARCHAR(100) → VARCHAR(20))
+    repo: peo
+    status: done
+    file: done/13-fix-contract-oid-type.md
+
+  - id: "14"
+    name: Fix requester_profile_public_id type (INTEGER → UUID)
+    repo: peo
+    status: done
+    file: done/14-fix-requester-profile-public-id-type.md
+
   - id: "09"
     name: End-to-end testing
     repo: backend, peo

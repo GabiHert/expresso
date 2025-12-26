@@ -1,0 +1,19 @@
+# Task Status Index
+task: "PEOCM-792-4"
+title: "Filter positions without code in transfer_resources"
+created: "2025-12-26"
+updated: "2025-12-26"
+
+summary:
+  total: 1
+  todo: 0
+  in_progress: 0
+  done: 1
+
+work_items:
+  - id: "01"
+    name: "filter-positions-without-code"
+    repo: "backend"
+    status: done
+    file: "done/01-filter-positions-without-code.md"
+

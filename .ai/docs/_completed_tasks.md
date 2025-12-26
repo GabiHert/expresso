@@ -163,6 +163,54 @@
 
 ---
 
+## 2025-12-26: PEOCM-819 - Fix HiBob HRIS sync overwriting Contract effectiveDate
+
+**Repos affected**: backend
+**JIRA**: [PEOCM-819](https://letsdeel.atlassian.net/browse/PEOCM-819)
+
+**Summary**: Fixed HiBob HRIS sync overwriting Contract effectiveDate - removed effectiveDate/effectivePlainDate from HRIS sync updates.
+
+**Key changes**:
+- Removed `effectiveDate` and `effectivePlainDate` from Contract updates in `job_data_update_builder.ts`
+- Removed `effectiveDate` and `effectivePlainDate` from Contract updates in `peo_hris_sync_service.ts`
+- Updated unit tests to expect correct behavior (no effectiveDate in contract updates)
+- `initialEffectiveDate` and `initialEffectivePlainDate` still updated correctly
+
+**Files modified**:
+- `services/peo/integrations/hris_integration_update/builders/job_data_update_builder.ts`
+- `services/peo/peo_hris_sync_service.ts`
+- Unit tests updated
+
+**Learnings**:
+- HiBob's `startDate` maps to `peoStartDate`, not the agreement `effectiveDate`
+- Contract `effectiveDate` is the agreement start date - should never be overwritten by HRIS sync
+- `initialEffectiveDate` is for first-time setup only and is correct to update
+
+---
+
+## 2025-12-26: PEOCM-820 - Add EntityTransfer enum to PeoContractOrigin
+
+**Repos affected**: peo, backend
+**JIRA**: [PEOCM-820](https://letsdeel.atlassian.net/browse/PEOCM-820)
+
+**Summary**: Added entity_transfer value to PeoContractOrigin database enum and updated code to use EntityTransfer origin.
+
+**Key changes**:
+- Created migration to add `'entity_transfer'` to `peo.enum_peo_contracts_origin` enum
+- Updated `create_contract_step.ts` to use `PeoContractOrigin.EntityTransfer` instead of `PeoContractOrigin.Hibob`
+- Removed TODO comments referencing PEOCM-660
+
+**Deployment order**:
+1. Deploy peo migration first (adds enum value)
+2. Deploy backend code changes (uses new enum value)
+
+**Learnings**:
+- TypeScript enums and PostgreSQL enums must stay in sync
+- `ALTER TYPE ... ADD VALUE IF NOT EXISTS` is safe for enum additions
+- Always check database enum values match TypeScript enum values
+
+---
+
 ## 2025-12-17: PEOCM-661-5 - Change basePeoContractId to basePeoContractOid
 
 **Repos affected**: backend, peo
