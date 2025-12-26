@@ -14,7 +14,9 @@
 
 Sync the `.ai/` folder with its git repository. Commits local changes, pushes to origin, pulls updates, and merges the main branch for framework updates.
 
-This command manages the `.ai-framework/` git repository that contains your `.ai/` content.
+This command supports two modes:
+- **Standalone mode**: `.ai-framework/` git repository with `.ai` as symlink
+- **Embedded mode**: `.ai/` as a regular directory within the main project repo
 
 ## Usage
 
@@ -25,9 +27,9 @@ This command manages the `.ai-framework/` git repository that contains your `.ai
 /ai-sync --push-only               # Only commit and push, don't pull
 ```
 
-## Prerequisites
+## Supported Configurations
 
-The project must have `.ai/` set up as a symlink to a git repository:
+### Standalone Mode (separate repo)
 ```
 project/
 ├── .ai -> .ai-framework/.ai       # Symlink
@@ -36,15 +38,23 @@ project/
     └── .ai/
 ```
 
+### Embedded Mode (within project repo)
+```
+project/
+├── .git/                          # Main project git repo
+└── .ai/                           # Regular directory (tracked by main repo)
+```
+
 ## Workflow
 
 ```
-1. VERIFY SETUP
-   • Check .ai-framework/ exists and is a git repo
-   • Identify current branch
+1. DETECT MODE
+   • Check if .ai-framework/ exists → Standalone mode
+   • Otherwise check if .ai/ is in a git repo → Embedded mode
+   • Determine GIT_DIR and PATH_PREFIX accordingly
 
 2. CHECK STATUS
-   • Run git status to see changes
+   • Run git status to see .ai/ changes
    • Report what will be committed
 
 3. COMMIT CHANGES (if any)
@@ -55,7 +65,7 @@ project/
    • Pull current branch from origin
    • Handle merge conflicts if any
 
-5. MERGE MAIN (framework updates)
+5. MERGE MAIN (framework updates) [Standalone mode only]
    • Fetch main branch
    • Merge main into current branch
    • Handle conflicts if any
@@ -79,56 +89,82 @@ Announce:
 ╚══════════════════════════════════════════════════════════════════╝
 ```
 
-### Step 1: Verify Setup
+### Step 1: Detect Mode and Verify Setup
 
-Check that the git repository exists:
+Detect which mode the project uses:
 
 ```bash
-# Find the .ai-framework directory (relative to project root)
-# It should be at the same level as .ai symlink
+# Check for standalone mode first
+if [ -d ".ai-framework" ] && [ -d ".ai-framework/.git" ]; then
+    MODE="standalone"
+    GIT_DIR=".ai-framework"
+    PATH_PREFIX=""
+# Check for embedded mode (main project is a git repo with .ai/ directory)
+elif [ -d ".git" ] && [ -d ".ai" ]; then
+    MODE="embedded"
+    GIT_DIR="."
+    PATH_PREFIX=".ai/"
+else
+    # No valid configuration found
+    MODE="none"
+fi
 ```
 
-**If `.ai-framework/` doesn't exist:**
+**Output the detected mode:**
 ```
-ERROR: .ai-framework/ directory not found.
+MODE: {standalone|embedded}
 
-This command requires .ai/ to be set up as a git repository.
-Expected structure:
-  project/.ai-framework/    ← Git repo
-  project/.ai -> .ai-framework/.ai
+Standalone: .ai-framework/ is a separate git repository
+Embedded: .ai/ is tracked within the main project repository
+```
+
+**If no valid configuration found:**
+```
+ERROR: No valid git configuration found for .ai/
+
+Expected one of:
+  1. Standalone: .ai-framework/ directory with .git/
+  2. Embedded: Project root has .git/ and .ai/ directory
 
 Run /init or manually set up the git repository.
 ```
 
-**If not a git repo:**
+**If git repo exists but no remote configured:**
 ```
-ERROR: .ai-framework/ is not a git repository.
+WARNING: No remote 'origin' configured.
 
-Initialize it with:
-  git -C .ai-framework init
-  git -C .ai-framework remote add origin <url>
+Add a remote to enable push/pull:
+  git remote add origin <git-url>
+
+Continuing with local-only sync...
 ```
 
 ### Step 2: Check Current State
 
 ```bash
-git -C .ai-framework status
-git -C .ai-framework branch -v
+# For standalone mode:
+git -C $GIT_DIR status
+git -C $GIT_DIR branch -v
+
+# For embedded mode, filter to .ai/ changes only:
+git status -- .ai/
+git branch -v
 ```
 
 Output:
 ```
 CURRENT STATE
 
+Mode: {standalone|embedded}
 Branch: {branch-name}
 Remote: {origin-url}
 
-Changes:
+Changes in .ai/:
   {list of modified/added/deleted files}
 
   OR
 
-  No uncommitted changes.
+  No uncommitted changes in .ai/
 ```
 
 ### Step 3: Parse Arguments
@@ -142,9 +178,9 @@ Changes:
 
 **If `--pull-only`, skip this step.**
 
-**If no changes:**
+**If no changes in .ai/:**
 ```
-No changes to commit.
+No changes to commit in .ai/
 ```
 
 **If changes exist:**
@@ -160,8 +196,13 @@ Auto-generated based on changes:
 
 Execute:
 ```bash
+# For standalone mode:
 git -C .ai-framework add -A
 git -C .ai-framework commit -m "{message}"
+
+# For embedded mode (only stage .ai/ changes):
+git add .ai/
+git commit -m "{message}"
 ```
 
 Output:
@@ -179,8 +220,14 @@ COMMITTED
 
 **If `--push-only`, skip this step.**
 
+**If no remote configured, skip this step with warning.**
+
 ```bash
+# For standalone mode:
 git -C .ai-framework pull origin {current-branch}
+
+# For embedded mode:
+git pull origin {current-branch}
 ```
 
 **If conflicts:**
@@ -191,7 +238,7 @@ Conflicting files:
   • {file1}
   • {file2}
 
-Please resolve conflicts manually in .ai-framework/ and run /ai-sync again.
+Please resolve conflicts manually and run /ai-sync again.
 ```
 
 Then stop.
@@ -208,6 +255,8 @@ PULLED
 ```
 
 ### Step 6: Merge Main Branch
+
+**STANDALONE MODE ONLY - Skip entirely for embedded mode.**
 
 **If `--push-only`, skip this step.**
 
@@ -242,12 +291,26 @@ MERGED MAIN
   Already up to date with main.
 ```
 
+**For embedded mode:**
+```
+MERGE MAIN: Skipped (embedded mode)
+
+  In embedded mode, .ai/ is part of the main project.
+  Framework updates come through normal project git workflow.
+```
+
 ### Step 7: Push to Origin
 
 **If `--pull-only`, skip this step.**
 
+**If no remote configured, skip this step with warning.**
+
 ```bash
+# For standalone mode:
 git -C .ai-framework push origin {current-branch}
+
+# For embedded mode:
+git push origin {current-branch}
 ```
 
 **If push fails (remote has changes):**
@@ -271,12 +334,13 @@ PUSHED
 ║ AI-SYNC COMPLETE                                                 ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║                                                                  ║
+║ Mode: {standalone|embedded}                                      ║
 ║ Branch: {branch}                                                 ║
 ║                                                                  ║
 ║ Actions:                                                         ║
 ║   ✓ Committed {n} files                                         ║
 ║   ✓ Pulled from origin                                          ║
-║   ✓ Merged main (framework updates)                             ║
+║   ✓ Merged main (framework updates)  [standalone only]          ║
 ║   ✓ Pushed to origin                                            ║
 ║                                                                  ║
 ╚══════════════════════════════════════════════════════════════════╝
@@ -288,10 +352,15 @@ Then stop. Do not proceed further.
 
 ### Remote not configured
 ```
-ERROR: No remote 'origin' configured.
+WARNING: No remote 'origin' configured.
 
-Add a remote:
+For standalone mode:
   git -C .ai-framework remote add origin <git-url>
+
+For embedded mode:
+  git remote add origin <git-url>
+
+Continuing with local-only operations...
 ```
 
 ### Authentication failed
@@ -305,6 +374,13 @@ Check your git credentials for the remote repository.
 ```
 ERROR: HEAD is detached.
 
-Checkout a branch:
-  git -C .ai-framework checkout deel
+Checkout a branch first:
+  git checkout <branch-name>
+```
+
+### No .ai/ directory
+```
+ERROR: No .ai/ directory found.
+
+Run /init to set up the AI framework for this project.
 ```
