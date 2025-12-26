@@ -16,7 +16,7 @@
 |-------|-------|
 | **Project** | Deel Platform |
 | **Description** | Global HR and payroll platform with PEO, EOR, and contractor management services |
-| **Root** | /Users/gabriel.herter/Documents/Projects/deel |
+| **Root** | /Users/gabriel.herter/Documents/Projects/new_deel |
 
 ## Repositories
 
