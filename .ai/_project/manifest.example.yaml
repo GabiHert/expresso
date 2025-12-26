@@ -71,7 +71,7 @@ conventions:
 
   # Git worktrees (for isolated task work)
   worktrees:
-    enabled: false                              # Set to true to enable --worktree support
+    enabled: true                               # Worktree support for --worktree flag
     base_path: "../worktrees"                   # Base directory for worktrees (relative to project root)
     pattern: "{TICKET}/{repo}"                  # Directory pattern within base_path
     base_branch: "origin/master"                # Branch to create worktree from
