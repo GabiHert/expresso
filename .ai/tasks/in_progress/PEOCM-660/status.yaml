@@ -84,6 +84,18 @@ work_items:
     status: done
     file: done/14-fix-requester-profile-public-id-type.md
 
+  - id: "15"
+    name: Fix effectiveDate Zod validation type mismatch
+    repo: backend
+    status: done
+    file: done/15-fix-effective-date-zod-validation.md
+
+  - id: "16"
+    name: Change initial transfer status from DRAFT to PENDING_SIGNATURES
+    repo: peo
+    status: todo
+    file: todo/16-change-initial-transfer-status.md
+
   - id: "09"
     name: End-to-end testing
     repo: backend, peo
