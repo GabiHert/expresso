@@ -19,7 +19,8 @@ Start a task by moving it from todo to in_progress, reading the task context, an
 ```
 /task-start JIRA-123
 /task-start LOCAL-001
-/task-start                    # Lists available tasks to choose from
+/task-start JIRA-123 --worktree   # Create git worktrees for isolated work
+/task-start                       # Lists available tasks to choose from
 ```
 
 ## Workflow
@@ -28,6 +29,7 @@ Start a task by moving it from todo to in_progress, reading the task context, an
 1. FIND TASK
    • Search in .ai/tasks/todo/
    • Validate task exists
+   • Parse --worktree flag if present
 
 2. MOVE TO IN_PROGRESS
    • Move folder from todo/ to in_progress/
@@ -46,9 +48,13 @@ Start a task by moving it from todo to in_progress, reading the task context, an
    • Identify which are in todo/ vs done/
    • Recommend starting point
 
-5. PREPARE BRANCHES
-   • Create branch in each affected repo
-   • Follow branch naming convention from manifest
+5. PREPARE BRANCHES (or WORKTREES)
+   • If --worktree flag AND conventions.worktrees.enabled:
+     - Create worktree directories per affected repo
+     - Create symlinks for shared config (.ai, .claude, etc.)
+   • Otherwise:
+     - Create branch in each affected repo
+     - Follow branch naming convention from manifest
 ```
 
 ## Implementation
@@ -59,6 +65,7 @@ Start a task by moving it from todo to in_progress, reading the task context, an
    - Available repositories
    - Branch naming conventions
    - Commit conventions
+   - Worktree conventions (if `--worktree` flag used)
 
 2. Announce:
 ```
@@ -69,11 +76,24 @@ Start a task by moving it from todo to in_progress, reading the task context, an
 
 ### Step 1: Parse Arguments
 
+**Parse flags:**
+- Check for `--worktree` flag in arguments
+- Store worktree mode for later use
+
 **If task ID provided:**
 - Look for task in `.ai/tasks/todo/{task-id}/`
 - If not found in todo, check `.ai/tasks/in_progress/{task-id}/`
   - If found there, say: "Task {task-id} is already in progress. Use /task-resume to continue."
 - If not found anywhere, say: "Task {task-id} not found. Use /task-status to see available tasks."
+
+**If `--worktree` flag used:**
+- Verify `conventions.worktrees.enabled` is `true` in manifest
+- If not enabled, warn:
+  ```
+  Worktree mode requested but not enabled in manifest.
+  Add `conventions.worktrees.enabled: true` to manifest.yaml to use this feature.
+  Proceeding with normal branch mode.
+  ```
 
 **If no task ID provided:**
 - List available tasks in todo/:
@@ -152,7 +172,44 @@ Start with work item 01: {name}
 This is the first item and has no dependencies.
 ```
 
-### Step 5: Prepare Branches
+### Step 5: Prepare Branches or Worktrees
+
+**If `--worktree` mode AND `conventions.worktrees.enabled`:**
+
+Show worktree plan:
+```
+WORKTREES
+
+The following worktrees will be created:
+
+  {base_path}/{TICKET}/{repo}/  (branch: {branch-name})
+  {base_path}/{TICKET}/{repo}/  (branch: {branch-name})
+
+Symlinks to create in each:
+  .ai -> {relative_path_to_project}/.ai
+  .claude -> {relative_path_to_project}/.claude
+
+Create worktrees now? (y/n)
+```
+
+**If yes**, for each affected repo:
+1. Calculate worktree path: `{conventions.worktrees.base_path}/{TICKET}/{repo.name}`
+2. Create parent directories if needed:
+   ```bash
+   mkdir -p {worktree_parent_path}
+   ```
+3. Create the worktree with new branch:
+   ```bash
+   git -C {repo.path} worktree add {worktree_path} -b {branch-name} {conventions.worktrees.base_branch}
+   ```
+4. Create symlinks for each item in `conventions.worktrees.symlinks`:
+   ```bash
+   cd {worktree_path}
+   ln -s {relative_path_to_project_root}/{symlink_target} {symlink_name}
+   ```
+   Example: `ln -s ../../../.ai .ai`
+
+**Otherwise (normal branch mode):**
 
 For each affected repo, offer to create the branch:
 ```
@@ -176,7 +233,7 @@ Would you like me to create these branches now? (y/n)
    git checkout -b {conventions.branches.pattern}
    ```
 
-**If no**, proceed without creating branches.
+**If no**, proceed without creating branches/worktrees.
 
 ### Step 6: Update Context
 
@@ -185,6 +242,36 @@ Update `.ai/context.md`:
 
 ### Step 7: Output Summary
 
+**If worktree mode:**
+```
+╔══════════════════════════════════════════════════════════════════╗
+║ READY TO WORK (WORKTREE MODE)                                    ║
+╚══════════════════════════════════════════════════════════════════╝
+
+Task: {task-id} - {title}
+Location: .ai/tasks/in_progress/{task-id}/
+
+Worktrees Created:
+  {base_path}/{TICKET}/{repo}/ → branch: {branch-name}
+  {base_path}/{TICKET}/{repo}/ → branch: {branch-name}
+
+Symlinks: .ai, .claude, .cursor (linked to project root)
+
+Work Items: {total} total, {todo} remaining
+
+Start With:
+  □ 01. {first work item name} ({repo})
+
+To work in worktrees:
+  cd {base_path}/{TICKET}/{repo}/
+
+Quick Commands:
+  • /task-work 01              Work on item 01
+  • /task-status               View all tasks
+  • /task-review               Run code review
+```
+
+**Otherwise (normal mode):**
 ```
 ╔══════════════════════════════════════════════════════════════════╗
 ║ READY TO WORK                                                    ║
