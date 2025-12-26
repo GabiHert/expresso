@@ -45,6 +45,37 @@
 - **Branches**: {conventions.branches.pattern}
 - **JIRA Prefix**: {conventions.jira.prefix}
 
+## Worktrees
+
+{if conventions.worktrees.enabled}
+Git worktrees are **enabled** for this project.
+
+| Setting | Value |
+|---------|-------|
+| Base Path | `{conventions.worktrees.base_path}` |
+| Pattern | `{conventions.worktrees.pattern}` |
+| Base Branch | `{conventions.worktrees.base_branch}` |
+| Symlinks | {conventions.worktrees.symlinks} |
+
+**Usage**: `/task-start TICKET-123 --worktree`
+
+This creates isolated directories for each repo:
+```
+{base_path}/{TICKET}/{repo}/  ← git worktree with feature branch
+  .ai/                        ← symlink to project .ai/
+  .claude/                    ← symlink to project .claude/
+```
+{else}
+Worktrees are not configured. To enable, add to manifest.yaml:
+```yaml
+conventions:
+  worktrees:
+    enabled: true
+    base_path: "../worktrees"
+    pattern: "{TICKET}/{repo}"
+```
+{/if}
+
 ## Available MCPs
 
 | MCP | Description |
