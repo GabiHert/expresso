@@ -316,6 +316,14 @@ lightweight_commands:
 {for each lightweight_command}
     - {command_name}
 {/for}
+
+# ============================================================
+# AUTO-SYNC
+# ============================================================
+# Automatically sync .ai/ changes after each command
+auto_sync:
+  enabled: true                       # Auto-commit and push after commands
+  use_agent: true                     # Use lightweight ai-sync agent (Haiku)
 ```
 
 ### Step 4: Create Domain Layer

@@ -292,6 +292,21 @@ Commit now? (y/n)
 
 If yes, create the commit following manifest conventions.
 
+### Step 10: Auto-Sync (if enabled)
+
+Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
+
+**If auto_sync is enabled:**
+
+Use the ai-sync agent (lightweight/Haiku) to commit and push changes:
+```
+Use the ai-sync agent to sync the .ai folder changes
+```
+
+This ensures work item progress is tracked in version control automatically.
+
+**If auto_sync is disabled:** Skip this step.
+
 Then stop. Do not proceed further.
 
 ---
@@ -423,5 +438,20 @@ Next Steps:
   • Run /task-review for final comprehensive review
   • Run /task-done to complete the task
 ```
+
+### Autopilot Step 5: Auto-Sync (if enabled)
+
+Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
+
+**If auto_sync is enabled:**
+
+Use the ai-sync agent (lightweight/Haiku) to commit and push changes:
+```
+Use the ai-sync agent to sync the .ai folder changes
+```
+
+This ensures all autopilot progress is tracked in version control automatically.
+
+**If auto_sync is disabled:** Skip this step.
 
 Then stop. Do not proceed further.
