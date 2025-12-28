@@ -85,6 +85,7 @@
 | Pattern | Location | Description |
 |---------|----------|-------------|
 | Shared README | [docs/_shared/README.md](./docs/_shared/README.md) | Cross-cutting patterns |
+| Claude Code Hooks | [docs/_shared/claude-code-hooks.md](./docs/_shared/claude-code-hooks.md) | Complete hooks reference - events, input/output, examples |
 
 ### Repository Documentation
 | Repo | Location | Description |
