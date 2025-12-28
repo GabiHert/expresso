@@ -1,7 +1,7 @@
 <!--
 ╔══════════════════════════════════════════════════════════════════╗
 ║ LAYER: TASK                                                      ║
-║ LOCATION: .ai/tasks/todo/LOCAL-002/                              ║
+║ LOCATION: .ai/tasks/in_progress/LOCAL-002/                       ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║ EPIC: EPIC-001 (AI Cockpit MVP v2)                               ║
 ║ PHASE: 2 of 3                                                    ║
