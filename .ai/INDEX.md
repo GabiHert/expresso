@@ -21,9 +21,6 @@
 
 **Start here**: `context.md` - Project overview and current state
 
-> Note: In this framework repo, `context.md` is a template at `_framework/templates/context.md`.
-> When you run `/init` on a real project, it generates `.ai/context.md` with actual values.
-
 ## Framework
 
 | Resource | Location | Description |
@@ -73,35 +70,26 @@
 
 | Resource | Location | Description |
 |----------|----------|-------------|
+| Manifest | [_project/manifest.yaml](./_project/manifest.yaml) | Project configuration |
 | Manifest Example | [_project/manifest.example.yaml](./_project/manifest.example.yaml) | Config template |
 
 ## Documentation
 
-### Shared Patterns
-| Pattern | Location | Description |
-|---------|----------|-------------|
-| Sequelize | [docs/_shared/sequelize-patterns.md](./docs/_shared/sequelize-patterns.md) | Sequelize ORM conventions |
-| NATS Events | [docs/_shared/nats-events.md](./docs/_shared/nats-events.md) | Event messaging patterns |
-
 ### Architecture
 | Topic | Location | Description |
 |-------|----------|-------------|
-| Overview | [docs/_architecture/overview.md](./docs/_architecture/overview.md) | System architecture, service map |
+| Overview | [docs/_architecture/README.md](./docs/_architecture/README.md) | System architecture and design |
+
+### Shared Patterns
+| Pattern | Location | Description |
+|---------|----------|-------------|
+| Shared README | [docs/_shared/README.md](./docs/_shared/README.md) | Cross-cutting patterns |
 
 ### Repository Documentation
 | Repo | Location | Description |
 |------|----------|-------------|
-| backend | [docs/backend/](./docs/backend/) | Backend monorepo docs |
-| backend/modules | [docs/backend/modules.md](./docs/backend/modules.md) | ~200 modules guide |
-| backend/entity_transfers | [docs/backend/entity_transfers/](./docs/backend/entity_transfers/) | Entity transfer feature |
-| frontend | [docs/frontend/](./docs/frontend/) | Frontend React app |
-| admin | [docs/admin/](./docs/admin/) | Admin dashboard |
-| peo | [docs/peo/](./docs/peo/) | PEO service |
-| peo/entity_transfers | [docs/peo/entity_transfers/](./docs/peo/entity_transfers/) | Entity transfer handlers |
-| peo/hris_integration | [docs/peo/hris_integration/](./docs/peo/hris_integration/) | HRIS integration (BambooHR, Hibob, Workday) |
-| payroll-processing-api | [docs/payroll-processing-api/](./docs/payroll-processing-api/) | Payroll processing |
-| benefits | [docs/benefits/](./docs/benefits/) | Benefits service |
-| playwright-automation | [docs/playwright-automation/](./docs/playwright-automation/) | E2E testing framework |
+| ai-framework | [docs/ai-framework/README.md](./docs/ai-framework/README.md) | Core framework documentation |
+| vscode-extension | [docs/vscode-extension/README.md](./docs/vscode-extension/README.md) | VSCode extension documentation |
 
 ### History
 | Document | Location | Description |
@@ -118,4 +106,4 @@
 
 ---
 
-_Last Updated: 2025-12-22_
+_Last Updated: 2025-12-27_

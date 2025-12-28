@@ -1,32 +1,13 @@
-<!--
-╔══════════════════════════════════════════════════════════════════╗
-║ LAYER: DOMAIN                                                    ║
-║ LOCATION: .ai/docs/_shared/                                     ║
-╠══════════════════════════════════════════════════════════════════╣
-║ Cross-cutting patterns and shared knowledge.                     ║
-║ Document patterns that apply across multiple repositories.       ║
-╚══════════════════════════════════════════════════════════════════╝
--->
+# Shared Documentation
 
-# Shared Patterns
-
-This directory contains documentation for patterns that span multiple repositories.
+Cross-cutting patterns and conventions used across repositories.
 
 ## Contents
 
-| Pattern | Description |
-|---------|-------------|
-| [sequelize-patterns.md](./sequelize-patterns.md) | Sequelize ORM patterns used across services |
-| [nats-events.md](./nats-events.md) | NATS JetStream event-driven architecture |
+_Add documentation as you learn patterns that apply across repos._
 
-## When to Add Here
+## Planned Topics
 
-Add documentation here when:
-- A pattern is used in 2+ repositories
-- A convention applies project-wide
-- Knowledge is not specific to one repo
-
-## See Also
-
-- [INDEX.md](../INDEX.md) - Navigation hub
-- [_architecture/](../_architecture/) - System architecture
+- Claude Code hooks integration pattern
+- File-based IPC for extension communication
+- Diff tracking and storage patterns
