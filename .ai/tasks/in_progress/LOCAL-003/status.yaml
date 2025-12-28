@@ -12,43 +12,43 @@ dependencies:
 
 summary:
   total: 6
-  todo: 6
+  todo: 0
   in_progress: 0
-  done: 0
+  done: 6
 
 work_items:
   - id: "01"
     name: "Create extension scaffold"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/01-extension-scaffold.md"
+    status: done
+    file: "done/01-extension-scaffold.md"
 
   - id: "02"
     name: "Implement file watcher"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/02-file-watcher.md"
+    status: done
+    file: "done/02-file-watcher.md"
 
   - id: "03"
     name: "Add status bar provider"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/03-status-bar.md"
+    status: done
+    file: "done/03-status-bar.md"
 
   - id: "04"
     name: "Create task panel (TreeView)"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/04-task-panel.md"
+    status: done
+    file: "done/04-task-panel.md"
 
   - id: "05"
     name: "Add diff viewer integration"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/05-diff-viewer.md"
+    status: done
+    file: "done/05-diff-viewer.md"
 
   - id: "06"
     name: "Test and polish"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/06-test-polish.md"
+    status: done
+    file: "done/06-test-polish.md"
