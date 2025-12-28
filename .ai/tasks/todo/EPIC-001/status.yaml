@@ -1,0 +1,35 @@
+# EPIC Status Index
+task: "EPIC-001"
+title: "AI Cockpit MVP v2 Implementation"
+type: epic
+created: "2025-12-28"
+updated: "2025-12-28"
+
+summary:
+  total: 3
+  todo: 3
+  in_progress: 0
+  done: 0
+
+# Phase tasks (each is a separate task folder)
+phase_tasks:
+  - id: "LOCAL-001"
+    name: "Framework Integration"
+    phase: 1
+    status: todo
+    location: ".ai/tasks/todo/LOCAL-001/"
+    dependencies: []
+
+  - id: "LOCAL-002"
+    name: "Hook System"
+    phase: 2
+    status: todo
+    location: ".ai/tasks/todo/LOCAL-002/"
+    dependencies: ["LOCAL-001"]
+
+  - id: "LOCAL-003"
+    name: "VSCode Extension"
+    phase: 3
+    status: todo
+    location: ".ai/tasks/todo/LOCAL-003/"
+    dependencies: ["LOCAL-002"]

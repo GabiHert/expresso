@@ -1,0 +1,41 @@
+# Task Status Index
+task: "LOCAL-002"
+title: "Hook System (Phase 2)"
+epic: "EPIC-001"
+phase: 2
+created: "2025-12-28"
+updated: "2025-12-28"
+
+dependencies:
+  - "LOCAL-001"
+
+summary:
+  total: 4
+  todo: 4
+  in_progress: 0
+  done: 0
+
+work_items:
+  - id: "01"
+    name: "Create cockpit-capture.js hook"
+    repo: "ai-framework"
+    status: todo
+    file: "todo/01-hook-script.md"
+
+  - id: "02"
+    name: "Add hook configuration"
+    repo: "ai-framework"
+    status: todo
+    file: "todo/02-hook-config.md"
+
+  - id: "03"
+    name: "Implement task ID resolution"
+    repo: "ai-framework"
+    status: todo
+    file: "todo/03-task-id-resolution.md"
+
+  - id: "04"
+    name: "Test hook integration"
+    repo: "ai-framework"
+    status: todo
+    file: "todo/04-test-hooks.md"
