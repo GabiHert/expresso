@@ -80,6 +80,7 @@
 |-------|----------|-------------|
 | Overview | [docs/_architecture/README.md](./docs/_architecture/README.md) | System architecture and design |
 | AI Cockpit MVP v1 | [docs/_architecture/ai-cockpit-mvp-v1.md](./docs/_architecture/ai-cockpit-mvp-v1.md) | MVP v1 specification - task panel, diff tracking, hooks |
+| AI Cockpit MVP v2 | [docs/_architecture/ai-cockpit-mvp-v2.md](./docs/_architecture/ai-cockpit-mvp-v2.md) | MVP v2 specification - task ID propagation, active-task file |
 
 ### Shared Patterns
 | Pattern | Location | Description |
