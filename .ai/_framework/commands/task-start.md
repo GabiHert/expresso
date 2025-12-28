@@ -240,7 +240,67 @@ Would you like me to create these branches now? (y/n)
 Update `.ai/context.md`:
 - Move task from "Todo" to "In Progress" in Current State section
 
-### Step 7: Output Summary
+### Step 7: Activate Cockpit Tracking
+
+Activate cockpit tracking for the task:
+
+1. Ensure `.ai/cockpit/` directory exists:
+   ```bash
+   mkdir -p .ai/cockpit/events
+   ```
+
+2. Check if another task is already active:
+   ```bash
+   cat .ai/cockpit/active-task.json 2>/dev/null | jq -r '.taskId'
+   ```
+
+   **If another task is active**, warn:
+   ```
+   Warning: Task {existing-task-id} is already active.
+   Options:
+     1. Switch to {new-task-id} (replaces active)
+     2. Cancel
+
+   Choice? (1/2)
+   ```
+
+   If user chooses 1, continue. If 2, abort task-start.
+
+3. Get current git branch:
+   ```bash
+   git branch --show-current 2>/dev/null || echo "unknown"
+   ```
+
+4. Generate sessionId (timestamp-based):
+   ```bash
+   date +%s%N | md5sum | head -c 12
+   ```
+
+5. Write `active-task.json` atomically:
+   ```bash
+   # Write to temp file first
+   cat > .ai/cockpit/active-task.json.tmp << 'EOF'
+   {
+     "taskId": "{task-id}",
+     "title": "{task-title}",
+     "branch": "{current-git-branch}",
+     "frameworkPath": ".ai/tasks/in_progress/{task-id}",
+     "startedAt": "{ISO-timestamp}",
+     "sessionId": "{generated-session-id}"
+   }
+   EOF
+
+   # Atomic rename
+   mv .ai/cockpit/active-task.json.tmp .ai/cockpit/active-task.json
+   ```
+
+6. Announce activation:
+   ```
+   Cockpit: Task {task-id} is now active
+   All edits will be tracked under this task.
+   ```
+
+### Step 8: Output Summary
 
 **If worktree mode:**
 ```
@@ -291,7 +351,7 @@ Quick Commands:
   • /task-review               Run code review
 ```
 
-### Step 8: Auto-Sync (if enabled)
+### Step 9: Auto-Sync (if enabled)
 
 Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 
