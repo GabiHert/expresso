@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-005/todo/02-typescript-type.md",
+  "taskId": "LOCAL-004",
+  "baseline": {
+    "capturedAt": "2025-12-29T18:22:10.365Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-29T18:22:10.366Z",
+    "hash": "9982062e13a59b36",
+    "size": 2602,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-29T18:22:10.366Z",
+    "actualFileHash": "9982062e13a59b36",
+    "status": "synced"
+  }
+}

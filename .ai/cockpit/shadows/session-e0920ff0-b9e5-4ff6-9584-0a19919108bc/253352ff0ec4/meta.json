@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/context.md",
+  "taskId": "session-e0920ff0-b9e5-4ff6-9584-0a19919108bc",
+  "baseline": {
+    "capturedAt": "2025-12-29T21:00:01.241Z",
+    "hash": "59e54c8bcbc76340",
+    "size": 2452
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-29T21:00:01.241Z",
+    "hash": "7389855da6dc29f6",
+    "size": 2466,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-29T21:00:01.241Z",
+    "actualFileHash": "7389855da6dc29f6",
+    "status": "synced"
+  }
+}

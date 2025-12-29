@@ -1,0 +1,77 @@
+{
+  "id": "evt-1767017868442-iz6cknh7o",
+  "taskId": "LOCAL-003",
+  "taskIdSource": "active-task-file",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Design Shadow Copy System architecture",
+        "status": "in_progress",
+        "activeForm": "Designing Shadow Copy System architecture"
+      },
+      {
+        "content": "Define shadow file structure and manifest format",
+        "status": "pending",
+        "activeForm": "Defining shadow file structure"
+      },
+      {
+        "content": "Plan hook enhancement for baseline capture",
+        "status": "pending",
+        "activeForm": "Planning hook enhancement"
+      },
+      {
+        "content": "Design ShadowManager service",
+        "status": "pending",
+        "activeForm": "Designing ShadowManager service"
+      },
+      {
+        "content": "Plan file sync detection mechanism",
+        "status": "pending",
+        "activeForm": "Planning file sync detection"
+      },
+      {
+        "content": "Design UI components for cumulative views",
+        "status": "pending",
+        "activeForm": "Designing UI components"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [],
+    "newTodos": [
+      {
+        "content": "Design Shadow Copy System architecture",
+        "status": "in_progress",
+        "activeForm": "Designing Shadow Copy System architecture"
+      },
+      {
+        "content": "Define shadow file structure and manifest format",
+        "status": "pending",
+        "activeForm": "Defining shadow file structure"
+      },
+      {
+        "content": "Plan hook enhancement for baseline capture",
+        "status": "pending",
+        "activeForm": "Planning hook enhancement"
+      },
+      {
+        "content": "Design ShadowManager service",
+        "status": "pending",
+        "activeForm": "Designing ShadowManager service"
+      },
+      {
+        "content": "Plan file sync detection mechanism",
+        "status": "pending",
+        "activeForm": "Planning file sync detection"
+      },
+      {
+        "content": "Design UI components for cumulative views",
+        "status": "pending",
+        "activeForm": "Designing UI components"
+      }
+    ]
+  },
+  "sessionId": "e0920ff0-b9e5-4ff6-9584-0a19919108bc",
+  "timestamp": "2025-12-29T14:17:48.442Z"
+}

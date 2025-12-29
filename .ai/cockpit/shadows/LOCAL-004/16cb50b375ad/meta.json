@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-005/todo/03-documentation.md",
+  "taskId": "LOCAL-004",
+  "baseline": {
+    "capturedAt": "2025-12-29T18:22:27.054Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-29T18:22:27.054Z",
+    "hash": "f47551c488af418c",
+    "size": 3100,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-29T18:22:27.054Z",
+    "actualFileHash": "f47551c488af418c",
+    "status": "synced"
+  }
+}

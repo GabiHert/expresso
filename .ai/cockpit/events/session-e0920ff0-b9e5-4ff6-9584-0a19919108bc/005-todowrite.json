@@ -1,0 +1,27 @@
+{
+  "id": "evt-1767042142433-nruiobmqe",
+  "taskId": "session-e0920ff0-b9e5-4ff6-9584-0a19919108bc",
+  "taskIdSource": "session-fallback",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Create task LOCAL-006 for session tracking",
+        "status": "in_progress",
+        "activeForm": "Creating session tracking task"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [],
+    "newTodos": [
+      {
+        "content": "Create task LOCAL-006 for session tracking",
+        "status": "in_progress",
+        "activeForm": "Creating session tracking task"
+      }
+    ]
+  },
+  "sessionId": "e0920ff0-b9e5-4ff6-9584-0a19919108bc",
+  "timestamp": "2025-12-29T21:02:22.433Z"
+}

@@ -1,0 +1,19 @@
+{
+  "id": "evt-1767033255140-c0igh4iap",
+  "taskId": "LOCAL-005",
+  "taskIdSource": "active-task-file",
+  "tool": "Write",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/test-env-var.txt",
+    "content": "Test file for COCKPIT_TASK env var feature.\nCreated: 2025-12-29\n\nThis edit should be captured by the hook.\nCurrent session uses active-task.json (LOCAL-005).\n"
+  },
+  "response": {
+    "type": "create",
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/test-env-var.txt",
+    "content": "Test file for COCKPIT_TASK env var feature.\nCreated: 2025-12-29\n\nThis edit should be captured by the hook.\nCurrent session uses active-task.json (LOCAL-005).\n",
+    "structuredPatch": [],
+    "originalFile": null
+  },
+  "sessionId": "e0920ff0-b9e5-4ff6-9584-0a19919108bc",
+  "timestamp": "2025-12-29T18:34:15.140Z"
+}

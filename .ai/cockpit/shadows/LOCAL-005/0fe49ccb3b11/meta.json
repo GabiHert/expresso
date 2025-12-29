@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/docs/_architecture/ai-cockpit-mvp-v2.md",
+  "taskId": "LOCAL-005",
+  "baseline": {
+    "capturedAt": "2025-12-29T18:31:40.791Z",
+    "hash": "ad03ef95603e7eca",
+    "size": 21988
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-29T18:32:06.775Z",
+    "hash": "021c98eeb88a9026",
+    "size": 23217,
+    "editCount": 3
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-29T18:32:06.775Z",
+    "actualFileHash": "021c98eeb88a9026",
+    "status": "synced"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/docs/_completed_tasks.md",
+  "taskId": "session-e0920ff0-b9e5-4ff6-9584-0a19919108bc",
+  "baseline": {
+    "capturedAt": "2025-12-29T20:59:46.232Z",
+    "hash": "d50bb4d1c0b73f3b",
+    "size": 778
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-29T20:59:46.232Z",
+    "hash": "bc5710b81998c48e",
+    "size": 949,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-29T20:59:46.232Z",
+    "actualFileHash": "bc5710b81998c48e",
+    "status": "synced"
+  }
+}

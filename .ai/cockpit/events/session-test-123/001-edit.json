@@ -1,0 +1,13 @@
+{
+  "id": "evt-1767016835593-a10vesatp",
+  "taskId": "session-test-123",
+  "taskIdSource": "session-fallback",
+  "tool": "Edit",
+  "input": {
+    "file_path": "test.txt",
+    "old_string": "a",
+    "new_string": "b"
+  },
+  "sessionId": "test-123",
+  "timestamp": "2025-12-29T14:00:35.593Z"
+}

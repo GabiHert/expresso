@@ -1,0 +1,73 @@
+{
+  "id": "evt-1767028056715-jkfy2ly10",
+  "taskId": "LOCAL-004",
+  "taskIdSource": "active-task-file",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/services/ShadowManager.ts",
+    "old_string": "  async checkSyncStatus(\n    shadow: Shadow\n  ): Promise<'synced' | 'user-modified' | 'file-deleted'> {\n    const actualPath = path.join(this.workspaceRoot, shadow.meta.filePath);\n\n    if (!fs.existsSync(actualPath)) {\n      return 'file-deleted';\n    }\n\n    const actual = fs.readFileSync(actualPath, 'utf8');\n    const actualHash = this.hashContent(actual);\n\n    return actualHash === shadow.meta.accumulated.hash\n      ? 'synced'\n      : 'user-modified';\n  }\n\n  async getActualContent(shadow: Shadow): Promise<string | null> {\n    const actualPath = path.join(this.workspaceRoot, shadow.meta.filePath);\n\n    if (!fs.existsSync(actualPath)) {\n      return null;\n    }\n\n    return fs.readFileSync(actualPath, 'utf8');\n  }",
+    "new_string": "  async checkSyncStatus(\n    shadow: Shadow\n  ): Promise<'synced' | 'user-modified' | 'file-deleted'> {\n    const actualPath = this.resolveFilePath(shadow.meta.filePath);\n\n    if (!fs.existsSync(actualPath)) {\n      return 'file-deleted';\n    }\n\n    const actual = fs.readFileSync(actualPath, 'utf8');\n    const actualHash = this.hashContent(actual);\n\n    return actualHash === shadow.meta.accumulated.hash\n      ? 'synced'\n      : 'user-modified';\n  }\n\n  async getActualContent(shadow: Shadow): Promise<string | null> {\n    const actualPath = this.resolveFilePath(shadow.meta.filePath);\n\n    if (!fs.existsSync(actualPath)) {\n      return null;\n    }\n\n    return fs.readFileSync(actualPath, 'utf8');\n  }\n\n  private resolveFilePath(filePath: string): string {\n    return path.isAbsolute(filePath) ? filePath : path.join(this.workspaceRoot, filePath);\n  }"
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/services/ShadowManager.ts",
+    "oldString": "  async checkSyncStatus(\n    shadow: Shadow\n  ): Promise<'synced' | 'user-modified' | 'file-deleted'> {\n    const actualPath = path.join(this.workspaceRoot, shadow.meta.filePath);\n\n    if (!fs.existsSync(actualPath)) {\n      return 'file-deleted';\n    }\n\n    const actual = fs.readFileSync(actualPath, 'utf8');\n    const actualHash = this.hashContent(actual);\n\n    return actualHash === shadow.meta.accumulated.hash\n      ? 'synced'\n      : 'user-modified';\n  }\n\n  async getActualContent(shadow: Shadow): Promise<string | null> {\n    const actualPath = path.join(this.workspaceRoot, shadow.meta.filePath);\n\n    if (!fs.existsSync(actualPath)) {\n      return null;\n    }\n\n    return fs.readFileSync(actualPath, 'utf8');\n  }",
+    "newString": "  async checkSyncStatus(\n    shadow: Shadow\n  ): Promise<'synced' | 'user-modified' | 'file-deleted'> {\n    const actualPath = this.resolveFilePath(shadow.meta.filePath);\n\n    if (!fs.existsSync(actualPath)) {\n      return 'file-deleted';\n    }\n\n    const actual = fs.readFileSync(actualPath, 'utf8');\n    const actualHash = this.hashContent(actual);\n\n    return actualHash === shadow.meta.accumulated.hash\n      ? 'synced'\n      : 'user-modified';\n  }\n\n  async getActualContent(shadow: Shadow): Promise<string | null> {\n    const actualPath = this.resolveFilePath(shadow.meta.filePath);\n\n    if (!fs.existsSync(actualPath)) {\n      return null;\n    }\n\n    return fs.readFileSync(actualPath, 'utf8');\n  }\n\n  private resolveFilePath(filePath: string): string {\n    return path.isAbsolute(filePath) ? filePath : path.join(this.workspaceRoot, filePath);\n  }",
+    "originalFile": "import * as fs from 'fs';\nimport * as path from 'path';\nimport * as crypto from 'crypto';\n\nexport interface ShadowMeta {\n  filePath: string;\n  taskId: string;\n  baseline: {\n    capturedAt: string;\n    hash: string;\n    size: number;\n  };\n  accumulated: {\n    lastUpdatedAt: string;\n    hash: string;\n    size: number;\n    editCount: number;\n  };\n  sync: {\n    lastCheckedAt: string;\n    actualFileHash?: string;\n    status: 'synced' | 'user-modified' | 'file-deleted';\n  };\n}\n\nexport interface Shadow {\n  meta: ShadowMeta;\n  baseline: string;\n  accumulated: string;\n  dirPath: string;\n}\n\nexport class ShadowManager {\n  private shadowsPath: string;\n\n  constructor(private workspaceRoot: string) {\n    this.shadowsPath = path.join(workspaceRoot, '.ai/cockpit/shadows');\n  }\n\n  async getShadowsForTask(taskId: string): Promise<Shadow[]> {\n    const taskDir = path.join(this.shadowsPath, taskId);\n    if (!fs.existsSync(taskDir)) return [];\n\n    const shadows: Shadow[] = [];\n    const entries = fs.readdirSync(taskDir, { withFileTypes: true });\n\n    for (const entry of entries) {\n      if (entry.isDirectory()) {\n        try {\n          const shadow = await this.loadShadow(path.join(taskDir, entry.name));\n          shadows.push(shadow);\n        } catch {\n          // Skip invalid shadow directories\n        }\n      }\n    }\n\n    return shadows;\n  }\n\n  async getShadow(taskId: string, filePath: string): Promise<Shadow | null> {\n    const hash = this.hashFilePath(filePath);\n    const shadowDir = path.join(this.shadowsPath, taskId, hash);\n\n    if (!fs.existsSync(path.join(shadowDir, 'meta.json'))) {\n      return null;\n    }\n\n    return this.loadShadow(shadowDir);\n  }\n\n  private async loadShadow(shadowDir: string): Promise<Shadow> {\n    const meta = JSON.parse(\n      fs.readFileSync(path.join(shadowDir, 'meta.json'), 'utf8')\n    ) as ShadowMeta;\n\n    const baseline = fs.readFileSync(\n      path.join(shadowDir, 'baseline.txt'),\n      'utf8'\n    );\n\n    const accumulated = fs.readFileSync(\n      path.join(shadowDir, 'accumulated.txt'),\n      'utf8'\n    );\n\n    return { meta, baseline, accumulated, dirPath: shadowDir };\n  }\n\n  async checkSyncStatus(\n    shadow: Shadow\n  ): Promise<'synced' | 'user-modified' | 'file-deleted'> {\n    const actualPath = path.join(this.workspaceRoot, shadow.meta.filePath);\n\n    if (!fs.existsSync(actualPath)) {\n      return 'file-deleted';\n    }\n\n    const actual = fs.readFileSync(actualPath, 'utf8');\n    const actualHash = this.hashContent(actual);\n\n    return actualHash === shadow.meta.accumulated.hash\n      ? 'synced'\n      : 'user-modified';\n  }\n\n  async getActualContent(shadow: Shadow): Promise<string | null> {\n    const actualPath = path.join(this.workspaceRoot, shadow.meta.filePath);\n\n    if (!fs.existsSync(actualPath)) {\n      return null;\n    }\n\n    return fs.readFileSync(actualPath, 'utf8');\n  }\n\n  private hashFilePath(filePath: string): string {\n    return crypto\n      .createHash('sha256')\n      .update(filePath)\n      .digest('hex')\n      .substring(0, 12);\n  }\n\n  private hashContent(content: string): string {\n    return crypto\n      .createHash('sha256')\n      .update(content)\n      .digest('hex')\n      .substring(0, 16);\n  }\n}\n",
+    "structuredPatch": [
+      {
+        "oldStart": 90,
+        "oldLines": 7,
+        "newStart": 90,
+        "newLines": 7,
+        "lines": [
+          "   async checkSyncStatus(",
+          "     shadow: Shadow",
+          "   ): Promise<'synced' | 'user-modified' | 'file-deleted'> {",
+          "-    const actualPath = path.join(this.workspaceRoot, shadow.meta.filePath);",
+          "+    const actualPath = this.resolveFilePath(shadow.meta.filePath);",
+          " ",
+          "     if (!fs.existsSync(actualPath)) {",
+          "       return 'file-deleted';"
+        ]
+      },
+      {
+        "oldStart": 105,
+        "oldLines": 7,
+        "newStart": 105,
+        "newLines": 7,
+        "lines": [
+          "   }",
+          " ",
+          "   async getActualContent(shadow: Shadow): Promise<string | null> {",
+          "-    const actualPath = path.join(this.workspaceRoot, shadow.meta.filePath);",
+          "+    const actualPath = this.resolveFilePath(shadow.meta.filePath);",
+          " ",
+          "     if (!fs.existsSync(actualPath)) {",
+          "       return null;"
+        ]
+      },
+      {
+        "oldStart": 114,
+        "oldLines": 6,
+        "newStart": 114,
+        "newLines": 10,
+        "lines": [
+          "     return fs.readFileSync(actualPath, 'utf8');",
+          "   }",
+          " ",
+          "+  private resolveFilePath(filePath: string): string {",
+          "+    return path.isAbsolute(filePath) ? filePath : path.join(this.workspaceRoot, filePath);",
+          "+  }",
+          "+",
+          "   private hashFilePath(filePath: string): string {",
+          "     return crypto",
+          "       .createHash('sha256')"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "e0920ff0-b9e5-4ff6-9584-0a19919108bc",
+  "timestamp": "2025-12-29T17:07:36.716Z"
+}

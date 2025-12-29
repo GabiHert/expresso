@@ -1,0 +1,132 @@
+{
+  "name": "ai-cockpit",
+  "displayName": "AI Cockpit",
+  "description": "Monitor and manage Claude Code tasks with real-time diff tracking",
+  "version": "0.1.0",
+  "publisher": "ai-cockpit",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "workspaceContains:.ai/cockpit"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "aiCockpit.showPanel",
+        "title": "AI Cockpit: Show Panel"
+      },
+      {
+        "command": "aiCockpit.refresh",
+        "title": "AI Cockpit: Refresh"
+      },
+      {
+        "command": "aiCockpit.showTaskMenu",
+        "title": "AI Cockpit: Show Task Menu"
+      },
+      {
+        "command": "aiCockpit.viewEventDiff",
+        "title": "AI Cockpit: View Event Diff"
+      },
+      {
+        "command": "aiCockpit.showClaudeChanges",
+        "title": "AI Cockpit: Show Claude Changes"
+      },
+      {
+        "command": "aiCockpit.showYourChanges",
+        "title": "AI Cockpit: Show Your Changes"
+      },
+      {
+        "command": "aiCockpit.showFullDiff",
+        "title": "AI Cockpit: Show Full Diff"
+      },
+      {
+        "command": "aiCockpit.openTaskTerminal",
+        "title": "AI Cockpit: Open Task Terminal",
+        "icon": "$(terminal)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ai-cockpit",
+          "title": "AI Cockpit",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "ai-cockpit": [
+        {
+          "id": "aiCockpit.tasks",
+          "name": "Tasks"
+        }
+      ]
+    },
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "aiCockpit.openTaskTerminal",
+          "when": "view == aiCockpit.tasks && viewItem == task-in_progress",
+          "group": "inline"
+        },
+        {
+          "command": "aiCockpit.openTaskTerminal",
+          "when": "view == aiCockpit.tasks && viewItem == task-active",
+          "group": "inline"
+        },
+        {
+          "command": "aiCockpit.openTaskTerminal",
+          "when": "view == aiCockpit.tasks && viewItem == task-todo",
+          "group": "inline"
+        },
+        {
+          "command": "aiCockpit.openTaskTerminal",
+          "when": "view == aiCockpit.tasks && viewItem == task-done",
+          "group": "inline"
+        },
+        {
+          "command": "aiCockpit.viewEventDiff",
+          "when": "view == aiCockpit.tasks && viewItem == event",
+          "group": "inline"
+        },
+        {
+          "command": "aiCockpit.showClaudeChanges",
+          "when": "view == aiCockpit.tasks && viewItem =~ /shadow-file/",
+          "group": "navigation@1"
+        },
+        {
+          "command": "aiCockpit.showYourChanges",
+          "when": "view == aiCockpit.tasks && viewItem == shadow-file-user-modified",
+          "group": "navigation@2"
+        },
+        {
+          "command": "aiCockpit.showFullDiff",
+          "when": "view == aiCockpit.tasks && viewItem =~ /shadow-file/",
+          "group": "navigation@3"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@vscode/vsce": "^3.7.1"
+  }
+}

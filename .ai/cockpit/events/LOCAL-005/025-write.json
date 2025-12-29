@@ -1,0 +1,19 @@
+{
+  "id": "evt-1767037327492-tjf0zrvnn",
+  "taskId": "LOCAL-005",
+  "taskIdSource": "active-task-file",
+  "tool": "Write",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/CLAUDE.md",
+    "content": "# AI Cockpit Project Instructions\n\n## Task Context\n\nWhen starting a session, check if you're bound to a specific task:\n\n```bash\necho $COCKPIT_TASK\n```\n\nIf `COCKPIT_TASK` is set, announce:\n```\nWorking on task: {COCKPIT_TASK}\n```\n\nThen read the task README for context:\n```\n.ai/tasks/*/{ COCKPIT_TASK }/README.md\n```\n\n## Cockpit Integration\n\n- All your edits are tracked by the AI Cockpit extension\n- Use `/task-start TASK-ID` to begin work on a task\n- Use `/task-work` to work through task items\n- Use `/task-done` when complete\n"
+  },
+  "response": {
+    "type": "create",
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/CLAUDE.md",
+    "content": "# AI Cockpit Project Instructions\n\n## Task Context\n\nWhen starting a session, check if you're bound to a specific task:\n\n```bash\necho $COCKPIT_TASK\n```\n\nIf `COCKPIT_TASK` is set, announce:\n```\nWorking on task: {COCKPIT_TASK}\n```\n\nThen read the task README for context:\n```\n.ai/tasks/*/{ COCKPIT_TASK }/README.md\n```\n\n## Cockpit Integration\n\n- All your edits are tracked by the AI Cockpit extension\n- Use `/task-start TASK-ID` to begin work on a task\n- Use `/task-work` to work through task items\n- Use `/task-done` when complete\n",
+    "structuredPatch": [],
+    "originalFile": null
+  },
+  "sessionId": "e0920ff0-b9e5-4ff6-9584-0a19919108bc",
+  "timestamp": "2025-12-29T19:42:07.492Z"
+}

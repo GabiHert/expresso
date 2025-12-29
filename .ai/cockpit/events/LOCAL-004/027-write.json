@@ -1,0 +1,69 @@
+{
+  "id": "evt-1767024499617-6bzmcyvyq",
+  "taskId": "LOCAL-004",
+  "taskIdSource": "active-task-file",
+  "tool": "Write",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/in_progress/LOCAL-004/status.yaml",
+    "content": "# Task Status Index\ntask: \"LOCAL-004\"\ntitle: \"Shadow Copy System - Cumulative Diff Tracking\"\ncreated: \"2025-12-29\"\nupdated: \"2025-12-29\"\n\nsummary:\n  total: 4\n  todo: 0\n  in_progress: 0\n  done: 4\n\nwork_items:\n  - id: \"01\"\n    name: \"Update hook with shadow support\"\n    repo: \".claude/hooks\"\n    status: done\n    file: \"done/01-hook-shadow-support.md\"\n\n  - id: \"02\"\n    name: \"Create ShadowManager service\"\n    repo: \"vscode-extension\"\n    status: done\n    file: \"done/02-shadow-manager.md\"\n\n  - id: \"03\"\n    name: \"Add cumulative diff commands\"\n    repo: \"vscode-extension\"\n    status: done\n    file: \"done/03-cumulative-diff-commands.md\"\n\n  - id: \"04\"\n    name: \"Add Files Changed to Tree View\"\n    repo: \"vscode-extension\"\n    status: done\n    file: \"done/04-files-changed-tree.md\"\n"
+  },
+  "response": {
+    "type": "update",
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/in_progress/LOCAL-004/status.yaml",
+    "content": "# Task Status Index\ntask: \"LOCAL-004\"\ntitle: \"Shadow Copy System - Cumulative Diff Tracking\"\ncreated: \"2025-12-29\"\nupdated: \"2025-12-29\"\n\nsummary:\n  total: 4\n  todo: 0\n  in_progress: 0\n  done: 4\n\nwork_items:\n  - id: \"01\"\n    name: \"Update hook with shadow support\"\n    repo: \".claude/hooks\"\n    status: done\n    file: \"done/01-hook-shadow-support.md\"\n\n  - id: \"02\"\n    name: \"Create ShadowManager service\"\n    repo: \"vscode-extension\"\n    status: done\n    file: \"done/02-shadow-manager.md\"\n\n  - id: \"03\"\n    name: \"Add cumulative diff commands\"\n    repo: \"vscode-extension\"\n    status: done\n    file: \"done/03-cumulative-diff-commands.md\"\n\n  - id: \"04\"\n    name: \"Add Files Changed to Tree View\"\n    repo: \"vscode-extension\"\n    status: done\n    file: \"done/04-files-changed-tree.md\"\n",
+    "structuredPatch": [
+      {
+        "oldStart": 6,
+        "oldLines": 31,
+        "newStart": 6,
+        "newLines": 31,
+        "lines": [
+          " ",
+          " summary:",
+          "   total: 4",
+          "-  todo: 4",
+          "+  todo: 0",
+          "   in_progress: 0",
+          "-  done: 0",
+          "+  done: 4",
+          " ",
+          " work_items:",
+          "   - id: \"01\"",
+          "     name: \"Update hook with shadow support\"",
+          "     repo: \".claude/hooks\"",
+          "-    status: todo",
+          "-    file: \"todo/01-hook-shadow-support.md\"",
+          "+    status: done",
+          "+    file: \"done/01-hook-shadow-support.md\"",
+          " ",
+          "   - id: \"02\"",
+          "     name: \"Create ShadowManager service\"",
+          "     repo: \"vscode-extension\"",
+          "-    status: todo",
+          "-    file: \"todo/02-shadow-manager.md\"",
+          "+    status: done",
+          "+    file: \"done/02-shadow-manager.md\"",
+          " ",
+          "   - id: \"03\"",
+          "     name: \"Add cumulative diff commands\"",
+          "     repo: \"vscode-extension\"",
+          "-    status: todo",
+          "-    file: \"todo/03-cumulative-diff-commands.md\"",
+          "+    status: done",
+          "+    file: \"done/03-cumulative-diff-commands.md\"",
+          " ",
+          "   - id: \"04\"",
+          "     name: \"Add Files Changed to Tree View\"",
+          "     repo: \"vscode-extension\"",
+          "-    status: todo",
+          "-    file: \"todo/04-files-changed-tree.md\"",
+          "+    status: done",
+          "+    file: \"done/04-files-changed-tree.md\""
+        ]
+      }
+    ],
+    "originalFile": "# Task Status Index\ntask: \"LOCAL-004\"\ntitle: \"Shadow Copy System - Cumulative Diff Tracking\"\ncreated: \"2025-12-29\"\nupdated: \"2025-12-29\"\n\nsummary:\n  total: 4\n  todo: 4\n  in_progress: 0\n  done: 0\n\nwork_items:\n  - id: \"01\"\n    name: \"Update hook with shadow support\"\n    repo: \".claude/hooks\"\n    status: todo\n    file: \"todo/01-hook-shadow-support.md\"\n\n  - id: \"02\"\n    name: \"Create ShadowManager service\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/02-shadow-manager.md\"\n\n  - id: \"03\"\n    name: \"Add cumulative diff commands\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/03-cumulative-diff-commands.md\"\n\n  - id: \"04\"\n    name: \"Add Files Changed to Tree View\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/04-files-changed-tree.md\"\n"
+  },
+  "sessionId": "e0920ff0-b9e5-4ff6-9584-0a19919108bc",
+  "timestamp": "2025-12-29T16:08:19.617Z"
+}

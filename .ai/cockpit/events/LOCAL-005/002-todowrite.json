@@ -1,0 +1,47 @@
+{
+  "id": "evt-1767032972612-58vvv3k28",
+  "taskId": "LOCAL-005",
+  "taskIdSource": "active-task-file",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Work item 01: Hook env var support",
+        "status": "in_progress",
+        "activeForm": "Adding COCKPIT_TASK env var to hook"
+      },
+      {
+        "content": "Work item 02: TypeScript type update",
+        "status": "pending",
+        "activeForm": "Updating taskIdSource type"
+      },
+      {
+        "content": "Work item 03: Documentation update",
+        "status": "pending",
+        "activeForm": "Updating architecture docs"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [],
+    "newTodos": [
+      {
+        "content": "Work item 01: Hook env var support",
+        "status": "in_progress",
+        "activeForm": "Adding COCKPIT_TASK env var to hook"
+      },
+      {
+        "content": "Work item 02: TypeScript type update",
+        "status": "pending",
+        "activeForm": "Updating taskIdSource type"
+      },
+      {
+        "content": "Work item 03: Documentation update",
+        "status": "pending",
+        "activeForm": "Updating architecture docs"
+      }
+    ]
+  },
+  "sessionId": "e0920ff0-b9e5-4ff6-9584-0a19919108bc",
+  "timestamp": "2025-12-29T18:29:32.612Z"
+}

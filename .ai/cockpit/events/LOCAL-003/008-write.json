@@ -1,0 +1,19 @@
+{
+  "id": "evt-1767023438249-hd3po9d39",
+  "taskId": "LOCAL-003",
+  "taskIdSource": "active-task-file",
+  "tool": "Write",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-004/status.yaml",
+    "content": "# Task Status Index\ntask: \"LOCAL-004\"\ntitle: \"Shadow Copy System - Cumulative Diff Tracking\"\ncreated: \"2025-12-29\"\nupdated: \"2025-12-29\"\n\nsummary:\n  total: 4\n  todo: 4\n  in_progress: 0\n  done: 0\n\nwork_items:\n  - id: \"01\"\n    name: \"Update hook with shadow support\"\n    repo: \".claude/hooks\"\n    status: todo\n    file: \"todo/01-hook-shadow-support.md\"\n\n  - id: \"02\"\n    name: \"Create ShadowManager service\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/02-shadow-manager.md\"\n\n  - id: \"03\"\n    name: \"Add cumulative diff commands\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/03-cumulative-diff-commands.md\"\n\n  - id: \"04\"\n    name: \"Add Files Changed to Tree View\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/04-files-changed-tree.md\"\n"
+  },
+  "response": {
+    "type": "create",
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-004/status.yaml",
+    "content": "# Task Status Index\ntask: \"LOCAL-004\"\ntitle: \"Shadow Copy System - Cumulative Diff Tracking\"\ncreated: \"2025-12-29\"\nupdated: \"2025-12-29\"\n\nsummary:\n  total: 4\n  todo: 4\n  in_progress: 0\n  done: 0\n\nwork_items:\n  - id: \"01\"\n    name: \"Update hook with shadow support\"\n    repo: \".claude/hooks\"\n    status: todo\n    file: \"todo/01-hook-shadow-support.md\"\n\n  - id: \"02\"\n    name: \"Create ShadowManager service\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/02-shadow-manager.md\"\n\n  - id: \"03\"\n    name: \"Add cumulative diff commands\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/03-cumulative-diff-commands.md\"\n\n  - id: \"04\"\n    name: \"Add Files Changed to Tree View\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/04-files-changed-tree.md\"\n",
+    "structuredPatch": [],
+    "originalFile": null
+  },
+  "sessionId": "e0920ff0-b9e5-4ff6-9584-0a19919108bc",
+  "timestamp": "2025-12-29T15:50:38.249Z"
+}

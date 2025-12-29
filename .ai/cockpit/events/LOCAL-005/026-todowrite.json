@@ -1,0 +1,77 @@
+{
+  "id": "evt-1767041647066-6phwavrfp",
+  "taskId": "LOCAL-005",
+  "taskIdSource": "active-task-file",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Move LOCAL-001 to done",
+        "status": "in_progress",
+        "activeForm": "Moving LOCAL-001"
+      },
+      {
+        "content": "Move LOCAL-002 to done",
+        "status": "pending",
+        "activeForm": "Moving LOCAL-002"
+      },
+      {
+        "content": "Move LOCAL-003 to done",
+        "status": "pending",
+        "activeForm": "Moving LOCAL-003"
+      },
+      {
+        "content": "Move LOCAL-004 to done",
+        "status": "pending",
+        "activeForm": "Moving LOCAL-004"
+      },
+      {
+        "content": "Move LOCAL-005 to done",
+        "status": "pending",
+        "activeForm": "Moving LOCAL-005"
+      },
+      {
+        "content": "Update history and context",
+        "status": "pending",
+        "activeForm": "Updating docs"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [],
+    "newTodos": [
+      {
+        "content": "Move LOCAL-001 to done",
+        "status": "in_progress",
+        "activeForm": "Moving LOCAL-001"
+      },
+      {
+        "content": "Move LOCAL-002 to done",
+        "status": "pending",
+        "activeForm": "Moving LOCAL-002"
+      },
+      {
+        "content": "Move LOCAL-003 to done",
+        "status": "pending",
+        "activeForm": "Moving LOCAL-003"
+      },
+      {
+        "content": "Move LOCAL-004 to done",
+        "status": "pending",
+        "activeForm": "Moving LOCAL-004"
+      },
+      {
+        "content": "Move LOCAL-005 to done",
+        "status": "pending",
+        "activeForm": "Moving LOCAL-005"
+      },
+      {
+        "content": "Update history and context",
+        "status": "pending",
+        "activeForm": "Updating docs"
+      }
+    ]
+  },
+  "sessionId": "e0920ff0-b9e5-4ff6-9584-0a19919108bc",
+  "timestamp": "2025-12-29T20:54:07.066Z"
+}
