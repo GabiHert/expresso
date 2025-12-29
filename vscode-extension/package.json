@@ -7,7 +7,9 @@
   "engines": {
     "vscode": "^1.85.0"
   },
-  "categories": ["Other"],
+  "categories": [
+    "Other"
+  ],
   "activationEvents": [
     "workspaceContains:.ai/cockpit"
   ],
@@ -29,6 +31,18 @@
       {
         "command": "aiCockpit.viewEventDiff",
         "title": "AI Cockpit: View Event Diff"
+      },
+      {
+        "command": "aiCockpit.showClaudeChanges",
+        "title": "AI Cockpit: Show Claude Changes"
+      },
+      {
+        "command": "aiCockpit.showYourChanges",
+        "title": "AI Cockpit: Show Your Changes"
+      },
+      {
+        "command": "aiCockpit.showFullDiff",
+        "title": "AI Cockpit: Show Full Diff"
       }
     ],
     "viewsContainers": {
@@ -54,6 +68,21 @@
           "command": "aiCockpit.viewEventDiff",
           "when": "view == aiCockpit.tasks && viewItem == event",
           "group": "inline"
+        },
+        {
+          "command": "aiCockpit.showClaudeChanges",
+          "when": "view == aiCockpit.tasks && viewItem =~ /shadow-file/",
+          "group": "navigation@1"
+        },
+        {
+          "command": "aiCockpit.showYourChanges",
+          "when": "view == aiCockpit.tasks && viewItem == shadow-file-user-modified",
+          "group": "navigation@2"
+        },
+        {
+          "command": "aiCockpit.showFullDiff",
+          "when": "view == aiCockpit.tasks && viewItem =~ /shadow-file/",
+          "group": "navigation@3"
         }
       ]
     }
@@ -71,5 +100,8 @@
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.0.0",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@vscode/vsce": "^3.7.1"
   }
 }

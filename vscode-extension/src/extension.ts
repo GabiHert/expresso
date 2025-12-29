@@ -1,17 +1,21 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { CockpitFileWatcher } from './watchers/FileWatcher';
 import { StatusBarProvider } from './providers/StatusBarProvider';
 import { TaskTreeProvider } from './providers/TaskTreeProvider';
 import { DiffContentProvider, DIFF_SCHEME } from './providers/DiffContentProvider';
 import { DiffViewer } from './services/DiffViewer';
+import { ShadowManager } from './services/ShadowManager';
 import { registerCommands } from './commands';
 import { CockpitEvent } from './types';
+import { Shadow } from './services/ShadowManager';
 
 let fileWatcher: CockpitFileWatcher | undefined;
 let statusBar: StatusBarProvider | undefined;
 let taskTreeProvider: TaskTreeProvider | undefined;
 let diffContentProvider: DiffContentProvider | undefined;
 let diffViewer: DiffViewer | undefined;
+let shadowManager: ShadowManager | undefined;
 
 export function activate(context: vscode.ExtensionContext) {
   console.log('AI Cockpit extension activated');
@@ -24,9 +28,10 @@ export function activate(context: vscode.ExtensionContext) {
   // Initialize providers
   statusBar = new StatusBarProvider();
   fileWatcher = new CockpitFileWatcher(workspaceRoot);
+  shadowManager = new ShadowManager(workspaceRoot);
 
   // Initialize task tree provider
-  taskTreeProvider = new TaskTreeProvider(fileWatcher);
+  taskTreeProvider = new TaskTreeProvider(fileWatcher, shadowManager);
 
   // Register tree view
   const treeView = vscode.window.createTreeView('aiCockpit.tasks', {
@@ -40,7 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
     DIFF_SCHEME,
     diffContentProvider
   );
-  diffViewer = new DiffViewer(diffContentProvider, workspaceRoot);
+  diffViewer = new DiffViewer(diffContentProvider, workspaceRoot, shadowManager);
 
   // Connect file watcher to status bar
   fileWatcher.onActiveTaskChanged(task => {
@@ -81,6 +86,29 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(viewEventDiff);
 
+  // Register open task command
+  const openTaskCommand = vscode.commands.registerCommand(
+    'aiCockpit.openTask',
+    async (task: { taskId: string; status: string }) => {
+      const readmePath = path.join(
+        workspaceRoot,
+        '.ai/tasks',
+        task.status,
+        task.taskId,
+        'README.md'
+      );
+
+      try {
+        const doc = await vscode.workspace.openTextDocument(readmePath);
+        await vscode.window.showTextDocument(doc);
+      } catch {
+        vscode.window.showWarningMessage(`Could not open README for ${task.taskId}`);
+      }
+    }
+  );
+
+  context.subscriptions.push(openTaskCommand);
+
   // Register refresh command
   const refreshCommand = vscode.commands.registerCommand(
     'aiCockpit.refresh',
@@ -98,6 +126,43 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(refreshCommand, showPanelCommand);
+
+  // Register shadow diff commands
+  // Note: arg can be Shadow (from click) or TreeItem with shadow property (from context menu)
+  const extractShadow = (arg: unknown): Shadow | undefined => {
+    if (!arg) return undefined;
+    // If it has meta.filePath, it's a Shadow
+    if ((arg as Shadow).meta?.filePath) return arg as Shadow;
+    // If it has shadow property, it's a ShadowFileItem
+    if ((arg as { shadow?: Shadow }).shadow) return (arg as { shadow: Shadow }).shadow;
+    return undefined;
+  };
+
+  const showClaudeChanges = vscode.commands.registerCommand(
+    'aiCockpit.showClaudeChanges',
+    async (arg: unknown) => {
+      const shadow = extractShadow(arg);
+      if (shadow) await diffViewer?.showClaudeChanges(shadow);
+    }
+  );
+
+  const showYourChanges = vscode.commands.registerCommand(
+    'aiCockpit.showYourChanges',
+    async (arg: unknown) => {
+      const shadow = extractShadow(arg);
+      if (shadow) await diffViewer?.showYourChanges(shadow);
+    }
+  );
+
+  const showFullDiff = vscode.commands.registerCommand(
+    'aiCockpit.showFullDiff',
+    async (arg: unknown) => {
+      const shadow = extractShadow(arg);
+      if (shadow) await diffViewer?.showFullDiff(shadow);
+    }
+  );
+
+  context.subscriptions.push(showClaudeChanges, showYourChanges, showFullDiff);
 }
 
 export function deactivate() {

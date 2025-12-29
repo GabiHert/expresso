@@ -2,11 +2,13 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { CockpitEvent } from '../types';
 import { DiffContentProvider, DIFF_SCHEME } from '../providers/DiffContentProvider';
+import { Shadow, ShadowManager } from './ShadowManager';
 
 export class DiffViewer {
   constructor(
     private contentProvider: DiffContentProvider,
-    private workspaceRoot: string
+    private workspaceRoot: string,
+    private shadowManager: ShadowManager
   ) {}
 
   async showEditDiff(event: CockpitEvent): Promise<void> {
@@ -131,5 +133,83 @@ export class DiffViewer {
     } catch {
       await this.showEditDiff(event);
     }
+  }
+
+  /**
+   * Show all Claude changes (baseline → accumulated)
+   */
+  async showClaudeChanges(shadow: Shadow): Promise<void> {
+    const beforeUri = vscode.Uri.parse(
+      `${DIFF_SCHEME}:baseline/${shadow.meta.taskId}/${path.basename(shadow.meta.filePath)}`
+    );
+    const afterUri = vscode.Uri.parse(
+      `${DIFF_SCHEME}:accumulated/${shadow.meta.taskId}/${path.basename(shadow.meta.filePath)}`
+    );
+
+    this.contentProvider.registerContent(beforeUri, shadow.baseline);
+    this.contentProvider.registerContent(afterUri, shadow.accumulated);
+
+    await vscode.commands.executeCommand(
+      'vscode.diff',
+      beforeUri,
+      afterUri,
+      `${path.basename(shadow.meta.filePath)} - Claude Changes (${shadow.meta.accumulated.editCount} edits)`
+    );
+  }
+
+  /**
+   * Show user changes (accumulated → actual file)
+   */
+  async showYourChanges(shadow: Shadow): Promise<void> {
+    const actual = await this.shadowManager.getActualContent(shadow);
+
+    if (actual === null) {
+      vscode.window.showWarningMessage('File has been deleted');
+      return;
+    }
+
+    const beforeUri = vscode.Uri.parse(
+      `${DIFF_SCHEME}:accumulated/${shadow.meta.taskId}/${path.basename(shadow.meta.filePath)}`
+    );
+    const afterUri = vscode.Uri.file(this.resolveFilePath(shadow.meta.filePath));
+
+    this.contentProvider.registerContent(beforeUri, shadow.accumulated);
+
+    await vscode.commands.executeCommand(
+      'vscode.diff',
+      beforeUri,
+      afterUri,
+      `${path.basename(shadow.meta.filePath)} - Your Changes`
+    );
+  }
+
+  /**
+   * Show full picture (baseline → actual file)
+   */
+  async showFullDiff(shadow: Shadow): Promise<void> {
+    const actual = await this.shadowManager.getActualContent(shadow);
+
+    if (actual === null) {
+      vscode.window.showWarningMessage('File has been deleted');
+      return;
+    }
+
+    const beforeUri = vscode.Uri.parse(
+      `${DIFF_SCHEME}:baseline/${shadow.meta.taskId}/${path.basename(shadow.meta.filePath)}`
+    );
+    const afterUri = vscode.Uri.file(this.resolveFilePath(shadow.meta.filePath));
+
+    this.contentProvider.registerContent(beforeUri, shadow.baseline);
+
+    await vscode.commands.executeCommand(
+      'vscode.diff',
+      beforeUri,
+      afterUri,
+      `${path.basename(shadow.meta.filePath)} - Full Changes (Original → Current)`
+    );
+  }
+
+  private resolveFilePath(filePath: string): string {
+    return path.isAbsolute(filePath) ? filePath : path.join(this.workspaceRoot, filePath);
   }
 }

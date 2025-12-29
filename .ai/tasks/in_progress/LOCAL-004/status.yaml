@@ -1,0 +1,36 @@
+# Task Status Index
+task: "LOCAL-004"
+title: "Shadow Copy System - Cumulative Diff Tracking"
+created: "2025-12-29"
+updated: "2025-12-29"
+
+summary:
+  total: 4
+  todo: 0
+  in_progress: 0
+  done: 4
+
+work_items:
+  - id: "01"
+    name: "Update hook with shadow support"
+    repo: ".claude/hooks"
+    status: done
+    file: "done/01-hook-shadow-support.md"
+
+  - id: "02"
+    name: "Create ShadowManager service"
+    repo: "vscode-extension"
+    status: done
+    file: "done/02-shadow-manager.md"
+
+  - id: "03"
+    name: "Add cumulative diff commands"
+    repo: "vscode-extension"
+    status: done
+    file: "done/03-cumulative-diff-commands.md"
+
+  - id: "04"
+    name: "Add Files Changed to Tree View"
+    repo: "vscode-extension"
+    status: done
+    file: "done/04-files-changed-tree.md"

@@ -4,6 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { execSync } = require('child_process');
 
 // Read hook input from stdin
@@ -32,6 +33,11 @@ process.stdin.on('end', () => {
 
     // Save event to file
     saveEvent(projectDir, event);
+
+    // Update shadow for file tracking
+    if (hookData.tool_name === 'Edit' || hookData.tool_name === 'Write') {
+      updateShadow(projectDir, taskId.id, hookData);
+    }
 
     // Success - don't block Claude Code
     process.exit(0);
@@ -117,4 +123,114 @@ function saveEvent(projectDir, event) {
 
   fs.writeFileSync(tempPath, JSON.stringify(event, null, 2));
   fs.renameSync(tempPath, eventPath);
+}
+
+/**
+ * Get the shadow directory for a file
+ */
+function getShadowDir(projectDir, taskId, filePath) {
+  const hash = crypto
+    .createHash('sha256')
+    .update(filePath)
+    .digest('hex')
+    .substring(0, 12);
+
+  return path.join(projectDir, '.ai/cockpit/shadows', taskId, hash);
+}
+
+/**
+ * Hash content for comparison
+ */
+function hashContent(content) {
+  return crypto
+    .createHash('sha256')
+    .update(content)
+    .digest('hex')
+    .substring(0, 16);
+}
+
+/**
+ * Update shadow copy for cumulative diff tracking
+ */
+function updateShadow(projectDir, taskId, hookData) {
+  const filePath = hookData.tool_input.file_path;
+  if (!filePath) return;
+
+  const shadowDir = getShadowDir(projectDir, taskId, filePath);
+  const metaPath = path.join(shadowDir, 'meta.json');
+  const baselinePath = path.join(shadowDir, 'baseline.txt');
+  const accumulatedPath = path.join(shadowDir, 'accumulated.txt');
+
+  fs.mkdirSync(shadowDir, { recursive: true });
+
+  const isFirstEdit = !fs.existsSync(metaPath);
+
+  if (isFirstEdit) {
+    // Capture baseline
+    const fullPath = path.isAbsolute(filePath) ? filePath : path.join(projectDir, filePath);
+    let baseline = '';
+
+    if (hookData.tool_name === 'Write') {
+      baseline = ''; // New file, empty baseline
+    } else if (fs.existsSync(fullPath)) {
+      // Reconstruct baseline by reversing the edit
+      const current = fs.readFileSync(fullPath, 'utf8');
+      const oldStr = hookData.tool_input.old_string || '';
+      const newStr = hookData.tool_input.new_string || '';
+      baseline = current.replace(newStr, oldStr);
+    }
+
+    fs.writeFileSync(baselinePath, baseline);
+
+    // Initialize meta
+    const meta = {
+      filePath,
+      taskId,
+      baseline: {
+        capturedAt: new Date().toISOString(),
+        hash: hashContent(baseline),
+        size: baseline.length
+      },
+      accumulated: {
+        lastUpdatedAt: new Date().toISOString(),
+        hash: '',
+        size: 0,
+        editCount: 0
+      },
+      sync: {
+        lastCheckedAt: new Date().toISOString(),
+        status: 'synced'
+      }
+    };
+
+    fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
+  }
+
+  // Update accumulated with current file state
+  const fullPath = path.isAbsolute(filePath) ? filePath : path.join(projectDir, filePath);
+  let accumulated = '';
+
+  if (hookData.tool_name === 'Write') {
+    accumulated = hookData.tool_input.content || '';
+  } else if (fs.existsSync(fullPath)) {
+    accumulated = fs.readFileSync(fullPath, 'utf8');
+  }
+
+  fs.writeFileSync(accumulatedPath, accumulated);
+
+  // Update meta
+  const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+  meta.accumulated = {
+    lastUpdatedAt: new Date().toISOString(),
+    hash: hashContent(accumulated),
+    size: accumulated.length,
+    editCount: (meta.accumulated.editCount || 0) + 1
+  };
+  meta.sync = {
+    lastCheckedAt: new Date().toISOString(),
+    actualFileHash: meta.accumulated.hash,
+    status: 'synced'
+  };
+
+  fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
 }
