@@ -51,12 +51,19 @@ process.stdin.on('end', () => {
 
 /**
  * Resolve the active task ID using fallback chain:
- * 1. active-task.json file
- * 2. Git branch pattern
- * 3. Session ID fallback
+ * 1. COCKPIT_TASK env var (enables parallel sessions)
+ * 2. active-task.json file
+ * 3. Git branch pattern
+ * 4. Session ID fallback
  */
 function resolveTaskId(projectDir, sessionId) {
-  // Strategy 1: Active task file
+  // Strategy 1: Environment variable override (highest priority)
+  const envTaskId = process.env.COCKPIT_TASK;
+  if (envTaskId) {
+    return { id: envTaskId, source: 'env-var' };
+  }
+
+  // Strategy 2: Active task file
   const activeTaskPath = path.join(projectDir, '.ai/cockpit/active-task.json');
   if (fs.existsSync(activeTaskPath)) {
     try {
@@ -69,7 +76,7 @@ function resolveTaskId(projectDir, sessionId) {
     }
   }
 
-  // Strategy 2: Git branch pattern
+  // Strategy 3: Git branch pattern
   try {
     const branch = execSync('git branch --show-current', {
       cwd: projectDir,
@@ -86,7 +93,7 @@ function resolveTaskId(projectDir, sessionId) {
     // Git not available or not in a repo
   }
 
-  // Strategy 3: Session fallback
+  // Strategy 4: Session fallback
   return {
     id: `session-${sessionId || 'unknown'}`,
     source: 'session-fallback'

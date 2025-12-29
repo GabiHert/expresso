@@ -29,9 +29,9 @@
 
 | Status | Count | Details |
 |--------|-------|---------|
-| **In Progress** | 1 | LOCAL-004: Shadow Copy System |
-| **Todo** | 1 | LOCAL-005: Session-to-Task Binding |
-| **Recently Done** | 0 | - |
+| **In Progress** | 0 | - |
+| **Todo** | 0 | - |
+| **Recently Done** | 5 | LOCAL-001..005: AI Cockpit MVP Complete |
 
 ## Quick Reference
 

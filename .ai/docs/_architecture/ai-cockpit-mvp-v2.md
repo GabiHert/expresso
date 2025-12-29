@@ -66,21 +66,42 @@ Use a file-based approach where the current task is written to `.ai/cockpit/acti
 │                    TASK ID RESOLUTION                          │
 ├────────────────────────────────────────────────────────────────┤
 │                                                                │
-│  1. Read .ai/cockpit/active-task.json                          │
+│  1. COCKPIT_TASK environment variable  ◄── NEW: Parallel work  │
+│     ↓ if set                                                   │
+│     → Use env var value (highest priority)                     │
+│                                                                │
+│     ↓ if not set                                               │
+│  2. Read .ai/cockpit/active-task.json                          │
 │     ↓ if exists and valid                                      │
 │     → Use taskId from file                                     │
 │                                                                │
 │     ↓ if not found                                             │
-│  2. Parse git branch name                                      │
+│  3. Parse git branch name                                      │
 │     ↓ if matches pattern (e.g., feat/TASK-123-*)               │
 │     → Use extracted task ID                                    │
 │                                                                │
 │     ↓ if no match                                              │
-│  3. Use session_id as fallback                                 │
+│  4. Use session_id as fallback                                 │
 │     → Group events by session (orphaned edits)                 │
 │                                                                │
 └────────────────────────────────────────────────────────────────┘
 ```
+
+### Parallel Sessions
+
+To work on multiple tasks simultaneously in different terminals:
+
+```bash
+# Terminal 1: Work on LOCAL-001
+COCKPIT_TASK=LOCAL-001 claude
+
+# Terminal 2: Work on LOCAL-002 (parallel)
+COCKPIT_TASK=LOCAL-002 claude
+```
+
+Each session's edits are routed independently to their specified task.
+
+**Without the env var**, all sessions use the same active task from `active-task.json`.
 
 ---
 
@@ -284,7 +305,13 @@ process.stdin.on('end', () => {
 });
 
 function resolveTaskId(projectDir, sessionId) {
-  // Strategy 1: Active task file
+  // Strategy 1: Environment variable override (highest priority)
+  const envTaskId = process.env.COCKPIT_TASK;
+  if (envTaskId) {
+    return { id: envTaskId, source: 'env-var' };
+  }
+
+  // Strategy 2: Active task file
   const activeTaskPath = path.join(projectDir, '.ai/cockpit/active-task.json');
   if (fs.existsSync(activeTaskPath)) {
     try {
@@ -295,7 +322,7 @@ function resolveTaskId(projectDir, sessionId) {
     } catch {}
   }
 
-  // Strategy 2: Git branch pattern
+  // Strategy 3: Git branch pattern
   try {
     const branch = execSync('git branch --show-current', {
       cwd: projectDir,
@@ -310,7 +337,7 @@ function resolveTaskId(projectDir, sessionId) {
     }
   } catch {}
 
-  // Strategy 3: Session fallback
+  // Strategy 4: Session fallback
   return { id: `session-${sessionId}`, source: 'session-fallback' };
 }
 
@@ -629,8 +656,18 @@ Phase 3: VSCode Extension (Basic)
 ```typescript
 // Test task ID resolution
 describe('resolveTaskId', () => {
-  it('should read from active-task.json first', () => {
-    // Mock file exists with taskId
+  it('should read from COCKPIT_TASK env var first', () => {
+    // Env var set
+    process.env.COCKPIT_TASK = 'ENV-TASK';
+    expect(resolveTaskId(mockDir, 'session-1')).toEqual({
+      id: 'ENV-TASK',
+      source: 'env-var'
+    });
+    delete process.env.COCKPIT_TASK;
+  });
+
+  it('should fall back to active-task.json', () => {
+    // No env var, but file exists with taskId
     expect(resolveTaskId(mockDir, 'session-1')).toEqual({
       id: 'TASK-123',
       source: 'active-task-file'
@@ -638,7 +675,7 @@ describe('resolveTaskId', () => {
   });
 
   it('should fall back to git branch', () => {
-    // No active-task.json, but git branch is feat/JIRA-456-fix
+    // No env var, no active-task.json, but git branch is feat/JIRA-456-fix
     expect(resolveTaskId(mockDir, 'session-1')).toEqual({
       id: 'JIRA-456',
       source: 'git-branch'
@@ -646,7 +683,7 @@ describe('resolveTaskId', () => {
   });
 
   it('should fall back to session ID', () => {
-    // No active-task.json, no matching branch
+    // No env var, no active-task.json, no matching branch
     expect(resolveTaskId(mockDir, 'session-1')).toEqual({
       id: 'session-session-1',
       source: 'session-fallback'
