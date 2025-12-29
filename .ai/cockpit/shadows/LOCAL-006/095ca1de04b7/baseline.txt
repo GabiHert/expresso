@@ -24,17 +24,3 @@ export interface Task {
   status: 'todo' | 'in_progress' | 'done';
   events: CockpitEvent[];
 }
-
-export interface CockpitSession {
-  id: string;
-  taskId: string;
-  label: string;
-  createdAt: string;
-  lastActive: string;
-  status: 'active' | 'closed';
-  terminalName: string;
-}
-
-export interface SessionRegistry {
-  sessions: CockpitSession[];
-}

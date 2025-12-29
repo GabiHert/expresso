@@ -112,6 +112,10 @@ export class CockpitFileWatcher implements vscode.Disposable {
     return events;
   }
 
+  getWorkspaceRoot(): string {
+    return this.workspaceRoot;
+  }
+
   getActiveTask(): ActiveTask | null {
     const activeTaskPath = path.join(
       this.workspaceRoot,

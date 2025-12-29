@@ -1,0 +1,93 @@
+{
+  "id": "evt-1767043041966-kpdjbphk4",
+  "taskId": "LOCAL-006",
+  "taskIdSource": "active-task-file",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Work Item 01: Session registry data structure",
+        "status": "completed",
+        "activeForm": "Implementing session registry data structure"
+      },
+      {
+        "content": "Work Item 02: Capture sessionId on terminal open",
+        "status": "completed",
+        "activeForm": "Implementing session capture on terminal open"
+      },
+      {
+        "content": "Work Item 03: Sessions section in TaskTreeProvider",
+        "status": "in_progress",
+        "activeForm": "Implementing sessions UI in tree provider"
+      },
+      {
+        "content": "Work Item 04: Resume session command",
+        "status": "pending",
+        "activeForm": "Implementing resume session command"
+      },
+      {
+        "content": "Work Item 05: New session command with label",
+        "status": "pending",
+        "activeForm": "Implementing new session command"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [
+      {
+        "content": "Work Item 01: Session registry data structure",
+        "status": "completed",
+        "activeForm": "Implementing session registry data structure"
+      },
+      {
+        "content": "Work Item 02: Capture sessionId on terminal open",
+        "status": "in_progress",
+        "activeForm": "Implementing session capture on terminal open"
+      },
+      {
+        "content": "Work Item 03: Sessions section in TaskTreeProvider",
+        "status": "pending",
+        "activeForm": "Implementing sessions UI in tree provider"
+      },
+      {
+        "content": "Work Item 04: Resume session command",
+        "status": "pending",
+        "activeForm": "Implementing resume session command"
+      },
+      {
+        "content": "Work Item 05: New session command with label",
+        "status": "pending",
+        "activeForm": "Implementing new session command"
+      }
+    ],
+    "newTodos": [
+      {
+        "content": "Work Item 01: Session registry data structure",
+        "status": "completed",
+        "activeForm": "Implementing session registry data structure"
+      },
+      {
+        "content": "Work Item 02: Capture sessionId on terminal open",
+        "status": "completed",
+        "activeForm": "Implementing session capture on terminal open"
+      },
+      {
+        "content": "Work Item 03: Sessions section in TaskTreeProvider",
+        "status": "in_progress",
+        "activeForm": "Implementing sessions UI in tree provider"
+      },
+      {
+        "content": "Work Item 04: Resume session command",
+        "status": "pending",
+        "activeForm": "Implementing resume session command"
+      },
+      {
+        "content": "Work Item 05: New session command with label",
+        "status": "pending",
+        "activeForm": "Implementing new session command"
+      }
+    ]
+  },
+  "sessionId": "998d8151-40d9-4124-ab15-358ca47378b7",
+  "timestamp": "2025-12-29T21:17:21.966Z"
+}

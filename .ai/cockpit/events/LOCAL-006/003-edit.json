@@ -1,0 +1,48 @@
+{
+  "id": "evt-1767042608667-55ktjr2tr",
+  "taskId": "LOCAL-006",
+  "taskIdSource": "active-task-file",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/types/index.ts",
+    "old_string": "export interface Task {\n  id: string;\n  title: string;\n  status: 'todo' | 'in_progress' | 'done';\n  events: CockpitEvent[];\n}",
+    "new_string": "export interface Task {\n  id: string;\n  title: string;\n  status: 'todo' | 'in_progress' | 'done';\n  events: CockpitEvent[];\n}\n\nexport interface CockpitSession {\n  id: string;\n  taskId: string;\n  label: string;\n  createdAt: string;\n  lastActive: string;\n  status: 'active' | 'closed';\n  terminalName: string;\n}\n\nexport interface SessionRegistry {\n  sessions: CockpitSession[];\n}"
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/types/index.ts",
+    "oldString": "export interface Task {\n  id: string;\n  title: string;\n  status: 'todo' | 'in_progress' | 'done';\n  events: CockpitEvent[];\n}",
+    "newString": "export interface Task {\n  id: string;\n  title: string;\n  status: 'todo' | 'in_progress' | 'done';\n  events: CockpitEvent[];\n}\n\nexport interface CockpitSession {\n  id: string;\n  taskId: string;\n  label: string;\n  createdAt: string;\n  lastActive: string;\n  status: 'active' | 'closed';\n  terminalName: string;\n}\n\nexport interface SessionRegistry {\n  sessions: CockpitSession[];\n}",
+    "originalFile": "export interface ActiveTask {\n  taskId: string;\n  title: string;\n  branch?: string;\n  frameworkPath: string;\n  startedAt: string;\n  sessionId?: string;\n}\n\nexport interface CockpitEvent {\n  id: string;\n  taskId: string;\n  taskIdSource: 'env-var' | 'active-task-file' | 'git-branch' | 'session-fallback';\n  tool: 'Edit' | 'Write' | 'TodoWrite';\n  input: Record<string, unknown>;\n  response?: string;\n  sessionId: string;\n  timestamp: string;\n}\n\nexport interface Task {\n  id: string;\n  title: string;\n  status: 'todo' | 'in_progress' | 'done';\n  events: CockpitEvent[];\n}\n",
+    "structuredPatch": [
+      {
+        "oldStart": 24,
+        "oldLines": 3,
+        "newStart": 24,
+        "newLines": 17,
+        "lines": [
+          "   status: 'todo' | 'in_progress' | 'done';",
+          "   events: CockpitEvent[];",
+          " }",
+          "+",
+          "+export interface CockpitSession {",
+          "+  id: string;",
+          "+  taskId: string;",
+          "+  label: string;",
+          "+  createdAt: string;",
+          "+  lastActive: string;",
+          "+  status: 'active' | 'closed';",
+          "+  terminalName: string;",
+          "+}",
+          "+",
+          "+export interface SessionRegistry {",
+          "+  sessions: CockpitSession[];",
+          "+}"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "998d8151-40d9-4124-ab15-358ca47378b7",
+  "timestamp": "2025-12-29T21:10:08.667Z"
+}

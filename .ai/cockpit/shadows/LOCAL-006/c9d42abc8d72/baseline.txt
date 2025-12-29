@@ -48,16 +48,6 @@
         "command": "aiCockpit.openTaskTerminal",
         "title": "AI Cockpit: Open Task Terminal",
         "icon": "$(terminal)"
-      },
-      {
-        "command": "aiCockpit.resumeSession",
-        "title": "AI Cockpit: Resume Session",
-        "icon": "$(play)"
-      },
-      {
-        "command": "aiCockpit.newSession",
-        "title": "AI Cockpit: New Session",
-        "icon": "$(add)"
       }
     ],
     "viewsContainers": {
@@ -118,16 +108,6 @@
           "command": "aiCockpit.showFullDiff",
           "when": "view == aiCockpit.tasks && viewItem =~ /shadow-file/",
           "group": "navigation@3"
-        },
-        {
-          "command": "aiCockpit.resumeSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-closed",
-          "group": "inline"
-        },
-        {
-          "command": "aiCockpit.newSession",
-          "when": "view == aiCockpit.tasks && viewItem == sessions-section",
-          "group": "inline"
         }
       ]
     }

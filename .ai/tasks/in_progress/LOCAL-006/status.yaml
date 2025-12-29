@@ -6,37 +6,37 @@ updated: "2025-12-29"
 
 summary:
   total: 5
-  todo: 5
+  todo: 0
   in_progress: 0
-  done: 0
+  done: 5
 
 work_items:
   - id: "01"
     name: "Session registry data structure"
     repo: "ai-framework"
-    status: todo
-    file: "todo/01-session-registry.md"
+    status: done
+    file: "done/01-session-registry.md"
 
   - id: "02"
     name: "Capture sessionId on terminal open"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/02-capture-session.md"
+    status: done
+    file: "done/02-capture-session.md"
 
   - id: "03"
     name: "Sessions section in TaskTreeProvider"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/03-sessions-ui.md"
+    status: done
+    file: "done/03-sessions-ui.md"
 
   - id: "04"
     name: "Resume session command"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/04-resume-command.md"
+    status: done
+    file: "done/04-resume-command.md"
 
   - id: "05"
     name: "New session command with label"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/05-new-session.md"
+    status: done
+    file: "done/05-new-session.md"

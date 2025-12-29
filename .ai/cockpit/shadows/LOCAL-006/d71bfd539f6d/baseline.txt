@@ -1,12 +1,11 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { ActiveTask, CockpitEvent, CockpitSession } from '../types';
+import { ActiveTask, CockpitEvent } from '../types';
 import { CockpitFileWatcher } from '../watchers/FileWatcher';
 import { Shadow, ShadowManager } from '../services/ShadowManager';
-import { SessionManager } from '../services/SessionManager';
 
-type TreeItemType = SectionItem | TaskItem | EventItem | WorkItemNode | FilesChangedSection | ShadowFileItem | SessionsSection | SessionItem;
+type TreeItemType = SectionItem | TaskItem | EventItem | WorkItemNode | FilesChangedSection | ShadowFileItem;
 
 interface FrameworkTask {
   taskId: string;
@@ -32,8 +31,7 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
 
   constructor(
     private fileWatcher: CockpitFileWatcher,
-    private shadowManager: ShadowManager,
-    private sessionManager?: SessionManager
+    private shadowManager: ShadowManager
   ) {
     this.workspaceRoot = fileWatcher.getWorkspaceRoot();
 
@@ -69,10 +67,6 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
 
     if (element instanceof TaskItem) {
       return this.getTaskChildren(element);
-    }
-
-    if (element instanceof SessionsSection) {
-      return this.getSessionsForTask(element.taskId);
     }
 
     if (element instanceof FilesChangedSection) {
@@ -211,14 +205,6 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
   private async getTaskChildren(task: TaskItem): Promise<TreeItemType[]> {
     const items: TreeItemType[] = [];
 
-    // Add Sessions section if sessions exist
-    if (this.sessionManager) {
-      const sessions = this.sessionManager.getSessionsForTask(task.taskId);
-      if (sessions.length > 0) {
-        items.push(new SessionsSection(task.taskId, sessions.length));
-      }
-    }
-
     // Add work items if available
     if (task.task.workItems && task.task.workItems.length > 0) {
       for (const wi of task.task.workItems) {
@@ -233,22 +219,6 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
     }
 
     return items;
-  }
-
-  private getSessionsForTask(taskId: string): SessionItem[] {
-    if (!this.sessionManager) return [];
-
-    const sessions = this.sessionManager.getSessionsForTask(taskId);
-
-    // Sort: active sessions first, then by lastActive descending
-    return sessions
-      .sort((a, b) => {
-        if (a.status !== b.status) {
-          return a.status === 'active' ? -1 : 1;
-        }
-        return new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime();
-      })
-      .map(s => new SessionItem(s));
   }
 
   private async getFilesForTask(taskId: string): Promise<ShadowFileItem[]> {
@@ -463,50 +433,5 @@ class ShadowFileItem extends vscode.TreeItem {
     };
 
     this.contextValue = `shadow-file-${syncStatus}`;
-  }
-}
-
-class SessionsSection extends vscode.TreeItem {
-  constructor(
-    public readonly taskId: string,
-    sessionCount: number
-  ) {
-    super('Sessions', vscode.TreeItemCollapsibleState.Collapsed);
-
-    this.description = `${sessionCount}`;
-    this.iconPath = new vscode.ThemeIcon('terminal');
-    this.contextValue = 'sessions-section';
-  }
-}
-
-class SessionItem extends vscode.TreeItem {
-  constructor(public readonly session: CockpitSession) {
-    super(session.label, vscode.TreeItemCollapsibleState.None);
-
-    this.description = session.status;
-
-    // Icon: green circle for active, gray outline for closed
-    if (session.status === 'active') {
-      this.iconPath = new vscode.ThemeIcon(
-        'circle-filled',
-        new vscode.ThemeColor('charts.green')
-      );
-    } else {
-      this.iconPath = new vscode.ThemeIcon('circle-outline');
-    }
-
-    // Click to resume session
-    this.command = {
-      command: 'aiCockpit.resumeSession',
-      title: 'Resume Session',
-      arguments: [session]
-    };
-
-    this.contextValue = `session-${session.status}`;
-
-    // Format timestamps for tooltip
-    const created = new Date(session.createdAt).toLocaleString();
-    const lastActive = new Date(session.lastActive).toLocaleString();
-    this.tooltip = `Session ID: ${session.id}\nCreated: ${created}\nLast active: ${lastActive}`;
   }
 }
