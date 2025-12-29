@@ -29,8 +29,8 @@
 
 | Status | Count | Details |
 |--------|-------|---------|
-| **In Progress** | 0 | - |
-| **Todo** | 0 | - |
+| **In Progress** | 1 | LOCAL-004: Shadow Copy System |
+| **Todo** | 1 | LOCAL-005: Session-to-Task Binding |
 | **Recently Done** | 0 | - |
 
 ## Quick Reference
