@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-015/todo/05-active-task-cleanup.md",
+  "taskId": "session-a854a1d6-3b04-4ec6-88ce-1670da42be1c",
+  "baseline": {
+    "capturedAt": "2025-12-30T19:08:58.085Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T19:08:58.085Z",
+    "hash": "9e1d46905f81dec1",
+    "size": 4654,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T19:08:58.085Z",
+    "actualFileHash": "9e1d46905f81dec1",
+    "status": "synced"
+  }
+}

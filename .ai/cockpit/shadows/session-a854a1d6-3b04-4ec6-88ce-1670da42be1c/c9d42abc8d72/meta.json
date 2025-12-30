@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/package.json",
+  "taskId": "session-a854a1d6-3b04-4ec6-88ce-1670da42be1c",
+  "baseline": {
+    "capturedAt": "2025-12-30T19:09:39.842Z",
+    "hash": "14994e01317e9cc7",
+    "size": 9994
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T19:09:49.430Z",
+    "hash": "c416d538d306226f",
+    "size": 10786,
+    "editCount": 2
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T19:09:49.430Z",
+    "actualFileHash": "c416d538d306226f",
+    "status": "synced"
+  }
+}

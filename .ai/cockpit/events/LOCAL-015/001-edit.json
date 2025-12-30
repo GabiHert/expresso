@@ -1,0 +1,35 @@
+{
+  "id": "evt-1767122625322-o759nbb9p",
+  "taskId": "LOCAL-015",
+  "taskIdSource": "env-var",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/docs/_completed_tasks.md",
+    "old_string": "| 2025-12-30 | [LOCAL-013](.ai/tasks/done/LOCAL-013/) | Diff Feedback System - Markdown storage format, /address-feedback command, VSCode feedback button, task-create integration |",
+    "new_string": "| 2025-12-30 | [LOCAL-013](.ai/tasks/done/LOCAL-013/) | Diff Feedback System - Markdown storage format, /address-feedback command, VSCode feedback button, task-create integration |\n| 2025-12-30 | [LOCAL-015](.ai/tasks/done/LOCAL-015/) | Delete Task Functionality - Context menu deletion with cleanup of events, shadows, sessions, and active task state |"
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/docs/_completed_tasks.md",
+    "oldString": "| 2025-12-30 | [LOCAL-013](.ai/tasks/done/LOCAL-013/) | Diff Feedback System - Markdown storage format, /address-feedback command, VSCode feedback button, task-create integration |",
+    "newString": "| 2025-12-30 | [LOCAL-013](.ai/tasks/done/LOCAL-013/) | Diff Feedback System - Markdown storage format, /address-feedback command, VSCode feedback button, task-create integration |\n| 2025-12-30 | [LOCAL-015](.ai/tasks/done/LOCAL-015/) | Delete Task Functionality - Context menu deletion with cleanup of events, shadows, sessions, and active task state |",
+    "originalFile": "# Completed Tasks Log\n\nTasks completed in this project, for reference and learning.\n\n| Date | Task | Summary |\n|------|------|---------|\n| 2025-12-29 | [LOCAL-001](.ai/tasks/done/LOCAL-001/) | Framework Integration - Cockpit directory structure and task lifecycle |\n| 2025-12-29 | [LOCAL-002](.ai/tasks/done/LOCAL-002/) | Hook System - PostToolUse hooks capturing Edit/Write/TodoWrite events |\n| 2025-12-29 | [LOCAL-003](.ai/tasks/done/LOCAL-003/) | VSCode Extension - Task panel, status bar, file watcher, diff viewer |\n| 2025-12-29 | [LOCAL-004](.ai/tasks/done/LOCAL-004/) | Shadow Copy System - Cumulative diff tracking with baseline/accumulated |\n| 2025-12-29 | [LOCAL-005](.ai/tasks/done/LOCAL-005/) | Session-to-Task Binding - COCKPIT_TASK env var for parallel sessions |\n| 2025-12-29 | [EPIC-001](.ai/tasks/done/EPIC-001/) | **AI Cockpit MVP v2** - Complete VSCode extension with task tracking, hooks, diffs, shadows, and parallel sessions |\n| 2025-12-29 | [LOCAL-006](.ai/tasks/done/LOCAL-006/) | Session Tracking & Resume - Persist sessions in registry, display in Cockpit UI, resume closed sessions with full context |\n| 2025-12-29 | [LOCAL-007](.ai/tasks/done/LOCAL-007/) | Session Tracking Fixes - Race condition handling, async I/O, session cleanup, JSON error handling, configurable paths |\n| 2025-12-29 | [LOCAL-008](.ai/tasks/done/LOCAL-008/) | Session Terminal Reuse - Focus existing terminals for active sessions, support multiple parallel sessions per task |\n| 2025-12-30 | [LOCAL-009](.ai/tasks/done/LOCAL-009/) | Sidebar Click Behavior - Tasks open README, work items open .md files, terminals via context menu |\n| 2025-12-30 | [LOCAL-010](.ai/tasks/done/LOCAL-010/) | Session Rename & Delete - Right-click context menus to rename session labels or delete sessions with confirmation |\n| 2025-12-30 | [LOCAL-011](.ai/tasks/done/LOCAL-011/) | Default Full Diff - Changed file click behavior from Claude Changes to Full Diff |\n| 2025-12-30 | [LOCAL-012](.ai/tasks/done/LOCAL-012/) | Unassigned Sessions & Task Linking - Start sessions without a task, view in dedicated section, link to tasks later via context menu or /task-create |\n| 2025-12-30 | [LOCAL-014](.ai/tasks/done/LOCAL-014/) | GitHub-style PR Review Diff Viewer - Inline commenting with diff2html, plus security fixes (XSS, path traversal, race conditions) |\n| 2025-12-30 | [LOCAL-013](.ai/tasks/done/LOCAL-013/) | Diff Feedback System - Markdown storage format, /address-feedback command, VSCode feedback button, task-create integration |\n",
+    "structuredPatch": [
+      {
+        "oldStart": 19,
+        "oldLines": 3,
+        "newStart": 19,
+        "newLines": 4,
+        "lines": [
+          " | 2025-12-30 | [LOCAL-012](.ai/tasks/done/LOCAL-012/) | Unassigned Sessions & Task Linking - Start sessions without a task, view in dedicated section, link to tasks later via context menu or /task-create |",
+          " | 2025-12-30 | [LOCAL-014](.ai/tasks/done/LOCAL-014/) | GitHub-style PR Review Diff Viewer - Inline commenting with diff2html, plus security fixes (XSS, path traversal, race conditions) |",
+          " | 2025-12-30 | [LOCAL-013](.ai/tasks/done/LOCAL-013/) | Diff Feedback System - Markdown storage format, /address-feedback command, VSCode feedback button, task-create integration |",
+          "+| 2025-12-30 | [LOCAL-015](.ai/tasks/done/LOCAL-015/) | Delete Task Functionality - Context menu deletion with cleanup of events, shadows, sessions, and active task state |"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "700d2c53-d41e-49dc-8f88-59aca83ac6c1",
+  "timestamp": "2025-12-30T19:23:45.322Z"
+}

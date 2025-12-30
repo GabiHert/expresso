@@ -1,0 +1,39 @@
+{
+  "id": "evt-1767122650498-qcjxarb9q",
+  "taskId": "LOCAL-015",
+  "taskIdSource": "env-var",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/done/LOCAL-015/README.md",
+    "old_string": "║ LOCATION: .ai/tasks/todo/LOCAL-015/                              ║",
+    "new_string": "║ LOCATION: .ai/tasks/done/LOCAL-015/                              ║"
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/done/LOCAL-015/README.md",
+    "oldString": "║ LOCATION: .ai/tasks/todo/LOCAL-015/                              ║",
+    "newString": "║ LOCATION: .ai/tasks/done/LOCAL-015/                              ║",
+    "originalFile": "<!--\n╔═══════════════════════════════════════════════════════════════yde═══╗\n║ LAYER: TASK                                                      ║\n║ LOCATION: .ai/tasks/todo/LOCAL-015/                              ║\n╠══════════════════════════════════════════════════════════════════╣\n║ BEFORE WORKING ON THIS TASK:                                     ║\n║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)           ║\n║ 2. Read this entire README first                                 ║\n║ 3. Check which work items are in todo/ vs done/                  ║\n║ 4. Work on ONE item at a time from todo/                         ║\n╚══════════════════════════════════════════════════════════════════╝\n-->\n\n# LOCAL-015: Delete Task Functionality\n\n## Problem Statement\n\nUsers need the ability to delete tasks from the AI Cockpit. Currently, tasks can only be created and completed - there is no way to remove them. When a task is deleted, all associated data should be cleaned up including:\n- Task folder (`.ai/tasks/{status}/{taskId}/`)\n- Event history (`.ai/cockpit/events/{taskId}/`)\n- Shadow copies (`.ai/cockpit/shadows/{taskId}/`)\n- Session references in `sessions.json`\n- Git worktrees (if enabled and exist)\n- Active task state (if the deleted task is active)\n\n## Acceptance Criteria\n\n- [ ] Tasks can be deleted from the VSCode extension sidebar via context menu\n- [ ] Confirmation dialog shown before deletion (with warning for active/in-progress tasks)\n- [ ] Task folder is completely removed from `.ai/tasks/{status}/{taskId}/`\n- [ ] Event history is removed from `.ai/cockpit/events/{taskId}/`\n- [ ] Shadow copies are removed from `.ai/cockpit/shadows/{taskId}/`\n- [ ] Session references are cleaned from `sessions.json`\n- [ ] If deleted task is active, `active-task.json` is cleared\n- [ ] Open DiffReviewPanels for deleted task are closed\n- [ ] Tree view refreshes after deletion\n- [ ] Path traversal attacks are prevented\n\n## Work Items\n\nSee `status.yaml` for full index.\n\n| ID | Name | Repo | Status |\n|----|------|------|--------|\n| 01 | Add deleteTask command definition | vscode-extension | todo |\n| 02 | Add context menu for delete action | vscode-extension | todo |\n| 03 | Implement deleteTask command | vscode-extension | todo |\n| 04 | Add cockpit cleanup service | vscode-extension | todo |\n| 05 | Handle active task and panel cleanup | vscode-extension | todo |\n| 06 | Add comprehensive tests | vscode-extension | todo |\n\n## Branches\n\n| Repo | Branch |\n|------|--------|\n| vscode-extension | `LOCAL-015-delete-task` |\n\n## Technical Context\n\n### Existing Patterns to Follow\n\nThe `deleteSession` command (extension.ts:540-577) provides the perfect pattern:\n1. Extract entity from context menu item\n2. Show confirmation dialog (with warning for active state)\n3. Perform cleanup operations\n4. Refresh tree view\n5. Show success message\n\n### Key Files\n\n- `extension.ts:540-577` - deleteSession implementation (template)\n- `package.json:246-264` - Session context menu definitions\n- `SessionManager.ts:83-95` - Registry file manipulation\n- `TaskTreeProvider.ts:382-428` - TaskItem class with contextValue\n\n### Storage Locations\n\n```\n.ai/tasks/{status}/{taskId}/     # Task folder (README, status.yaml, work items)\n.ai/cockpit/events/{taskId}/     # Event JSON files (can be thousands)\n.ai/cockpit/shadows/{taskId}/    # Shadow directories with baseline/accumulated\n.ai/cockpit/sessions.json        # Session registry (filter by taskId)\n.ai/cockpit/active-task.json     # Active task reference (delete if matches)\n../worktrees/{taskId}/           # Git worktrees (if enabled)\n```\n\n## Implementation Approach\n\n1. **Command Definition**: Add `aiCockpit.deleteTask` command in package.json\n2. **Context Menu**: Add menu items for `task-todo` and `task-done` contexts (optionally `task-in_progress` with extra warning)\n3. **Command Implementation**: Follow deleteSession pattern with multi-location cleanup\n4. **Cleanup Service**: Create dedicated service for cockpit data cleanup (events, shadows, sessions)\n5. **Edge Cases**: Handle active task, open panels, concurrent access\n\n## Risks & Considerations\n\n- **Data Loss**: Deletion is permanent - confirmation dialog is critical\n- **Active Task**: Must handle case where user deletes the currently active task\n- **Open Panels**: DiffReviewPanels may be open for files in the deleted task\n- **Path Traversal**: Must validate paths stay within allowed directories\n- **Concurrent Access**: Hook may fire during deletion - use atomic operations\n- **Worktree Cleanup**: Requires git commands per repo, may fail if dirty\n\n## Testing Strategy\n\n1. Unit tests for cleanup service\n2. Integration tests for command execution\n3. Manual testing scenarios:\n   - Delete todo task\n   - Delete done task\n   - Delete in-progress task (with warning)\n   - Delete active task (clears active-task.json)\n   - Delete task with open DiffReviewPanel\n   - Delete task with worktrees\n\n## Feedback\n\nReview comments can be added to `feedback/diff-review.md`.\nUse `/address-feedback` to discuss feedback with the agent.\n\n## References\n\n- Exploration findings from /task-explore session\n- deleteSession pattern: extension.ts:540-577\n- Session context menus: package.json:246-264\n",
+    "structuredPatch": [
+      {
+        "oldStart": 1,
+        "oldLines": 7,
+        "newStart": 1,
+        "newLines": 7,
+        "lines": [
+          " <!--",
+          " ╔═══════════════════════════════════════════════════════════════yde═══╗",
+          " ║ LAYER: TASK                                                      ║",
+          "-║ LOCATION: .ai/tasks/todo/LOCAL-015/                              ║",
+          "+║ LOCATION: .ai/tasks/done/LOCAL-015/                              ║",
+          " ╠══════════════════════════════════════════════════════════════════╣",
+          " ║ BEFORE WORKING ON THIS TASK:                                     ║",
+          " ║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)           ║"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "700d2c53-d41e-49dc-8f88-59aca83ac6c1",
+  "timestamp": "2025-12-30T19:24:10.498Z"
+}

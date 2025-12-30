@@ -1,0 +1,48 @@
+# Task Status Index
+task: "LOCAL-015"
+title: "Delete Task Functionality"
+created: "2025-12-30"
+updated: "2025-12-30"
+
+summary:
+  total: 6
+  todo: 6
+  in_progress: 0
+  done: 0
+
+work_items:
+  - id: "01"
+    name: "Add deleteTask command definition"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/01-command-definition.md"
+
+  - id: "02"
+    name: "Add context menu for delete action"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/02-context-menu.md"
+
+  - id: "03"
+    name: "Implement deleteTask command"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/03-implement-command.md"
+
+  - id: "04"
+    name: "Add cockpit cleanup service"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/04-cleanup-service.md"
+
+  - id: "05"
+    name: "Handle active task and panel cleanup"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/05-active-task-cleanup.md"
+
+  - id: "06"
+    name: "Add comprehensive tests"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/06-tests.md"

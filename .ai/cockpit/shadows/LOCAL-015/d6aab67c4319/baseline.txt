@@ -19,4 +19,3 @@ Tasks completed in this project, for reference and learning.
 | 2025-12-30 | [LOCAL-012](.ai/tasks/done/LOCAL-012/) | Unassigned Sessions & Task Linking - Start sessions without a task, view in dedicated section, link to tasks later via context menu or /task-create |
 | 2025-12-30 | [LOCAL-014](.ai/tasks/done/LOCAL-014/) | GitHub-style PR Review Diff Viewer - Inline commenting with diff2html, plus security fixes (XSS, path traversal, race conditions) |
 | 2025-12-30 | [LOCAL-013](.ai/tasks/done/LOCAL-013/) | Diff Feedback System - Markdown storage format, /address-feedback command, VSCode feedback button, task-create integration |
-| 2025-12-30 | [LOCAL-015](.ai/tasks/done/LOCAL-015/) | Delete Task Functionality - Context menu deletion with cleanup of events, shadows, sessions, and active task state |

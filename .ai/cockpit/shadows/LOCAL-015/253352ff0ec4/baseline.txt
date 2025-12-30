@@ -31,7 +31,7 @@
 |--------|-------|---------|
 | **In Progress** | 0 | - |
 | **Todo** | 0 | - |
-| **Recently Done** | 16 | EPIC-001 + LOCAL-001..015: AI Cockpit MVP v2 + Delete Task |
+| **Recently Done** | 6 | EPIC-001 + LOCAL-001..005: AI Cockpit MVP v2 Complete |
 
 ## Quick Reference
 

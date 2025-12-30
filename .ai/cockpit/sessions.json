@@ -139,6 +139,26 @@
       "status": "closed",
       "terminalName": "Cockpit: Session",
       "terminalId": "c52ea9c1-633d-4d19-9343-ca6e89a61975"
+    },
+    {
+      "id": "a854a1d6-3b04-4ec6-88ce-1670da42be1c",
+      "taskId": "LOCAL-015",
+      "label": "Session 4:20:12 PM",
+      "createdAt": "2025-12-30T19:20:12.921Z",
+      "lastActive": "2025-12-30T19:20:12.921Z",
+      "status": "active",
+      "terminalName": "Cockpit: LOCAL-015",
+      "terminalId": "e36d8cd2-8cc3-4783-87b9-8b72a44c2ef5"
+    },
+    {
+      "id": "700d2c53-d41e-49dc-8f88-59aca83ac6c1",
+      "taskId": "_unassigned",
+      "label": "allow dangerously operations ",
+      "createdAt": "2025-12-30T19:21:03.675Z",
+      "lastActive": "2025-12-30T19:21:03.675Z",
+      "status": "active",
+      "terminalName": "Cockpit: Session",
+      "terminalId": "340c83c5-6ec5-4310-9fd3-26a142e5008c"
     }
   ]
 }
