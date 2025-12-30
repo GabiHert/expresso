@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/extension.ts",
+  "taskId": "LOCAL-009",
+  "baseline": {
+    "capturedAt": "2025-12-30T01:16:13.847Z",
+    "hash": "afdf798d099959ce",
+    "size": 21200
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T01:18:40.540Z",
+    "hash": "dac43cff62351ecb",
+    "size": 22334,
+    "editCount": 2
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T01:18:40.540Z",
+    "actualFileHash": "dac43cff62351ecb",
+    "status": "synced"
+  }
+}
