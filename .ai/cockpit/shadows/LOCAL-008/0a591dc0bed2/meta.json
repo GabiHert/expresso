@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-009/todo/02-workitem-click-handler.md",
+  "taskId": "LOCAL-008",
+  "baseline": {
+    "capturedAt": "2025-12-30T00:48:27.130Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T00:48:27.130Z",
+    "hash": "1a314983b120dfc2",
+    "size": 3366,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T00:48:27.130Z",
+    "actualFileHash": "1a314983b120dfc2",
+    "status": "synced"
+  }
+}

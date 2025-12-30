@@ -1,0 +1,69 @@
+{
+  "id": "evt-1767056314608-boxz6scag",
+  "taskId": "LOCAL-008",
+  "taskIdSource": "active-task-file",
+  "tool": "Write",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/in_progress/LOCAL-008/status.yaml",
+    "content": "# Task Status Index\ntask: \"LOCAL-008\"\ntitle: \"Fix Session Terminal Reuse and Multi-Session Status\"\ncreated: \"2025-12-29\"\nupdated: \"2025-12-29\"\n\nsummary:\n  total: 4\n  todo: 0\n  in_progress: 0\n  done: 4\n\nwork_items:\n  - id: \"01\"\n    name: \"Export terminalIdMap for terminal lookup\"\n    repo: \"vscode-extension\"\n    status: done\n    file: \"done/01-terminal-manager.md\"\n\n  - id: \"02\"\n    name: \"Add focusSession command for active sessions\"\n    repo: \"vscode-extension\"\n    status: done\n    file: \"done/02-focus-session.md\"\n\n  - id: \"03\"\n    name: \"Fix SessionItem click handler branching\"\n    repo: \"vscode-extension\"\n    status: done\n    file: \"done/03-session-item-branching.md\"\n\n  - id: \"04\"\n    name: \"Remove auto-close of other active sessions\"\n    repo: \"vscode-extension\"\n    status: done\n    file: \"done/04-remove-auto-close.md\"\n"
+  },
+  "response": {
+    "type": "update",
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/in_progress/LOCAL-008/status.yaml",
+    "content": "# Task Status Index\ntask: \"LOCAL-008\"\ntitle: \"Fix Session Terminal Reuse and Multi-Session Status\"\ncreated: \"2025-12-29\"\nupdated: \"2025-12-29\"\n\nsummary:\n  total: 4\n  todo: 0\n  in_progress: 0\n  done: 4\n\nwork_items:\n  - id: \"01\"\n    name: \"Export terminalIdMap for terminal lookup\"\n    repo: \"vscode-extension\"\n    status: done\n    file: \"done/01-terminal-manager.md\"\n\n  - id: \"02\"\n    name: \"Add focusSession command for active sessions\"\n    repo: \"vscode-extension\"\n    status: done\n    file: \"done/02-focus-session.md\"\n\n  - id: \"03\"\n    name: \"Fix SessionItem click handler branching\"\n    repo: \"vscode-extension\"\n    status: done\n    file: \"done/03-session-item-branching.md\"\n\n  - id: \"04\"\n    name: \"Remove auto-close of other active sessions\"\n    repo: \"vscode-extension\"\n    status: done\n    file: \"done/04-remove-auto-close.md\"\n",
+    "structuredPatch": [
+      {
+        "oldStart": 6,
+        "oldLines": 31,
+        "newStart": 6,
+        "newLines": 31,
+        "lines": [
+          " ",
+          " summary:",
+          "   total: 4",
+          "-  todo: 4",
+          "+  todo: 0",
+          "   in_progress: 0",
+          "-  done: 0",
+          "+  done: 4",
+          " ",
+          " work_items:",
+          "   - id: \"01\"",
+          "     name: \"Export terminalIdMap for terminal lookup\"",
+          "     repo: \"vscode-extension\"",
+          "-    status: todo",
+          "-    file: \"todo/01-terminal-manager.md\"",
+          "+    status: done",
+          "+    file: \"done/01-terminal-manager.md\"",
+          " ",
+          "   - id: \"02\"",
+          "     name: \"Add focusSession command for active sessions\"",
+          "     repo: \"vscode-extension\"",
+          "-    status: todo",
+          "-    file: \"todo/02-focus-session.md\"",
+          "+    status: done",
+          "+    file: \"done/02-focus-session.md\"",
+          " ",
+          "   - id: \"03\"",
+          "     name: \"Fix SessionItem click handler branching\"",
+          "     repo: \"vscode-extension\"",
+          "-    status: todo",
+          "-    file: \"todo/03-session-item-branching.md\"",
+          "+    status: done",
+          "+    file: \"done/03-session-item-branching.md\"",
+          " ",
+          "   - id: \"04\"",
+          "     name: \"Remove auto-close of other active sessions\"",
+          "     repo: \"vscode-extension\"",
+          "-    status: todo",
+          "-    file: \"todo/04-remove-auto-close.md\"",
+          "+    status: done",
+          "+    file: \"done/04-remove-auto-close.md\""
+        ]
+      }
+    ],
+    "originalFile": "# Task Status Index\ntask: \"LOCAL-008\"\ntitle: \"Fix Session Terminal Reuse and Multi-Session Status\"\ncreated: \"2025-12-29\"\nupdated: \"2025-12-29\"\n\nsummary:\n  total: 4\n  todo: 4\n  in_progress: 0\n  done: 0\n\nwork_items:\n  - id: \"01\"\n    name: \"Export terminalIdMap for terminal lookup\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/01-terminal-manager.md\"\n\n  - id: \"02\"\n    name: \"Add focusSession command for active sessions\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/02-focus-session.md\"\n\n  - id: \"03\"\n    name: \"Fix SessionItem click handler branching\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/03-session-item-branching.md\"\n\n  - id: \"04\"\n    name: \"Remove auto-close of other active sessions\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/04-remove-auto-close.md\"\n"
+  },
+  "sessionId": "998d8151-40d9-4124-ab15-358ca47378b7",
+  "timestamp": "2025-12-30T00:58:34.608Z"
+}

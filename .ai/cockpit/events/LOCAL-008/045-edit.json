@@ -1,0 +1,39 @@
+{
+  "id": "evt-1767057062055-tjj8pfkhc",
+  "taskId": "LOCAL-008",
+  "taskIdSource": "active-task-file",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/done/LOCAL-007/README.md",
+    "old_string": "║ LOCATION: .ai/tasks/in_progress/LOCAL-007/                       ║",
+    "new_string": "║ LOCATION: .ai/tasks/done/LOCAL-007/                              ║"
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/done/LOCAL-007/README.md",
+    "oldString": "║ LOCATION: .ai/tasks/in_progress/LOCAL-007/                       ║",
+    "newString": "║ LOCATION: .ai/tasks/done/LOCAL-007/                              ║",
+    "originalFile": "<!--\n╔══════════════════════════════════════════════════════════════════╗\n║ LAYER: TASK                                                      ║\n║ LOCATION: .ai/tasks/in_progress/LOCAL-007/                       ║\n╠══════════════════════════════════════════════════════════════════╣\n║ BEFORE WORKING ON THIS TASK:                                     ║\n║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)           ║\n║ 2. Read this entire README first                                 ║\n║ 3. Check which work items are in todo/ vs done/                  ║\n║ 4. Work on ONE item at a time from todo/                         ║\n╚══════════════════════════════════════════════════════════════════╝\n-->\n\n# LOCAL-007: Fix Session Tracking Issues\n\n## Problem Statement\n\nCode review of LOCAL-006 (Session Tracking & Resume) identified several issues ranging from race conditions to file system concurrency problems. These need to be addressed to make session tracking robust and production-ready.\n\n## Acceptance Criteria\n\n- [ ] Session capture reliably identifies the correct session even with rapid terminal opens\n- [ ] File I/O operations are async and don't block the extension\n- [ ] Terminal name collisions are handled gracefully\n- [ ] JSON parsing errors are caught and handled\n- [ ] Old sessions can be cleaned up automatically\n- [ ] No hardcoded paths - use configuration where possible\n\n## Work Items\n\nSee `status.yaml` for full index.\n\n| ID | Name | Repo | Status |\n|----|------|------|--------|\n| 01 | Improve session capture with unique terminal markers | vscode-extension | todo |\n| 02 | Convert SessionManager to async I/O | vscode-extension | todo |\n| 03 | Add session cleanup mechanism | vscode-extension | todo |\n| 04 | Handle JSON parsing errors gracefully | vscode-extension | todo |\n| 05 | Make Claude history path configurable | vscode-extension | todo |\n\n## Branches\n\n| Repo | Branch |\n|------|--------|\n| vscode-extension | `feature/session-tracking-fixes` |\n\n## Technical Context\n\nFrom LOCAL-006 code review findings:\n\n### Race Condition (BLOCKING)\nThe polling mechanism in `captureLatestSessionId` compares against `knownSessionIds`, but if two terminals are opened rapidly, the second terminal could capture the first's sessionId before it's added to known set.\n\n### File System Concurrency (BLOCKING)\n`SessionManager.loadRegistry()` and `saveRegistry()` use synchronous file I/O which:\n- Blocks the VS Code extension host\n- Can cause file corruption if multiple operations overlap\n\n### Error Handling (IMPORTANT)\n- `JSON.parse()` on history.jsonl entries can throw\n- Session capture failures are logged but user isn't notified\n- No retry logic for transient failures\n\n### Hardcoded Paths (IMPORTANT)\n- `~/.claude/history.jsonl` is hardcoded\n- Different Claude installations may use different paths\n\n## Implementation Approach\n\n1. **Session Capture** - Use unique terminal environment variables to correlate terminals with sessions\n2. **Async I/O** - Convert all file operations to use `fs.promises`\n3. **Cleanup** - Add TTL-based cleanup for old closed sessions\n4. **Error Handling** - Wrap JSON.parse in try-catch, add user notifications for failures\n5. **Configuration** - Add VS Code settings for Claude history path\n\n## Risks & Considerations\n\n- Changing session capture logic may break existing sessions\n- Need to handle migration of existing sessions.json format\n- Async conversion needs careful testing for race conditions\n\n## Testing Strategy\n\n- Manual testing with rapid terminal opens\n- Test with corrupted sessions.json file\n- Test with missing/different Claude history locations\n- Test cleanup doesn't remove active sessions\n\n## References\n\n- LOCAL-006 implementation files\n- VS Code Extension API: Terminal.creationOptions\n",
+    "structuredPatch": [
+      {
+        "oldStart": 1,
+        "oldLines": 7,
+        "newStart": 1,
+        "newLines": 7,
+        "lines": [
+          " <!--",
+          " ╔══════════════════════════════════════════════════════════════════╗",
+          " ║ LAYER: TASK                                                      ║",
+          "-║ LOCATION: .ai/tasks/in_progress/LOCAL-007/                       ║",
+          "+║ LOCATION: .ai/tasks/done/LOCAL-007/                              ║",
+          " ╠══════════════════════════════════════════════════════════════════╣",
+          " ║ BEFORE WORKING ON THIS TASK:                                     ║",
+          " ║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)           ║"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "7b080bb2-fd73-4c1e-baa0-f0d38b013406",
+  "timestamp": "2025-12-30T01:11:02.055Z"
+}

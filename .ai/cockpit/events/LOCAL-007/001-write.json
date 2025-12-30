@@ -1,0 +1,41 @@
+{
+  "id": "evt-1767045901734-xc9c5lh6s",
+  "taskId": "LOCAL-007",
+  "taskIdSource": "active-task-file",
+  "tool": "Write",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/cockpit/active-task.json",
+    "content": "{\n  \"taskId\": \"LOCAL-007\",\n  \"title\": \"Fix Session Tracking Issues\",\n  \"branch\": \"project/ai-cockpit\",\n  \"frameworkPath\": \".ai/tasks/in_progress/LOCAL-007\",\n  \"startedAt\": \"2025-12-29T16:30:00.000Z\",\n  \"sessionId\": \"local007sess\"\n}\n"
+  },
+  "response": {
+    "type": "update",
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/cockpit/active-task.json",
+    "content": "{\n  \"taskId\": \"LOCAL-007\",\n  \"title\": \"Fix Session Tracking Issues\",\n  \"branch\": \"project/ai-cockpit\",\n  \"frameworkPath\": \".ai/tasks/in_progress/LOCAL-007\",\n  \"startedAt\": \"2025-12-29T16:30:00.000Z\",\n  \"sessionId\": \"local007sess\"\n}\n",
+    "structuredPatch": [
+      {
+        "oldStart": 1,
+        "oldLines": 8,
+        "newStart": 1,
+        "newLines": 8,
+        "lines": [
+          " {",
+          "-  \"taskId\": \"LOCAL-006\",",
+          "-  \"title\": \"Session Tracking & Resume from Cockpit\",",
+          "+  \"taskId\": \"LOCAL-007\",",
+          "+  \"title\": \"Fix Session Tracking Issues\",",
+          "   \"branch\": \"project/ai-cockpit\",",
+          "-  \"frameworkPath\": \".ai/tasks/in_progress/LOCAL-006\",",
+          "-  \"startedAt\": \"2025-12-29T20:00:00Z\",",
+          "-  \"sessionId\": \"local006sess\"",
+          "+  \"frameworkPath\": \".ai/tasks/in_progress/LOCAL-007\",",
+          "+  \"startedAt\": \"2025-12-29T16:30:00.000Z\",",
+          "+  \"sessionId\": \"local007sess\"",
+          " }"
+        ]
+      }
+    ],
+    "originalFile": "{\n  \"taskId\": \"LOCAL-006\",\n  \"title\": \"Session Tracking & Resume from Cockpit\",\n  \"branch\": \"project/ai-cockpit\",\n  \"frameworkPath\": \".ai/tasks/in_progress/LOCAL-006\",\n  \"startedAt\": \"2025-12-29T20:00:00Z\",\n  \"sessionId\": \"local006sess\"\n}\n"
+  },
+  "sessionId": "998d8151-40d9-4124-ab15-358ca47378b7",
+  "timestamp": "2025-12-29T22:05:01.734Z"
+}

@@ -1,0 +1,8 @@
+{
+  "taskId": "LOCAL-007",
+  "title": "Fix Session Tracking Issues",
+  "branch": "project/ai-cockpit",
+  "frameworkPath": ".ai/tasks/in_progress/LOCAL-007",
+  "startedAt": "2025-12-29T16:30:00.000Z",
+  "sessionId": "local007sess"
+}

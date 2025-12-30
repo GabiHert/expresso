@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-008/todo/02-focus-session.md",
+  "taskId": "LOCAL-007",
+  "baseline": {
+    "capturedAt": "2025-12-30T00:40:46.656Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T00:40:46.659Z",
+    "hash": "6ceb13ff44c8148f",
+    "size": 4048,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T00:40:46.659Z",
+    "actualFileHash": "6ceb13ff44c8148f",
+    "status": "synced"
+  }
+}

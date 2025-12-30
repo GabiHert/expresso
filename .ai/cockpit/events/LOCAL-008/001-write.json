@@ -1,0 +1,41 @@
+{
+  "id": "evt-1767055478050-fhvc0s2x1",
+  "taskId": "LOCAL-008",
+  "taskIdSource": "active-task-file",
+  "tool": "Write",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/cockpit/active-task.json",
+    "content": "{\n  \"taskId\": \"LOCAL-008\",\n  \"title\": \"Fix Session Terminal Reuse and Multi-Session Status\",\n  \"branch\": \"project/ai-cockpit\",\n  \"frameworkPath\": \".ai/tasks/in_progress/LOCAL-008\",\n  \"startedAt\": \"2025-12-29T22:35:00Z\",\n  \"sessionId\": \"local008sess\"\n}\n"
+  },
+  "response": {
+    "type": "update",
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/cockpit/active-task.json",
+    "content": "{\n  \"taskId\": \"LOCAL-008\",\n  \"title\": \"Fix Session Terminal Reuse and Multi-Session Status\",\n  \"branch\": \"project/ai-cockpit\",\n  \"frameworkPath\": \".ai/tasks/in_progress/LOCAL-008\",\n  \"startedAt\": \"2025-12-29T22:35:00Z\",\n  \"sessionId\": \"local008sess\"\n}\n",
+    "structuredPatch": [
+      {
+        "oldStart": 1,
+        "oldLines": 8,
+        "newStart": 1,
+        "newLines": 8,
+        "lines": [
+          " {",
+          "-  \"taskId\": \"LOCAL-007\",",
+          "-  \"title\": \"Fix Session Tracking Issues\",",
+          "+  \"taskId\": \"LOCAL-008\",",
+          "+  \"title\": \"Fix Session Terminal Reuse and Multi-Session Status\",",
+          "   \"branch\": \"project/ai-cockpit\",",
+          "-  \"frameworkPath\": \".ai/tasks/in_progress/LOCAL-007\",",
+          "-  \"startedAt\": \"2025-12-29T16:30:00.000Z\",",
+          "-  \"sessionId\": \"local007sess\"",
+          "+  \"frameworkPath\": \".ai/tasks/in_progress/LOCAL-008\",",
+          "+  \"startedAt\": \"2025-12-29T22:35:00Z\",",
+          "+  \"sessionId\": \"local008sess\"",
+          " }"
+        ]
+      }
+    ],
+    "originalFile": "{\n  \"taskId\": \"LOCAL-007\",\n  \"title\": \"Fix Session Tracking Issues\",\n  \"branch\": \"project/ai-cockpit\",\n  \"frameworkPath\": \".ai/tasks/in_progress/LOCAL-007\",\n  \"startedAt\": \"2025-12-29T16:30:00.000Z\",\n  \"sessionId\": \"local007sess\"\n}\n"
+  },
+  "sessionId": "998d8151-40d9-4124-ab15-358ca47378b7",
+  "timestamp": "2025-12-30T00:44:38.050Z"
+}

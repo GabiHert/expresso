@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-009/todo/03-register-openworkitem-command.md",
+  "taskId": "LOCAL-008",
+  "baseline": {
+    "capturedAt": "2025-12-30T00:48:27.341Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T00:48:27.342Z",
+    "hash": "b223ae9f1fa3b153",
+    "size": 3597,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T00:48:27.342Z",
+    "actualFileHash": "b223ae9f1fa3b153",
+    "status": "synced"
+  }
+}

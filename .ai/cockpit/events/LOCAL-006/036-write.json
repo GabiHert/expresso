@@ -1,0 +1,19 @@
+{
+  "id": "evt-1767044144302-490aonqrk",
+  "taskId": "LOCAL-006",
+  "taskIdSource": "active-task-file",
+  "tool": "Write",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-007/status.yaml",
+    "content": "# Task Status Index\ntask: \"LOCAL-007\"\ntitle: \"Fix Session Tracking Issues\"\ncreated: \"2025-12-29\"\nupdated: \"2025-12-29\"\n\nsummary:\n  total: 5\n  todo: 5\n  in_progress: 0\n  done: 0\n\nwork_items:\n  - id: \"01\"\n    name: \"Improve session capture with unique terminal markers\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/01-terminal-markers.md\"\n\n  - id: \"02\"\n    name: \"Convert SessionManager to async I/O\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/02-async-io.md\"\n\n  - id: \"03\"\n    name: \"Add session cleanup mechanism\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/03-session-cleanup.md\"\n\n  - id: \"04\"\n    name: \"Handle JSON parsing errors gracefully\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/04-json-error-handling.md\"\n\n  - id: \"05\"\n    name: \"Make Claude history path configurable\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/05-configurable-paths.md\"\n"
+  },
+  "response": {
+    "type": "create",
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-007/status.yaml",
+    "content": "# Task Status Index\ntask: \"LOCAL-007\"\ntitle: \"Fix Session Tracking Issues\"\ncreated: \"2025-12-29\"\nupdated: \"2025-12-29\"\n\nsummary:\n  total: 5\n  todo: 5\n  in_progress: 0\n  done: 0\n\nwork_items:\n  - id: \"01\"\n    name: \"Improve session capture with unique terminal markers\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/01-terminal-markers.md\"\n\n  - id: \"02\"\n    name: \"Convert SessionManager to async I/O\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/02-async-io.md\"\n\n  - id: \"03\"\n    name: \"Add session cleanup mechanism\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/03-session-cleanup.md\"\n\n  - id: \"04\"\n    name: \"Handle JSON parsing errors gracefully\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/04-json-error-handling.md\"\n\n  - id: \"05\"\n    name: \"Make Claude history path configurable\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/05-configurable-paths.md\"\n",
+    "structuredPatch": [],
+    "originalFile": null
+  },
+  "sessionId": "998d8151-40d9-4124-ab15-358ca47378b7",
+  "timestamp": "2025-12-29T21:35:44.302Z"
+}

@@ -1,0 +1,42 @@
+{
+  "id": "evt-1767047258364-uhu30o34x",
+  "taskId": "LOCAL-007",
+  "taskIdSource": "active-task-file",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/utils/jsonUtils.ts",
+    "old_string": "export function safeJsonParseLine<T>(\n  line: string,\n  _context?: string\n): T | null {\n  try {\n    return JSON.parse(line) as T;\n  } catch {\n    // Silent for line-by-line parsing (common with JSONL)\n    return null;\n  }\n}",
+    "new_string": "export function safeJsonParseLine<T>(line: string): T | null {\n  try {\n    return JSON.parse(line) as T;\n  } catch {\n    // Silent for line-by-line parsing (common with JSONL)\n    return null;\n  }\n}"
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/utils/jsonUtils.ts",
+    "oldString": "export function safeJsonParseLine<T>(\n  line: string,\n  _context?: string\n): T | null {\n  try {\n    return JSON.parse(line) as T;\n  } catch {\n    // Silent for line-by-line parsing (common with JSONL)\n    return null;\n  }\n}",
+    "newString": "export function safeJsonParseLine<T>(line: string): T | null {\n  try {\n    return JSON.parse(line) as T;\n  } catch {\n    // Silent for line-by-line parsing (common with JSONL)\n    return null;\n  }\n}",
+    "originalFile": "/**\n * Safe JSON parsing utilities for graceful error handling\n */\n\nexport function safeJsonParse<T>(\n  json: string,\n  fallback: T,\n  context?: string\n): T {\n  try {\n    return JSON.parse(json) as T;\n  } catch (error) {\n    console.warn(\n      `AI Cockpit: JSON parse error${context ? ` in ${context}` : ''}: ${error}`\n    );\n    return fallback;\n  }\n}\n\nexport function safeJsonParseLine<T>(\n  line: string,\n  _context?: string\n): T | null {\n  try {\n    return JSON.parse(line) as T;\n  } catch {\n    // Silent for line-by-line parsing (common with JSONL)\n    return null;\n  }\n}\n",
+    "structuredPatch": [
+      {
+        "oldStart": 17,
+        "oldLines": 10,
+        "newStart": 17,
+        "newLines": 7,
+        "lines": [
+          "   }",
+          " }",
+          " ",
+          "-export function safeJsonParseLine<T>(",
+          "-  line: string,",
+          "-  _context?: string",
+          "-): T | null {",
+          "+export function safeJsonParseLine<T>(line: string): T | null {",
+          "   try {",
+          "     return JSON.parse(line) as T;",
+          "   } catch {"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "998d8151-40d9-4124-ab15-358ca47378b7",
+  "timestamp": "2025-12-29T22:27:38.364Z"
+}

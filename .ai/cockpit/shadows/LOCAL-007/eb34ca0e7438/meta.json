@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/in_progress/LOCAL-008/README.md",
+  "taskId": "LOCAL-007",
+  "baseline": {
+    "capturedAt": "2025-12-30T00:43:44.651Z",
+    "hash": "189b6d828d7549a3",
+    "size": 4489
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T00:43:44.651Z",
+    "hash": "590c6d95b47295bb",
+    "size": 4489,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T00:43:44.651Z",
+    "actualFileHash": "590c6d95b47295bb",
+    "status": "synced"
+  }
+}

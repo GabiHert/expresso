@@ -1,0 +1,36 @@
+# Task Status Index
+task: "LOCAL-008"
+title: "Fix Session Terminal Reuse and Multi-Session Status"
+created: "2025-12-29"
+updated: "2025-12-29"
+
+summary:
+  total: 4
+  todo: 4
+  in_progress: 0
+  done: 0
+
+work_items:
+  - id: "01"
+    name: "Export terminalIdMap for terminal lookup"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/01-terminal-manager.md"
+
+  - id: "02"
+    name: "Add focusSession command for active sessions"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/02-focus-session.md"
+
+  - id: "03"
+    name: "Fix SessionItem click handler branching"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/03-session-item-branching.md"
+
+  - id: "04"
+    name: "Remove auto-close of other active sessions"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/04-remove-auto-close.md"

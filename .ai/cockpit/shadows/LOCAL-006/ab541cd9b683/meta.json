@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-007/todo/02-async-io.md",
+  "taskId": "LOCAL-006",
+  "baseline": {
+    "capturedAt": "2025-12-29T21:36:32.062Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-29T21:36:32.062Z",
+    "hash": "5af2de68f0c82e7b",
+    "size": 4779,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-29T21:36:32.062Z",
+    "actualFileHash": "5af2de68f0c82e7b",
+    "status": "synced"
+  }
+}

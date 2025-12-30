@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-008/todo/04-remove-auto-close.md",
+  "taskId": "LOCAL-007",
+  "baseline": {
+    "capturedAt": "2025-12-30T00:41:33.621Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T00:41:33.621Z",
+    "hash": "cd035f4b6d37b7d3",
+    "size": 4779,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T00:41:33.621Z",
+    "actualFileHash": "cd035f4b6d37b7d3",
+    "status": "synced"
+  }
+}

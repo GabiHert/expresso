@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-007/todo/03-session-cleanup.md",
+  "taskId": "LOCAL-006",
+  "baseline": {
+    "capturedAt": "2025-12-29T21:36:55.119Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-29T21:36:55.120Z",
+    "hash": "d61fc23659469492",
+    "size": 5313,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-29T21:36:55.120Z",
+    "actualFileHash": "d61fc23659469492",
+    "status": "synced"
+  }
+}

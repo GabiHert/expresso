@@ -1,0 +1,42 @@
+# Task Status Index
+task: "LOCAL-007"
+title: "Fix Session Tracking Issues"
+created: "2025-12-29"
+updated: "2025-12-29"
+
+summary:
+  total: 5
+  todo: 5
+  in_progress: 0
+  done: 0
+
+work_items:
+  - id: "01"
+    name: "Improve session capture with unique terminal markers"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/01-terminal-markers.md"
+
+  - id: "02"
+    name: "Convert SessionManager to async I/O"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/02-async-io.md"
+
+  - id: "03"
+    name: "Add session cleanup mechanism"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/03-session-cleanup.md"
+
+  - id: "04"
+    name: "Handle JSON parsing errors gracefully"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/04-json-error-handling.md"
+
+  - id: "05"
+    name: "Make Claude history path configurable"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/05-configurable-paths.md"

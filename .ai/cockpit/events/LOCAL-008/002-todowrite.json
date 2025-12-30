@@ -1,0 +1,78 @@
+{
+  "id": "evt-1767055626073-n0etwx1bd",
+  "taskId": "LOCAL-008",
+  "taskIdSource": "active-task-file",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Work item 01: Export terminalIdMap for terminal lookup",
+        "status": "in_progress",
+        "activeForm": "Creating TerminalManager service"
+      },
+      {
+        "content": "Work item 02: Add focusSession command",
+        "status": "pending",
+        "activeForm": "Adding focusSession command"
+      },
+      {
+        "content": "Work item 03: Fix SessionItem click handler branching",
+        "status": "pending",
+        "activeForm": "Updating SessionItem branching"
+      },
+      {
+        "content": "Work item 04: Remove auto-close of other sessions",
+        "status": "pending",
+        "activeForm": "Removing auto-close logic"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [
+      {
+        "content": "Work item 01: Export terminalIdMap for terminal lookup",
+        "status": "pending",
+        "activeForm": "Creating TerminalManager service"
+      },
+      {
+        "content": "Work item 02: Add focusSession command",
+        "status": "pending",
+        "activeForm": "Adding focusSession command"
+      },
+      {
+        "content": "Work item 03: Fix SessionItem click handler branching",
+        "status": "pending",
+        "activeForm": "Updating SessionItem branching"
+      },
+      {
+        "content": "Work item 04: Remove auto-close of other sessions",
+        "status": "pending",
+        "activeForm": "Removing auto-close logic"
+      }
+    ],
+    "newTodos": [
+      {
+        "content": "Work item 01: Export terminalIdMap for terminal lookup",
+        "status": "in_progress",
+        "activeForm": "Creating TerminalManager service"
+      },
+      {
+        "content": "Work item 02: Add focusSession command",
+        "status": "pending",
+        "activeForm": "Adding focusSession command"
+      },
+      {
+        "content": "Work item 03: Fix SessionItem click handler branching",
+        "status": "pending",
+        "activeForm": "Updating SessionItem branching"
+      },
+      {
+        "content": "Work item 04: Remove auto-close of other sessions",
+        "status": "pending",
+        "activeForm": "Removing auto-close logic"
+      }
+    ]
+  },
+  "sessionId": "998d8151-40d9-4124-ab15-358ca47378b7",
+  "timestamp": "2025-12-30T00:47:06.073Z"
+}

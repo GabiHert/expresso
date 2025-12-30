@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/services/TerminalManager.ts",
+  "taskId": "LOCAL-008",
+  "baseline": {
+    "capturedAt": "2025-12-30T00:47:27.135Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T00:57:04.555Z",
+    "hash": "29b0dfdf0b9c94cf",
+    "size": 1233,
+    "editCount": 2
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T00:57:04.555Z",
+    "actualFileHash": "29b0dfdf0b9c94cf",
+    "status": "synced"
+  }
+}

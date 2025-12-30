@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-007/todo/05-configurable-paths.md",
+  "taskId": "LOCAL-006",
+  "baseline": {
+    "capturedAt": "2025-12-29T21:37:52.232Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-29T21:37:52.233Z",
+    "hash": "042b8555ac32ce5b",
+    "size": 6796,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-29T21:37:52.233Z",
+    "actualFileHash": "042b8555ac32ce5b",
+    "status": "synced"
+  }
+}
