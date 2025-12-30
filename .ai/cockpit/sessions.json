@@ -1,3 +1,44 @@
 {
-  "sessions": []
+  "sessions": [
+    {
+      "id": "998d8151-40d9-4124-ab15-358ca47378b7",
+      "taskId": "LOCAL-007",
+      "label": "Session 9:30:30 PM",
+      "createdAt": "2025-12-30T00:30:30.274Z",
+      "lastActive": "2025-12-30T00:32:14.652Z",
+      "status": "closed",
+      "terminalName": "Cockpit: LOCAL-007",
+      "terminalId": "ded63f91-1f72-4dc0-be6e-cb1fc5d91310"
+    },
+    {
+      "id": "894074b7-bab6-4ccd-bc8b-69aba509df7c",
+      "taskId": "LOCAL-007",
+      "label": "Session 9:31:33 PM",
+      "createdAt": "2025-12-30T00:31:33.953Z",
+      "lastActive": "2025-12-30T00:35:09.605Z",
+      "status": "closed",
+      "terminalName": "Cockpit: LOCAL-007",
+      "terminalId": "4bc77ecb-4b2d-429f-a0cd-c1a18660550d"
+    },
+    {
+      "id": "1003a498-7aa6-4c95-8bec-4e496088e74f",
+      "taskId": "LOCAL-007",
+      "label": "Session 9:32:14 PM",
+      "createdAt": "2025-12-30T00:32:14.667Z",
+      "lastActive": "2025-12-30T00:36:17.969Z",
+      "status": "closed",
+      "terminalName": "Cockpit: LOCAL-007",
+      "terminalId": "9acc84a7-e0c4-493f-8daf-342f01497266"
+    },
+    {
+      "id": "057cb678-5c66-4f3f-8616-39d231ad4578",
+      "taskId": "LOCAL-007",
+      "label": "Session 9:43:21 PM",
+      "createdAt": "2025-12-30T00:43:21.924Z",
+      "lastActive": "2025-12-30T00:43:28.111Z",
+      "status": "closed",
+      "terminalName": "Cockpit: LOCAL-007",
+      "terminalId": "7223393f-84f1-4127-871f-f3e81aaa4506"
+    }
+  ]
 }

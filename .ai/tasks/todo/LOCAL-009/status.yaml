@@ -1,0 +1,28 @@
+# Task Status Index
+task: "LOCAL-009"
+title: "Sidebar click behavior - show descriptions"
+created: "2025-12-29"
+updated: "2025-12-29"
+
+summary:
+  total: 3
+  todo: 3
+  in_progress: 0
+  done: 0
+
+work_items:
+  - id: "01"
+    name: "Change TaskItem click to open description"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/01-taskitem-click-description.md"
+  - id: "02"
+    name: "Add WorkItemNode click handler"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/02-workitem-click-handler.md"
+  - id: "03"
+    name: "Register openWorkItem command"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/03-register-openworkitem-command.md"
