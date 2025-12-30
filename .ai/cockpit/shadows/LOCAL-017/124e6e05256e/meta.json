@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/test/suite/captureQueue.test.ts",
+  "taskId": "LOCAL-017",
+  "baseline": {
+    "capturedAt": "2025-12-30T20:20:14.210Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T20:20:14.210Z",
+    "hash": "27c1c8435c2680d0",
+    "size": 7683,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T20:20:14.210Z",
+    "actualFileHash": "27c1c8435c2680d0",
+    "status": "synced"
+  }
+}
