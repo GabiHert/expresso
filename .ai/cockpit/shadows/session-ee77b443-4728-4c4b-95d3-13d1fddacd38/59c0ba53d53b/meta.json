@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-016/feedback/diff-review.md",
+  "taskId": "session-ee77b443-4728-4c4b-95d3-13d1fddacd38",
+  "baseline": {
+    "capturedAt": "2025-12-30T19:30:59.402Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T19:30:59.402Z",
+    "hash": "37836543486447ab",
+    "size": 101,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T19:30:59.402Z",
+    "actualFileHash": "37836543486447ab",
+    "status": "synced"
+  }
+}

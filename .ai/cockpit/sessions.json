@@ -145,8 +145,8 @@
       "taskId": "LOCAL-015",
       "label": "Session 4:20:12 PM",
       "createdAt": "2025-12-30T19:20:12.921Z",
-      "lastActive": "2025-12-30T19:20:12.921Z",
-      "status": "active",
+      "lastActive": "2025-12-30T19:26:26.164Z",
+      "status": "closed",
       "terminalName": "Cockpit: LOCAL-015",
       "terminalId": "e36d8cd2-8cc3-4783-87b9-8b72a44c2ef5"
     },
@@ -159,6 +159,16 @@
       "status": "active",
       "terminalName": "Cockpit: Session",
       "terminalId": "340c83c5-6ec5-4310-9fd3-26a142e5008c"
+    },
+    {
+      "id": "ee77b443-4728-4c4b-95d3-13d1fddacd38",
+      "taskId": "_unassigned",
+      "label": "work items collapse",
+      "createdAt": "2025-12-30T19:27:04.313Z",
+      "lastActive": "2025-12-30T19:27:04.313Z",
+      "status": "active",
+      "terminalName": "Cockpit: Session",
+      "terminalId": "2bc252fd-9cf9-44eb-aa61-74a77c1e146d"
     }
   ]
 }
