@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-012/todo/01-unassigned-constant.md",
+  "taskId": "session-f850ca99-11ef-4ce4-b5d4-ecd349139a40",
+  "baseline": {
+    "capturedAt": "2025-12-30T02:35:46.559Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T02:35:46.559Z",
+    "hash": "ed4a1a806e059270",
+    "size": 708,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T02:35:46.559Z",
+    "actualFileHash": "ed4a1a806e059270",
+    "status": "synced"
+  }
+}

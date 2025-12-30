@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-013/todo/03-vscode-feedback-button.md",
+  "taskId": "LOCAL-012",
+  "baseline": {
+    "capturedAt": "2025-12-30T02:40:34.646Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T02:40:34.647Z",
+    "hash": "82f34b8ae917eb5f",
+    "size": 3759,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T02:40:34.647Z",
+    "actualFileHash": "82f34b8ae917eb5f",
+    "status": "synced"
+  }
+}

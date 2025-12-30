@@ -1,0 +1,27 @@
+{
+  "id": "evt-1767061714073-wyjf88tm3",
+  "taskId": "session-3764ab9c-088d-4e71-9b80-408a356de620",
+  "taskIdSource": "session-fallback",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Create LOCAL-013 task structure",
+        "status": "in_progress",
+        "activeForm": "Creating LOCAL-013 task structure"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [],
+    "newTodos": [
+      {
+        "content": "Create LOCAL-013 task structure",
+        "status": "in_progress",
+        "activeForm": "Creating LOCAL-013 task structure"
+      }
+    ]
+  },
+  "sessionId": "3764ab9c-088d-4e71-9b80-408a356de620",
+  "timestamp": "2025-12-30T02:28:34.073Z"
+}

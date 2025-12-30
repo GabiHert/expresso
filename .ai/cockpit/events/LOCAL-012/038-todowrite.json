@@ -1,0 +1,67 @@
+{
+  "id": "evt-1767062925163-t2hfldfge",
+  "taskId": "LOCAL-012",
+  "taskIdSource": "active-task-file",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Log to completed tasks history",
+        "status": "in_progress",
+        "activeForm": "Logging to history"
+      },
+      {
+        "content": "Move task to done folder",
+        "status": "pending",
+        "activeForm": "Moving task to done"
+      },
+      {
+        "content": "Deactivate cockpit tracking",
+        "status": "pending",
+        "activeForm": "Deactivating cockpit tracking"
+      },
+      {
+        "content": "Send notification",
+        "status": "pending",
+        "activeForm": "Sending notification"
+      },
+      {
+        "content": "Auto-sync changes",
+        "status": "pending",
+        "activeForm": "Auto-syncing changes"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [],
+    "newTodos": [
+      {
+        "content": "Log to completed tasks history",
+        "status": "in_progress",
+        "activeForm": "Logging to history"
+      },
+      {
+        "content": "Move task to done folder",
+        "status": "pending",
+        "activeForm": "Moving task to done"
+      },
+      {
+        "content": "Deactivate cockpit tracking",
+        "status": "pending",
+        "activeForm": "Deactivating cockpit tracking"
+      },
+      {
+        "content": "Send notification",
+        "status": "pending",
+        "activeForm": "Sending notification"
+      },
+      {
+        "content": "Auto-sync changes",
+        "status": "pending",
+        "activeForm": "Auto-syncing changes"
+      }
+    ]
+  },
+  "sessionId": "f850ca99-11ef-4ce4-b5d4-ecd349139a40",
+  "timestamp": "2025-12-30T02:48:45.163Z"
+}

@@ -1,0 +1,19 @@
+{
+  "id": "evt-1767062146752-xa5qxvd63",
+  "taskId": "session-f850ca99-11ef-4ce4-b5d4-ecd349139a40",
+  "taskIdSource": "session-fallback",
+  "tool": "Write",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-012/todo/02-session-manager-methods.md",
+    "content": "---\nrepo: vscode-extension\n---\n\n# Add SessionManager Methods\n\n## Objective\n\nAdd methods to get unassigned sessions and link sessions to tasks.\n\n## Implementation Steps\n\n### Step 1: Import UNASSIGNED_TASK_ID\n\n**File**: `src/services/SessionManager.ts`\n\nAdd import:\n```typescript\nimport { CockpitSession, SessionRegistry, UNASSIGNED_TASK_ID } from '../types';\n```\n\n### Step 2: Add getUnassignedSessions method\n\n**Location**: After `getSessionsForTask` method\n\n```typescript\nasync getUnassignedSessions(): Promise<CockpitSession[]> {\n  const sessions = await this.getSessions();\n  return sessions.filter(s => s.taskId === UNASSIGNED_TASK_ID);\n}\n```\n\n### Step 3: Add linkSessionToTask method\n\n**Location**: After `renameSession` method\n\n```typescript\nasync linkSessionToTask(sessionId: string, newTaskId: string): Promise<boolean> {\n  return this.updateSession(sessionId, { taskId: newTaskId });\n}\n```\n\n### Step 4: Update getSessionsForTask to exclude unassigned\n\n**Modify existing method** to ensure task-scoped queries don't include unassigned:\n\n```typescript\nasync getSessionsForTask(taskId: string): Promise<CockpitSession[]> {\n  const sessions = await this.getSessions();\n  return sessions.filter(s => s.taskId === taskId && taskId !== UNASSIGNED_TASK_ID);\n}\n```\n\n## Acceptance Criteria\n\n- [ ] `getUnassignedSessions()` returns only sessions with `_unassigned` taskId\n- [ ] `linkSessionToTask()` updates session's taskId\n- [ ] `getSessionsForTask()` excludes `_unassigned` sessions\n"
+  },
+  "response": {
+    "type": "create",
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-012/todo/02-session-manager-methods.md",
+    "content": "---\nrepo: vscode-extension\n---\n\n# Add SessionManager Methods\n\n## Objective\n\nAdd methods to get unassigned sessions and link sessions to tasks.\n\n## Implementation Steps\n\n### Step 1: Import UNASSIGNED_TASK_ID\n\n**File**: `src/services/SessionManager.ts`\n\nAdd import:\n```typescript\nimport { CockpitSession, SessionRegistry, UNASSIGNED_TASK_ID } from '../types';\n```\n\n### Step 2: Add getUnassignedSessions method\n\n**Location**: After `getSessionsForTask` method\n\n```typescript\nasync getUnassignedSessions(): Promise<CockpitSession[]> {\n  const sessions = await this.getSessions();\n  return sessions.filter(s => s.taskId === UNASSIGNED_TASK_ID);\n}\n```\n\n### Step 3: Add linkSessionToTask method\n\n**Location**: After `renameSession` method\n\n```typescript\nasync linkSessionToTask(sessionId: string, newTaskId: string): Promise<boolean> {\n  return this.updateSession(sessionId, { taskId: newTaskId });\n}\n```\n\n### Step 4: Update getSessionsForTask to exclude unassigned\n\n**Modify existing method** to ensure task-scoped queries don't include unassigned:\n\n```typescript\nasync getSessionsForTask(taskId: string): Promise<CockpitSession[]> {\n  const sessions = await this.getSessions();\n  return sessions.filter(s => s.taskId === taskId && taskId !== UNASSIGNED_TASK_ID);\n}\n```\n\n## Acceptance Criteria\n\n- [ ] `getUnassignedSessions()` returns only sessions with `_unassigned` taskId\n- [ ] `linkSessionToTask()` updates session's taskId\n- [ ] `getSessionsForTask()` excludes `_unassigned` sessions\n",
+    "structuredPatch": [],
+    "originalFile": null
+  },
+  "sessionId": "f850ca99-11ef-4ce4-b5d4-ecd349139a40",
+  "timestamp": "2025-12-30T02:35:46.752Z"
+}

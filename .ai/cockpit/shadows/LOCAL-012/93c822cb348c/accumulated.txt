@@ -1,0 +1,54 @@
+# Task Status Index
+task: "LOCAL-012"
+title: "Unassigned Sessions & Task Linking"
+created: "2025-12-30"
+updated: "2025-12-30"
+
+summary:
+  total: 7
+  todo: 0
+  in_progress: 0
+  done: 7
+
+work_items:
+  - id: "01"
+    name: "Add UNASSIGNED_TASK_ID constant"
+    repo: "vscode-extension"
+    status: done
+    file: "done/01-unassigned-constant.md"
+
+  - id: "02"
+    name: "Add SessionManager methods"
+    repo: "vscode-extension"
+    status: done
+    file: "done/02-session-manager-methods.md"
+
+  - id: "03"
+    name: "Add UnassignedSessionsSection to tree"
+    repo: "vscode-extension"
+    status: done
+    file: "done/03-unassigned-tree-section.md"
+
+  - id: "04"
+    name: "Register startSession command"
+    repo: "vscode-extension"
+    status: done
+    file: "done/04-start-session-command.md"
+
+  - id: "05"
+    name: "Register linkSessionToTask command"
+    repo: "vscode-extension"
+    status: done
+    file: "done/05-link-session-command.md"
+
+  - id: "06"
+    name: "Add package.json contributions"
+    repo: "vscode-extension"
+    status: done
+    file: "done/06-package-json.md"
+
+  - id: "07"
+    name: "Update task-create.md integration"
+    repo: "ai-framework"
+    status: done
+    file: "done/07-task-create-integration.md"

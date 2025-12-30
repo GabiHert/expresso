@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-013/status.yaml",
+  "taskId": "LOCAL-012",
+  "baseline": {
+    "capturedAt": "2025-12-30T02:40:33.958Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T02:40:33.959Z",
+    "hash": "2ee1c9bf113a048c",
+    "size": 770,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T02:40:33.959Z",
+    "actualFileHash": "2ee1c9bf113a048c",
+    "status": "synced"
+  }
+}

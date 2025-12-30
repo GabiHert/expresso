@@ -129,6 +129,16 @@
       "status": "closed",
       "terminalName": "Cockpit: LOCAL-009",
       "terminalId": "bb7082b0-0fe3-4809-ab4c-1580f6fd636c"
+    },
+    {
+      "id": "3764ab9c-088d-4e71-9b80-408a356de620",
+      "taskId": "LOCAL-012",
+      "label": "Session 11:46:49 PM",
+      "createdAt": "2025-12-30T02:46:49.151Z",
+      "lastActive": "2025-12-30T02:46:49.151Z",
+      "status": "active",
+      "terminalName": "Cockpit: Session",
+      "terminalId": "c52ea9c1-633d-4d19-9343-ca6e89a61975"
     }
   ]
 }

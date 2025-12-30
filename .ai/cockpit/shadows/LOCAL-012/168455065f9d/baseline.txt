@@ -430,40 +430,11 @@ Next Steps:
   1. Review the task README: .ai/tasks/todo/{ticket-id}/README.md
   2. Run /task-start {ticket-id} to begin working
   3. Or run /task-status to see all tasks
-  • If session is unassigned, use "Link to Task" in Cockpit sidebar
 
 Quick Commands:
   • /task-start {ticket-id}     Begin this task
   • /task-status                View dashboard
 ```
-
-### Step 9.5: Link Current Session (if applicable)
-
-If running in a Cockpit session that is unassigned, offer to link it to the new task:
-
-1. Check if there's an active unassigned session:
-   - Look for terminal with `COCKPIT_TERMINAL_ID` env var but no `COCKPIT_TASK`
-   - Or check `.ai/cockpit/sessions.json` for active sessions with `taskId: "_unassigned"`
-
-2. If an unassigned session is found, ask:
-   ```
-   LINK SESSION
-
-   You're working in an unassigned session. Link it to {ticket-id}?
-
-   This will associate your current session history with the new task.
-
-   Link session? (y/n)
-   ```
-
-3. If yes, update the session:
-   - Update session's taskId from "_unassigned" to new task ID
-   - Refresh the Cockpit tree view
-
-4. If no, continue without linking.
-
-**Note**: This step requires the AI Cockpit VSCode extension. When running outside
-VSCode or without the extension, this step is skipped silently.
 
 ### Step 10: Auto-Sync (if enabled)
 

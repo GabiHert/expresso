@@ -1,0 +1,236 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import { CockpitSession, SessionRegistry } from '../types';
+import { safeJsonParse } from '../utils/jsonUtils';
+
+export class SessionManager {
+  private sessionsPath: string;
+  private writeQueue: Promise<void> = Promise.resolve();
+
+  constructor(private workspaceRoot: string) {
+    this.sessionsPath = path.join(workspaceRoot, '.ai/cockpit/sessions.json');
+  }
+
+  async getSessions(): Promise<CockpitSession[]> {
+    const registry = await this.loadRegistryAsync();
+    return registry.sessions;
+  }
+
+  async getSessionsForTask(taskId: string): Promise<CockpitSession[]> {
+    const sessions = await this.getSessions();
+    return sessions.filter(s => s.taskId === taskId);
+  }
+
+  async getSession(sessionId: string): Promise<CockpitSession | null> {
+    const sessions = await this.getSessions();
+    return sessions.find(s => s.id === sessionId) || null;
+  }
+
+  async registerSession(session: CockpitSession): Promise<void> {
+    return this.withLock(async () => {
+      const registry = await this.loadRegistryAsync();
+
+      const existingIndex = registry.sessions.findIndex(s => s.id === session.id);
+      if (existingIndex >= 0) {
+        registry.sessions[existingIndex] = session;
+      } else {
+        registry.sessions.push(session);
+      }
+
+      await this.saveRegistryAsync(registry);
+    });
+  }
+
+  async updateSession(
+    sessionId: string,
+    updates: Partial<CockpitSession>
+  ): Promise<boolean> {
+    return this.withLock(async () => {
+      const registry = await this.loadRegistryAsync();
+      const session = registry.sessions.find(s => s.id === sessionId);
+
+      if (!session) {
+        return false;
+      }
+
+      Object.assign(session, updates);
+      await this.saveRegistryAsync(registry);
+      return true;
+    });
+  }
+
+  async closeSession(sessionId: string): Promise<boolean> {
+    return this.updateSession(sessionId, {
+      status: 'closed',
+      lastActive: new Date().toISOString()
+    });
+  }
+
+  async renameSession(sessionId: string, newLabel: string): Promise<boolean> {
+    return this.updateSession(sessionId, { label: newLabel });
+  }
+
+  async deleteSession(sessionId: string): Promise<boolean> {
+    return this.withLock(async () => {
+      const registry = await this.loadRegistryAsync();
+      const originalLength = registry.sessions.length;
+      registry.sessions = registry.sessions.filter(s => s.id !== sessionId);
+
+      if (registry.sessions.length < originalLength) {
+        await this.saveRegistryAsync(registry);
+        return true;
+      }
+      return false;
+    });
+  }
+
+  async closeSessionByTerminal(terminalName: string): Promise<void> {
+    return this.withLock(async () => {
+      const registry = await this.loadRegistryAsync();
+      const session = registry.sessions.find(
+        s => s.terminalName === terminalName && s.status === 'active'
+      );
+
+      if (session) {
+        session.status = 'closed';
+        session.lastActive = new Date().toISOString();
+        await this.saveRegistryAsync(registry);
+      }
+    });
+  }
+
+  async closeSessionByTerminalId(terminalId: string): Promise<boolean> {
+    return this.withLock(async () => {
+      const registry = await this.loadRegistryAsync();
+      const session = registry.sessions.find(
+        s => s.terminalId === terminalId && s.status === 'active'
+      );
+
+      if (session) {
+        session.status = 'closed';
+        session.lastActive = new Date().toISOString();
+        await this.saveRegistryAsync(registry);
+        return true;
+      }
+      return false;
+    });
+  }
+
+  async getActiveSessionByTerminalId(terminalId: string): Promise<CockpitSession | null> {
+    const sessions = await this.getSessions();
+    return sessions.find(
+      s => s.terminalId === terminalId && s.status === 'active'
+    ) || null;
+  }
+
+  async cleanupOldSessions(retentionDays: number): Promise<number> {
+    return this.withLock(async () => {
+      const registry = await this.loadRegistryAsync();
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
+
+      const originalCount = registry.sessions.length;
+      registry.sessions = registry.sessions.filter(session => {
+        // Never delete active sessions
+        if (session.status === 'active') return true;
+
+        // Keep sessions newer than cutoff
+        const lastActive = new Date(session.lastActive);
+        return lastActive > cutoffDate;
+      });
+
+      const deletedCount = originalCount - registry.sessions.length;
+      if (deletedCount > 0) {
+        await this.saveRegistryAsync(registry);
+      }
+
+      return deletedCount;
+    });
+  }
+
+  private async withLock<T>(operation: () => Promise<T>): Promise<T> {
+    const result = this.writeQueue.then(() => operation());
+    this.writeQueue = result.then(
+      () => {},
+      () => {}
+    );
+    return result;
+  }
+
+  private async loadRegistryAsync(): Promise<SessionRegistry> {
+    try {
+      await fs.promises.access(this.sessionsPath);
+      const content = await fs.promises.readFile(this.sessionsPath, 'utf8');
+      const registry = safeJsonParse<SessionRegistry>(
+        content,
+        { sessions: [] },
+        'sessions.json'
+      );
+
+      // Validate sessions array
+      if (!Array.isArray(registry.sessions)) {
+        console.warn('AI Cockpit: Invalid sessions format, resetting');
+        return { sessions: [] };
+      }
+
+      // Filter out invalid session objects
+      registry.sessions = registry.sessions.filter(this.isValidSession);
+
+      return registry;
+    } catch {
+      return { sessions: [] };
+    }
+  }
+
+  private isValidSession(session: unknown): session is CockpitSession {
+    if (!session || typeof session !== 'object') return false;
+    const s = session as Record<string, unknown>;
+    return (
+      typeof s.id === 'string' &&
+      typeof s.taskId === 'string' &&
+      typeof s.label === 'string' &&
+      typeof s.createdAt === 'string' &&
+      typeof s.lastActive === 'string' &&
+      typeof s.terminalName === 'string' &&
+      (s.status === 'active' || s.status === 'closed') &&
+      !isNaN(new Date(s.lastActive as string).getTime())
+    );
+  }
+
+  async repairRegistry(): Promise<boolean> {
+    return this.withLock(async () => {
+      try {
+        const content = await fs.promises.readFile(this.sessionsPath, 'utf8');
+        JSON.parse(content); // Test parse
+        return false; // No repair needed
+      } catch {
+        // Backup corrupted file
+        const backupPath = `${this.sessionsPath}.backup.${Date.now()}`;
+        try {
+          await fs.promises.rename(this.sessionsPath, backupPath);
+          console.log(`AI Cockpit: Backed up corrupted sessions to ${backupPath}`);
+        } catch {
+          // File might not exist
+        }
+
+        // Create fresh registry
+        await this.saveRegistryAsync({ sessions: [] });
+        return true; // Repair performed
+      }
+    });
+  }
+
+  private async saveRegistryAsync(registry: SessionRegistry): Promise<void> {
+    const dir = path.dirname(this.sessionsPath);
+    try {
+      await fs.promises.access(dir);
+    } catch {
+      await fs.promises.mkdir(dir, { recursive: true });
+    }
+    await fs.promises.writeFile(
+      this.sessionsPath,
+      JSON.stringify(registry, null, 2),
+      'utf8'
+    );
+  }
+}
