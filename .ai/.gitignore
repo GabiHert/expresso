@@ -1,2 +1,5 @@
-# Cockpit session files (created/deleted dynamically)
+# Cockpit - ignore all transient session data
 cockpit/active-task.json
+cockpit/sessions.json
+cockpit/events/
+cockpit/shadows/

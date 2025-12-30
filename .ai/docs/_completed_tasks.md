@@ -21,3 +21,4 @@ Tasks completed in this project, for reference and learning.
 | 2025-12-30 | [LOCAL-013](.ai/tasks/done/LOCAL-013/) | Diff Feedback System - Markdown storage format, /address-feedback command, VSCode feedback button, task-create integration |
 | 2025-12-30 | [LOCAL-015](.ai/tasks/done/LOCAL-015/) | Delete Task Functionality - Context menu deletion with cleanup of events, shadows, sessions, and active task state |
 | 2025-12-30 | [LOCAL-016](.ai/tasks/done/LOCAL-016/) | Claude Permissions Flag - Added --allow-dangerously-skip-permissions to all Claude sessions with centralized command builder |
+| 2025-12-30 | [LOCAL-017](.ai/tasks/done/LOCAL-017/) | Session ID Race Condition Fix - Atomic captureAndRegisterSession() prevents concurrent captures from grabbing each other's IDs |

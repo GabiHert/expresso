@@ -1,7 +1,7 @@
 <!--
 ╔══════════════════════════════════════════════════════════════════╗
 ║ LAYER: TASK                                                      ║
-║ LOCATION: .ai/tasks/in_progress/LOCAL-017/                       ║
+║ LOCATION: .ai/tasks/done/LOCAL-017/                              ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║ BEFORE WORKING ON THIS TASK:                                     ║
 ║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)           ║

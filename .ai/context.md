@@ -31,7 +31,7 @@
 |--------|-------|---------|
 | **In Progress** | 0 | - |
 | **Todo** | 0 | - |
-| **Recently Done** | 17 | EPIC-001 + LOCAL-001..016: AI Cockpit MVP v2 + Permissions Flag |
+| **Recently Done** | 18 | EPIC-001 + LOCAL-001..017: AI Cockpit MVP v2 + Session Race Fix |
 
 ## Quick Reference
 
