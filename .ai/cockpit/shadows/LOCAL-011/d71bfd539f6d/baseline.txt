@@ -469,10 +469,10 @@ class ShadowFileItem extends vscode.TreeItem {
         break;
     }
 
-    // Click to show full diff
+    // Click to show Claude changes
     this.command = {
-      command: 'aiCockpit.showFullDiff',
-      title: 'Show Full Diff',
+      command: 'aiCockpit.showClaudeChanges',
+      title: 'Show Claude Changes',
       arguments: [shadow]
     };
 

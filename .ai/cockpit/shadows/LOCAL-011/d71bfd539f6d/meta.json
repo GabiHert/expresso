@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/providers/TaskTreeProvider.ts",
+  "taskId": "LOCAL-011",
+  "baseline": {
+    "capturedAt": "2025-12-30T01:52:03.292Z",
+    "hash": "3494d6fd65c7a03a",
+    "size": 16413
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T01:52:03.292Z",
+    "hash": "aaf9ac8ad04a3054",
+    "size": 16398,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T01:52:03.292Z",
+    "actualFileHash": "aaf9ac8ad04a3054",
+    "status": "synced"
+  }
+}
