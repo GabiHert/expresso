@@ -99,11 +99,6 @@
         "command": "aiCockpit.linkSessionToTask",
         "title": "Link to Task",
         "icon": "$(link)"
-      },
-      {
-        "command": "aiCockpit.openFeedbackFile",
-        "title": "Open Feedback",
-        "icon": "$(comment-discussion)"
       }
     ],
     "configuration": {
@@ -158,24 +153,14 @@
       ],
       "view/item/context": [
         {
-          "command": "aiCockpit.openFeedbackFile",
-          "when": "view == aiCockpit.tasks && viewItem == task-in_progress",
-          "group": "inline@1"
-        },
-        {
           "command": "aiCockpit.openTaskTerminal",
           "when": "view == aiCockpit.tasks && viewItem == task-in_progress",
-          "group": "inline@2"
-        },
-        {
-          "command": "aiCockpit.openFeedbackFile",
-          "when": "view == aiCockpit.tasks && viewItem == task-active",
-          "group": "inline@1"
+          "group": "inline"
         },
         {
           "command": "aiCockpit.openTaskTerminal",
           "when": "view == aiCockpit.tasks && viewItem == task-active",
-          "group": "inline@2"
+          "group": "inline"
         },
         {
           "command": "aiCockpit.openTaskTerminal",

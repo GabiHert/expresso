@@ -1,0 +1,41 @@
+{
+  "id": "evt-1767063389189-vhoowrf2r",
+  "taskId": "LOCAL-013",
+  "taskIdSource": "active-task-file",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/in_progress/LOCAL-013/status.yaml",
+    "old_string": "  - id: \"02\"\n    name: \"Create /address-feedback command\"\n    repo: \"ai-framework\"\n    status: todo\n    file: \"todo/02-address-feedback-command.md\"",
+    "new_string": "  - id: \"02\"\n    name: \"Create /address-feedback command\"\n    repo: \"ai-framework\"\n    status: in_progress\n    file: \"in_progress/02-address-feedback-command.md\""
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/in_progress/LOCAL-013/status.yaml",
+    "oldString": "  - id: \"02\"\n    name: \"Create /address-feedback command\"\n    repo: \"ai-framework\"\n    status: todo\n    file: \"todo/02-address-feedback-command.md\"",
+    "newString": "  - id: \"02\"\n    name: \"Create /address-feedback command\"\n    repo: \"ai-framework\"\n    status: in_progress\n    file: \"in_progress/02-address-feedback-command.md\"",
+    "originalFile": "# Task Status Index\ntask: \"LOCAL-013\"\ntitle: \"Add diff feedback comments for agent review\"\ncreated: \"2025-12-29\"\nupdated: \"2025-12-29\"\n\nsummary:\n  total: 4\n  todo: 3\n  in_progress: 0\n  done: 1\n\nwork_items:\n  - id: \"01\"\n    name: \"Feedback storage format\"\n    repo: \"ai-framework\"\n    status: done\n    file: \"done/01-feedback-storage-format.md\"\n  - id: \"02\"\n    name: \"Create /address-feedback command\"\n    repo: \"ai-framework\"\n    status: todo\n    file: \"todo/02-address-feedback-command.md\"\n  - id: \"03\"\n    name: \"VSCode feedback button\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/03-vscode-feedback-button.md\"\n  - id: \"04\"\n    name: \"Task-create integration\"\n    repo: \"ai-framework\"\n    status: todo\n    file: \"todo/04-task-create-integration.md\"\n",
+    "structuredPatch": [
+      {
+        "oldStart": 19,
+        "oldLines": 8,
+        "newStart": 19,
+        "newLines": 8,
+        "lines": [
+          "   - id: \"02\"",
+          "     name: \"Create /address-feedback command\"",
+          "     repo: \"ai-framework\"",
+          "-    status: todo",
+          "-    file: \"todo/02-address-feedback-command.md\"",
+          "+    status: in_progress",
+          "+    file: \"in_progress/02-address-feedback-command.md\"",
+          "   - id: \"03\"",
+          "     name: \"VSCode feedback button\"",
+          "     repo: \"vscode-extension\""
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "3764ab9c-088d-4e71-9b80-408a356de620",
+  "timestamp": "2025-12-30T02:56:29.189Z"
+}

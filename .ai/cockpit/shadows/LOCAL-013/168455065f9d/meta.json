@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/_framework/commands/task-create.md",
+  "taskId": "LOCAL-013",
+  "baseline": {
+    "capturedAt": "2025-12-30T03:02:14.464Z",
+    "hash": "3c2910ca54f54aba",
+    "size": 11930
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T03:02:14.708Z",
+    "hash": "3c3bc52d2908a2b2",
+    "size": 12454,
+    "editCount": 3
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T03:02:14.708Z",
+    "actualFileHash": "3c3bc52d2908a2b2",
+    "status": "synced"
+  }
+}

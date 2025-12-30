@@ -1,0 +1,78 @@
+{
+  "id": "evt-1767063533938-zzbt40qd1",
+  "taskId": "LOCAL-013",
+  "taskIdSource": "active-task-file",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Implement work item 01: Feedback storage format",
+        "status": "completed",
+        "activeForm": "Implementing work item 01: Feedback storage format"
+      },
+      {
+        "content": "Implement work item 02: Create /address-feedback command",
+        "status": "completed",
+        "activeForm": "Implementing work item 02: Create /address-feedback command"
+      },
+      {
+        "content": "Implement work item 03: VSCode feedback button",
+        "status": "in_progress",
+        "activeForm": "Implementing work item 03: VSCode feedback button"
+      },
+      {
+        "content": "Implement work item 04: Task-create integration",
+        "status": "pending",
+        "activeForm": "Implementing work item 04: Task-create integration"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [
+      {
+        "content": "Implement work item 01: Feedback storage format",
+        "status": "completed",
+        "activeForm": "Implementing work item 01: Feedback storage format"
+      },
+      {
+        "content": "Implement work item 02: Create /address-feedback command",
+        "status": "in_progress",
+        "activeForm": "Implementing work item 02: Create /address-feedback command"
+      },
+      {
+        "content": "Implement work item 03: VSCode feedback button",
+        "status": "pending",
+        "activeForm": "Implementing work item 03: VSCode feedback button"
+      },
+      {
+        "content": "Implement work item 04: Task-create integration",
+        "status": "pending",
+        "activeForm": "Implementing work item 04: Task-create integration"
+      }
+    ],
+    "newTodos": [
+      {
+        "content": "Implement work item 01: Feedback storage format",
+        "status": "completed",
+        "activeForm": "Implementing work item 01: Feedback storage format"
+      },
+      {
+        "content": "Implement work item 02: Create /address-feedback command",
+        "status": "completed",
+        "activeForm": "Implementing work item 02: Create /address-feedback command"
+      },
+      {
+        "content": "Implement work item 03: VSCode feedback button",
+        "status": "in_progress",
+        "activeForm": "Implementing work item 03: VSCode feedback button"
+      },
+      {
+        "content": "Implement work item 04: Task-create integration",
+        "status": "pending",
+        "activeForm": "Implementing work item 04: Task-create integration"
+      }
+    ]
+  },
+  "sessionId": "3764ab9c-088d-4e71-9b80-408a356de620",
+  "timestamp": "2025-12-30T02:58:53.938Z"
+}

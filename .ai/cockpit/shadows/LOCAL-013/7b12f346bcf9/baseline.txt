@@ -6,28 +6,28 @@ updated: "2025-12-29"
 
 summary:
   total: 4
-  todo: 0
+  todo: 4
   in_progress: 0
-  done: 4
+  done: 0
 
 work_items:
   - id: "01"
     name: "Feedback storage format"
     repo: "ai-framework"
-    status: done
-    file: "done/01-feedback-storage-format.md"
+    status: todo
+    file: "todo/01-feedback-storage-format.md"
   - id: "02"
     name: "Create /address-feedback command"
     repo: "ai-framework"
-    status: done
-    file: "done/02-address-feedback-command.md"
+    status: todo
+    file: "todo/02-address-feedback-command.md"
   - id: "03"
     name: "VSCode feedback button"
     repo: "vscode-extension"
-    status: done
-    file: "done/03-vscode-feedback-button.md"
+    status: todo
+    file: "todo/03-vscode-feedback-button.md"
   - id: "04"
     name: "Task-create integration"
     repo: "ai-framework"
-    status: done
-    file: "done/04-task-create-integration.md"
+    status: todo
+    file: "todo/04-task-create-integration.md"

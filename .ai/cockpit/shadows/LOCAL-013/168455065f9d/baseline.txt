@@ -241,7 +241,6 @@ Iterate until user approves.
 - `todo/`
 - `in_progress/`
 - `done/`
-- `feedback/`
 
 **7c. Create README.md** (from `_framework/templates/task-readme.md`, include diagrams from Step 5):
 ```markdown
@@ -317,11 +316,6 @@ See `status.yaml` for full index.
 ## Testing Strategy
 
 {testing approach from planning}
-
-## Feedback
-
-Review comments can be added to `feedback/diff-review.md`.
-Use `/address-feedback` to discuss feedback with the agent.
 
 ## References
 
@@ -409,22 +403,6 @@ After completing, run a **code review agent** to check for issues.
 ## Notes
 
 {any additional context or warnings}
-```
-
-**7f. Create feedback file:**
-Copy the feedback template to the task's feedback folder:
-```
-.ai/_framework/templates/feedback-template.md → .ai/tasks/todo/{ticket-id}/feedback/diff-review.md
-```
-
-If the template doesn't exist, create a minimal feedback file:
-```markdown
-# Diff Feedback
-
-Add your feedback below using the format:
-
-### path/to/file.ts:42
-Your comment here
 ```
 
 ### Step 8: Update Context
