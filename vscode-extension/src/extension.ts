@@ -365,7 +365,7 @@ export function activate(context: vscode.ExtensionContext) {
       terminal.sendText(generateClaudeCommand());
 
       // Store mapping for terminal close correlation
-      terminalManager!.registerTerminal(terminalId, terminal);
+      terminalManager!.registerTerminal(terminalId, terminal, taskId);
 
       // Mark as pending capture (to handle terminal close during capture)
       terminalManager!.markPendingCapture(terminalId);
@@ -477,7 +477,7 @@ export function activate(context: vscode.ExtensionContext) {
       terminal.show();
 
       // Store mapping for terminal close correlation
-      terminalManager!.registerTerminal(terminalId, terminal);
+      terminalManager!.registerTerminal(terminalId, terminal, session.taskId);
 
       // Resume the Claude session
       terminal.sendText(generateClaudeCommand({ resume: session.id }));
@@ -752,7 +752,7 @@ export function activate(context: vscode.ExtensionContext) {
       terminal.sendText(generateClaudeCommand());
 
       // Store mapping for terminal close correlation
-      terminalManager!.registerTerminal(terminalId, terminal);
+      terminalManager!.registerTerminal(terminalId, terminal, taskId);
 
       // Mark as pending capture (to handle terminal close during capture)
       terminalManager!.markPendingCapture(terminalId);
@@ -830,7 +830,7 @@ export function activate(context: vscode.ExtensionContext) {
       terminal.sendText(generateClaudeCommand());
 
       // Store mapping for terminal close correlation
-      terminalManager!.registerTerminal(terminalId, terminal);
+      terminalManager!.registerTerminal(terminalId, terminal, UNASSIGNED_TASK_ID);
 
       // Mark as pending capture
       terminalManager!.markPendingCapture(terminalId);
