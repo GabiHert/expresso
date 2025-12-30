@@ -1,0 +1,78 @@
+{
+  "id": "evt-1767060366732-q8sdi6tcp",
+  "taskId": "session-6da5b926-4ad7-4ff9-a1db-9ae5322984d9",
+  "taskIdSource": "session-fallback",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Move task to done folder",
+        "status": "completed",
+        "activeForm": "Moving task to done folder"
+      },
+      {
+        "content": "Log to completed tasks history",
+        "status": "completed",
+        "activeForm": "Logging to history"
+      },
+      {
+        "content": "Deactivate cockpit tracking",
+        "status": "completed",
+        "activeForm": "Deactivating cockpit tracking"
+      },
+      {
+        "content": "Send notification",
+        "status": "in_progress",
+        "activeForm": "Sending notification"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [
+      {
+        "content": "Move task to done folder",
+        "status": "completed",
+        "activeForm": "Moving task to done folder"
+      },
+      {
+        "content": "Log to completed tasks history",
+        "status": "completed",
+        "activeForm": "Logging to history"
+      },
+      {
+        "content": "Deactivate cockpit tracking",
+        "status": "in_progress",
+        "activeForm": "Deactivating cockpit tracking"
+      },
+      {
+        "content": "Send notification",
+        "status": "pending",
+        "activeForm": "Sending notification"
+      }
+    ],
+    "newTodos": [
+      {
+        "content": "Move task to done folder",
+        "status": "completed",
+        "activeForm": "Moving task to done folder"
+      },
+      {
+        "content": "Log to completed tasks history",
+        "status": "completed",
+        "activeForm": "Logging to history"
+      },
+      {
+        "content": "Deactivate cockpit tracking",
+        "status": "completed",
+        "activeForm": "Deactivating cockpit tracking"
+      },
+      {
+        "content": "Send notification",
+        "status": "in_progress",
+        "activeForm": "Sending notification"
+      }
+    ]
+  },
+  "sessionId": "6da5b926-4ad7-4ff9-a1db-9ae5322984d9",
+  "timestamp": "2025-12-30T02:06:06.732Z"
+}
