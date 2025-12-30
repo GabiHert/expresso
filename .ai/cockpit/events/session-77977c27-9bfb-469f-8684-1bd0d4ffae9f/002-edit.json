@@ -1,0 +1,39 @@
+{
+  "id": "evt-1767120665954-t3m905xuv",
+  "taskId": "session-77977c27-9bfb-469f-8684-1bd0d4ffae9f",
+  "taskIdSource": "session-fallback",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/done/LOCAL-013/README.md",
+    "old_string": "║ LOCATION: .ai/tasks/in_progress/LOCAL-013/                       ║",
+    "new_string": "║ LOCATION: .ai/tasks/done/LOCAL-013/                              ║"
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/done/LOCAL-013/README.md",
+    "oldString": "║ LOCATION: .ai/tasks/in_progress/LOCAL-013/                       ║",
+    "newString": "║ LOCATION: .ai/tasks/done/LOCAL-013/                              ║",
+    "originalFile": "<!--\n╔══════════════════════════════════════════════════════════════════╗\n║ LAYER: TASK                                                      ║\n║ LOCATION: .ai/tasks/in_progress/LOCAL-013/                       ║\n╠══════════════════════════════════════════════════════════════════╣\n║ BEFORE WORKING ON THIS TASK:                                     ║\n║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)           ║\n║ 2. Read this entire README first                                 ║\n║ 3. Check which work items are in todo/ vs done/                  ║\n║ 4. Work on ONE item at a time from todo/                         ║\n╚══════════════════════════════════════════════════════════════════╝\n-->\n\n# LOCAL-013: Add diff feedback comments for agent review\n\n## Problem Statement\n\nUsers need a way to review full diff file changes from tasks and add comments that can be forwarded to agents. Currently, there's no mechanism to provide feedback on code changes that agents can read and address in subsequent sessions.\n\nThe solution should be simple: store feedback as markdown in the task documentation folder, and provide a framework command for agents to read and address the feedback.\n\n## Acceptance Criteria\n\n- [ ] Users can add comments to `.ai/tasks/{taskId}/feedback/diff-review.md`\n- [ ] `/address-feedback` command reads and presents comments to agent\n- [ ] VSCode shows button to open feedback file for active task\n- [ ] New tasks include `feedback/` folder in structure\n\n## Work Items\n\nSee `status.yaml` for full index.\n\n| ID | Name | Repo | Status |\n|----|------|------|--------|\n| 01 | Feedback storage format | ai-framework | todo |\n| 02 | Create /address-feedback command | ai-framework | todo |\n| 03 | VSCode feedback button | vscode-extension | todo |\n| 04 | Task-create integration | ai-framework | todo |\n\n## Branches\n\n| Repo | Branch |\n|------|--------|\n| ai-framework | `LOCAL-013-diff-feedback` |\n\n## Technical Context\n\n### Current State\n- Diffs are tracked via shadow copy system in `.ai/cockpit/shadows/{taskId}/`\n- Three-way diff viewing available (baseline, accumulated, actual)\n- No commenting or feedback mechanism exists\n\n### Target State\n- Feedback stored in task folder: `.ai/tasks/{taskId}/feedback/diff-review.md`\n- Simple markdown format with file paths and line references\n- Agent can read feedback via `/address-feedback` command\n- VSCode provides quick access button\n\n### Key Files\n\n**ai-framework:**\n- `.ai/_framework/commands/` - Where new command will live\n- `.ai/_framework/templates/` - Where feedback template will go\n- `.ai/_framework/commands/task-create.md` - Needs update for feedback folder\n\n**vscode-extension:**\n- `src/extension.ts` - Command registration\n- `src/providers/TaskTreeProvider.ts` - Tree view items\n\n## Implementation Approach\n\n1. Design a simple markdown format for feedback (file path + line + comment)\n2. Create framework command that reads feedback and formats for agent\n3. Add VSCode button that opens feedback file in editor\n4. Update task-create to include feedback folder in new tasks\n\n## Risks & Considerations\n\n- Keep format simple - users will edit manually\n- Ensure agent can parse file paths and line numbers from markdown\n- Consider how to handle resolved vs unresolved feedback\n\n## Testing Strategy\n\n1. Create a feedback file manually, run `/address-feedback`\n2. Verify agent receives and acknowledges feedback\n3. Test VSCode button opens correct file\n4. Create new task, verify feedback folder exists\n\n## References\n\n- Exploration from /task-explore session on diff commenting\n- Shadow copy system docs: `.ai/docs/_architecture/shadow-copy-system.md`\n",
+    "structuredPatch": [
+      {
+        "oldStart": 1,
+        "oldLines": 7,
+        "newStart": 1,
+        "newLines": 7,
+        "lines": [
+          " <!--",
+          " ╔══════════════════════════════════════════════════════════════════╗",
+          " ║ LAYER: TASK                                                      ║",
+          "-║ LOCATION: .ai/tasks/in_progress/LOCAL-013/                       ║",
+          "+║ LOCATION: .ai/tasks/done/LOCAL-013/                              ║",
+          " ╠══════════════════════════════════════════════════════════════════╣",
+          " ║ BEFORE WORKING ON THIS TASK:                                     ║",
+          " ║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)           ║"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "77977c27-9bfb-469f-8684-1bd0d4ffae9f",
+  "timestamp": "2025-12-30T18:51:05.954Z"
+}
