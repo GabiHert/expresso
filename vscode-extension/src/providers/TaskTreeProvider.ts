@@ -5,6 +5,7 @@ import { ActiveTask, CockpitEvent, CockpitSession, UNASSIGNED_TASK_ID } from '..
 import { CockpitFileWatcher } from '../watchers/FileWatcher';
 import { Shadow, ShadowManager } from '../services/ShadowManager';
 import { SessionManager } from '../services/SessionManager';
+import { CommentManager } from '../services/CommentManager';
 
 type TreeItemType = SectionItem | TaskItem | EventItem | WorkItemNode | FilesChangedSection | ShadowFileItem | SessionsSection | SessionItem | UnassignedSessionsSection;
 
@@ -23,32 +24,52 @@ interface WorkItem {
   file?: string;
 }
 
-export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
+export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, vscode.Disposable {
   private _onDidChangeTreeData = new vscode.EventEmitter<TreeItemType | undefined>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
   private activeTask: ActiveTask | null = null;
   private events: Map<string, CockpitEvent[]> = new Map();
   private workspaceRoot: string;
+  private disposables: vscode.Disposable[] = [];
 
   constructor(
     private fileWatcher: CockpitFileWatcher,
     private shadowManager: ShadowManager,
-    private sessionManager?: SessionManager
+    private sessionManager?: SessionManager,
+    private commentManager?: CommentManager
   ) {
     this.workspaceRoot = fileWatcher.getWorkspaceRoot();
 
-    fileWatcher.onActiveTaskChanged(task => {
-      this.activeTask = task;
-      this.refresh();
-    });
+    this.disposables.push(
+      fileWatcher.onActiveTaskChanged(task => {
+        this.activeTask = task;
+        this.refresh();
+      })
+    );
 
-    fileWatcher.onEventAdded(event => {
-      const existing = this.events.get(event.taskId) || [];
-      existing.push(event);
-      this.events.set(event.taskId, existing);
-      this.refresh();
-    });
+    this.disposables.push(
+      fileWatcher.onEventAdded(event => {
+        const existing = this.events.get(event.taskId) || [];
+        existing.push(event);
+        this.events.set(event.taskId, existing);
+        this.refresh();
+      })
+    );
+
+    // Refresh tree when comments change
+    if (commentManager) {
+      this.disposables.push(
+        commentManager.onChange(() => {
+          this.refresh();
+        })
+      );
+    }
+  }
+
+  dispose(): void {
+    this.disposables.forEach(d => d.dispose());
+    this._onDidChangeTreeData.dispose();
   }
 
   refresh(): void {
@@ -81,7 +102,7 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
     }
 
     if (element instanceof FilesChangedSection) {
-      return this.getFilesForTask(element.taskId);
+      return this.getFilesForTask(element.taskId, element.taskStatus);
     }
 
     return [];
@@ -244,7 +265,7 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
     // Add Files Changed section if shadows exist
     const shadows = await this.shadowManager.getShadowsForTask(task.taskId);
     if (shadows.length > 0) {
-      items.push(new FilesChangedSection(task.taskId, shadows.length));
+      items.push(new FilesChangedSection(task.taskId, task.task.status, shadows.length));
     }
 
     return items;
@@ -282,20 +303,42 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
       .map(s => new SessionItem(s, true));
   }
 
-  private async getFilesForTask(taskId: string): Promise<ShadowFileItem[]> {
+  private async getFilesForTask(taskId: string, taskStatus: string): Promise<ShadowFileItem[]> {
     const shadows = await this.shadowManager.getShadowsForTask(taskId);
     const items: ShadowFileItem[] = [];
 
-    for (const shadow of shadows) {
-      const syncStatus = await this.shadowManager.checkSyncStatus(shadow);
-      items.push(new ShadowFileItem(shadow, syncStatus));
+    // Load feedback to get comment counts
+    let commentsByFile: Map<string, number> = new Map();
+    if (this.commentManager) {
+      try {
+        const feedback = await this.commentManager.loadFeedback(taskId);
+        // Count only open comments per file
+        for (const comment of feedback.comments) {
+          if (comment.status === 'open') {
+            const count = commentsByFile.get(comment.filePath) || 0;
+            commentsByFile.set(comment.filePath, count + 1);
+          }
+        }
+      } catch {
+        // Ignore errors loading feedback
+      }
     }
 
-    // Sort: modified first, then by filename
+    for (const shadow of shadows) {
+      const syncStatus = await this.shadowManager.checkSyncStatus(shadow);
+      const commentCount = commentsByFile.get(shadow.meta.filePath) || 0;
+      items.push(new ShadowFileItem(shadow, syncStatus, taskId, taskStatus, commentCount));
+    }
+
+    // Sort: modified first, then files with comments, then by filename
     items.sort((a, b) => {
       if (a.syncStatus !== b.syncStatus) {
         if (a.syncStatus === 'user-modified') return -1;
         if (b.syncStatus === 'user-modified') return 1;
+      }
+      // Files with comments come before files without
+      if (a.commentCount !== b.commentCount) {
+        return b.commentCount - a.commentCount;
       }
       return a.shadow.meta.filePath.localeCompare(b.shadow.meta.filePath);
     });
@@ -460,7 +503,11 @@ class EventItem extends vscode.TreeItem {
 }
 
 class FilesChangedSection extends vscode.TreeItem {
-  constructor(public readonly taskId: string, fileCount: number) {
+  constructor(
+    public readonly taskId: string,
+    public readonly taskStatus: string,
+    fileCount: number
+  ) {
     super('Files Changed', vscode.TreeItemCollapsibleState.Collapsed);
 
     this.description = `${fileCount}`;
@@ -472,14 +519,19 @@ class FilesChangedSection extends vscode.TreeItem {
 class ShadowFileItem extends vscode.TreeItem {
   constructor(
     public readonly shadow: Shadow,
-    public readonly syncStatus: 'synced' | 'user-modified' | 'file-deleted'
+    public readonly syncStatus: 'synced' | 'user-modified' | 'file-deleted',
+    public readonly taskId: string,
+    public readonly taskStatus: string,
+    public readonly commentCount: number = 0
   ) {
     super(
       path.basename(shadow.meta.filePath),
       vscode.TreeItemCollapsibleState.None
     );
 
-    this.description = `${shadow.meta.accumulated.editCount} edit${shadow.meta.accumulated.editCount !== 1 ? 's' : ''}`;
+    let descParts: string[] = [];
+    descParts.push(`${shadow.meta.accumulated.editCount} edit${shadow.meta.accumulated.editCount !== 1 ? 's' : ''}`);
+
     this.tooltip = `${shadow.meta.filePath}\n${shadow.meta.accumulated.editCount} Claude edits\nStatus: ${syncStatus}`;
 
     // Icon based on sync status
@@ -489,20 +541,36 @@ class ShadowFileItem extends vscode.TreeItem {
         break;
       case 'user-modified':
         this.iconPath = new vscode.ThemeIcon('warning', new vscode.ThemeColor('charts.yellow'));
-        this.description += ' (modified)';
+        descParts.push('(modified)');
         break;
       case 'file-deleted':
         this.iconPath = new vscode.ThemeIcon('trash', new vscode.ThemeColor('charts.red'));
-        this.description += ' (deleted)';
+        descParts.push('(deleted)');
         break;
     }
 
-    // Click to show full diff
-    this.command = {
-      command: 'aiCockpit.showFullDiff',
-      title: 'Show Full Diff',
-      arguments: [shadow]
-    };
+    // Show comment count badge
+    if (commentCount > 0) {
+      descParts.push(`💬 ${commentCount}`);
+      this.tooltip += `\n${commentCount} open comment${commentCount !== 1 ? 's' : ''}`;
+    }
+
+    this.description = descParts.join(' ');
+
+    // Click action: DiffReviewPanel for in_progress, native diff otherwise
+    if (taskStatus === 'in_progress') {
+      this.command = {
+        command: 'aiCockpit.openDiffReview',
+        title: 'Review Changes',
+        arguments: [shadow]
+      };
+    } else {
+      this.command = {
+        command: 'aiCockpit.showFullDiff',
+        title: 'Show Full Diff',
+        arguments: [shadow]
+      };
+    }
 
     this.contextValue = `shadow-file-${syncStatus}`;
   }

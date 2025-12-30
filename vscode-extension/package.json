@@ -104,6 +104,16 @@
         "command": "aiCockpit.openFeedbackFile",
         "title": "Open Feedback",
         "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "aiCockpit.openDiffReview",
+        "title": "Review Changes",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "aiCockpit.showPlainDiff",
+        "title": "Show Plain Diff",
+        "icon": "$(diff)"
       }
     ],
     "configuration": {
@@ -193,19 +203,29 @@
           "group": "inline"
         },
         {
-          "command": "aiCockpit.showClaudeChanges",
+          "command": "aiCockpit.openDiffReview",
           "when": "view == aiCockpit.tasks && viewItem =~ /shadow-file/",
           "group": "navigation@1"
         },
         {
+          "command": "aiCockpit.showPlainDiff",
+          "when": "view == aiCockpit.tasks && viewItem =~ /shadow-file/",
+          "group": "navigation@2"
+        },
+        {
+          "command": "aiCockpit.showClaudeChanges",
+          "when": "view == aiCockpit.tasks && viewItem =~ /shadow-file/",
+          "group": "diff@1"
+        },
+        {
           "command": "aiCockpit.showYourChanges",
           "when": "view == aiCockpit.tasks && viewItem == shadow-file-user-modified",
-          "group": "navigation@2"
+          "group": "diff@2"
         },
         {
           "command": "aiCockpit.showFullDiff",
           "when": "view == aiCockpit.tasks && viewItem =~ /shadow-file/",
-          "group": "navigation@3"
+          "group": "diff@3"
         },
         {
           "command": "aiCockpit.focusSession",
@@ -297,6 +317,7 @@
     "lint": "eslint src --ext ts"
   },
   "devDependencies": {
+    "@types/diff": "^5.2.3",
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.85.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
@@ -305,6 +326,8 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@vscode/vsce": "^3.7.1"
+    "@vscode/vsce": "^3.7.1",
+    "diff": "^5.2.0",
+    "diff2html": "^3.4.48"
   }
 }

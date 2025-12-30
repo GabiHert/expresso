@@ -16,6 +16,8 @@ import { Shadow } from './services/ShadowManager';
 import { safeJsonParseLine } from './utils/jsonUtils';
 import { getClaudeHistoryPath } from './utils/claudePaths';
 import { TerminalManager } from './services/TerminalManager';
+import { DiffReviewPanel } from './panels/DiffReviewPanel';
+import { CommentManager } from './services/CommentManager';
 
 let fileWatcher: CockpitFileWatcher | undefined;
 let statusBar: StatusBarProvider | undefined;
@@ -25,6 +27,7 @@ let diffViewer: DiffViewer | undefined;
 let shadowManager: ShadowManager | undefined;
 let sessionManager: SessionManager | undefined;
 let terminalManager: TerminalManager | undefined;
+let commentManager: CommentManager | undefined;
 
 export function getTerminalManager(): TerminalManager | undefined {
   return terminalManager;
@@ -44,9 +47,11 @@ export function activate(context: vscode.ExtensionContext) {
   shadowManager = new ShadowManager(workspaceRoot);
   sessionManager = new SessionManager(workspaceRoot);
   terminalManager = new TerminalManager();
+  commentManager = new CommentManager(workspaceRoot);
+  context.subscriptions.push({ dispose: () => commentManager?.dispose() });
 
   // Initialize task tree provider
-  taskTreeProvider = new TaskTreeProvider(fileWatcher, shadowManager, sessionManager);
+  taskTreeProvider = new TaskTreeProvider(fileWatcher, shadowManager, sessionManager, commentManager);
 
   // Run session cleanup on startup if enabled
   const config = vscode.workspace.getConfiguration('aiCockpit');
@@ -85,7 +90,7 @@ export function activate(context: vscode.ExtensionContext) {
   registerCommands(context, statusBar);
 
   // Add to subscriptions
-  context.subscriptions.push(fileWatcher, statusBar, treeView, diffProviderRegistration);
+  context.subscriptions.push(fileWatcher, statusBar, treeView, diffProviderRegistration, taskTreeProvider);
 
   // Register diff command
   const viewEventDiff = vscode.commands.registerCommand(
@@ -135,6 +140,9 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(openTaskCommand);
 
+  // Valid task statuses whitelist
+  const VALID_STATUSES = ['todo', 'in_progress', 'done'];
+
   // Register open work item command
   const openWorkItemCommand = vscode.commands.registerCommand(
     'aiCockpit.openWorkItem',
@@ -144,20 +152,39 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
+      // Validate task status against whitelist
+      if (!VALID_STATUSES.includes(args.taskStatus)) {
+        vscode.window.showErrorMessage('Invalid task status');
+        return;
+      }
+
+      // Normalize path before checking for traversal
       const fileName = args.workItem.file;
-      if (fileName.includes('..') || path.isAbsolute(fileName)) {
+      const normalizedFileName = path.normalize(fileName);
+
+      // Check for traversal attempts after normalization
+      if (normalizedFileName.includes('..') || path.isAbsolute(normalizedFileName)) {
         vscode.window.showErrorMessage('Invalid work item file path');
         return;
       }
 
+      // Build the path using normalized filename
       const workItemPath = path.join(
         workspaceRoot,
         '.ai',
         'tasks',
         args.taskStatus,
         args.taskId,
-        fileName
+        normalizedFileName
       );
+
+      // Verify resolved path is within allowed directory
+      const resolvedPath = path.resolve(workItemPath);
+      const allowedBase = path.resolve(workspaceRoot, '.ai', 'tasks', args.taskStatus, args.taskId);
+      if (!resolvedPath.startsWith(allowedBase + path.sep)) {
+        vscode.window.showErrorMessage('Path traversal detected');
+        return;
+      }
 
       try {
         const uri = vscode.Uri.file(workItemPath);
@@ -837,7 +864,39 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  context.subscriptions.push(showClaudeChanges, showYourChanges, showFullDiff);
+  // Register plain diff command (native VSCode diff, no comments)
+  const showPlainDiff = vscode.commands.registerCommand(
+    'aiCockpit.showPlainDiff',
+    async (arg: unknown) => {
+      const shadow = extractShadow(arg);
+      if (!shadow) {
+        vscode.window.showWarningMessage('No shadow data provided');
+        return;
+      }
+      await diffViewer?.showFullDiff(shadow);
+    }
+  );
+
+  context.subscriptions.push(showClaudeChanges, showYourChanges, showFullDiff, showPlainDiff);
+
+  // Register open diff review panel command (GitHub-style review)
+  const openDiffReview = vscode.commands.registerCommand(
+    'aiCockpit.openDiffReview',
+    async (arg: unknown) => {
+      const shadow = extractShadow(arg);
+      if (!shadow) {
+        vscode.window.showWarningMessage('No shadow data provided');
+        return;
+      }
+      if (!commentManager) {
+        vscode.window.showErrorMessage('CommentManager not initialized');
+        return;
+      }
+      DiffReviewPanel.createOrShow(context.extensionUri, shadow, commentManager);
+    }
+  );
+
+  context.subscriptions.push(openDiffReview);
 
   // Register open feedback file command
   const openFeedbackFile = vscode.commands.registerCommand(
@@ -914,5 +973,6 @@ export function deactivate() {
   fileWatcher?.dispose();
   statusBar?.dispose();
   terminalManager?.dispose();
+  commentManager?.dispose();
   console.log('AI Cockpit extension deactivated');
 }

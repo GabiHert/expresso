@@ -17,3 +17,4 @@ Tasks completed in this project, for reference and learning.
 | 2025-12-30 | [LOCAL-010](.ai/tasks/done/LOCAL-010/) | Session Rename & Delete - Right-click context menus to rename session labels or delete sessions with confirmation |
 | 2025-12-30 | [LOCAL-011](.ai/tasks/done/LOCAL-011/) | Default Full Diff - Changed file click behavior from Claude Changes to Full Diff |
 | 2025-12-30 | [LOCAL-012](.ai/tasks/done/LOCAL-012/) | Unassigned Sessions & Task Linking - Start sessions without a task, view in dedicated section, link to tasks later via context menu or /task-create |
+| 2025-12-30 | [LOCAL-014](.ai/tasks/done/LOCAL-014/) | GitHub-style PR Review Diff Viewer - Inline commenting with diff2html, plus security fixes (XSS, path traversal, race conditions) |
