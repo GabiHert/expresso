@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/cockpit/active-task.json",
+  "taskId": "LOCAL-016",
+  "baseline": {
+    "capturedAt": "2025-12-30T19:44:54.967Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T19:44:54.967Z",
+    "hash": "00c61f47f660c0dd",
+    "size": 260,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T19:44:54.967Z",
+    "actualFileHash": "00c61f47f660c0dd",
+    "status": "synced"
+  }
+}

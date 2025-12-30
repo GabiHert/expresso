@@ -1,0 +1,8 @@
+{
+  "taskId": "LOCAL-016",
+  "title": "Add --allow-dangerously-skip-permissions to Claude sessions",
+  "branch": "project/ai-cockpit",
+  "frameworkPath": ".ai/tasks/in_progress/LOCAL-016",
+  "startedAt": "2025-12-30T19:45:00Z",
+  "sessionId": "a1b2c3d4e5f6"
+}

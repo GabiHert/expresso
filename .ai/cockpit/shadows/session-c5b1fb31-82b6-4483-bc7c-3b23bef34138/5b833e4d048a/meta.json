@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/.claude/plans/gleaming-weaving-catmull.md",
+  "taskId": "session-c5b1fb31-82b6-4483-bc7c-3b23bef34138",
+  "baseline": {
+    "capturedAt": "2025-12-30T19:33:18.461Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T19:33:18.461Z",
+    "hash": "a82692504be182b9",
+    "size": 1471,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T19:33:18.461Z",
+    "actualFileHash": "a82692504be182b9",
+    "status": "synced"
+  }
+}
