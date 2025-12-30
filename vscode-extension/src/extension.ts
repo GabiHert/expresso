@@ -305,11 +305,28 @@ export function activate(context: vscode.ExtensionContext) {
   };
 
   /**
-   * Queued version of session capture that prevents concurrent captures.
-   * This fixes the race condition where multiple terminals starting Claude
-   * simultaneously could capture each other's session IDs.
+   * Session registration data for atomic capture+register operation
    */
-  const captureLatestSessionId = async (): Promise<string | null> => {
+  interface SessionRegistrationData {
+    taskId: string;
+    label: string;
+    terminalName: string;
+    terminalId: string;
+  }
+
+  /**
+   * Atomically captures a session ID and registers it in a single queued operation.
+   * This prevents race conditions where concurrent captures could grab each other's
+   * session IDs because registration happened outside the queue.
+   *
+   * The entire capture + registration is done inside the queue, ensuring:
+   * 1. Fresh sessions are read at capture time
+   * 2. New session is found via polling
+   * 3. Session is registered BEFORE the next capture can start
+   */
+  const captureAndRegisterSession = async (
+    registrationData: SessionRegistrationData
+  ): Promise<string | null> => {
     return new Promise((resolve) => {
       captureQueue = captureQueue.then(async () => {
         // Get FRESH known sessions at capture time (not terminal creation time)
@@ -318,9 +335,25 @@ export function activate(context: vscode.ExtensionContext) {
 
         console.log(`AI Cockpit: Starting queued capture, ${knownSessionIds.size} known sessions`);
 
-        const result = await captureLatestSessionIdImpl(knownSessionIds);
-        resolve(result);
-        return result;
+        const sessionId = await captureLatestSessionIdImpl(knownSessionIds);
+
+        // Register INSIDE the queue before returning, so next capture sees it
+        if (sessionId && sessionManager) {
+          await sessionManager.registerSession({
+            id: sessionId,
+            taskId: registrationData.taskId,
+            label: registrationData.label,
+            createdAt: new Date().toISOString(),
+            lastActive: new Date().toISOString(),
+            status: 'active',
+            terminalName: registrationData.terminalName,
+            terminalId: registrationData.terminalId
+          });
+          console.log(`AI Cockpit: Session ${sessionId} registered inside queue`);
+        }
+
+        resolve(sessionId);
+        return sessionId;
       });
     });
   };
@@ -372,8 +405,13 @@ export function activate(context: vscode.ExtensionContext) {
 
       let sessionId: string | null = null;
       try {
-        // Capture session with polling to handle variable Claude startup time
-        sessionId = await captureLatestSessionId();
+        // Atomically capture and register session (prevents race conditions)
+        sessionId = await captureAndRegisterSession({
+          taskId,
+          label: `Session ${new Date().toLocaleTimeString()}`,
+          terminalName: terminal.name,
+          terminalId
+        });
       } finally {
         // Always remove from pending, even if capture throws
         terminalManager!.clearPendingCapture(terminalId);
@@ -386,17 +424,7 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      if (sessionId && sessionManager) {
-        await sessionManager.registerSession({
-          id: sessionId,
-          taskId,
-          label: `Session ${new Date().toLocaleTimeString()}`,
-          createdAt: new Date().toISOString(),
-          lastActive: new Date().toISOString(),
-          status: 'active',
-          terminalName: terminal.name,
-          terminalId
-        });
+      if (sessionId) {
         taskTreeProvider?.refresh();
       } else {
         console.warn(`AI Cockpit: Failed to capture sessionId for task ${taskId}`);
@@ -757,10 +785,16 @@ export function activate(context: vscode.ExtensionContext) {
       // Mark as pending capture (to handle terminal close during capture)
       terminalManager!.markPendingCapture(terminalId);
 
+      const sessionLabel = label || `Session ${new Date().toLocaleTimeString()}`;
       let sessionId: string | null = null;
       try {
-        // Capture session with polling
-        sessionId = await captureLatestSessionId();
+        // Atomically capture and register session (prevents race conditions)
+        sessionId = await captureAndRegisterSession({
+          taskId,
+          label: sessionLabel,
+          terminalName: terminal.name,
+          terminalId
+        });
       } finally {
         // Always remove from pending, even if capture throws
         terminalManager!.clearPendingCapture(terminalId);
@@ -772,18 +806,7 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      if (sessionId && sessionManager) {
-        const sessionLabel = label || `Session ${new Date().toLocaleTimeString()}`;
-        await sessionManager.registerSession({
-          id: sessionId,
-          taskId,
-          label: sessionLabel,
-          createdAt: new Date().toISOString(),
-          lastActive: new Date().toISOString(),
-          status: 'active',
-          terminalName: terminal.name,
-          terminalId
-        });
+      if (sessionId) {
         taskTreeProvider?.refresh();
         console.log(`AI Cockpit: Session "${sessionLabel}" registered for task ${taskId}`);
       } else {
@@ -835,9 +858,16 @@ export function activate(context: vscode.ExtensionContext) {
       // Mark as pending capture
       terminalManager!.markPendingCapture(terminalId);
 
+      const sessionLabel = label || `Session ${new Date().toLocaleTimeString()}`;
       let sessionId: string | null = null;
       try {
-        sessionId = await captureLatestSessionId();
+        // Atomically capture and register session (prevents race conditions)
+        sessionId = await captureAndRegisterSession({
+          taskId: UNASSIGNED_TASK_ID,
+          label: sessionLabel,
+          terminalName: terminal.name,
+          terminalId
+        });
       } finally {
         terminalManager!.clearPendingCapture(terminalId);
       }
@@ -848,18 +878,7 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      if (sessionId && sessionManager) {
-        const sessionLabel = label || `Session ${new Date().toLocaleTimeString()}`;
-        await sessionManager.registerSession({
-          id: sessionId,
-          taskId: UNASSIGNED_TASK_ID,
-          label: sessionLabel,
-          createdAt: new Date().toISOString(),
-          lastActive: new Date().toISOString(),
-          status: 'active',
-          terminalName: terminal.name,
-          terminalId
-        });
+      if (sessionId) {
         taskTreeProvider?.refresh();
         console.log(`AI Cockpit: Unassigned session "${sessionLabel}" registered`);
       } else {

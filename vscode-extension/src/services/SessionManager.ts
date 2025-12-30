@@ -12,8 +12,12 @@ export class SessionManager {
   }
 
   async getSessions(): Promise<CockpitSession[]> {
-    const registry = await this.loadRegistryAsync();
-    return registry.sessions;
+    // Use lock to ensure we read AFTER any pending writes complete
+    // This prevents race conditions where concurrent captures read stale data
+    return this.withLock(async () => {
+      const registry = await this.loadRegistryAsync();
+      return registry.sessions;
+    });
   }
 
   async getSessionsForTask(taskId: string): Promise<CockpitSession[]> {
