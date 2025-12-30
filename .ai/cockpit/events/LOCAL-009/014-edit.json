@@ -1,0 +1,39 @@
+{
+  "id": "evt-1767058089629-rkkotewmx",
+  "taskId": "LOCAL-009",
+  "taskIdSource": "active-task-file",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/done/LOCAL-009/README.md",
+    "old_string": "║ LOCATION: .ai/tasks/todo/LOCAL-009/                              ║",
+    "new_string": "║ LOCATION: .ai/tasks/done/LOCAL-009/                              ║"
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/done/LOCAL-009/README.md",
+    "oldString": "║ LOCATION: .ai/tasks/todo/LOCAL-009/                              ║",
+    "newString": "║ LOCATION: .ai/tasks/done/LOCAL-009/                              ║",
+    "originalFile": "<!--\n╔══════════════════════════════════════════════════════════════════╗\n║ LAYER: TASK                                                      ║\n║ LOCATION: .ai/tasks/todo/LOCAL-009/                              ║\n╠══════════════════════════════════════════════════════════════════╣\n║ BEFORE WORKING ON THIS TASK:                                     ║\n║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)           ║\n║ 2. Read this entire README first                                 ║\n║ 3. Check which work items are in todo/ vs done/                  ║\n║ 4. Work on ONE item at a time from todo/                         ║\n╚══════════════════════════════════════════════════════════════════╝\n-->\n\n# LOCAL-009: Sidebar click behavior - show descriptions\n\n## Problem Statement\n\nWhen clicking items in the VSCode AI Cockpit sidebar:\n- **Task clicks** currently open a Claude terminal (creates new session) - should show task description instead\n- **Work item clicks** do nothing - should show work item description\n- **Sessions** should remain in their own section for creating/resuming Claude sessions\n\nThe user experience should be:\n1. Click task → View task README.md in editor\n2. Click work item → View work item .md file in editor\n3. Use Sessions section → Create/resume Claude sessions\n\n## Acceptance Criteria\n\n- [ ] Clicking a task item opens its README.md in the editor\n- [ ] Clicking a work item opens its .md file in the editor\n- [ ] Sessions section still allows creating/resuming Claude sessions\n- [ ] Context menus remain functional for all item types\n\n## Work Items\n\nSee `status.yaml` for full index.\n\n| ID | Name | Repo | Status |\n|----|------|------|--------|\n| 01 | Change TaskItem click to open description | vscode-extension | todo |\n| 02 | Add WorkItemNode click handler | vscode-extension | todo |\n| 03 | Register openWorkItem command | vscode-extension | todo |\n\n## Branches\n\n| Repo | Branch |\n|------|--------|\n| vscode-extension | `feature/sidebar-click-descriptions` |\n\n## Technical Context\n\n### Current Implementation\n\n**TaskTreeProvider.ts** defines tree item classes:\n- `TaskItem` (lines 308-354): Has click command → `aiCockpit.openTaskTerminal`\n- `WorkItemNode` (lines 356-375): NO command property (clicking does nothing)\n- `SessionItem` (lines 482-512): Has click command → `aiCockpit.resumeSession`\n\n**extension.ts** has existing handlers:\n- `openTask` (lines 115-135): Opens README files - EXISTS but not wired to TaskItem clicks\n- `openTaskTerminal` (lines 230-312): Currently triggered by TaskItem clicks\n\n### Key Files\n\n| File | Lines | Purpose |\n|------|-------|---------|\n| TaskTreeProvider.ts | 308-354 | TaskItem class with command property |\n| TaskTreeProvider.ts | 356-375 | WorkItemNode class (needs command) |\n| extension.ts | 115-135 | openTask handler (exists, needs wiring) |\n| package.json | 70-111 | Command definitions |\n\n## Implementation Approach\n\n1. **TaskItem**: Change `command` from `openTaskTerminal` to `openTask`\n2. **WorkItemNode**: Add `command` property pointing to new `openWorkItem` command\n3. **extension.ts**: Add `openWorkItem` command handler that opens work item file\n4. **package.json**: Register the new command\n\n## Risks & Considerations\n\n- Users may expect task click to still open terminal - consider adding context menu option\n- Work item files must exist at expected paths for click to work\n- Need to handle case where work item file doesn't exist gracefully\n\n## Testing Strategy\n\n1. Manual testing in VSCode:\n   - Click task → Verify README opens\n   - Click work item → Verify work item file opens\n   - Click session → Verify session resumes (unchanged)\n   - Right-click items → Verify context menus still work\n2. Test with tasks in different states (todo, in_progress, done)\n3. Test error cases (missing files)\n\n## References\n\n- VSCode TreeView API: https://code.visualstudio.com/api/extension-guides/tree-view\n- Exploration findings from conversation on 2025-12-29\n",
+    "structuredPatch": [
+      {
+        "oldStart": 1,
+        "oldLines": 7,
+        "newStart": 1,
+        "newLines": 7,
+        "lines": [
+          " <!--",
+          " ╔══════════════════════════════════════════════════════════════════╗",
+          " ║ LAYER: TASK                                                      ║",
+          "-║ LOCATION: .ai/tasks/todo/LOCAL-009/                              ║",
+          "+║ LOCATION: .ai/tasks/done/LOCAL-009/                              ║",
+          " ╠══════════════════════════════════════════════════════════════════╣",
+          " ║ BEFORE WORKING ON THIS TASK:                                     ║",
+          " ║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)           ║"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "d6d9c4c7-40e8-4c40-abc5-5fbdd91f52ce",
+  "timestamp": "2025-12-30T01:28:09.629Z"
+}
