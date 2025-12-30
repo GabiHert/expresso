@@ -1,0 +1,53 @@
+# Task Status Index
+task: "LOCAL-014"
+title: "GitHub-style PR review diff viewer"
+created: "2025-12-30"
+updated: "2025-12-30"
+
+summary:
+  total: 8
+  todo: 8
+  in_progress: 0
+  done: 0
+
+work_items:
+  - id: "01"
+    name: "Enhanced feedback format design"
+    repo: "ai-framework"
+    status: todo
+    file: "todo/01-enhanced-feedback-format.md"
+  - id: "02"
+    name: "Feedback parsing library"
+    repo: "ai-framework"
+    status: todo
+    file: "todo/02-feedback-parsing-library.md"
+  - id: "03"
+    name: "DiffReviewPanel webview scaffold"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/03-diff-review-panel-scaffold.md"
+  - id: "04"
+    name: "Integrate diff2html rendering"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/04-diff2html-integration.md"
+  - id: "05"
+    name: "Comment UI overlay system"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/05-comment-ui-overlay.md"
+  - id: "06"
+    name: "CommentManager service"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/06-comment-manager-service.md"
+  - id: "07"
+    name: "Wire tree view to webview"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/07-wire-tree-view.md"
+  - id: "08"
+    name: "Styling and polish"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/08-styling-polish.md"

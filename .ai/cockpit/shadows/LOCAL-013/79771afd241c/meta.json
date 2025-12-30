@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-014/todo/03-diff-review-panel-scaffold.md",
+  "taskId": "LOCAL-013",
+  "baseline": {
+    "capturedAt": "2025-12-30T10:25:11.345Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T10:25:11.346Z",
+    "hash": "3d35fd6921c4df69",
+    "size": 9551,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T10:25:11.346Z",
+    "actualFileHash": "3d35fd6921c4df69",
+    "status": "synced"
+  }
+}

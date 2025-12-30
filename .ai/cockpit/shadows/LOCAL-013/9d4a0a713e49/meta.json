@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-014/todo/02-feedback-parsing-library.md",
+  "taskId": "LOCAL-013",
+  "baseline": {
+    "capturedAt": "2025-12-30T10:25:10.598Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T10:25:10.599Z",
+    "hash": "c88ecc03dcb5a8b2",
+    "size": 4434,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T10:25:10.599Z",
+    "actualFileHash": "c88ecc03dcb5a8b2",
+    "status": "synced"
+  }
+}

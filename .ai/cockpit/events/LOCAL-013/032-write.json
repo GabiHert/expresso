@@ -1,0 +1,19 @@
+{
+  "id": "evt-1767089517553-8c3y7bgai",
+  "taskId": "LOCAL-013",
+  "taskIdSource": "active-task-file",
+  "tool": "Write",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-014/status.yaml",
+    "content": "# Task Status Index\ntask: \"LOCAL-014\"\ntitle: \"GitHub-style PR review diff viewer\"\ncreated: \"2025-12-30\"\nupdated: \"2025-12-30\"\n\nsummary:\n  total: 8\n  todo: 8\n  in_progress: 0\n  done: 0\n\nwork_items:\n  - id: \"01\"\n    name: \"Enhanced feedback format design\"\n    repo: \"ai-framework\"\n    status: todo\n    file: \"todo/01-enhanced-feedback-format.md\"\n  - id: \"02\"\n    name: \"Feedback parsing library\"\n    repo: \"ai-framework\"\n    status: todo\n    file: \"todo/02-feedback-parsing-library.md\"\n  - id: \"03\"\n    name: \"DiffReviewPanel webview scaffold\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/03-diff-review-panel-scaffold.md\"\n  - id: \"04\"\n    name: \"Integrate diff2html rendering\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/04-diff2html-integration.md\"\n  - id: \"05\"\n    name: \"Comment UI overlay system\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/05-comment-ui-overlay.md\"\n  - id: \"06\"\n    name: \"CommentManager service\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/06-comment-manager-service.md\"\n  - id: \"07\"\n    name: \"Wire tree view to webview\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/07-wire-tree-view.md\"\n  - id: \"08\"\n    name: \"Styling and polish\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/08-styling-polish.md\"\n"
+  },
+  "response": {
+    "type": "create",
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-014/status.yaml",
+    "content": "# Task Status Index\ntask: \"LOCAL-014\"\ntitle: \"GitHub-style PR review diff viewer\"\ncreated: \"2025-12-30\"\nupdated: \"2025-12-30\"\n\nsummary:\n  total: 8\n  todo: 8\n  in_progress: 0\n  done: 0\n\nwork_items:\n  - id: \"01\"\n    name: \"Enhanced feedback format design\"\n    repo: \"ai-framework\"\n    status: todo\n    file: \"todo/01-enhanced-feedback-format.md\"\n  - id: \"02\"\n    name: \"Feedback parsing library\"\n    repo: \"ai-framework\"\n    status: todo\n    file: \"todo/02-feedback-parsing-library.md\"\n  - id: \"03\"\n    name: \"DiffReviewPanel webview scaffold\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/03-diff-review-panel-scaffold.md\"\n  - id: \"04\"\n    name: \"Integrate diff2html rendering\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/04-diff2html-integration.md\"\n  - id: \"05\"\n    name: \"Comment UI overlay system\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/05-comment-ui-overlay.md\"\n  - id: \"06\"\n    name: \"CommentManager service\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/06-comment-manager-service.md\"\n  - id: \"07\"\n    name: \"Wire tree view to webview\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/07-wire-tree-view.md\"\n  - id: \"08\"\n    name: \"Styling and polish\"\n    repo: \"vscode-extension\"\n    status: todo\n    file: \"todo/08-styling-polish.md\"\n",
+    "structuredPatch": [],
+    "originalFile": null
+  },
+  "sessionId": "3764ab9c-088d-4e71-9b80-408a356de620",
+  "timestamp": "2025-12-30T10:11:57.553Z"
+}

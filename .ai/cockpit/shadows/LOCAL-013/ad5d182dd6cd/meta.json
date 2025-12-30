@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-014/todo/07-wire-tree-view.md",
+  "taskId": "LOCAL-013",
+  "baseline": {
+    "capturedAt": "2025-12-30T10:25:16.344Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T10:25:16.345Z",
+    "hash": "96215037ef7d27c3",
+    "size": 7503,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T10:25:16.345Z",
+    "actualFileHash": "96215037ef7d27c3",
+    "status": "synced"
+  }
+}

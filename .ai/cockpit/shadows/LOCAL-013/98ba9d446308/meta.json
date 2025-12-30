@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-014/todo/01-enhanced-feedback-format.md",
+  "taskId": "LOCAL-013",
+  "baseline": {
+    "capturedAt": "2025-12-30T10:25:09.995Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T10:25:09.996Z",
+    "hash": "2dd42882a701a9df",
+    "size": 3964,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T10:25:09.996Z",
+    "actualFileHash": "2dd42882a701a9df",
+    "status": "synced"
+  }
+}
