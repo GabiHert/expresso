@@ -1,0 +1,93 @@
+{
+  "id": "evt-1767125311006-lk5h0wia1",
+  "taskId": "LOCAL-016",
+  "taskIdSource": "active-task-file",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Create task for session capture fix",
+        "status": "completed",
+        "activeForm": "Creating task for session capture fix"
+      },
+      {
+        "content": "Check existing tasks for next LOCAL ID",
+        "status": "completed",
+        "activeForm": "Checking existing tasks for next LOCAL ID"
+      },
+      {
+        "content": "Design work items for the fix",
+        "status": "completed",
+        "activeForm": "Designing work items for the fix"
+      },
+      {
+        "content": "Create task directory and files",
+        "status": "completed",
+        "activeForm": "Creating task directory and files"
+      },
+      {
+        "content": "Run ai-sync to commit changes",
+        "status": "in_progress",
+        "activeForm": "Running ai-sync to commit changes"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [
+      {
+        "content": "Create task for session capture fix",
+        "status": "in_progress",
+        "activeForm": "Creating task for session capture fix"
+      },
+      {
+        "content": "Check existing tasks for next LOCAL ID",
+        "status": "completed",
+        "activeForm": "Checking existing tasks for next LOCAL ID"
+      },
+      {
+        "content": "Design work items for the fix",
+        "status": "completed",
+        "activeForm": "Designing work items for the fix"
+      },
+      {
+        "content": "Create task directory and files",
+        "status": "in_progress",
+        "activeForm": "Creating task directory and files"
+      },
+      {
+        "content": "Run ai-sync to commit changes",
+        "status": "pending",
+        "activeForm": "Running ai-sync to commit changes"
+      }
+    ],
+    "newTodos": [
+      {
+        "content": "Create task for session capture fix",
+        "status": "completed",
+        "activeForm": "Creating task for session capture fix"
+      },
+      {
+        "content": "Check existing tasks for next LOCAL ID",
+        "status": "completed",
+        "activeForm": "Checking existing tasks for next LOCAL ID"
+      },
+      {
+        "content": "Design work items for the fix",
+        "status": "completed",
+        "activeForm": "Designing work items for the fix"
+      },
+      {
+        "content": "Create task directory and files",
+        "status": "completed",
+        "activeForm": "Creating task directory and files"
+      },
+      {
+        "content": "Run ai-sync to commit changes",
+        "status": "in_progress",
+        "activeForm": "Running ai-sync to commit changes"
+      }
+    ]
+  },
+  "sessionId": "dd0a047d-3819-478f-878b-9be028f29b38",
+  "timestamp": "2025-12-30T20:08:31.006Z"
+}

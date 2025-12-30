@@ -114,6 +114,11 @@
         "command": "aiCockpit.showPlainDiff",
         "title": "Show Plain Diff",
         "icon": "$(diff)"
+      },
+      {
+        "command": "aiCockpit.deleteTask",
+        "title": "Delete Task",
+        "icon": "$(trash)"
       }
     ],
     "configuration": {
@@ -306,6 +311,26 @@
           "command": "aiCockpit.deleteSession",
           "when": "view == aiCockpit.tasks && viewItem == session-closed-unassigned",
           "group": "2_session@2"
+        },
+        {
+          "command": "aiCockpit.deleteTask",
+          "when": "view == aiCockpit.tasks && viewItem == task-todo",
+          "group": "3_delete"
+        },
+        {
+          "command": "aiCockpit.deleteTask",
+          "when": "view == aiCockpit.tasks && viewItem == task-done",
+          "group": "3_delete"
+        },
+        {
+          "command": "aiCockpit.deleteTask",
+          "when": "view == aiCockpit.tasks && viewItem == task-in_progress",
+          "group": "3_delete"
+        },
+        {
+          "command": "aiCockpit.deleteTask",
+          "when": "view == aiCockpit.tasks && viewItem == task-active",
+          "group": "3_delete"
         }
       ]
     }

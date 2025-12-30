@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/todo/LOCAL-017/todo/02-refresh-known-sessions.md",
+  "taskId": "LOCAL-016",
+  "baseline": {
+    "capturedAt": "2025-12-30T20:08:14.127Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T20:08:14.128Z",
+    "hash": "8d08d079004bb83d",
+    "size": 3501,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T20:08:14.128Z",
+    "actualFileHash": "8d08d079004bb83d",
+    "status": "synced"
+  }
+}

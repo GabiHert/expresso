@@ -143,6 +143,24 @@ export class DiffReviewPanel {
     return DiffReviewPanel.panels.get(key);
   }
 
+  /**
+   * Close all DiffReviewPanels for a specific task
+   * @returns The number of panels that were closed
+   */
+  public static closeAllForTask(taskId: string): number {
+    let closedCount = 0;
+
+    for (const [key, panel] of DiffReviewPanel.panels.entries()) {
+      // Key format is "{taskId}:{filePath}"
+      if (key.startsWith(`${taskId}:`)) {
+        panel.dispose();
+        closedCount++;
+      }
+    }
+
+    return closedCount;
+  }
+
   private constructor(
     panel: vscode.WebviewPanel,
     extensionUri: vscode.Uri,

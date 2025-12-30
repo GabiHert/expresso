@@ -18,6 +18,7 @@ import { getClaudeHistoryPath } from './utils/claudePaths';
 import { TerminalManager } from './services/TerminalManager';
 import { DiffReviewPanel } from './panels/DiffReviewPanel';
 import { CommentManager } from './services/CommentManager';
+import { CockpitCleanupService } from './services/CockpitCleanupService';
 
 let fileWatcher: CockpitFileWatcher | undefined;
 let statusBar: StatusBarProvider | undefined;
@@ -300,6 +301,21 @@ export function activate(context: vscode.ExtensionContext) {
     return null;
   };
 
+  /**
+   * Generates the Claude CLI command with required flags.
+   * All Cockpit-initiated Claude sessions should use this to ensure
+   * the --allow-dangerously-skip-permissions flag is included.
+   */
+  const generateClaudeCommand = (options?: { resume?: string }): string => {
+    const parts = ['claude', '--allow-dangerously-skip-permissions'];
+
+    if (options?.resume) {
+      parts.push('--resume', options.resume);
+    }
+
+    return parts.join(' ');
+  };
+
   // Register open terminal command - opens terminal with COCKPIT_TASK env var
   const openTaskTerminal = vscode.commands.registerCommand(
     'aiCockpit.openTaskTerminal',
@@ -326,7 +342,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
       });
       terminal.show();
-      terminal.sendText('claude');
+      terminal.sendText(generateClaudeCommand());
 
       // Store mapping for terminal close correlation
       terminalManager!.registerTerminal(terminalId, terminal);
@@ -444,7 +460,7 @@ export function activate(context: vscode.ExtensionContext) {
       terminalManager!.registerTerminal(terminalId, terminal);
 
       // Resume the Claude session
-      terminal.sendText(`claude --resume ${session.id}`);
+      terminal.sendText(generateClaudeCommand({ resume: session.id }));
 
       // Update session status to active with new terminalId
       if (sessionManager) {
@@ -576,6 +592,100 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(deleteSession);
 
+  // Create cockpit cleanup service
+  const cockpitCleanupService = new CockpitCleanupService(workspaceRoot);
+
+  // Register delete task command
+  const deleteTask = vscode.commands.registerCommand(
+    'aiCockpit.deleteTask',
+    async (item: { taskId?: string; task?: { taskId: string; status: string; title: string } }) => {
+      const taskId = item?.taskId || item?.task?.taskId;
+      const status = item?.task?.status;
+      const title = item?.task?.title || taskId;
+
+      if (!taskId || !status) {
+        vscode.window.showWarningMessage('No task selected');
+        return;
+      }
+
+      // Validate status
+      const VALID_STATUSES = ['todo', 'in_progress', 'done'];
+      if (!VALID_STATUSES.includes(status)) {
+        vscode.window.showErrorMessage('Invalid task status');
+        return;
+      }
+
+      // Validate taskId doesn't contain path traversal
+      if (taskId.includes('..') || taskId.includes('/') || taskId.includes('\\')) {
+        vscode.window.showErrorMessage('Invalid task ID');
+        return;
+      }
+
+      // Build warning message based on task state
+      let warningMessage = `Delete task "${title}"?`;
+      let detail = 'This will permanently remove the task and all associated data (events, shadows, sessions).';
+
+      if (status === 'in_progress') {
+        warningMessage = `Delete in-progress task "${title}"?`;
+        detail = 'WARNING: This task is currently in progress. ' + detail;
+      }
+
+      // Confirmation dialog
+      const result = await vscode.window.showWarningMessage(
+        warningMessage,
+        { modal: true, detail },
+        'Delete'
+      );
+
+      if (result !== 'Delete') {
+        return;
+      }
+
+      // Close any open DiffReviewPanels for this task
+      const closedPanels = DiffReviewPanel.closeAllForTask(taskId);
+
+      // Clean up cockpit data (events, shadows, sessions, active task)
+      const cleanupResult = await cockpitCleanupService.cleanupTask(taskId);
+      if (!cleanupResult.success) {
+        console.warn('Partial cleanup errors:', cleanupResult.errors);
+      }
+
+      // Construct task path
+      const taskPath = path.join(workspaceRoot, '.ai/tasks', status, taskId);
+
+      // Security: Validate path stays within allowed directory
+      const resolvedTaskPath = path.resolve(taskPath);
+      const allowedBase = path.resolve(workspaceRoot, '.ai/tasks');
+      if (!resolvedTaskPath.startsWith(allowedBase + path.sep)) {
+        vscode.window.showErrorMessage('Invalid task path');
+        return;
+      }
+
+      try {
+        // Delete task folder
+        await fs.promises.rm(taskPath, { recursive: true, force: true });
+
+        // Refresh tree view
+        taskTreeProvider?.refresh();
+
+        // Build success message
+        let successMsg = `Task "${taskId}" deleted`;
+        if (cleanupResult.wasActive) {
+          successMsg += ' (was active task)';
+        }
+        if (closedPanels > 0) {
+          successMsg += ` - closed ${closedPanels} diff panel(s)`;
+        }
+
+        vscode.window.showInformationMessage(successMsg);
+      } catch (error) {
+        vscode.window.showErrorMessage(`Failed to delete task: ${error}`);
+      }
+    }
+  );
+
+  context.subscriptions.push(deleteTask);
+
   // Register new session command with custom label
   const newSession = vscode.commands.registerCommand(
     'aiCockpit.newSession',
@@ -623,7 +733,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
       });
       terminal.show();
-      terminal.sendText('claude');
+      terminal.sendText(generateClaudeCommand());
 
       // Store mapping for terminal close correlation
       terminalManager!.registerTerminal(terminalId, terminal);
@@ -705,7 +815,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
       });
       terminal.show();
-      terminal.sendText('claude');
+      terminal.sendText(generateClaudeCommand());
 
       // Store mapping for terminal close correlation
       terminalManager!.registerTerminal(terminalId, terminal);

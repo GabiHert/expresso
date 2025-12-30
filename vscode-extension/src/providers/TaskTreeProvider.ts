@@ -7,7 +7,7 @@ import { Shadow, ShadowManager } from '../services/ShadowManager';
 import { SessionManager } from '../services/SessionManager';
 import { CommentManager } from '../services/CommentManager';
 
-type TreeItemType = SectionItem | TaskItem | EventItem | WorkItemNode | FilesChangedSection | ShadowFileItem | SessionsSection | SessionItem | UnassignedSessionsSection;
+type TreeItemType = SectionItem | TaskItem | EventItem | WorkItemNode | FilesChangedSection | ShadowFileItem | SessionsSection | SessionItem | UnassignedSessionsSection | WorkItemsSection;
 
 interface FrameworkTask {
   taskId: string;
@@ -103,6 +103,10 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
 
     if (element instanceof FilesChangedSection) {
       return this.getFilesForTask(element.taskId, element.taskStatus);
+    }
+
+    if (element instanceof WorkItemsSection) {
+      return this.getWorkItemsForSection(element);
     }
 
     return [];
@@ -255,11 +259,9 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
       }
     }
 
-    // Add work items if available
+    // Add work items section if available
     if (task.task.workItems && task.task.workItems.length > 0) {
-      for (const wi of task.task.workItems) {
-        items.push(new WorkItemNode(wi, task.task.taskId, task.task.status));
-      }
+      items.push(new WorkItemsSection(task.task.taskId, task.task.status, task.task.workItems, task.task.workItems.length));
     }
 
     // Add Files Changed section if shadows exist
@@ -344,6 +346,10 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
     });
 
     return items;
+  }
+
+  private getWorkItemsForSection(section: WorkItemsSection): WorkItemNode[] {
+    return section.workItems.map(wi => new WorkItemNode(wi, section.taskId, section.taskStatus));
   }
 }
 
@@ -588,6 +594,22 @@ class SessionsSection extends vscode.TreeItem {
     this.description = `${sessionCount}`;
     this.iconPath = new vscode.ThemeIcon('terminal');
     this.contextValue = 'sessions-section';
+  }
+}
+
+class WorkItemsSection extends vscode.TreeItem {
+  constructor(
+    public readonly taskId: string,
+    public readonly taskStatus: string,
+    public readonly workItems: WorkItem[],
+    workItemCount: number
+  ) {
+    super('Work Items', vscode.TreeItemCollapsibleState.Collapsed);
+
+    this.id = `workitems-${taskId}`;
+    this.description = `${workItemCount}`;
+    this.iconPath = new vscode.ThemeIcon('checklist');
+    this.contextValue = 'workitems-section';
   }
 }
 
