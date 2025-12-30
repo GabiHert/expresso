@@ -155,50 +155,10 @@
       "taskId": "LOCAL-016",
       "label": "allow dangerously operations ",
       "createdAt": "2025-12-30T19:21:03.675Z",
-      "lastActive": "2025-12-30T19:56:06.488Z",
-      "status": "closed",
-      "terminalName": "Cockpit: LOCAL-016",
-      "terminalId": "8ad2632b-81df-438c-8b91-d369e3219e51"
-    },
-    {
-      "id": "ee77b443-4728-4c4b-95d3-13d1fddacd38",
-      "taskId": "_unassigned",
-      "label": "work items collapse",
-      "createdAt": "2025-12-30T19:27:04.313Z",
-      "lastActive": "2025-12-30T19:27:04.313Z",
+      "lastActive": "2025-12-30T20:15:59.472Z",
       "status": "active",
-      "terminalName": "Cockpit: Session",
-      "terminalId": "2bc252fd-9cf9-44eb-aa61-74a77c1e146d"
-    },
-    {
-      "id": "c5b1fb31-82b6-4483-bc7c-3b23bef34138",
-      "taskId": "_unassigned",
-      "label": "assign section to todo task",
-      "createdAt": "2025-12-30T19:45:56.965Z",
-      "lastActive": "2025-12-30T19:55:55.547Z",
-      "status": "closed",
-      "terminalName": "Cockpit: _unassigned",
-      "terminalId": "e247f2d1-0fc6-4a55-a67a-c1598096dbc9"
-    },
-    {
-      "id": "a599bb9a-d79f-4c4d-9a75-0a8447691ad6",
-      "taskId": "_unassigned",
-      "label": "test",
-      "createdAt": "2025-12-30T20:08:28.379Z",
-      "lastActive": "2025-12-30T20:08:30.336Z",
-      "status": "closed",
-      "terminalName": "Cockpit: Session",
-      "terminalId": "db2f64b4-112a-48a3-bd05-3ce9780f4f56"
-    },
-    {
-      "id": "dd0a047d-3819-478f-878b-9be028f29b38",
-      "taskId": "_unassigned",
-      "label": "Session 5:08:35 PM",
-      "createdAt": "2025-12-30T20:08:35.348Z",
-      "lastActive": "2025-12-30T20:08:38.668Z",
-      "status": "closed",
-      "terminalName": "Cockpit: Session",
-      "terminalId": "c74b6bc5-4e6f-40ef-bb42-37fe9ad47940"
+      "terminalName": "Cockpit: LOCAL-016",
+      "terminalId": "c7e25f00-d16c-4d11-8db8-ca005add4df3"
     }
   ]
 }

@@ -1,0 +1,39 @@
+{
+  "id": "evt-1767125842545-ln9ee5fmm",
+  "taskId": "LOCAL-016",
+  "taskIdSource": "env-var",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/done/LOCAL-016/README.md",
+    "old_string": "║ LOCATION: .ai/tasks/in_progress/LOCAL-016/                       ║",
+    "new_string": "║ LOCATION: .ai/tasks/done/LOCAL-016/                              ║"
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/done/LOCAL-016/README.md",
+    "oldString": "║ LOCATION: .ai/tasks/in_progress/LOCAL-016/                       ║",
+    "newString": "║ LOCATION: .ai/tasks/done/LOCAL-016/                              ║",
+    "originalFile": "<!--\n╔══════════════════════════════════════════════════════════════════╗\n║ LAYER: TASK                                                      ║\n║ LOCATION: .ai/tasks/in_progress/LOCAL-016/                       ║\n╠══════════════════════════════════════════════════════════════════╣\n║ BEFORE WORKING ON THIS TASK:                                     ║\n║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)           ║\n║ 2. Read this entire README first                                 ║\n║ 3. Check which work items are in todo/ vs done/                  ║\n║ 4. Work on ONE item at a time from todo/                         ║\n╚══════════════════════════════════════════════════════════════════╝\n-->\n\n# LOCAL-016: Add --allow-dangerously-skip-permissions to Claude sessions\n\n## Problem Statement\n\nAll Claude CLI sessions initiated by the AI Cockpit VSCode extension need to include the `--allow-dangerously-skip-permissions` flag. This flag enables Claude to run without interactive permission prompts, which is necessary for automated/orchestrated workflows managed by the Cockpit.\n\nCurrently, the extension launches Claude sessions using bare `claude` commands or `claude --resume {id}` without this flag, requiring manual permission grants during execution.\n\n## Acceptance Criteria\n\n- [ ] All Claude sessions started by Cockpit include `--allow-dangerously-skip-permissions`\n- [ ] Resume sessions also include the flag (before `--resume`)\n- [ ] Code is DRY with a centralized command builder function\n- [ ] Extension compiles without TypeScript errors\n- [ ] All 4 launch points are updated consistently\n\n## Work Items\n\nSee `status.yaml` for full index.\n\n| ID | Name | Repo | Status |\n|----|------|------|--------|\n| WI-01 | Create Claude command builder helper | vscode-extension | todo |\n| WI-02 | Update all Claude launch points | vscode-extension | todo |\n| WI-03 | Verify changes work correctly | vscode-extension | todo |\n\n## Branches\n\n| Repo | Branch |\n|------|--------|\n| vscode-extension | `LOCAL-016-claude-permissions-flag` |\n\n## Technical Context\n\n### Current State\n\nThe VSCode extension (`vscode-extension/src/extension.ts`) launches Claude sessions in **4 locations**:\n\n1. **Line ~330** - `openTaskTerminal`: Opens terminal for a task from the tree view\n   - Current: `terminal.sendText('claude')`\n\n2. **Line ~448** - `resumeSession`: Resumes a previous Claude session\n   - Current: `terminal.sendText(\\`claude --resume ${session.id}\\`)`\n\n3. **Line ~721** - `newSession`: Creates new session with custom label\n   - Current: `terminal.sendText('claude')`\n\n4. **Line ~803** - `startSession`: Starts unassigned/exploratory session\n   - Current: `terminal.sendText('claude')`\n\n### Terminal Creation Pattern\n\nAll launches follow this pattern:\n```typescript\nconst terminal = vscode.window.createTerminal({\n  name: `Cockpit: ${taskId}`,\n  env: {\n    COCKPIT_TASK: taskId,\n    COCKPIT_TERMINAL_ID: terminalId\n  }\n});\nterminal.show();\nterminal.sendText('claude');  // <-- Need to add flag here\n```\n\n### Target State\n\nAll Claude invocations should use:\n```typescript\nterminal.sendText('claude --allow-dangerously-skip-permissions');\n// or for resume:\nterminal.sendText(`claude --allow-dangerously-skip-permissions --resume ${session.id}`);\n```\n\n## Implementation Approach\n\n**Recommended**: Create a private helper method to ensure consistency:\n\n```typescript\nprivate generateClaudeCommand(options?: { resume?: string }): string {\n  const parts = ['claude', '--allow-dangerously-skip-permissions'];\n  if (options?.resume) {\n    parts.push('--resume', options.resume);\n  }\n  return parts.join(' ');\n}\n```\n\nThen replace all hardcoded commands with calls to this helper.\n\n## Risks & Considerations\n\n- **Security**: The `--allow-dangerously-skip-permissions` flag gives Claude full system access without prompts. This is intentional for Cockpit-managed sessions but users should understand the implications.\n- **Flag order**: For resume commands, the permissions flag should come before `--resume` to ensure proper parsing.\n\n## Testing Strategy\n\n1. Build the extension: `npm run compile` in vscode-extension/\n2. Launch Extension Development Host (F5)\n3. Test each launch method:\n   - Click on a task in the sidebar to open task terminal\n   - Use \"Resume Session\" on an existing session\n   - Create a new session with custom label\n   - Start an unassigned session\n4. Verify each terminal shows `claude --allow-dangerously-skip-permissions` in the command\n\n## Feedback\n\nReview comments can be added to `feedback/diff-review.md`.\nUse `/address-feedback` to discuss feedback with the agent.\n\n## References\n\n- Claude CLI documentation\n- VSCode Terminal API: https://code.visualstudio.com/api/references/vscode-api#Terminal\n",
+    "structuredPatch": [
+      {
+        "oldStart": 1,
+        "oldLines": 7,
+        "newStart": 1,
+        "newLines": 7,
+        "lines": [
+          " <!--",
+          " ╔══════════════════════════════════════════════════════════════════╗",
+          " ║ LAYER: TASK                                                      ║",
+          "-║ LOCATION: .ai/tasks/in_progress/LOCAL-016/                       ║",
+          "+║ LOCATION: .ai/tasks/done/LOCAL-016/                              ║",
+          " ╠══════════════════════════════════════════════════════════════════╣",
+          " ║ BEFORE WORKING ON THIS TASK:                                     ║",
+          " ║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)           ║"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "700d2c53-d41e-49dc-8f88-59aca83ac6c1",
+  "timestamp": "2025-12-30T20:17:22.545Z"
+}

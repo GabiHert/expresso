@@ -1,0 +1,79 @@
+{
+  "id": "evt-1767125833360-c21c2r3x4",
+  "taskId": "LOCAL-017",
+  "taskIdSource": "active-task-file",
+  "tool": "Write",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/services/TerminalManager.ts",
+    "content": "import * as vscode from 'vscode';\n\ninterface TerminalContext {\n  terminal: vscode.Terminal;\n  taskId: string;\n  createdAt: number;\n}\n\nexport class TerminalManager {\n  private terminalMap = new Map<string, TerminalContext>();\n  private pendingCaptures = new Set<string>();\n\n  registerTerminal(terminalId: string, terminal: vscode.Terminal, taskId: string): void {\n    this.terminalMap.set(terminalId, {\n      terminal,\n      taskId,\n      createdAt: Date.now()\n    });\n  }\n\n  unregisterTerminal(terminalId: string): void {\n    this.terminalMap.delete(terminalId);\n    this.pendingCaptures.delete(terminalId);\n  }\n\n  getTerminal(terminalId: string): vscode.Terminal | undefined {\n    return this.terminalMap.get(terminalId)?.terminal;\n  }\n\n  getTaskId(terminalId: string): string | undefined {\n    return this.terminalMap.get(terminalId)?.taskId;\n  }\n\n  findTerminalId(terminal: vscode.Terminal): string | undefined {\n    for (const [id, ctx] of this.terminalMap.entries()) {\n      if (ctx.terminal === terminal) return id;\n    }\n    return undefined;\n  }\n\n  hasTerminal(terminalId: string): boolean {\n    return this.terminalMap.has(terminalId);\n  }\n\n  markPendingCapture(terminalId: string): void {\n    this.pendingCaptures.add(terminalId);\n  }\n\n  clearPendingCapture(terminalId: string): void {\n    this.pendingCaptures.delete(terminalId);\n  }\n\n  isPendingCapture(terminalId: string): boolean {\n    return this.pendingCaptures.has(terminalId);\n  }\n\n  dispose(): void {\n    this.terminalMap.clear();\n    this.pendingCaptures.clear();\n  }\n}\n"
+  },
+  "response": {
+    "type": "update",
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/services/TerminalManager.ts",
+    "content": "import * as vscode from 'vscode';\n\ninterface TerminalContext {\n  terminal: vscode.Terminal;\n  taskId: string;\n  createdAt: number;\n}\n\nexport class TerminalManager {\n  private terminalMap = new Map<string, TerminalContext>();\n  private pendingCaptures = new Set<string>();\n\n  registerTerminal(terminalId: string, terminal: vscode.Terminal, taskId: string): void {\n    this.terminalMap.set(terminalId, {\n      terminal,\n      taskId,\n      createdAt: Date.now()\n    });\n  }\n\n  unregisterTerminal(terminalId: string): void {\n    this.terminalMap.delete(terminalId);\n    this.pendingCaptures.delete(terminalId);\n  }\n\n  getTerminal(terminalId: string): vscode.Terminal | undefined {\n    return this.terminalMap.get(terminalId)?.terminal;\n  }\n\n  getTaskId(terminalId: string): string | undefined {\n    return this.terminalMap.get(terminalId)?.taskId;\n  }\n\n  findTerminalId(terminal: vscode.Terminal): string | undefined {\n    for (const [id, ctx] of this.terminalMap.entries()) {\n      if (ctx.terminal === terminal) return id;\n    }\n    return undefined;\n  }\n\n  hasTerminal(terminalId: string): boolean {\n    return this.terminalMap.has(terminalId);\n  }\n\n  markPendingCapture(terminalId: string): void {\n    this.pendingCaptures.add(terminalId);\n  }\n\n  clearPendingCapture(terminalId: string): void {\n    this.pendingCaptures.delete(terminalId);\n  }\n\n  isPendingCapture(terminalId: string): boolean {\n    return this.pendingCaptures.has(terminalId);\n  }\n\n  dispose(): void {\n    this.terminalMap.clear();\n    this.pendingCaptures.clear();\n  }\n}\n",
+    "structuredPatch": [
+      {
+        "oldStart": 1,
+        "oldLines": 11,
+        "newStart": 1,
+        "newLines": 21,
+        "lines": [
+          " import * as vscode from 'vscode';",
+          " ",
+          "+interface TerminalContext {",
+          "+  terminal: vscode.Terminal;",
+          "+  taskId: string;",
+          "+  createdAt: number;",
+          "+}",
+          "+",
+          " export class TerminalManager {",
+          "-  private terminalMap = new Map<string, vscode.Terminal>();",
+          "+  private terminalMap = new Map<string, TerminalContext>();",
+          "   private pendingCaptures = new Set<string>();",
+          " ",
+          "-  registerTerminal(terminalId: string, terminal: vscode.Terminal): void {",
+          "-    this.terminalMap.set(terminalId, terminal);",
+          "+  registerTerminal(terminalId: string, terminal: vscode.Terminal, taskId: string): void {",
+          "+    this.terminalMap.set(terminalId, {",
+          "+      terminal,",
+          "+      taskId,",
+          "+      createdAt: Date.now()",
+          "+    });",
+          "   }",
+          " ",
+          "   unregisterTerminal(terminalId: string): void {"
+        ]
+      },
+      {
+        "oldStart": 14,
+        "oldLines": 12,
+        "newStart": 24,
+        "newLines": 16,
+        "lines": [
+          "   }",
+          " ",
+          "   getTerminal(terminalId: string): vscode.Terminal | undefined {",
+          "-    return this.terminalMap.get(terminalId);",
+          "+    return this.terminalMap.get(terminalId)?.terminal;",
+          "   }",
+          " ",
+          "+  getTaskId(terminalId: string): string | undefined {",
+          "+    return this.terminalMap.get(terminalId)?.taskId;",
+          "+  }",
+          "+",
+          "   findTerminalId(terminal: vscode.Terminal): string | undefined {",
+          "-    for (const [id, t] of this.terminalMap.entries()) {",
+          "-      if (t === terminal) return id;",
+          "+    for (const [id, ctx] of this.terminalMap.entries()) {",
+          "+      if (ctx.terminal === terminal) return id;",
+          "     }",
+          "     return undefined;",
+          "   }"
+        ]
+      }
+    ],
+    "originalFile": "import * as vscode from 'vscode';\n\nexport class TerminalManager {\n  private terminalMap = new Map<string, vscode.Terminal>();\n  private pendingCaptures = new Set<string>();\n\n  registerTerminal(terminalId: string, terminal: vscode.Terminal): void {\n    this.terminalMap.set(terminalId, terminal);\n  }\n\n  unregisterTerminal(terminalId: string): void {\n    this.terminalMap.delete(terminalId);\n    this.pendingCaptures.delete(terminalId);\n  }\n\n  getTerminal(terminalId: string): vscode.Terminal | undefined {\n    return this.terminalMap.get(terminalId);\n  }\n\n  findTerminalId(terminal: vscode.Terminal): string | undefined {\n    for (const [id, t] of this.terminalMap.entries()) {\n      if (t === terminal) return id;\n    }\n    return undefined;\n  }\n\n  hasTerminal(terminalId: string): boolean {\n    return this.terminalMap.has(terminalId);\n  }\n\n  markPendingCapture(terminalId: string): void {\n    this.pendingCaptures.add(terminalId);\n  }\n\n  clearPendingCapture(terminalId: string): void {\n    this.pendingCaptures.delete(terminalId);\n  }\n\n  isPendingCapture(terminalId: string): boolean {\n    return this.pendingCaptures.has(terminalId);\n  }\n\n  dispose(): void {\n    this.terminalMap.clear();\n    this.pendingCaptures.clear();\n  }\n}\n"
+  },
+  "sessionId": "dd0a047d-3819-478f-878b-9be028f29b38",
+  "timestamp": "2025-12-30T20:17:13.360Z"
+}

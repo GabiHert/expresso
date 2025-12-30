@@ -1,0 +1,67 @@
+{
+  "id": "evt-1767125654847-ynatxmog2",
+  "taskId": "LOCAL-017",
+  "taskIdSource": "active-task-file",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Work item 01: Add capture queue to extension.ts",
+        "status": "pending",
+        "activeForm": "Adding capture queue to extension.ts"
+      },
+      {
+        "content": "Work item 02: Refresh knownSessionIds at capture time",
+        "status": "pending",
+        "activeForm": "Refreshing knownSessionIds at capture time"
+      },
+      {
+        "content": "Work item 03: Add task context to TerminalManager",
+        "status": "pending",
+        "activeForm": "Adding task context to TerminalManager"
+      },
+      {
+        "content": "Work item 04: Add tests for session capture",
+        "status": "pending",
+        "activeForm": "Adding tests for session capture"
+      },
+      {
+        "content": "Commit changes and sync",
+        "status": "pending",
+        "activeForm": "Committing changes and syncing"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [],
+    "newTodos": [
+      {
+        "content": "Work item 01: Add capture queue to extension.ts",
+        "status": "pending",
+        "activeForm": "Adding capture queue to extension.ts"
+      },
+      {
+        "content": "Work item 02: Refresh knownSessionIds at capture time",
+        "status": "pending",
+        "activeForm": "Refreshing knownSessionIds at capture time"
+      },
+      {
+        "content": "Work item 03: Add task context to TerminalManager",
+        "status": "pending",
+        "activeForm": "Adding task context to TerminalManager"
+      },
+      {
+        "content": "Work item 04: Add tests for session capture",
+        "status": "pending",
+        "activeForm": "Adding tests for session capture"
+      },
+      {
+        "content": "Commit changes and sync",
+        "status": "pending",
+        "activeForm": "Committing changes and syncing"
+      }
+    ]
+  },
+  "sessionId": "dd0a047d-3819-478f-878b-9be028f29b38",
+  "timestamp": "2025-12-30T20:14:14.847Z"
+}

@@ -242,11 +242,8 @@ export function activate(context: vscode.ExtensionContext) {
     return p.replace(/\/+$/, '');
   };
 
-  // Capture queue to prevent concurrent session captures (race condition fix)
-  let captureQueue: Promise<string | null> = Promise.resolve(null);
-
-  // Implementation: capture latest sessionId from Claude history with polling
-  const captureLatestSessionIdImpl = async (
+  // Helper function to capture latest sessionId from Claude history with polling
+  const captureLatestSessionId = async (
     knownSessionIds: Set<string>
   ): Promise<string | null> => {
     const historyPath = await getClaudeHistoryPath();
@@ -305,27 +302,6 @@ export function activate(context: vscode.ExtensionContext) {
   };
 
   /**
-   * Queued version of session capture that prevents concurrent captures.
-   * This fixes the race condition where multiple terminals starting Claude
-   * simultaneously could capture each other's session IDs.
-   */
-  const captureLatestSessionId = async (): Promise<string | null> => {
-    return new Promise((resolve) => {
-      captureQueue = captureQueue.then(async () => {
-        // Get FRESH known sessions at capture time (not terminal creation time)
-        const allSessions = await sessionManager?.getSessions() ?? [];
-        const knownSessionIds = new Set(allSessions.map(s => s.id));
-
-        console.log(`AI Cockpit: Starting queued capture, ${knownSessionIds.size} known sessions`);
-
-        const result = await captureLatestSessionIdImpl(knownSessionIds);
-        resolve(result);
-        return result;
-      });
-    });
-  };
-
-  /**
    * Generates the Claude CLI command with required flags.
    * All Cockpit-initiated Claude sessions should use this to ensure
    * the --allow-dangerously-skip-permissions flag is included.
@@ -354,6 +330,10 @@ export function activate(context: vscode.ExtensionContext) {
       // Generate unique terminal ID for correlation
       const terminalId = crypto.randomUUID();
 
+      // Get known session IDs before opening terminal
+      const allSessions = await sessionManager?.getSessions() ?? [];
+      const knownSessionIds = new Set(allSessions.map(s => s.id));
+
       const terminal = vscode.window.createTerminal({
         name: `Cockpit: ${taskId}`,
         env: {
@@ -373,7 +353,7 @@ export function activate(context: vscode.ExtensionContext) {
       let sessionId: string | null = null;
       try {
         // Capture session with polling to handle variable Claude startup time
-        sessionId = await captureLatestSessionId();
+        sessionId = await captureLatestSessionId(knownSessionIds);
       } finally {
         // Always remove from pending, even if capture throws
         terminalManager!.clearPendingCapture(terminalId);
@@ -740,6 +720,10 @@ export function activate(context: vscode.ExtensionContext) {
       // Generate unique terminal ID for correlation
       const terminalId = crypto.randomUUID();
 
+      // Get known session IDs before opening terminal
+      const allSessions = await sessionManager?.getSessions() ?? [];
+      const knownSessionIds = new Set(allSessions.map(s => s.id));
+
       // Create terminal
       const terminal = vscode.window.createTerminal({
         name: `Cockpit: ${taskId}`,
@@ -760,7 +744,7 @@ export function activate(context: vscode.ExtensionContext) {
       let sessionId: string | null = null;
       try {
         // Capture session with polling
-        sessionId = await captureLatestSessionId();
+        sessionId = await captureLatestSessionId(knownSessionIds);
       } finally {
         // Always remove from pending, even if capture throws
         terminalManager!.clearPendingCapture(terminalId);
@@ -819,6 +803,10 @@ export function activate(context: vscode.ExtensionContext) {
       // Generate unique terminal ID for correlation
       const terminalId = crypto.randomUUID();
 
+      // Get known session IDs before opening terminal
+      const allSessions = await sessionManager?.getSessions() ?? [];
+      const knownSessionIds = new Set(allSessions.map(s => s.id));
+
       // Create terminal without COCKPIT_TASK - this is an unassigned session
       const terminal = vscode.window.createTerminal({
         name: 'Cockpit: Session',
@@ -837,7 +825,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       let sessionId: string | null = null;
       try {
-        sessionId = await captureLatestSessionId();
+        sessionId = await captureLatestSessionId(knownSessionIds);
       } finally {
         terminalManager!.clearPendingCapture(terminalId);
       }
