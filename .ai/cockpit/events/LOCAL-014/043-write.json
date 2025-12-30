@@ -1,0 +1,19 @@
+{
+  "id": "evt-1767101107155-hqaatbaw2",
+  "taskId": "LOCAL-014",
+  "taskIdSource": "active-task-file",
+  "tool": "Write",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/utils/diffGenerator.ts",
+    "content": "import { createTwoFilesPatch } from 'diff';\n\n/**\n * Generate a unified diff from two strings\n */\nexport function generateUnifiedDiff(\n  filePath: string,\n  oldContent: string,\n  newContent: string\n): string {\n  return createTwoFilesPatch(\n    `a/${filePath}`,\n    `b/${filePath}`,\n    oldContent || '',\n    newContent || '',\n    'original',\n    'modified'\n  );\n}\n"
+  },
+  "response": {
+    "type": "create",
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/utils/diffGenerator.ts",
+    "content": "import { createTwoFilesPatch } from 'diff';\n\n/**\n * Generate a unified diff from two strings\n */\nexport function generateUnifiedDiff(\n  filePath: string,\n  oldContent: string,\n  newContent: string\n): string {\n  return createTwoFilesPatch(\n    `a/${filePath}`,\n    `b/${filePath}`,\n    oldContent || '',\n    newContent || '',\n    'original',\n    'modified'\n  );\n}\n",
+    "structuredPatch": [],
+    "originalFile": null
+  },
+  "sessionId": "3764ab9c-088d-4e71-9b80-408a356de620",
+  "timestamp": "2025-12-30T13:25:07.155Z"
+}

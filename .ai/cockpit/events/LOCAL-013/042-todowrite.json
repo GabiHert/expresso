@@ -1,0 +1,37 @@
+{
+  "id": "evt-1767090855727-6n6y9jw45",
+  "taskId": "LOCAL-013",
+  "taskIdSource": "active-task-file",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Start LOCAL-014 task",
+        "status": "in_progress",
+        "activeForm": "Starting LOCAL-014 task"
+      },
+      {
+        "content": "Work through all 8 work items",
+        "status": "pending",
+        "activeForm": "Working through all work items"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [],
+    "newTodos": [
+      {
+        "content": "Start LOCAL-014 task",
+        "status": "in_progress",
+        "activeForm": "Starting LOCAL-014 task"
+      },
+      {
+        "content": "Work through all 8 work items",
+        "status": "pending",
+        "activeForm": "Working through all work items"
+      }
+    ]
+  },
+  "sessionId": "3764ab9c-088d-4e71-9b80-408a356de620",
+  "timestamp": "2025-12-30T10:34:15.727Z"
+}

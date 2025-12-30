@@ -1,0 +1,19 @@
+{
+  "id": "evt-1767092917894-tbnpq8m2f",
+  "taskId": "LOCAL-014",
+  "taskIdSource": "active-task-file",
+  "tool": "Write",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/types/feedback.ts",
+    "content": "/**\n * Types for the feedback system (v2 format)\n * See .ai/docs/feedback-format-v2.md for specification\n */\n\n/**\n * A single comment on a diff\n */\nexport interface DiffComment {\n  /** Unique 6-character identifier */\n  id: string;\n\n  /** File path relative to repo root, or \"General\" for task-level comments */\n  filePath: string;\n\n  /** Starting line number (1-based), undefined for file/general comments */\n  line?: number;\n\n  /** Ending line number for ranges, undefined for single-line comments */\n  lineEnd?: number;\n\n  /** Comment text (markdown supported) */\n  text: string;\n\n  /** Current status */\n  status: 'open' | 'resolved';\n\n  /** ISO 8601 timestamp when comment was created */\n  createdAt: string;\n}\n\n/**\n * Complete feedback file structure\n */\nexport interface FeedbackFile {\n  /** Format version (2 for current spec) */\n  version: number;\n\n  /** ISO 8601 timestamp of last sync */\n  lastSynced: string;\n\n  /** Map of file paths to content hashes for staleness detection */\n  fileHashes: Record<string, string>;\n\n  /** All comments in the file */\n  comments: DiffComment[];\n}\n"
+  },
+  "response": {
+    "type": "create",
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/types/feedback.ts",
+    "content": "/**\n * Types for the feedback system (v2 format)\n * See .ai/docs/feedback-format-v2.md for specification\n */\n\n/**\n * A single comment on a diff\n */\nexport interface DiffComment {\n  /** Unique 6-character identifier */\n  id: string;\n\n  /** File path relative to repo root, or \"General\" for task-level comments */\n  filePath: string;\n\n  /** Starting line number (1-based), undefined for file/general comments */\n  line?: number;\n\n  /** Ending line number for ranges, undefined for single-line comments */\n  lineEnd?: number;\n\n  /** Comment text (markdown supported) */\n  text: string;\n\n  /** Current status */\n  status: 'open' | 'resolved';\n\n  /** ISO 8601 timestamp when comment was created */\n  createdAt: string;\n}\n\n/**\n * Complete feedback file structure\n */\nexport interface FeedbackFile {\n  /** Format version (2 for current spec) */\n  version: number;\n\n  /** ISO 8601 timestamp of last sync */\n  lastSynced: string;\n\n  /** Map of file paths to content hashes for staleness detection */\n  fileHashes: Record<string, string>;\n\n  /** All comments in the file */\n  comments: DiffComment[];\n}\n",
+    "structuredPatch": [],
+    "originalFile": null
+  },
+  "sessionId": "3764ab9c-088d-4e71-9b80-408a356de620",
+  "timestamp": "2025-12-30T11:08:37.894Z"
+}

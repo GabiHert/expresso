@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/panels/DiffReviewPanel.ts",
+  "taskId": "LOCAL-014",
+  "baseline": {
+    "capturedAt": "2025-12-30T11:24:29.970Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T15:26:47.112Z",
+    "hash": "f2252fa111a510b0",
+    "size": 12592,
+    "editCount": 25
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T15:26:47.112Z",
+    "actualFileHash": "f2252fa111a510b0",
+    "status": "synced"
+  }
+}

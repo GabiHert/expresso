@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/media/icon.svg",
+  "taskId": "LOCAL-014",
+  "baseline": {
+    "capturedAt": "2025-12-30T14:23:49.535Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T14:35:10.090Z",
+    "hash": "813f7f513436e2b0",
+    "size": 497,
+    "editCount": 2
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T14:35:10.090Z",
+    "actualFileHash": "813f7f513436e2b0",
+    "status": "synced"
+  }
+}

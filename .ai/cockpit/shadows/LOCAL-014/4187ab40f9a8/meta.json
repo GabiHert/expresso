@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/media/diff-review.css",
+  "taskId": "LOCAL-014",
+  "baseline": {
+    "capturedAt": "2025-12-30T11:24:56.618Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T15:00:17.444Z",
+    "hash": "3446e74e6d74437f",
+    "size": 11188,
+    "editCount": 8
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T15:00:17.445Z",
+    "actualFileHash": "3446e74e6d74437f",
+    "status": "synced"
+  }
+}

@@ -1,0 +1,93 @@
+# Task Status Index
+task: "LOCAL-014"
+title: "GitHub-style PR review diff viewer"
+created: "2025-12-30"
+updated: "2025-12-30"
+
+summary:
+  total: 16
+  todo: 0
+  in_progress: 0
+  done: 16
+
+work_items:
+  - id: "01"
+    name: "Enhanced feedback format design"
+    repo: "ai-framework"
+    status: done
+    file: "done/01-enhanced-feedback-format.md"
+  - id: "02"
+    name: "Feedback parsing library"
+    repo: "ai-framework"
+    status: done
+    file: "done/02-feedback-parsing-library.md"
+  - id: "03"
+    name: "DiffReviewPanel webview scaffold"
+    repo: "vscode-extension"
+    status: done
+    file: "done/03-diff-review-panel-scaffold.md"
+  - id: "04"
+    name: "Integrate diff2html rendering"
+    repo: "vscode-extension"
+    status: done
+    file: "done/04-diff2html-integration.md"
+  - id: "05"
+    name: "Comment UI overlay system"
+    repo: "vscode-extension"
+    status: done
+    file: "done/05-comment-ui-overlay.md"
+  - id: "06"
+    name: "CommentManager service"
+    repo: "vscode-extension"
+    status: done
+    file: "done/06-comment-manager-service.md"
+  - id: "07"
+    name: "Wire tree view to webview"
+    repo: "vscode-extension"
+    status: done
+    file: "done/07-wire-tree-view.md"
+  - id: "08"
+    name: "Styling and polish"
+    repo: "vscode-extension"
+    status: done
+    file: "done/08-styling-polish.md"
+  - id: "09"
+    name: "Fix race condition in file watcher setup"
+    repo: "vscode-extension"
+    status: done
+    file: "done/09-fix-watcher-race-condition.md"
+  - id: "10"
+    name: "Fix circular update loop in CommentManager"
+    repo: "vscode-extension"
+    status: done
+    file: "done/10-fix-circular-update-loop.md"
+  - id: "11"
+    name: "Fix memory leak in event listeners"
+    repo: "vscode-extension"
+    status: done
+    file: "done/11-fix-memory-leak-listeners.md"
+  - id: "12"
+    name: "Fix XSS vulnerability in comment rendering"
+    repo: "vscode-extension"
+    status: done
+    file: "done/12-fix-xss-comment-rendering.md"
+  - id: "13"
+    name: "Fix path traversal in work item opening"
+    repo: "vscode-extension"
+    status: done
+    file: "done/13-fix-path-traversal.md"
+  - id: "14"
+    name: "Add error handling for webview ready message"
+    repo: "vscode-extension"
+    status: done
+    file: "done/14-add-ready-error-handling.md"
+  - id: "15"
+    name: "Implement cache eviction in CommentManager"
+    repo: "vscode-extension"
+    status: done
+    file: "done/15-implement-cache-eviction.md"
+  - id: "16"
+    name: "Fix type guard for message validation"
+    repo: "vscode-extension"
+    status: done
+    file: "done/16-fix-type-guard-validation.md"

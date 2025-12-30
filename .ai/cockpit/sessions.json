@@ -139,16 +139,6 @@
       "status": "closed",
       "terminalName": "Cockpit: Session",
       "terminalId": "c52ea9c1-633d-4d19-9343-ca6e89a61975"
-    },
-    {
-      "id": "6da5b926-4ad7-4ff9-a1db-9ae5322984d9",
-      "taskId": "_unassigned",
-      "label": "Icons",
-      "createdAt": "2025-12-30T02:54:20.077Z",
-      "lastActive": "2025-12-30T02:54:20.077Z",
-      "status": "active",
-      "terminalName": "Cockpit: Session",
-      "terminalId": "5ade0e51-af3e-41da-a4ba-fa9a89570233"
     }
   ]
 }

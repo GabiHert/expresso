@@ -1,0 +1,56 @@
+{
+  "id": "evt-1767092388999-p3wb9z3q5",
+  "taskId": "LOCAL-014",
+  "taskIdSource": "active-task-file",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/docs/feedback-format-v2.md",
+    "old_string": "## Best Practices",
+    "new_string": "## Path Normalization\n\nFile paths in comments must be:\n- Relative to repository root\n- Use forward slashes (`/`) as separators\n- Not contain `..` (parent directory references)\n- Not be absolute paths (no leading `/` or Windows drive letters)\n\n**Valid paths:**\n- `src/services/AuthService.ts`\n- `packages/core/index.ts`\n\n**Invalid paths:**\n- `/Users/user/project/src/file.ts` (absolute)\n- `../../../etc/passwd` (path traversal)\n- `src\\services\\AuthService.ts` (backslashes)\n\nThe parser should normalize Windows paths to forward slashes and reject absolute or traversal paths.\n\n## Best Practices"
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/docs/feedback-format-v2.md",
+    "oldString": "## Best Practices",
+    "newString": "## Path Normalization\n\nFile paths in comments must be:\n- Relative to repository root\n- Use forward slashes (`/`) as separators\n- Not contain `..` (parent directory references)\n- Not be absolute paths (no leading `/` or Windows drive letters)\n\n**Valid paths:**\n- `src/services/AuthService.ts`\n- `packages/core/index.ts`\n\n**Invalid paths:**\n- `/Users/user/project/src/file.ts` (absolute)\n- `../../../etc/passwd` (path traversal)\n- `src\\services\\AuthService.ts` (backslashes)\n\nThe parser should normalize Windows paths to forward slashes and reject absolute or traversal paths.\n\n## Best Practices",
+    "originalFile": "# Feedback Format v2 Specification\n\n## Overview\n\nThe v2 feedback format adds structured metadata to diff review comments, enabling:\n- Unique comment identification\n- Status tracking (open/resolved)\n- Timestamps for audit trail\n- File hash tracking for staleness detection\n- Machine parsing while remaining human-readable\n\n## Format Structure\n\n### Complete Example\n\n```markdown\n# Diff Feedback\n\n## Metadata\n<!-- AUTO-GENERATED - DO NOT EDIT -->\nversion: 2\nlast_synced: 2025-12-30T10:00:00Z\nfile_hashes:\n  src/services/AuthService.ts: a1b2c3d4\n  src/utils/validation.ts: e5f6g7h8\n<!-- END METADATA -->\n\n---\n\n### src/services/AuthService.ts:42\n<!-- id: c1a2b3 | status: open | created: 2025-12-30T09:30:00Z -->\nThis validation logic seems incomplete. Should we also check for expired tokens?\n\n### src/services/AuthService.ts:55-60\n<!-- id: c4d5e6 | status: resolved | created: 2025-12-30T09:35:00Z -->\n~~Consider extracting this into a helper function for reusability.~~\n\n### src/utils/validation.ts\n<!-- id: d7e8f9 | status: open | created: 2025-12-30T09:37:00Z -->\nGeneral comment about this file - the error messages could be more descriptive.\n\n### General\n<!-- id: g1h2i3 | status: open | created: 2025-12-30T09:40:00Z -->\nOverall the approach looks good, but we should add more error handling throughout.\n```\n\n## Format Components\n\n### 1. Header\n\nAlways starts with:\n```markdown\n# Diff Feedback\n```\n\n### 2. Metadata Block\n\nThe metadata block stores file-level information:\n\n```markdown\n## Metadata\n<!-- AUTO-GENERATED - DO NOT EDIT -->\nversion: 2\nlast_synced: 2025-12-30T10:00:00Z\nfile_hashes:\n  path/to/file.ts: hash123\n  another/file.ts: hash456\n<!-- END METADATA -->\n```\n\n**Fields:**\n- `version`: Format version (always `2` for this spec)\n- `last_synced`: ISO timestamp of last sync with webview\n- `file_hashes`: Map of file paths to content hashes for staleness detection\n\n**Parsing:**\n- Metadata is enclosed in HTML comment markers\n- Content is YAML-formatted for easy parsing\n- Start marker: `<!-- AUTO-GENERATED - DO NOT EDIT -->`\n- End marker: `<!-- END METADATA -->`\n\n### 3. Comment Sections\n\nEach comment is a markdown section with embedded metadata:\n\n```markdown\n### path/to/file.ts:42\n<!-- id: abc123 | status: open | created: 2025-12-30T09:30:00Z -->\nComment text here. Can be multiple lines.\n\nThis is still part of the same comment.\n```\n\n**Header Format:**\n- `### path/to/file.ts:42` - Single line reference\n- `### path/to/file.ts:42-50` - Line range reference\n- `### path/to/file.ts` - General file comment (no line)\n- `### General` - Task-level comment (no file)\n\n**Metadata Format:**\n- Inline HTML comment immediately after header\n- Pipe-separated key-value pairs\n- Required fields: `id`, `status`, `created`\n- Format: `<!-- id: {id} | status: {status} | created: {timestamp} -->`\n\n**Comment Body:**\n- Follows the metadata comment\n- Can be multi-line markdown\n- Ends at the next `###` header or end of file\n\n### 4. Resolved Comments\n\nResolved comments have:\n1. `status: resolved` in metadata\n2. Body wrapped in strikethrough (`~~text~~`)\n\n```markdown\n### src/auth.ts:42\n<!-- id: abc123 | status: resolved | created: 2025-12-30T09:30:00Z -->\n~~This issue has been addressed in the latest commit.~~\n```\n\n## ID Generation\n\nComment IDs are:\n- 6-character alphanumeric strings\n- Generated using first 6 characters of UUID v4 (without hyphens)\n- Example: `a1b2c3`, `x9y8z7`\n\n```typescript\nfunction generateCommentId(): string {\n  return crypto.randomUUID().replace(/-/g, '').substring(0, 6);\n}\n```\n\n## File Hash Calculation\n\nFile hashes are used to detect if the source file has changed since comments were added:\n\n```typescript\nimport { createHash } from 'crypto';\n\nfunction calculateFileHash(content: string): string {\n  return createHash('sha256').update(content).digest('hex').substring(0, 8);\n}\n```\n\nWhen a file's current hash doesn't match the stored hash, the UI should warn:\n> \"File has changed since these comments were added. Line references may be inaccurate.\"\n\n## TypeScript Interfaces\n\n```typescript\n/**\n * A single comment on a diff\n */\ninterface DiffComment {\n  /** Unique 6-character identifier */\n  id: string;\n\n  /** File path relative to repo root, or \"General\" for task-level comments */\n  filePath: string;\n\n  /** Starting line number (1-based), or undefined for file/general comments */\n  line?: number;\n\n  /** Ending line number for ranges, or undefined for single-line comments */\n  lineEnd?: number;\n\n  /** Comment text (markdown supported) */\n  text: string;\n\n  /** Current status */\n  status: 'open' | 'resolved';\n\n  /** ISO 8601 timestamp when comment was created */\n  createdAt: string;\n}\n\n/**\n * Complete feedback file structure\n */\ninterface FeedbackFile {\n  /** Format version (2 for this spec) */\n  version: number;\n\n  /** ISO 8601 timestamp of last sync */\n  lastSynced: string;\n\n  /** Map of file paths to content hashes */\n  fileHashes: Record<string, string>;\n\n  /** All comments in the file */\n  comments: DiffComment[];\n}\n```\n\n## Parsing Rules\n\n### Regex Patterns\n\n```typescript\n// Metadata block\nconst METADATA_PATTERN = /## Metadata\\n<!-- AUTO-GENERATED - DO NOT EDIT -->\\n([\\s\\S]*?)\\n<!-- END METADATA -->/;\n\n// Comment header - \"General\" is a reserved keyword for task-level comments\nconst GENERAL_PATTERN = /^### General$/;\nconst HEADER_PATTERN = /^### (.+?)(?::(\\d+)(?:-(\\d+))?)?$/;\n// Groups: [1] filePath, [2] line (optional), [3] lineEnd (optional)\n// Note: Check GENERAL_PATTERN first, then fall back to HEADER_PATTERN\n\n// Comment metadata\nconst COMMENT_META_PATTERN = /<!-- id: (\\w+) \\| status: (open|resolved) \\| created: ([\\d\\-T:Z]+) -->/;\n// Groups: [1] id, [2] status, [3] createdAt\n```\n\n### Parsing Algorithm\n\n1. Extract metadata block using `METADATA_PATTERN`\n2. Parse metadata YAML content\n3. Split remaining content by `### ` (level 3 headers)\n4. For each section:\n   a. Parse header with `HEADER_PATTERN`\n   b. Extract metadata with `COMMENT_META_PATTERN`\n   c. Remaining text is comment body (trim whitespace)\n\n## Migration from v1\n\n### Detection\n\nv1 files are identified by:\n- No `## Metadata` section, OR\n- No `version:` field in metadata\n\n### Migration Process\n\n1. Parse existing comments using v1 rules (simpler header format)\n2. Generate IDs for each comment\n3. Set status based on strikethrough presence\n4. Set `createdAt` using (in priority order):\n   - Git commit timestamp of last modification to feedback file\n   - File modification time of feedback file\n   - Current timestamp (fallback)\n5. Write file in v2 format\n\n### Backward Compatibility\n\nThe v2 format is designed to be:\n- **Human-readable**: Comments are still plain markdown\n- **Git-friendly**: Changes are meaningful diffs\n- **Editor-friendly**: Works in any markdown editor\n- **v1-compatible**: v1 parsers can still read the basic structure\n\n## Best Practices\n\n1. **Don't edit metadata manually** - Let tooling manage it\n2. **Use strikethrough for resolved** - Visual indicator + status flag\n3. **Keep comments concise** - One concern per comment\n4. **Reference specific lines** - Helps with navigation\n5. **Update file hashes** - When syncing after file changes\n\n## Version History\n\n- **v1**: Original format with simple `### file:line` headers, no metadata\n- **v2**: Added comment IDs, status tracking, timestamps, file hashes\n",
+    "structuredPatch": [
+      {
+        "oldStart": 251,
+        "oldLines": 6,
+        "newStart": 251,
+        "newLines": 25,
+        "lines": [
+          " - **Editor-friendly**: Works in any markdown editor",
+          " - **v1-compatible**: v1 parsers can still read the basic structure",
+          " ",
+          "+## Path Normalization",
+          "+",
+          "+File paths in comments must be:",
+          "+- Relative to repository root",
+          "+- Use forward slashes (`/`) as separators",
+          "+- Not contain `..` (parent directory references)",
+          "+- Not be absolute paths (no leading `/` or Windows drive letters)",
+          "+",
+          "+**Valid paths:**",
+          "+- `src/services/AuthService.ts`",
+          "+- `packages/core/index.ts`",
+          "+",
+          "+**Invalid paths:**",
+          "+- `/Users/user/project/src/file.ts` (absolute)",
+          "+- `../../../etc/passwd` (path traversal)",
+          "+- `src\\services\\AuthService.ts` (backslashes)",
+          "+",
+          "+The parser should normalize Windows paths to forward slashes and reject absolute or traversal paths.",
+          "+",
+          " ## Best Practices",
+          " ",
+          " 1. **Don't edit metadata manually** - Let tooling manage it"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "3764ab9c-088d-4e71-9b80-408a356de620",
+  "timestamp": "2025-12-30T10:59:48.999Z"
+}

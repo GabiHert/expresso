@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/services/FeedbackParser.ts",
+  "taskId": "LOCAL-014",
+  "baseline": {
+    "capturedAt": "2025-12-30T11:15:57.860Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T11:23:31.094Z",
+    "hash": "f18b6833f1cceaa4",
+    "size": 12735,
+    "editCount": 5
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T11:23:31.094Z",
+    "actualFileHash": "f18b6833f1cceaa4",
+    "status": "synced"
+  }
+}

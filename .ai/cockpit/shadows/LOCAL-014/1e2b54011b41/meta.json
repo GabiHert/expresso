@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension/src/services/CommentManager.ts",
+  "taskId": "LOCAL-014",
+  "baseline": {
+    "capturedAt": "2025-12-30T14:05:31.117Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T15:25:43.034Z",
+    "hash": "081e905bf81af601",
+    "size": 10312,
+    "editCount": 15
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T15:25:43.034Z",
+    "actualFileHash": "081e905bf81af601",
+    "status": "synced"
+  }
+}

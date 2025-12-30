@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/in_progress/LOCAL-014/todo/11-fix-memory-leak-listeners.md",
+  "taskId": "LOCAL-014",
+  "baseline": {
+    "capturedAt": "2025-12-30T15:13:37.069Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T15:13:37.070Z",
+    "hash": "014d774b395876a1",
+    "size": 1647,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T15:13:37.070Z",
+    "actualFileHash": "014d774b395876a1",
+    "status": "synced"
+  }
+}

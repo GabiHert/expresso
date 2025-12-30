@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Personal/ai-framework/.ai/docs/feedback-format-v2.md",
+  "taskId": "LOCAL-014",
+  "baseline": {
+    "capturedAt": "2025-12-30T10:36:09.473Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2025-12-30T10:59:49.001Z",
+    "hash": "60a9b1db3c65e34e",
+    "size": 7849,
+    "editCount": 5
+  },
+  "sync": {
+    "lastCheckedAt": "2025-12-30T10:59:49.001Z",
+    "actualFileHash": "60a9b1db3c65e34e",
+    "status": "synced"
+  }
+}
