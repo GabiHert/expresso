@@ -20,6 +20,7 @@ interface WorkItem {
   id: string;
   name: string;
   status: string;
+  file?: string;
 }
 
 export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
@@ -197,6 +198,8 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
           currentWorkItem.name = line.split('name:')[1]?.trim().replace(/["']/g, '');
         } else if (currentWorkItem && line.includes('status:')) {
           currentWorkItem.status = line.split('status:')[1]?.trim();
+        } else if (currentWorkItem && line.includes('file:')) {
+          currentWorkItem.file = line.split('file:')[1]?.trim().replace(/["']/g, '');
         }
       }
     }
@@ -213,7 +216,7 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
 
     // Add Sessions section if sessions exist
     if (this.sessionManager) {
-      const sessions = this.sessionManager.getSessionsForTask(task.taskId);
+      const sessions = await this.sessionManager.getSessionsForTask(task.taskId);
       if (sessions.length > 0) {
         items.push(new SessionsSection(task.taskId, sessions.length));
       }
@@ -222,7 +225,7 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
     // Add work items if available
     if (task.task.workItems && task.task.workItems.length > 0) {
       for (const wi of task.task.workItems) {
-        items.push(new WorkItemNode(wi));
+        items.push(new WorkItemNode(wi, task.task.taskId, task.task.status));
       }
     }
 
@@ -235,10 +238,10 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
     return items;
   }
 
-  private getSessionsForTask(taskId: string): SessionItem[] {
+  private async getSessionsForTask(taskId: string): Promise<SessionItem[]> {
     if (!this.sessionManager) return [];
 
-    const sessions = this.sessionManager.getSessionsForTask(taskId);
+    const sessions = await this.sessionManager.getSessionsForTask(taskId);
 
     // Sort: active sessions first, then by lastActive descending
     return sessions
@@ -344,17 +347,17 @@ class TaskItem extends vscode.TreeItem {
 
     this.contextValue = isActive ? 'task-active' : `task-${task.status}`;
 
-    // Click to open terminal with COCKPIT_TASK set
+    // Click to open task README
     this.command = {
-      command: 'aiCockpit.openTaskTerminal',
-      title: 'Open Task Terminal',
-      arguments: [{ taskId: task.taskId, title: task.title }]
+      command: 'aiCockpit.openTask',
+      title: 'View Task',
+      arguments: [{ taskId: task.taskId, status: task.status, title: task.title }]
     };
   }
 }
 
 class WorkItemNode extends vscode.TreeItem {
-  constructor(workItem: WorkItem) {
+  constructor(workItem: WorkItem, taskId: string, taskStatus: string) {
     super(workItem.name, vscode.TreeItemCollapsibleState.None);
 
     this.description = workItem.id;
@@ -371,6 +374,17 @@ class WorkItemNode extends vscode.TreeItem {
     }
 
     this.contextValue = `workitem-${workItem.status}`;
+
+    // Click to open work item file
+    this.command = {
+      command: 'aiCockpit.openWorkItem',
+      title: 'View Work Item',
+      arguments: [{
+        taskId: taskId,
+        taskStatus: taskStatus,
+        workItem: workItem
+      }]
+    };
   }
 }
 
@@ -473,6 +487,8 @@ class SessionsSection extends vscode.TreeItem {
   ) {
     super('Sessions', vscode.TreeItemCollapsibleState.Collapsed);
 
+    // Set id to taskId so it's preserved when VSCode serializes the TreeItem
+    this.id = `sessions-${taskId}`;
     this.description = `${sessionCount}`;
     this.iconPath = new vscode.ThemeIcon('terminal');
     this.contextValue = 'sessions-section';
@@ -495,12 +511,20 @@ class SessionItem extends vscode.TreeItem {
       this.iconPath = new vscode.ThemeIcon('circle-outline');
     }
 
-    // Click to resume session
-    this.command = {
-      command: 'aiCockpit.resumeSession',
-      title: 'Resume Session',
-      arguments: [session]
-    };
+    // Click behavior depends on session status
+    if (session.status === 'active') {
+      this.command = {
+        command: 'aiCockpit.focusSession',
+        title: 'Focus Session',
+        arguments: [session]
+      };
+    } else {
+      this.command = {
+        command: 'aiCockpit.resumeSession',
+        title: 'Resume Session',
+        arguments: [session]
+      };
+    }
 
     this.contextValue = `session-${session.status}`;
 

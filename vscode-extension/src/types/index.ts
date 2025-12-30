@@ -33,6 +33,7 @@ export interface CockpitSession {
   lastActive: string;
   status: 'active' | 'closed';
   terminalName: string;
+  terminalId?: string;
 }
 
 export interface SessionRegistry {

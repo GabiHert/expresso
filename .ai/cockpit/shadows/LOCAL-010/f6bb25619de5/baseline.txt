@@ -66,24 +66,6 @@ export class SessionManager {
     });
   }
 
-  async renameSession(sessionId: string, newLabel: string): Promise<boolean> {
-    return this.updateSession(sessionId, { label: newLabel });
-  }
-
-  async deleteSession(sessionId: string): Promise<boolean> {
-    return this.withLock(async () => {
-      const registry = await this.loadRegistryAsync();
-      const originalLength = registry.sessions.length;
-      registry.sessions = registry.sessions.filter(s => s.id !== sessionId);
-
-      if (registry.sessions.length < originalLength) {
-        await this.saveRegistryAsync(registry);
-        return true;
-      }
-      return false;
-    });
-  }
-
   async closeSessionByTerminal(terminalName: string): Promise<void> {
     return this.withLock(async () => {
       const registry = await this.loadRegistryAsync();

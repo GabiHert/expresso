@@ -79,16 +79,6 @@
       {
         "command": "aiCockpit.openWorkItem",
         "title": "AI Cockpit: Open Work Item"
-      },
-      {
-        "command": "aiCockpit.renameSession",
-        "title": "Rename Session",
-        "icon": "$(edit)"
-      },
-      {
-        "command": "aiCockpit.deleteSession",
-        "title": "Delete Session",
-        "icon": "$(trash)"
       }
     ],
     "configuration": {
@@ -189,26 +179,6 @@
           "command": "aiCockpit.newSession",
           "when": "view == aiCockpit.tasks && viewItem == sessions-section",
           "group": "inline"
-        },
-        {
-          "command": "aiCockpit.renameSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-active",
-          "group": "2_session@1"
-        },
-        {
-          "command": "aiCockpit.renameSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-closed",
-          "group": "2_session@1"
-        },
-        {
-          "command": "aiCockpit.deleteSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-active",
-          "group": "2_session@2"
-        },
-        {
-          "command": "aiCockpit.deleteSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-closed",
-          "group": "2_session@2"
         }
       ]
     }
