@@ -1,0 +1,63 @@
+{
+  "id": "evt-1767124753288-mii0mcn53",
+  "taskId": "LOCAL-016",
+  "taskIdSource": "active-task-file",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "WI-01: Create Claude command builder helper",
+        "status": "completed",
+        "activeForm": "Creating Claude command builder helper"
+      },
+      {
+        "content": "WI-02: Update all Claude launch points",
+        "status": "completed",
+        "activeForm": "Updating all Claude launch points"
+      },
+      {
+        "content": "WI-03: Verify changes work correctly",
+        "status": "completed",
+        "activeForm": "Verifying changes work correctly"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [
+      {
+        "content": "WI-01: Create Claude command builder helper",
+        "status": "completed",
+        "activeForm": "Creating Claude command builder helper"
+      },
+      {
+        "content": "WI-02: Update all Claude launch points",
+        "status": "completed",
+        "activeForm": "Updating all Claude launch points"
+      },
+      {
+        "content": "WI-03: Verify changes work correctly",
+        "status": "in_progress",
+        "activeForm": "Verifying changes work correctly"
+      }
+    ],
+    "newTodos": [
+      {
+        "content": "WI-01: Create Claude command builder helper",
+        "status": "completed",
+        "activeForm": "Creating Claude command builder helper"
+      },
+      {
+        "content": "WI-02: Update all Claude launch points",
+        "status": "completed",
+        "activeForm": "Updating all Claude launch points"
+      },
+      {
+        "content": "WI-03: Verify changes work correctly",
+        "status": "completed",
+        "activeForm": "Verifying changes work correctly"
+      }
+    ]
+  },
+  "sessionId": "a599bb9a-d79f-4c4d-9a75-0a8447691ad6",
+  "timestamp": "2025-12-30T19:59:13.288Z"
+}

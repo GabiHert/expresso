@@ -155,10 +155,10 @@
       "taskId": "LOCAL-016",
       "label": "allow dangerously operations ",
       "createdAt": "2025-12-30T19:21:03.675Z",
-      "lastActive": "2025-12-30T19:21:03.675Z",
-      "status": "active",
-      "terminalName": "Cockpit: Session",
-      "terminalId": "340c83c5-6ec5-4310-9fd3-26a142e5008c"
+      "lastActive": "2025-12-30T19:56:06.488Z",
+      "status": "closed",
+      "terminalName": "Cockpit: LOCAL-016",
+      "terminalId": "8ad2632b-81df-438c-8b91-d369e3219e51"
     },
     {
       "id": "ee77b443-4728-4c4b-95d3-13d1fddacd38",
@@ -169,6 +169,16 @@
       "status": "active",
       "terminalName": "Cockpit: Session",
       "terminalId": "2bc252fd-9cf9-44eb-aa61-74a77c1e146d"
+    },
+    {
+      "id": "c5b1fb31-82b6-4483-bc7c-3b23bef34138",
+      "taskId": "_unassigned",
+      "label": "assign section to todo task",
+      "createdAt": "2025-12-30T19:45:56.965Z",
+      "lastActive": "2025-12-30T19:55:55.547Z",
+      "status": "closed",
+      "terminalName": "Cockpit: _unassigned",
+      "terminalId": "e247f2d1-0fc6-4a55-a67a-c1598096dbc9"
     }
   ]
 }
