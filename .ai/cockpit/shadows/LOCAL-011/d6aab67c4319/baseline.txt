@@ -14,5 +14,3 @@ Tasks completed in this project, for reference and learning.
 | 2025-12-29 | [LOCAL-007](.ai/tasks/done/LOCAL-007/) | Session Tracking Fixes - Race condition handling, async I/O, session cleanup, JSON error handling, configurable paths |
 | 2025-12-29 | [LOCAL-008](.ai/tasks/done/LOCAL-008/) | Session Terminal Reuse - Focus existing terminals for active sessions, support multiple parallel sessions per task |
 | 2025-12-30 | [LOCAL-009](.ai/tasks/done/LOCAL-009/) | Sidebar Click Behavior - Tasks open README, work items open .md files, terminals via context menu |
-| 2025-12-30 | [LOCAL-010](.ai/tasks/done/LOCAL-010/) | Session Rename & Delete - Right-click context menus to rename session labels or delete sessions with confirmation |
-| 2025-12-30 | [LOCAL-011](.ai/tasks/done/LOCAL-011/) | Default Full Diff - Changed file click behavior from Claude Changes to Full Diff |
