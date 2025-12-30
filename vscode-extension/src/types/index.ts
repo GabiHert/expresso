@@ -1,3 +1,9 @@
+export const UNASSIGNED_TASK_ID = '_unassigned';
+
+export function isUnassignedSession(session: CockpitSession): boolean {
+  return session.taskId === UNASSIGNED_TASK_ID;
+}
+
 export interface ActiveTask {
   taskId: string;
   title: string;

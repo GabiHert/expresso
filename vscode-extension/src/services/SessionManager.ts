@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { CockpitSession, SessionRegistry } from '../types';
+import { CockpitSession, SessionRegistry, UNASSIGNED_TASK_ID } from '../types';
 import { safeJsonParse } from '../utils/jsonUtils';
 
 export class SessionManager {
@@ -18,7 +18,13 @@ export class SessionManager {
 
   async getSessionsForTask(taskId: string): Promise<CockpitSession[]> {
     const sessions = await this.getSessions();
-    return sessions.filter(s => s.taskId === taskId);
+    // Exclude unassigned sessions from task-specific queries
+    return sessions.filter(s => s.taskId === taskId && taskId !== UNASSIGNED_TASK_ID);
+  }
+
+  async getUnassignedSessions(): Promise<CockpitSession[]> {
+    const sessions = await this.getSessions();
+    return sessions.filter(s => s.taskId === UNASSIGNED_TASK_ID);
   }
 
   async getSession(sessionId: string): Promise<CockpitSession | null> {
@@ -68,6 +74,10 @@ export class SessionManager {
 
   async renameSession(sessionId: string, newLabel: string): Promise<boolean> {
     return this.updateSession(sessionId, { label: newLabel });
+  }
+
+  async linkSessionToTask(sessionId: string, newTaskId: string): Promise<boolean> {
+    return this.updateSession(sessionId, { taskId: newTaskId });
   }
 
   async deleteSession(sessionId: string): Promise<boolean> {

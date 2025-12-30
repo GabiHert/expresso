@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { ActiveTask, CockpitEvent, CockpitSession } from '../types';
+import { ActiveTask, CockpitEvent, CockpitSession, UNASSIGNED_TASK_ID } from '../types';
 import { CockpitFileWatcher } from '../watchers/FileWatcher';
 import { Shadow, ShadowManager } from '../services/ShadowManager';
 import { SessionManager } from '../services/SessionManager';
 
-type TreeItemType = SectionItem | TaskItem | EventItem | WorkItemNode | FilesChangedSection | ShadowFileItem | SessionsSection | SessionItem;
+type TreeItemType = SectionItem | TaskItem | EventItem | WorkItemNode | FilesChangedSection | ShadowFileItem | SessionsSection | SessionItem | UnassignedSessionsSection;
 
 interface FrameworkTask {
   taskId: string;
@@ -76,6 +76,10 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
       return this.getSessionsForTask(element.taskId);
     }
 
+    if (element instanceof UnassignedSessionsSection) {
+      return this.getUnassignedSessions();
+    }
+
     if (element instanceof FilesChangedSection) {
       return this.getFilesForTask(element.taskId);
     }
@@ -83,8 +87,8 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
     return [];
   }
 
-  private async getSections(): Promise<SectionItem[]> {
-    const sections: SectionItem[] = [];
+  private async getSections(): Promise<(SectionItem | UnassignedSessionsSection)[]> {
+    const sections: (SectionItem | UnassignedSessionsSection)[] = [];
 
     const inProgressCount = await this.countTasksInDir('in_progress');
     const todoCount = await this.countTasksInDir('todo');
@@ -98,6 +102,14 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
     }
     if (doneCount > 0) {
       sections.push(new SectionItem('done', doneCount));
+    }
+
+    // Add unassigned sessions section at root level
+    if (this.sessionManager) {
+      const unassignedSessions = await this.sessionManager.getUnassignedSessions();
+      if (unassignedSessions.length > 0) {
+        sections.push(new UnassignedSessionsSection(unassignedSessions.length));
+      }
     }
 
     return sections;
@@ -252,6 +264,22 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType> {
         return new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime();
       })
       .map(s => new SessionItem(s));
+  }
+
+  private async getUnassignedSessions(): Promise<SessionItem[]> {
+    if (!this.sessionManager) return [];
+
+    const sessions = await this.sessionManager.getUnassignedSessions();
+
+    // Sort: active sessions first, then by lastActive descending
+    return sessions
+      .sort((a, b) => {
+        if (a.status !== b.status) {
+          return a.status === 'active' ? -1 : 1;
+        }
+        return new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime();
+      })
+      .map(s => new SessionItem(s, true));
   }
 
   private async getFilesForTask(taskId: string): Promise<ShadowFileItem[]> {
@@ -495,8 +523,22 @@ class SessionsSection extends vscode.TreeItem {
   }
 }
 
+class UnassignedSessionsSection extends vscode.TreeItem {
+  constructor(sessionCount: number) {
+    super('Sessions', vscode.TreeItemCollapsibleState.Collapsed);
+
+    this.id = 'sessions-unassigned';
+    this.description = `${sessionCount}`;
+    this.iconPath = new vscode.ThemeIcon('terminal');
+    this.contextValue = 'unassigned-sessions-section';
+  }
+}
+
 class SessionItem extends vscode.TreeItem {
-  constructor(public readonly session: CockpitSession) {
+  constructor(
+    public readonly session: CockpitSession,
+    public readonly isUnassigned: boolean = false
+  ) {
     super(session.label, vscode.TreeItemCollapsibleState.None);
 
     this.description = session.status;
@@ -526,7 +568,9 @@ class SessionItem extends vscode.TreeItem {
       };
     }
 
-    this.contextValue = `session-${session.status}`;
+    // Add 'unassigned' suffix for unassigned sessions to enable "Link to Task" menu
+    const baseCv = `session-${session.status}`;
+    this.contextValue = isUnassigned ? `${baseCv}-unassigned` : baseCv;
 
     // Format timestamps for tooltip
     const created = new Date(session.createdAt).toLocaleString();

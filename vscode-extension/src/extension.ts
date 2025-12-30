@@ -11,7 +11,7 @@ import { DiffViewer } from './services/DiffViewer';
 import { ShadowManager } from './services/ShadowManager';
 import { SessionManager } from './services/SessionManager';
 import { registerCommands } from './commands';
-import { CockpitEvent } from './types';
+import { CockpitEvent, UNASSIGNED_TASK_ID } from './types';
 import { Shadow } from './services/ShadowManager';
 import { safeJsonParseLine } from './utils/jsonUtils';
 import { getClaudeHistoryPath } from './utils/claudePaths';
@@ -647,6 +647,131 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(newSession);
+
+  // Register start unassigned session command
+  const startSession = vscode.commands.registerCommand(
+    'aiCockpit.startSession',
+    async () => {
+      // Prompt for session label
+      const label = await vscode.window.showInputBox({
+        prompt: 'Session label (optional)',
+        placeHolder: 'e.g., Exploration, Research, Debugging'
+      });
+
+      // User cancelled the input
+      if (label === undefined) {
+        return;
+      }
+
+      // Generate unique terminal ID for correlation
+      const terminalId = crypto.randomUUID();
+
+      // Get known session IDs before opening terminal
+      const allSessions = await sessionManager?.getSessions() ?? [];
+      const knownSessionIds = new Set(allSessions.map(s => s.id));
+
+      // Create terminal without COCKPIT_TASK - this is an unassigned session
+      const terminal = vscode.window.createTerminal({
+        name: 'Cockpit: Session',
+        env: {
+          COCKPIT_TERMINAL_ID: terminalId
+        }
+      });
+      terminal.show();
+      terminal.sendText('claude');
+
+      // Store mapping for terminal close correlation
+      terminalManager!.registerTerminal(terminalId, terminal);
+
+      // Mark as pending capture
+      terminalManager!.markPendingCapture(terminalId);
+
+      let sessionId: string | null = null;
+      try {
+        sessionId = await captureLatestSessionId(knownSessionIds);
+      } finally {
+        terminalManager!.clearPendingCapture(terminalId);
+      }
+
+      // Check if terminal was closed during capture
+      if (!terminalManager!.hasTerminal(terminalId)) {
+        console.warn('AI Cockpit: Terminal closed during session capture');
+        return;
+      }
+
+      if (sessionId && sessionManager) {
+        const sessionLabel = label || `Session ${new Date().toLocaleTimeString()}`;
+        await sessionManager.registerSession({
+          id: sessionId,
+          taskId: UNASSIGNED_TASK_ID,
+          label: sessionLabel,
+          createdAt: new Date().toISOString(),
+          lastActive: new Date().toISOString(),
+          status: 'active',
+          terminalName: terminal.name,
+          terminalId
+        });
+        taskTreeProvider?.refresh();
+        console.log(`AI Cockpit: Unassigned session "${sessionLabel}" registered`);
+      } else {
+        console.warn('AI Cockpit: Failed to capture sessionId for unassigned session');
+        terminalManager!.unregisterTerminal(terminalId);
+        vscode.window.showWarningMessage(
+          'AI Cockpit: Could not capture session. The terminal is open but session tracking may not work.',
+          'Dismiss'
+        );
+      }
+    }
+  );
+
+  context.subscriptions.push(startSession);
+
+  // Register link session to task command
+  const linkSessionToTask = vscode.commands.registerCommand(
+    'aiCockpit.linkSessionToTask',
+    async (sessionItem: { session?: { id: string; label: string; taskId: string } }) => {
+      const session = sessionItem?.session;
+      if (!session?.id || !sessionManager) {
+        return;
+      }
+
+      // Get list of in-progress tasks
+      const inProgressPath = path.join(workspaceRoot, '.ai/tasks/in_progress');
+      let taskIds: string[] = [];
+      try {
+        const entries = await fs.promises.readdir(inProgressPath, { withFileTypes: true });
+        taskIds = entries.filter(e => e.isDirectory()).map(e => e.name);
+      } catch {
+        // No in_progress directory
+      }
+
+      if (taskIds.length === 0) {
+        vscode.window.showWarningMessage('No in-progress tasks to link to');
+        return;
+      }
+
+      // Show quick pick
+      const selectedTask = await vscode.window.showQuickPick(taskIds, {
+        placeHolder: 'Select a task to link this session to'
+      });
+
+      if (!selectedTask) {
+        return;
+      }
+
+      const linked = await sessionManager.linkSessionToTask(session.id, selectedTask);
+      if (linked) {
+        taskTreeProvider?.refresh();
+        vscode.window.showInformationMessage(
+          `Session "${session.label}" linked to ${selectedTask}`
+        );
+      } else {
+        vscode.window.showWarningMessage('Session not found');
+      }
+    }
+  );
+
+  context.subscriptions.push(linkSessionToTask);
 
   // Register Claude path validation command
   const validateClaudePath = vscode.commands.registerCommand(
