@@ -5,7 +5,7 @@ Use this file to add review comments on code changes. The `/address-feedback` co
 ## Metadata
 <!-- AUTO-GENERATED - DO NOT EDIT -->
 version: 2
-last_synced: 2025-12-30T20:09:46.944Z
+last_synced: 2025-12-30T20:10:51.860Z
 file_hashes:
 <!-- END METADATA -->
 
@@ -16,5 +16,5 @@ file_hashes:
 Your comment here
 
 ### /Users/gabriel.herter/Documents/Personal/ai-framework/.ai/cockpit/active-task.json:2
-<!-- id: aks0ao | status: open | created: 2025-12-30T20:09:46.943Z -->
-this is a test
+<!-- id: aks0ao | status: resolved | created: 2025-12-30T20:09:46.943Z -->
+~~this is a test~~
