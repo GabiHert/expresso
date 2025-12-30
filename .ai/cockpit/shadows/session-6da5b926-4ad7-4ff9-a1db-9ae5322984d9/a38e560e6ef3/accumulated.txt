@@ -1,0 +1,18 @@
+# Task Status Index
+task: "LOCAL-011"
+title: "Change Default File Click to Full Diff"
+created: "2025-12-29"
+updated: "2025-12-29"
+
+summary:
+  total: 1
+  todo: 1
+  in_progress: 0
+  done: 0
+
+work_items:
+  - id: "01"
+    name: "Change default click command to showFullDiff"
+    repo: "vscode-extension"
+    status: todo
+    file: "todo/01-default-full-diff.md"
