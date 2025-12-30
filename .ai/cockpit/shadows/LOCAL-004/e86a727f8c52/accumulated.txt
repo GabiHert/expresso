@@ -1,4 +1,0 @@
-Hello! This is a fresh test file.
-Created after the path.isAbsolute fix.
-
-Edit #2: Adding more content to test cumulative diff.
