@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { ActiveTask, CockpitEvent, CockpitSession, UNASSIGNED_TASK_ID } from '../types';
+import { ActiveTask, CockpitEvent, CockpitSession, UNASSIGNED_TASK_ID, TaskColor, isValidTaskColor } from '../types';
 import { CockpitFileWatcher } from '../watchers/FileWatcher';
 import { Shadow, ShadowManager } from '../services/ShadowManager';
 import { SessionManager } from '../services/SessionManager';
@@ -15,6 +15,7 @@ interface FrameworkTask {
   status: 'todo' | 'in_progress' | 'done';
   summary?: { total: number; done: number; in_progress: number; todo: number };
   workItems?: WorkItem[];
+  color?: TaskColor;
 }
 
 interface WorkItem {
@@ -32,6 +33,7 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
   private events: Map<string, CockpitEvent[]> = new Map();
   private workspaceRoot: string;
   private disposables: vscode.Disposable[] = [];
+  private taskColors: Map<string, TaskColor> = new Map();
 
   constructor(
     private fileWatcher: CockpitFileWatcher,
@@ -65,6 +67,30 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
         })
       );
     }
+
+    // Pre-load task colors to avoid race condition with session color inheritance
+    this.loadAllTaskColors();
+  }
+
+  /**
+   * Pre-load all task colors to ensure they're available before sessions request them
+   */
+  private async loadAllTaskColors(): Promise<void> {
+    for (const status of ['in_progress', 'todo', 'done']) {
+      const dirPath = path.join(this.workspaceRoot, '.ai/tasks', status);
+      try {
+        const entries = await fs.promises.readdir(dirPath, { withFileTypes: true });
+        for (const entry of entries) {
+          if (!entry.isDirectory()) continue;
+          const task = await this.readFrameworkTask(entry.name, status);
+          if (task?.color) {
+            this.taskColors.set(task.taskId, task.color);
+          }
+        }
+      } catch {
+        // Directory doesn't exist, continue
+      }
+    }
   }
 
   dispose(): void {
@@ -73,7 +99,13 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
   }
 
   refresh(): void {
+    // Reload task colors on refresh to catch any changes
+    this.loadAllTaskColors();
     this._onDidChangeTreeData.fire(undefined);
+  }
+
+  public getTaskColor(taskId: string): TaskColor | undefined {
+    return this.taskColors.get(taskId);
   }
 
   getTreeItem(element: TreeItemType): vscode.TreeItem {
@@ -165,6 +197,10 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
 
         if (task) {
           const isActive = this.activeTask?.taskId === taskId;
+          // Store task color for session inheritance
+          if (task.color) {
+            this.taskColors.set(taskId, task.color);
+          }
           items.push(new TaskItem(task, isActive));
         }
       }
@@ -193,6 +229,7 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
   private parseStatusYaml(content: string, taskId: string, status: 'todo' | 'in_progress' | 'done'): FrameworkTask {
     const lines = content.split('\n');
     let title = taskId;
+    let color: TaskColor | undefined;
     let summary = { total: 0, done: 0, in_progress: 0, todo: 0 };
     const workItems: WorkItem[] = [];
 
@@ -203,6 +240,14 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
     for (const line of lines) {
       if (line.startsWith('title:')) {
         title = line.replace('title:', '').trim().replace(/^["']|["']$/g, '');
+      }
+
+      // Parse color field
+      if (line.startsWith('color:')) {
+        const colorValue = line.replace('color:', '').trim().replace(/^["']|["']$/g, '');
+        if (isValidTaskColor(colorValue)) {
+          color = colorValue;
+        }
       }
 
       if (line.startsWith('summary:')) {
@@ -245,7 +290,7 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
       workItems.push(currentWorkItem as WorkItem);
     }
 
-    return { taskId, title, status, summary, workItems };
+    return { taskId, title, status, summary, workItems, color };
   }
 
   private async getTaskChildren(task: TaskItem): Promise<TreeItemType[]> {
@@ -277,6 +322,7 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
     if (!this.sessionManager) return [];
 
     const sessions = await this.sessionManager.getSessionsForTask(taskId);
+    const taskColor = this.getTaskColor(taskId);
 
     // Sort: active sessions first, then by lastActive descending
     return sessions
@@ -286,7 +332,7 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
         }
         return new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime();
       })
-      .map(s => new SessionItem(s));
+      .map(s => new SessionItem(s, false, taskColor));
   }
 
   private async getUnassignedSessions(): Promise<SessionItem[]> {
@@ -406,19 +452,33 @@ class TaskItem extends vscode.TreeItem {
 
     this.tooltip = `${task.taskId}: ${task.title}`;
 
+    // Determine icon color: task color takes precedence over status-based color
+    const getIconColor = (): vscode.ThemeColor | undefined => {
+      if (task.color) {
+        return new vscode.ThemeColor(task.color);
+      }
+      // Fall back to status-based colors
+      if (isActive || task.status === 'in_progress') {
+        return new vscode.ThemeColor('charts.green');
+      }
+      return undefined;
+    };
+
+    const iconColor = getIconColor();
+
     if (isActive) {
-      this.iconPath = new vscode.ThemeIcon('play-circle', new vscode.ThemeColor('charts.green'));
+      this.iconPath = new vscode.ThemeIcon('play-circle', iconColor);
       this.tooltip += '\n(Active)';
     } else {
       switch (task.status) {
         case 'done':
-          this.iconPath = new vscode.ThemeIcon('check');
+          this.iconPath = new vscode.ThemeIcon('check', iconColor);
           break;
         case 'in_progress':
-          this.iconPath = new vscode.ThemeIcon('circle-large-outline');
+          this.iconPath = new vscode.ThemeIcon('circle-large-outline', iconColor);
           break;
         default:
-          this.iconPath = new vscode.ThemeIcon('circle-outline');
+          this.iconPath = new vscode.ThemeIcon('circle-outline', iconColor);
       }
     }
 
@@ -627,20 +687,31 @@ class UnassignedSessionsSection extends vscode.TreeItem {
 class SessionItem extends vscode.TreeItem {
   constructor(
     public readonly session: CockpitSession,
-    public readonly isUnassigned: boolean = false
+    public readonly isUnassigned: boolean = false,
+    taskColor?: TaskColor
   ) {
     super(session.label, vscode.TreeItemCollapsibleState.None);
 
     this.description = session.status;
 
-    // Icon: green circle for active, gray outline for closed
+    // Determine color: use task color if available, otherwise default green for active
+    const getColor = (): vscode.ThemeColor | undefined => {
+      if (taskColor) {
+        return new vscode.ThemeColor(taskColor);
+      }
+      if (session.status === 'active') {
+        return new vscode.ThemeColor('charts.green');
+      }
+      return undefined;
+    };
+
+    const iconColor = getColor();
+
+    // Icon: filled for active, outline for closed
     if (session.status === 'active') {
-      this.iconPath = new vscode.ThemeIcon(
-        'circle-filled',
-        new vscode.ThemeColor('charts.green')
-      );
+      this.iconPath = new vscode.ThemeIcon('circle-filled', iconColor);
     } else {
-      this.iconPath = new vscode.ThemeIcon('circle-outline');
+      this.iconPath = new vscode.ThemeIcon('circle-outline', iconColor);
     }
 
     // Click behavior depends on session status

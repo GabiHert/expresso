@@ -7,43 +7,43 @@ updated: "2026-01-05"
 
 summary:
   total: 6
-  todo: 6
+  todo: 0
   in_progress: 0
-  done: 0
+  done: 6
 
 work_items:
   - id: "WI-01"
     name: "Add signal file write to /task-start"
     repo: "ai-framework"
-    status: todo
-    file: "todo/WI-01-signal-file-task-start.md"
+    status: done
+    file: "done/WI-01-signal-file-task-start.md"
 
   - id: "WI-02"
     name: "Extend FileWatcher to monitor signal"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/WI-02-filewatcher-signal-monitor.md"
+    status: done
+    file: "done/WI-02-filewatcher-signal-monitor.md"
 
   - id: "WI-03"
     name: "Add session task update method"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/WI-03-session-update-method.md"
+    status: done
+    file: "done/WI-03-session-update-method.md"
 
   - id: "WI-04"
     name: "Wire signal handler in extension"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/WI-04-wire-signal-handler.md"
+    status: done
+    file: "done/WI-04-wire-signal-handler.md"
 
   - id: "WI-05"
     name: "Add continuous verification fallback"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/WI-05-continuous-verification.md"
+    status: done
+    file: "done/WI-05-continuous-verification.md"
 
   - id: "WI-06"
     name: "Add edge case handling and cleanup"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/WI-06-edge-cases-cleanup.md"
+    status: done
+    file: "done/WI-06-edge-cases-cleanup.md"

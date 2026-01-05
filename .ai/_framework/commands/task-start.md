@@ -276,7 +276,16 @@ Activate cockpit tracking for the task:
    date +%s%N | md5sum | head -c 12
    ```
 
-5. Write `active-task.json` atomically:
+5. Capture previous task ID for signal file:
+   ```bash
+   # Capture previous task ID for signal file
+   previous_task_id=""
+   if [ -f .ai/cockpit/active-task.json ]; then
+     previous_task_id=$(jq -r '.taskId // empty' .ai/cockpit/active-task.json 2>/dev/null)
+   fi
+   ```
+
+6. Write `active-task.json` atomically:
    ```bash
    # Write to temp file first
    cat > .ai/cockpit/active-task.json.tmp << 'EOF'
@@ -294,13 +303,36 @@ Activate cockpit tracking for the task:
    mv .ai/cockpit/active-task.json.tmp .ai/cockpit/active-task.json
    ```
 
-6. Announce activation:
+7. Write task-switch-signal to trigger VSCode sync:
+   ```bash
+   # Write task-switch-signal to trigger VSCode sync
+   if [ -n "$previous_task_id" ] && [ "$previous_task_id" != "$task_id" ]; then
+     cat > .ai/cockpit/task-switch-signal.json.tmp << EOF
+   {
+     "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+     "previousTaskId": "$previous_task_id",
+     "newTaskId": "$task_id",
+     "type": "task-switch"
+   }
+   EOF
+
+     # Atomic rename to trigger FileWatcher
+     mv .ai/cockpit/task-switch-signal.json.tmp .ai/cockpit/task-switch-signal.json
+   fi
+   ```
+
+8. Announce activation:
    ```
    Cockpit: Task {task-id} is now active
    All edits will be tracked under this task.
+
+   {if previous_task_id exists and differs from task_id}
+   ✓ Active task switched: {previous_task_id} → {task_id}
+     VSCode extension will be notified automatically
+   {/if}
    ```
 
-### Step 8: Output Summary
+### Step 9: Output Summary
 
 **If worktree mode:**
 ```
@@ -351,7 +383,7 @@ Quick Commands:
   • /task-review               Run code review
 ```
 
-### Step 9: Auto-Sync (if enabled)
+### Step 10: Auto-Sync (if enabled)
 
 Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 

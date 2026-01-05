@@ -84,6 +84,58 @@ export class SessionManager {
     return this.updateSession(sessionId, { taskId: newTaskId });
   }
 
+  /**
+   * Update a session's taskId when it switches to a different task via /task-start.
+   *
+   * This method is called by the signal handler when FileWatcher detects a
+   * task-switch-signal.json file. It atomically updates the session registry
+   * to keep it in sync with Claude's active task.
+   *
+   * Atomicity: Uses withLock() to prevent race conditions with other registry
+   * operations (session creation, closure, etc.)
+   *
+   * Idempotency: Safe to call multiple times with same taskId (no-op if already set)
+   *
+   * Error handling: Returns false if session not found, allowing caller to
+   * handle gracefully without throwing.
+   *
+   * @param sessionId - The session UUID to update
+   * @param newTaskId - The new task ID (e.g., LOCAL-018)
+   * @returns Promise<boolean> - true if update succeeded, false if session not found
+   */
+  async updateSessionTaskId(
+    sessionId: string,
+    newTaskId: string
+  ): Promise<boolean> {
+    return this.withLock(async () => {
+      const registry = await this.loadRegistryAsync();
+      const session = registry.sessions.find(s => s.id === sessionId);
+
+      if (!session) {
+        console.warn(`[AI Cockpit] Session ${sessionId} not found for task sync`);
+        return false;
+      }
+
+      const oldTaskId = session.taskId;
+
+      // Only update if taskId actually changed
+      if (oldTaskId === newTaskId) {
+        return true; // Already correct, no update needed
+      }
+
+      session.taskId = newTaskId;
+      session.lastActive = new Date().toISOString();
+      await this.saveRegistryAsync(registry);
+
+      console.log(
+        `[AI Cockpit] Session ${sessionId.substring(0, 8)}... task updated: ` +
+        `${oldTaskId} → ${newTaskId}`
+      );
+
+      return true;
+    });
+  }
+
   async deleteSession(sessionId: string): Promise<boolean> {
     return this.withLock(async () => {
       const registry = await this.loadRegistryAsync();
@@ -246,5 +298,119 @@ export class SessionManager {
       JSON.stringify(registry, null, 2),
       'utf8'
     );
+  }
+
+  /**
+   * Continuously verify that active sessions match active-task.json.
+   * This is a safety net in case signal files are missed.
+   *
+   * Checks every `intervalMs` (default 3000ms) and repairs mismatches automatically.
+   * Returns a disposable to stop verification.
+   *
+   * @param intervalMs - Polling interval in milliseconds (default 3000)
+   * @returns Disposable to stop verification
+   */
+  startContinuousVerification(intervalMs: number = 3000): { dispose: () => void } {
+    const verificationInterval = setInterval(async () => {
+      try {
+        await this.verifyAndRepairSessions();
+        await this.cleanupOldSignalFiles();
+      } catch (error) {
+        // Silent fail - don't spam logs on every poll
+        // Only log if actual repair happened
+      }
+    }, intervalMs);
+
+    console.log(
+      `[AI Cockpit] Started session verification (interval: ${intervalMs}ms)`
+    );
+
+    return {
+      dispose: () => {
+        clearInterval(verificationInterval);
+        console.log('[AI Cockpit] Stopped session verification');
+      }
+    };
+  }
+
+  /**
+   * Verify active sessions match active-task.json and repair mismatches.
+   * This is called periodically by startContinuousVerification().
+   */
+  private async verifyAndRepairSessions(): Promise<void> {
+    // Read active-task.json
+    const activeTaskPath = path.join(
+      path.dirname(this.sessionsPath),
+      'active-task.json'
+    );
+
+    if (!fs.existsSync(activeTaskPath)) {
+      // No active task, nothing to verify
+      return;
+    }
+
+    let activeTask: { taskId?: string } | null = null;
+    try {
+      const content = await fs.promises.readFile(activeTaskPath, 'utf8');
+      activeTask = JSON.parse(content);
+    } catch {
+      // File might be corrupted or being written, skip this cycle
+      return;
+    }
+
+    if (!activeTask?.taskId) {
+      return;
+    }
+
+    // Get all active sessions
+    const sessions = await this.getSessions();
+    const activeSessions = sessions.filter(s => s.status === 'active');
+
+    // Check each active session
+    for (const session of activeSessions) {
+      if (session.taskId !== activeTask.taskId) {
+        console.warn(
+          `[AI Cockpit] Session mismatch detected (verification). ` +
+          `Session ${session.id.substring(0, 8)}... assigned to ${session.taskId} ` +
+          `but active task is ${activeTask.taskId}`
+        );
+
+        // Repair the mismatch
+        const updated = await this.updateSessionTaskId(
+          session.id,
+          activeTask.taskId
+        );
+
+        if (updated) {
+          console.log(
+            `[AI Cockpit] Repaired session ${session.id.substring(0, 8)}... ` +
+            `via verification fallback`
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * Clean up signal files older than 60 seconds.
+   * Called periodically to prevent accumulation.
+   */
+  private async cleanupOldSignalFiles(): Promise<void> {
+    const signalPath = path.join(
+      path.dirname(this.sessionsPath),
+      'task-switch-signal.json'
+    );
+
+    try {
+      const stats = await fs.promises.stat(signalPath);
+      const ageMs = Date.now() - stats.mtimeMs;
+
+      if (ageMs > 60000) { // 60 seconds
+        await fs.promises.unlink(signalPath);
+        console.log('[AI Cockpit] Cleaned up old signal file');
+      }
+    } catch {
+      // File doesn't exist or error reading, ignore
+    }
   }
 }

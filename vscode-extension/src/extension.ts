@@ -11,7 +11,7 @@ import { DiffViewer } from './services/DiffViewer';
 import { ShadowManager } from './services/ShadowManager';
 import { SessionManager } from './services/SessionManager';
 import { registerCommands } from './commands';
-import { CockpitEvent, UNASSIGNED_TASK_ID } from './types';
+import { CockpitEvent, UNASSIGNED_TASK_ID, TaskColor, isValidTaskColor } from './types';
 import { Shadow } from './services/ShadowManager';
 import { safeJsonParseLine } from './utils/jsonUtils';
 import { getClaudeHistoryPath } from './utils/claudePaths';
@@ -34,6 +34,34 @@ export function getTerminalManager(): TerminalManager | undefined {
   return terminalManager;
 }
 
+/**
+ * Read task color from status.yaml file
+ */
+async function getTaskColorFromYaml(taskId: string, workspaceRoot: string): Promise<TaskColor | undefined> {
+  // Check all status directories
+  for (const status of ['in_progress', 'todo', 'done']) {
+    const statusPath = path.join(workspaceRoot, '.ai', 'tasks', status, taskId, 'status.yaml');
+    try {
+      const content = await fs.promises.readFile(statusPath, 'utf-8');
+      // Simple YAML parsing for color field
+      const colorMatch = content.match(/^color:\s*["']?([^"'\n]+)["']?/m);
+      if (colorMatch) {
+        const colorValue = colorMatch[1].trim();
+        if (isValidTaskColor(colorValue)) {
+          return colorValue;
+        }
+      }
+    } catch (err) {
+      // Only log non-ENOENT errors (file not found is expected)
+      const code = (err as NodeJS.ErrnoException).code;
+      if (code !== 'ENOENT') {
+        console.warn(`AI Cockpit: Failed to read color from ${statusPath}:`, code || err);
+      }
+    }
+  }
+  return undefined;
+}
+
 export function activate(context: vscode.ExtensionContext) {
   console.log('AI Cockpit extension activated');
 
@@ -41,6 +69,13 @@ export function activate(context: vscode.ExtensionContext) {
   if (!workspaceRoot) {
     return;
   }
+
+  // Clean up any stale signal files on startup
+  const signalPath = path.join(workspaceRoot, '.ai/cockpit/task-switch-signal.json');
+  fs.promises.unlink(signalPath).then(
+    () => console.log('AI Cockpit: Cleaned up stale signal file'),
+    () => { /* File doesn't exist, that's fine */ }
+  );
 
   // Initialize providers
   statusBar = new StatusBarProvider();
@@ -65,6 +100,12 @@ export function activate(context: vscode.ExtensionContext) {
     });
   }
 
+  // Start continuous verification (safety net for missed signals)
+  if (sessionManager) {
+    const verificationDisposable = sessionManager.startContinuousVerification(3000);
+    context.subscriptions.push(verificationDisposable);
+  }
+
   // Register tree view
   const treeView = vscode.window.createTreeView('aiCockpit.tasks', {
     treeDataProvider: taskTreeProvider,
@@ -82,6 +123,81 @@ export function activate(context: vscode.ExtensionContext) {
   // Connect file watcher to status bar
   fileWatcher.onActiveTaskChanged(task => {
     statusBar?.updateStatusBar(task);
+  });
+
+  /**
+   * Session Task Synchronization
+   *
+   * When a user runs /task-start within a Claude session, the task-start command
+   * writes a signal file that triggers this listener. We then update the session
+   * registry to match the new task, ensuring:
+   * - Resume operations open the correct session
+   * - Events are attributed to the correct task
+   * - UI shows sessions under the correct task tree
+   *
+   * This solves the session-task desync issue where sessions created for TASK-A
+   * never update when the user switches to TASK-B via /task-start.
+   */
+  fileWatcher.onTaskSwitched(async (signal) => {
+    if (!sessionManager) {
+      return;
+    }
+
+    console.log(
+      `AI Cockpit: Task switch detected: ${signal.previousTaskId} → ${signal.newTaskId}`
+    );
+
+    try {
+      // Find active sessions that belong to the previous task
+      const sessions = await sessionManager.getSessions();
+      const sessionsToUpdate = sessions.filter(
+        s => s.taskId === signal.previousTaskId && s.status === 'active'
+      );
+
+      if (sessionsToUpdate.length === 0) {
+        console.log(
+          `AI Cockpit: No active sessions found for ${signal.previousTaskId}, skipping sync`
+        );
+        return;
+      }
+
+      // Update each matching session
+      let updateCount = 0;
+      for (const session of sessionsToUpdate) {
+        // Check if terminal still exists (user might have closed it)
+        if (session.terminalId) {
+          const terminal = terminalManager?.getTerminal(session.terminalId);
+          if (!terminal) {
+            console.log(
+              `AI Cockpit: Skipping session ${session.id.substring(0, 8)}... ` +
+              `(terminal closed)`
+            );
+            continue;
+          }
+        }
+
+        const updated = await sessionManager.updateSessionTaskId(
+          session.id,
+          signal.newTaskId
+        );
+        if (updated) {
+          updateCount++;
+        }
+      }
+
+      console.log(
+        `AI Cockpit: Synced ${updateCount} session(s) from ${signal.previousTaskId} ` +
+        `to ${signal.newTaskId}`
+      );
+
+      // Refresh tree view to show updated task assignments
+      if (updateCount > 0 && taskTreeProvider) {
+        taskTreeProvider.refresh();
+      }
+    } catch (error) {
+      console.error('AI Cockpit: Error handling task switch:', error);
+      // Don't crash the extension - log and continue
+    }
   });
 
   // Start watching
@@ -387,8 +503,12 @@ export function activate(context: vscode.ExtensionContext) {
       // Generate unique terminal ID for correlation
       const terminalId = crypto.randomUUID();
 
+      // Get task color for terminal tab
+      const taskColor = await getTaskColorFromYaml(taskId, workspaceRoot);
+
       const terminal = vscode.window.createTerminal({
         name: `Cockpit: ${taskId}`,
+        color: taskColor ? new vscode.ThemeColor(taskColor) : undefined,
         env: {
           COCKPIT_TASK: taskId,
           COCKPIT_TERMINAL_ID: terminalId
@@ -494,9 +614,15 @@ export function activate(context: vscode.ExtensionContext) {
 
       const terminalId = crypto.randomUUID();
 
+      // Get task color for terminal tab (only for assigned tasks)
+      const taskColor = session.taskId !== UNASSIGNED_TASK_ID
+        ? await getTaskColorFromYaml(session.taskId, workspaceRoot)
+        : undefined;
+
       // Create terminal with COCKPIT_TASK set
       const terminal = vscode.window.createTerminal({
         name: `Cockpit: ${session.taskId}`,
+        color: taskColor ? new vscode.ThemeColor(taskColor) : undefined,
         env: {
           COCKPIT_TASK: session.taskId,
           COCKPIT_TERMINAL_ID: terminalId
@@ -768,9 +894,13 @@ export function activate(context: vscode.ExtensionContext) {
       // Generate unique terminal ID for correlation
       const terminalId = crypto.randomUUID();
 
+      // Get task color for terminal tab
+      const taskColor = await getTaskColorFromYaml(taskId, workspaceRoot);
+
       // Create terminal
       const terminal = vscode.window.createTerminal({
         name: `Cockpit: ${taskId}`,
+        color: taskColor ? new vscode.ThemeColor(taskColor) : undefined,
         env: {
           COCKPIT_TASK: taskId,
           COCKPIT_TERMINAL_ID: terminalId

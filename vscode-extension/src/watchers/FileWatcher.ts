@@ -1,11 +1,12 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { ActiveTask, CockpitEvent } from '../types';
+import { ActiveTask, CockpitEvent, TaskSwitchSignal } from '../types';
 
 export class CockpitFileWatcher implements vscode.Disposable {
   private activeTaskWatcher: vscode.FileSystemWatcher | undefined;
   private eventsWatcher: vscode.FileSystemWatcher | undefined;
+  private signalWatcher: vscode.FileSystemWatcher | undefined;
   private disposables: vscode.Disposable[] = [];
 
   private _onActiveTaskChanged = new vscode.EventEmitter<ActiveTask | null>();
@@ -13,6 +14,9 @@ export class CockpitFileWatcher implements vscode.Disposable {
 
   private _onEventAdded = new vscode.EventEmitter<CockpitEvent>();
   readonly onEventAdded = this._onEventAdded.event;
+
+  private _onTaskSwitched = new vscode.EventEmitter<TaskSwitchSignal>();
+  readonly onTaskSwitched = this._onTaskSwitched.event;
 
   constructor(private workspaceRoot: string) {}
 
@@ -39,7 +43,16 @@ export class CockpitFileWatcher implements vscode.Disposable {
 
     this.eventsWatcher.onDidCreate((uri) => this.loadEvent(uri.fsPath));
 
-    this.disposables.push(this.activeTaskWatcher, this.eventsWatcher);
+    // Watch task-switch-signal.json for task switches
+    const signalPattern = new vscode.RelativePattern(
+      cockpitPath,
+      'task-switch-signal.json'
+    );
+    this.signalWatcher = vscode.workspace.createFileSystemWatcher(signalPattern);
+    this.signalWatcher.onDidChange(() => this.handleTaskSwitch());
+    this.signalWatcher.onDidCreate(() => this.handleTaskSwitch());
+
+    this.disposables.push(this.activeTaskWatcher, this.eventsWatcher, this.signalWatcher);
 
     // Load initial state
     this.loadActiveTask();
@@ -136,9 +149,67 @@ export class CockpitFileWatcher implements vscode.Disposable {
     return null;
   }
 
+  private async handleTaskSwitch(): Promise<void> {
+    try {
+      const signal = await this.readTaskSwitchSignal();
+      if (signal) {
+        console.log(
+          `[AI Cockpit] Task switch detected: ${signal.previousTaskId} → ${signal.newTaskId}`
+        );
+        this._onTaskSwitched.fire(signal);
+
+        // Delete signal file after processing
+        await this.deleteSignalFile();
+      }
+    } catch (error) {
+      console.error('[AI Cockpit] Error handling task switch signal:', error);
+    }
+  }
+
+  private async readTaskSwitchSignal(): Promise<TaskSwitchSignal | null> {
+    const signalPath = path.join(
+      this.workspaceRoot,
+      '.ai',
+      'cockpit',
+      'task-switch-signal.json'
+    );
+
+    try {
+      const content = await fs.promises.readFile(signalPath, 'utf-8');
+      const signal = JSON.parse(content) as TaskSwitchSignal;
+
+      // Validate required fields
+      if (!signal.previousTaskId || !signal.newTaskId || signal.type !== 'task-switch') {
+        console.warn('[AI Cockpit] Invalid task-switch-signal format');
+        return null;
+      }
+
+      return signal;
+    } catch (error) {
+      // File might have been deleted already or doesn't exist
+      return null;
+    }
+  }
+
+  private async deleteSignalFile(): Promise<void> {
+    const signalPath = path.join(
+      this.workspaceRoot,
+      '.ai',
+      'cockpit',
+      'task-switch-signal.json'
+    );
+
+    try {
+      await fs.promises.unlink(signalPath);
+    } catch (error) {
+      // File already deleted, ignore
+    }
+  }
+
   dispose(): void {
     this._onActiveTaskChanged.dispose();
     this._onEventAdded.dispose();
+    this._onTaskSwitched.dispose();
     this.disposables.forEach(d => d.dispose());
   }
 }
