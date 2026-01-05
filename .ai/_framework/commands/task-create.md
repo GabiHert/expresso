@@ -232,6 +232,28 @@ Does this look right? Any changes needed?
 
 Iterate until user approves.
 
+### Step 6b: Select Task Color (Optional)
+
+Ask the user to optionally select a color for the task to help with visual identification:
+
+```
+TASK COLOR (optional)
+
+Select a color for this task to help identify it and its sessions:
+
+  1. Red      (charts.red)
+  2. Orange   (charts.orange)
+  3. Yellow   (charts.yellow)
+  4. Green    (charts.green)
+  5. Blue     (charts.blue)
+  6. Purple   (charts.purple)
+  7. None     (use default status-based colors)
+
+Choice (1-7, default: 7):
+```
+
+Store the selected color for use in status.yaml generation. If user presses Enter without selection, use "None" (no color).
+
 ### Step 7: Create Task Structure
 
 **7a. Create task directory:**
@@ -333,6 +355,9 @@ Use `/address-feedback` to discuss feedback with the agent.
 # Task Status Index
 task: "{ticket-id}"
 title: "{title}"
+{if color selected}
+color: "{selected-color}"  # e.g., charts.purple
+{/if}
 created: "{YYYY-MM-DD}"
 updated: "{YYYY-MM-DD}"
 
@@ -351,6 +376,8 @@ work_items:
     file: "todo/{id}-{slug}.md"
 {/for}
 ```
+
+**Note:** The `color` field is optional. Valid values are: `charts.red`, `charts.orange`, `charts.yellow`, `charts.green`, `charts.blue`, `charts.purple`. Only include the color field if the user selected one in Step 6b.
 
 **7e. Create work item files** in `todo/`:
 For each work item, create `{id}-{slug}.md`:
