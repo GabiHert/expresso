@@ -22,3 +22,4 @@ Tasks completed in this project, for reference and learning.
 | 2025-12-30 | [LOCAL-015](.ai/tasks/done/LOCAL-015/) | Delete Task Functionality - Context menu deletion with cleanup of events, shadows, sessions, and active task state |
 | 2025-12-30 | [LOCAL-016](.ai/tasks/done/LOCAL-016/) | Claude Permissions Flag - Added --allow-dangerously-skip-permissions to all Claude sessions with centralized command builder |
 | 2025-12-30 | [LOCAL-017](.ai/tasks/done/LOCAL-017/) | Session ID Race Condition Fix - Atomic captureAndRegisterSession() prevents concurrent captures from grabbing each other's IDs |
+| 2026-01-05 | [LOCAL-018](.ai/tasks/done/LOCAL-018/) | Task Color Support - Optional color palette for tasks (charts.red/orange/yellow/green/blue/purple), sessions inherit parent color, terminal tab colors, color picker in /task-create |

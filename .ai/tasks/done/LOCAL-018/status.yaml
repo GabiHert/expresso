@@ -1,6 +1,7 @@
 # Task Status Index
 task: "LOCAL-018"
 title: "Add Task Color Support"
+color: "charts.purple"
 created: "2025-12-30"
 updated: "2025-01-05"
 

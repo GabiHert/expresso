@@ -31,7 +31,7 @@
 |--------|-------|---------|
 | **In Progress** | 0 | - |
 | **Todo** | 0 | - |
-| **Recently Done** | 18 | EPIC-001 + LOCAL-001..017: AI Cockpit MVP v2 + Session Race Fix |
+| **Recently Done** | 18 | EPIC-001 + LOCAL-001..018: AI Cockpit MVP v2 + Task Colors |
 
 ## Quick Reference
 
