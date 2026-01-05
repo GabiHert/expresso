@@ -1,0 +1,285 @@
+<!--
+╔══════════════════════════════════════════════════════════════════╗
+║ WORK ITEM: 02-prism-vscode-theme.md                             ║
+║ TASK: LOCAL-019                                                  ║
+╠══════════════════════════════════════════════════════════════════╣
+║ WORKFLOW:                                                        ║
+║ 1. Move this file to in_progress/ when starting                 ║
+║ 2. Update status.yaml with new status                           ║
+║ 3. Complete ALL steps below                                      ║
+║ 4. Move to done/ when complete, update status.yaml              ║
+║ 5. Update task README with any learnings                        ║
+╚══════════════════════════════════════════════════════════════════╝
+-->
+
+---
+repo: vscode-extension
+---
+
+# Create VSCode-Compatible Prism Theme
+
+## Objective
+
+Create a custom Prism.js CSS theme that uses VSCode CSS variables for colors, ensuring syntax highlighting adapts to the user's current VSCode theme (dark/light).
+
+## Pre-Implementation
+
+Review existing theme integration in `diff-review.css`:
+- Lines 4-38: CSS variable definitions mapping VSCode tokens
+- Lines 158-232: diff2html color overrides
+
+## Implementation Steps
+
+### Step 1: Create Prism Theme CSS File
+
+**File**: `vscode-extension/media/prism-vscode.css`
+
+Create the file with the following content:
+
+```css
+/**
+ * Prism.js VSCode Theme
+ *
+ * Uses VSCode CSS variables for automatic theme adaptation.
+ * Tokens map to VSCode's semantic highlighting colors.
+ */
+
+/* ============================================================
+   BASE CODE STYLING
+   ============================================================ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: var(--vscode-editor-foreground);
+  background: none;
+  font-family: var(--vscode-editor-font-family, Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace);
+  font-size: var(--vscode-editor-font-size, 14px);
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: var(--vscode-editor-lineHeight, 1.5);
+  tab-size: 4;
+  hyphens: none;
+}
+
+/* ============================================================
+   TOKEN COLORS - Mapped to VSCode Theme Variables
+   ============================================================ */
+
+/* Comments - typically green/gray */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: var(--vscode-editorLineNumber-foreground, #6a9955);
+  font-style: italic;
+}
+
+/* Punctuation - same as foreground */
+.token.punctuation {
+  color: var(--vscode-editor-foreground);
+}
+
+/* Namespace - slightly dimmed */
+.token.namespace {
+  opacity: 0.7;
+}
+
+/* Strings, characters - typically orange/brown */
+.token.string,
+.token.char,
+.token.attr-value,
+.token.template-string {
+  color: var(--vscode-debugTokenExpression-string, #ce9178);
+}
+
+/* Numbers, booleans, constants - typically light green/cyan */
+.token.number,
+.token.boolean,
+.token.constant,
+.token.symbol {
+  color: var(--vscode-debugTokenExpression-number, #b5cea8);
+}
+
+/* Properties, tags - typically light blue */
+.token.property,
+.token.tag {
+  color: var(--vscode-symbolIcon-propertyForeground, #9cdcfe);
+}
+
+/* Selectors, attributes - typically yellow/gold */
+.token.selector,
+.token.attr-name {
+  color: var(--vscode-symbolIcon-colorForeground, #d7ba7d);
+}
+
+/* Keywords - typically blue/purple */
+.token.keyword,
+.token.atrule {
+  color: var(--vscode-debugTokenExpression-name, #569cd6);
+}
+
+/* Control flow keywords - typically purple/magenta */
+.token.control-flow,
+.token.keyword.control-flow {
+  color: var(--vscode-debugTokenExpression-name, #c586c0);
+}
+
+/* Functions, methods - typically yellow */
+.token.function,
+.token.method {
+  color: var(--vscode-symbolIcon-functionForeground, #dcdcaa);
+}
+
+/* Classes, types - typically green/teal */
+.token.class-name,
+.token.type,
+.token.builtin {
+  color: var(--vscode-symbolIcon-classForeground, #4ec9b0);
+}
+
+/* Operators - typically foreground or cyan */
+.token.operator,
+.token.entity,
+.token.url {
+  color: var(--vscode-editor-foreground);
+}
+
+/* Variables - typically light blue */
+.token.variable {
+  color: var(--vscode-symbolIcon-variableForeground, #9cdcfe);
+}
+
+/* Regex - typically red/pink */
+.token.regex {
+  color: var(--vscode-debugTokenExpression-value, #d16969);
+}
+
+/* Important, bold */
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+
+/* Italic */
+.token.italic {
+  font-style: italic;
+}
+
+/* Inserted text (green) */
+.token.inserted {
+  color: var(--vscode-gitDecoration-addedResourceForeground, #89d185);
+}
+
+/* Deleted text (red) */
+.token.deleted {
+  color: var(--vscode-gitDecoration-deletedResourceForeground, #f14c4c);
+}
+
+/* ============================================================
+   DIFF INTEGRATION - Preserve diff backgrounds
+   ============================================================ */
+
+/* Ensure tokens don't override diff line backgrounds */
+.d2h-code-line-ctn .token {
+  background: transparent !important;
+}
+
+.d2h-ins .token,
+.d2h-del .token {
+  background: transparent !important;
+}
+
+/* Ensure code is visible on diff backgrounds */
+.d2h-ins .d2h-code-line-ctn,
+.d2h-del .d2h-code-line-ctn {
+  /* Let tokens show their colors on top of diff backgrounds */
+}
+
+/* ============================================================
+   SELECTION - Match VSCode selection color
+   ============================================================ */
+
+code[class*="language-"]::selection,
+code[class*="language-"] *::selection,
+pre[class*="language-"]::selection,
+pre[class*="language-"] *::selection {
+  background: var(--vscode-editor-selectionBackground);
+}
+
+/* ============================================================
+   LANGUAGE-SPECIFIC OVERRIDES
+   ============================================================ */
+
+/* JSON keys */
+.language-json .token.property {
+  color: var(--vscode-symbolIcon-propertyForeground, #9cdcfe);
+}
+
+/* Markdown headings */
+.language-markdown .token.title {
+  color: var(--vscode-debugTokenExpression-name, #569cd6);
+  font-weight: bold;
+}
+
+/* Markdown links */
+.language-markdown .token.url {
+  color: var(--vscode-textLink-foreground, #3794ff);
+}
+
+/* CSS selectors */
+.language-css .token.selector {
+  color: var(--vscode-symbolIcon-colorForeground, #d7ba7d);
+}
+
+/* HTML tags */
+.language-html .token.tag {
+  color: var(--vscode-debugTokenExpression-name, #569cd6);
+}
+
+.language-html .token.attr-name {
+  color: var(--vscode-symbolIcon-propertyForeground, #9cdcfe);
+}
+
+.language-html .token.attr-value {
+  color: var(--vscode-debugTokenExpression-string, #ce9178);
+}
+```
+
+### Step 2: Verify File Placement
+
+Expected structure after:
+```
+media/
+├── vendor/
+│   ├── diff2html.min.js
+│   ├── diff2html.min.css
+│   └── prism.min.js
+├── diff-review.js
+├── diff-review.css
+└── prism-vscode.css          ← NEW
+```
+
+## Post-Implementation
+
+The CSS file will be loaded in work item 03 when updating the HTML template.
+
+## Acceptance Criteria
+
+- [ ] `prism-vscode.css` exists in `media/`
+- [ ] All token types have VSCode variable mappings
+- [ ] Diff background transparency rules are included
+- [ ] CSS is well-commented and organized
+
+## Testing
+
+Visual testing will happen in work item 05 after full integration.
+
+## Notes
+
+- VSCode CSS variables are automatically available in webviews
+- Fallback colors are provided for variables that might not exist
+- The `.d2h-*` rules ensure Prism tokens don't interfere with diff backgrounds
+- Theme switching is automatic - VSCode variables change when theme changes
