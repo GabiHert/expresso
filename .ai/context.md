@@ -29,8 +29,8 @@
 
 | Status | Count | Details |
 |--------|-------|---------|
-| **In Progress** | 0 | - |
-| **Todo** | 0 | - |
+| **In Progress** | 1 | LOCAL-020: Allow Session Assignment to TODO Tasks |
+| **Todo** | 1 | LOCAL-019 |
 | **Recently Done** | 18 | EPIC-001 + LOCAL-001..018: AI Cockpit MVP v2 + Task Colors |
 
 ## Quick Reference

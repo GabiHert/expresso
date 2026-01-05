@@ -1,0 +1,6 @@
+{
+  "timestamp": "'"$timestamp"'",
+  "previousTaskId": "LOCAL-021",
+  "newTaskId": "LOCAL-020",
+  "type": "task-switch"
+}
