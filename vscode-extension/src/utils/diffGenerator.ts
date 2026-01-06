@@ -14,6 +14,7 @@ export function generateUnifiedDiff(
     oldContent || '',
     newContent || '',
     'original',
-    'modified'
+    'modified',
+    { context: Infinity }
   );
 }
