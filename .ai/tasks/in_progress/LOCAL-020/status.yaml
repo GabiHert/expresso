@@ -6,13 +6,13 @@ updated: "2025-01-05"
 
 summary:
   total: 1
-  todo: 1
+  todo: 0
   in_progress: 0
-  done: 0
+  done: 1
 
 work_items:
   - id: "01"
     name: "Update linkSessionToTask command"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/01-update-link-session-command.md"
+    status: done
+    file: "done/01-update-link-session-command.md"
