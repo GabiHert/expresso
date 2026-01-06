@@ -78,6 +78,29 @@ export class SessionManager {
     });
   }
 
+  /**
+   * Import an existing session by ID.
+   * Creates a closed session that can be resumed later.
+   */
+  async importSession(
+    sessionId: string,
+    taskId: string,
+    label?: string
+  ): Promise<CockpitSession> {
+    const session: CockpitSession = {
+      id: sessionId,
+      taskId,
+      label: label || `Imported: ${sessionId.substring(0, 8)}...`,
+      createdAt: new Date().toISOString(),
+      lastActive: new Date().toISOString(),
+      status: 'closed',
+      terminalName: `Cockpit: ${taskId}`,
+      terminalId: undefined
+    };
+    await this.registerSession(session);
+    return session;
+  }
+
   async updateSession(
     sessionId: string,
     updates: Partial<CockpitSession>
@@ -233,53 +256,9 @@ export class SessionManager {
   }
 
   private async verifyAndRepairSessions(): Promise<void> {
-    if (!this.initialized) return;
-
-    const activeTaskPath = path.join(
-      this.workspaceRoot,
-      '.ai/cockpit/active-task.json'
-    );
-
-    if (!fs.existsSync(activeTaskPath)) {
-      return;
-    }
-
-    let activeTask: { taskId?: string } | null = null;
-    try {
-      const content = await fs.promises.readFile(activeTaskPath, 'utf8');
-      activeTask = JSON.parse(content);
-    } catch {
-      return;
-    }
-
-    if (!activeTask?.taskId) {
-      return;
-    }
-
-    const sessions = this.db.getAllSessions();
-    const activeSessions = sessions.filter(s => s.status === 'active');
-
-    for (const session of activeSessions) {
-      if (session.taskId !== activeTask.taskId) {
-        console.warn(
-          `[AI Cockpit] Session mismatch detected (verification). ` +
-          `Session ${session.id.substring(0, 8)}... assigned to ${session.taskId} ` +
-          `but active task is ${activeTask.taskId}`
-        );
-
-        const updated = await this.updateSessionTaskId(
-          session.id,
-          activeTask.taskId
-        );
-
-        if (updated) {
-          console.log(
-            `[AI Cockpit] Repaired session ${session.id.substring(0, 8)}... ` +
-            `via verification fallback`
-          );
-        }
-      }
-    }
+    // This method is intentionally empty - sessions should only be assigned
+    // to tasks at creation time, not via background auto-assignment.
+    // Keeping the method for potential future validation/cleanup logic.
   }
 
   private async cleanupOldSignalFiles(): Promise<void> {

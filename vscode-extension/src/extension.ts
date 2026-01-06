@@ -15,6 +15,9 @@ import { CockpitEvent, UNASSIGNED_TASK_ID, TaskColor, isValidTaskColor } from '.
 import { Shadow } from './services/ShadowManager';
 import { safeJsonParseLine } from './utils/jsonUtils';
 import { getClaudeHistoryPath } from './utils/claudePaths';
+
+// UUID regex for detecting session IDs in input
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 import { TerminalManager } from './services/TerminalManager';
 import { DiffReviewPanel } from './panels/DiffReviewPanel';
 import { CommentManager } from './services/CommentManager';
@@ -891,16 +894,34 @@ export async function activate(context: vscode.ExtensionContext) {
       }
       console.log(`AI Cockpit: newSession for taskId: ${taskId}`);
 
-      // Prompt for session label
-      const label = await vscode.window.showInputBox({
-        prompt: 'Session label (optional)',
-        placeHolder: 'e.g., Bug fix, Feature work, Testing'
+      // Prompt for session label or UUID
+      const input = await vscode.window.showInputBox({
+        prompt: 'Session label or existing session ID',
+        placeHolder: 'e.g., Bug fix, or paste a session UUID to import'
       });
 
       // User cancelled the input
-      if (label === undefined) {
+      if (input === undefined) {
         return;
       }
+
+      // Check if input is a UUID - import existing session instead of creating new
+      if (UUID_REGEX.test(input)) {
+        if (!sessionManager) {
+          vscode.window.showErrorMessage('Session manager not initialized');
+          return;
+        }
+
+        const imported = await sessionManager.importSession(input, taskId);
+        taskTreeProvider?.refresh();
+        vscode.window.showInformationMessage(
+          `Session ${input.substring(0, 8)}... imported to ${taskId}`
+        );
+        return;
+      }
+
+      // Not a UUID - treat as label and continue with existing flow
+      const label = input;
 
       // Generate unique terminal ID for correlation
       const terminalId = crypto.randomUUID();
@@ -969,16 +990,34 @@ export async function activate(context: vscode.ExtensionContext) {
   const startSession = vscode.commands.registerCommand(
     'aiCockpit.startSession',
     async () => {
-      // Prompt for session label
-      const label = await vscode.window.showInputBox({
-        prompt: 'Session label (optional)',
-        placeHolder: 'e.g., Exploration, Research, Debugging'
+      // Prompt for session label or UUID
+      const input = await vscode.window.showInputBox({
+        prompt: 'Session label or existing session ID',
+        placeHolder: 'e.g., Exploration, or paste a session UUID to import'
       });
 
       // User cancelled the input
-      if (label === undefined) {
+      if (input === undefined) {
         return;
       }
+
+      // Check if input is a UUID - import existing session as unassigned
+      if (UUID_REGEX.test(input)) {
+        if (!sessionManager) {
+          vscode.window.showErrorMessage('Session manager not initialized');
+          return;
+        }
+
+        const imported = await sessionManager.importSession(input, UNASSIGNED_TASK_ID);
+        taskTreeProvider?.refresh();
+        vscode.window.showInformationMessage(
+          `Session ${input.substring(0, 8)}... imported as unassigned`
+        );
+        return;
+      }
+
+      // Not a UUID - treat as label and continue with existing flow
+      const label = input;
 
       // Generate unique terminal ID for correlation
       const terminalId = crypto.randomUUID();
