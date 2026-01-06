@@ -6,23 +6,23 @@ updated: "2026-01-06"
 
 summary:
   total: 3
-  todo: 3
+  todo: 0
   in_progress: 0
-  done: 0
+  done: 3
 
 work_items:
   - id: "01"
     name: "Add importSession method to SessionManager"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/01-import-session-method.md"
+    status: done
+    file: "done/01-import-session-method.md"
   - id: "02"
     name: "Add UUID detection to newSession command"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/02-uuid-detection-new-session.md"
+    status: done
+    file: "done/02-uuid-detection-new-session.md"
   - id: "03"
     name: "Add UUID detection to startSession command"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/03-uuid-detection-start-session.md"
+    status: done
+    file: "done/03-uuid-detection-start-session.md"
