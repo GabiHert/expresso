@@ -257,12 +257,22 @@ export class DiffReviewPanel {
     const diff2htmlJs = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, 'media', 'vendor', 'diff2html.min.js')
     );
+    const prismJs = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'media', 'vendor', 'prism.min.js')
+    );
+    const prismCss = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'media', 'prism-vscode.css')
+    );
     const scriptUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, 'media', 'diff-review.js')
     );
     const styleUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, 'media', 'diff-review.css')
     );
+
+    // Add cache-busting parameter to force reload of JavaScript
+    const cacheBuster = Date.now();
+    const scriptUriWithCache = `${scriptUri}?v=${cacheBuster}`;
 
     const nonce = this._getNonce();
 
@@ -273,6 +283,7 @@ export class DiffReviewPanel {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
   <link href="${diff2htmlCss}" rel="stylesheet">
+  <link href="${prismCss}" rel="stylesheet">
   <link href="${styleUri}" rel="stylesheet">
   <title>Review: ${this._escapeHtml(path.basename(this._shadow.meta.filePath))}</title>
 </head>
@@ -287,7 +298,8 @@ export class DiffReviewPanel {
     </div>
   </div>
   <script nonce="${nonce}" src="${diff2htmlJs}"></script>
-  <script nonce="${nonce}" src="${scriptUri}"></script>
+  <script nonce="${nonce}" src="${prismJs}"></script>
+  <script nonce="${nonce}" src="${scriptUriWithCache}"></script>
 </body>
 </html>`;
   }

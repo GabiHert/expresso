@@ -624,13 +624,16 @@ class ShadowFileItem extends vscode.TreeItem {
     this.description = descParts.join(' ');
 
     // Click action: DiffReviewPanel for in_progress, native diff otherwise
+    console.log(`[ShadowFileItem] taskId=${taskId}, taskStatus="${taskStatus}", comparison=${taskStatus === 'in_progress'}`);
     if (taskStatus === 'in_progress') {
+      console.log(`[ShadowFileItem] Assigning openDiffReview command for ${shadow.meta.filePath}`);
       this.command = {
         command: 'aiCockpit.openDiffReview',
         title: 'Review Changes',
         arguments: [shadow]
       };
     } else {
+      console.log(`[ShadowFileItem] Assigning showFullDiff command for ${shadow.meta.filePath}`);
       this.command = {
         command: 'aiCockpit.showFullDiff',
         title: 'Show Full Diff',

@@ -5,6 +5,9 @@
 (function() {
   'use strict';
 
+  console.log('[DEBUG] diff-review.js starting execution');
+  console.log('[DEBUG] Prism available at script start:', typeof Prism !== 'undefined');
+
   // Get VSCode API
   const vscode = acquireVsCodeApi();
 
@@ -28,6 +31,200 @@
       comments,
       scrollPosition: window.scrollY
     });
+  }
+
+  /**
+   * Detect programming language from file path
+   * @param {string} filePath - Path to the file
+   * @returns {string|null} - Prism language identifier or null
+   */
+  function detectLanguage(filePath) {
+    if (!filePath) return null;
+
+    const ext = filePath.split('.').pop()?.toLowerCase();
+    const filename = filePath.split('/').pop()?.toLowerCase();
+
+    // Handle special filenames first
+    const filenameMap = {
+      'dockerfile': 'docker',
+      'makefile': 'makefile',
+      'gemfile': 'ruby',
+      'rakefile': 'ruby',
+      '.bashrc': 'bash',
+      '.zshrc': 'bash',
+      '.gitignore': 'git',
+    };
+
+    if (filenameMap[filename]) {
+      return filenameMap[filename];
+    }
+
+    // Map extensions to Prism language identifiers
+    const extensionMap = {
+      // JavaScript/TypeScript
+      'js': 'javascript',
+      'mjs': 'javascript',
+      'cjs': 'javascript',
+      'jsx': 'jsx',
+      'ts': 'typescript',
+      'tsx': 'tsx',
+
+      // Web
+      'html': 'html',
+      'htm': 'html',
+      'css': 'css',
+      'scss': 'scss',
+      'sass': 'sass',
+      'less': 'less',
+
+      // Data formats
+      'json': 'json',
+      'yaml': 'yaml',
+      'yml': 'yaml',
+      'xml': 'xml',
+      'toml': 'toml',
+
+      // Python
+      'py': 'python',
+      'pyw': 'python',
+      'pyx': 'python',
+
+      // Go
+      'go': 'go',
+
+      // Rust
+      'rs': 'rust',
+
+      // Java/JVM
+      'java': 'java',
+      'kt': 'kotlin',
+      'kts': 'kotlin',
+      'scala': 'scala',
+      'groovy': 'groovy',
+
+      // C family
+      'c': 'c',
+      'h': 'c',
+      'cpp': 'cpp',
+      'cc': 'cpp',
+      'cxx': 'cpp',
+      'hpp': 'cpp',
+      'hxx': 'cpp',
+      'cs': 'csharp',
+
+      // Other languages
+      'php': 'php',
+      'rb': 'ruby',
+      'swift': 'swift',
+      'r': 'r',
+      'lua': 'lua',
+      'pl': 'perl',
+      'pm': 'perl',
+
+      // Shell
+      'sh': 'bash',
+      'bash': 'bash',
+      'zsh': 'bash',
+      'fish': 'bash',
+      'ps1': 'powershell',
+
+      // Database
+      'sql': 'sql',
+
+      // Documentation
+      'md': 'markdown',
+      'markdown': 'markdown',
+      'rst': 'rest',
+
+      // Config
+      'ini': 'ini',
+      'conf': 'ini',
+      'cfg': 'ini',
+      'env': 'bash',
+
+      // Docker/DevOps
+      'dockerfile': 'docker',
+    };
+
+    return extensionMap[ext] || null;
+  }
+
+  /**
+   * Apply Prism.js syntax highlighting to diff code lines
+   * @param {string} filePath - Path to determine language
+   */
+  function highlightDiffCode(filePath) {
+    console.log('[DEBUG] highlightDiffCode called');
+    console.log('[DEBUG] filePath:', filePath);
+    console.log('[DEBUG] Prism available:', typeof Prism !== 'undefined');
+
+    // Check if Prism is available
+    if (typeof Prism === 'undefined') {
+      console.warn('Prism.js not loaded, skipping syntax highlighting');
+      return;
+    }
+
+    const language = detectLanguage(filePath);
+    console.log('[DEBUG] Detected language:', language);
+
+    if (!language) {
+      console.log('Unknown language for file:', filePath);
+      return;
+    }
+
+    // Check if Prism has the grammar for this language
+    if (!Prism.languages[language]) {
+      console.warn(`Prism language not available: ${language}`);
+      return;
+    }
+
+    // Select all code content elements from diff2html
+    const codeLines = document.querySelectorAll('.d2h-code-line-ctn');
+    console.log('[DEBUG] Found code lines:', codeLines.length);
+
+    codeLines.forEach(el => {
+      const code = el.textContent;
+
+      // Skip empty lines or lines with only whitespace
+      if (!code || !code.trim()) {
+        return;
+      }
+
+      try {
+        // Highlight the code using Prism
+        const highlighted = Prism.highlight(
+          code,
+          Prism.languages[language],
+          language
+        );
+
+        // Validate Prism output before using
+        if (!highlighted || typeof highlighted !== 'string') {
+          throw new Error(`Prism.highlight returned invalid output: got ${typeof highlighted}`);
+        }
+
+        // Additional safety: Validate HTML structure
+        const temp = document.createElement('div');
+        temp.innerHTML = highlighted;
+
+        // Verify only safe elements exist (spans with class attributes)
+        const unsafeElements = temp.querySelectorAll(':not(span)');
+        if (unsafeElements.length > 0) {
+          console.warn('Prism output contained unexpected elements, using plain text');
+          el.textContent = code;
+          return;
+        }
+
+        // Replace innerHTML with validated highlighted version
+        el.innerHTML = highlighted;
+      } catch (error) {
+        // If highlighting fails for a line, preserve original text
+        console.warn('Failed to highlight line:', error);
+        el.textContent = code;
+      }
+    });
+
+    console.log(`Syntax highlighting applied: ${language}`);
   }
 
   // Notify extension we're ready
@@ -54,11 +251,21 @@
       case 'loadDiff':
         showLoading();
         currentData = message.data;
-        // Small delay to allow loading state to render
-        requestAnimationFrame(() => {
-          renderDiff(message.data);
-          saveState();
-        });
+        console.log('[DEBUG] loadDiff message received');
+        // Wait for Prism to load before rendering to ensure syntax highlighting works
+        function renderWhenReady() {
+          console.log('[DEBUG] renderWhenReady - Prism available:', typeof Prism !== 'undefined');
+          if (typeof Prism !== 'undefined') {
+            console.log('[DEBUG] Prism loaded, rendering diff');
+            renderDiff(message.data);
+            saveState();
+          } else {
+            // Prism not loaded yet, retry after a short delay
+            console.log('[DEBUG] Prism not ready, polling again in 50ms');
+            setTimeout(renderWhenReady, 50);
+          }
+        }
+        renderWhenReady();
         break;
       case 'themeChanged':
         updateTheme(message.theme);
@@ -82,6 +289,8 @@
    * Render the diff content using diff2html
    */
   function renderDiff(data) {
+    console.log('[DEBUG] renderDiff called');
+    console.log('[DEBUG] data.filePath:', data.filePath);
     const container = document.getElementById('diff-container');
 
     // Clean up old event handlers before re-rendering
@@ -117,6 +326,12 @@
       });
 
       container.innerHTML = diffHtml;
+
+      // Apply syntax highlighting to code lines
+      // DOM is settled immediately after synchronous innerHTML assignment
+      console.log('[DEBUG] About to call highlightDiffCode from renderDiff');
+      highlightDiffCode(data.filePath);
+      console.log('[DEBUG] highlightDiffCode returned');
 
       // Calculate and update stats
       const additions = (data.unifiedDiff.match(/^\+[^+]/gm) || []).length;
@@ -619,7 +834,20 @@
   };
 
   // Render cached data if available (for restored sessions)
+  // Wait for Prism to load before rendering to ensure syntax highlighting works
+  function initializeWithState() {
+    if (previousState && previousState.currentData) {
+      if (typeof Prism !== 'undefined') {
+        renderDiff(previousState.currentData);
+      } else {
+        // Prism not loaded yet, retry after a short delay
+        setTimeout(initializeWithState, 50);
+      }
+    }
+  }
+
+  // Start the initialization check
   if (previousState && previousState.currentData) {
-    renderDiff(previousState.currentData);
+    initializeWithState();
   }
 })();

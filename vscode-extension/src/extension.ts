@@ -63,7 +63,7 @@ async function getTaskColorFromYaml(taskId: string, workspaceRoot: string): Prom
 }
 
 export function activate(context: vscode.ExtensionContext) {
-  console.log('AI Cockpit extension activated');
+  console.log('🔍 AI Cockpit extension activated - DEBUG VERSION 2026-01-06-v2');
 
   const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!workspaceRoot) {
@@ -1029,27 +1029,40 @@ export function activate(context: vscode.ExtensionContext) {
     'aiCockpit.linkSessionToTask',
     async (sessionItem: { session?: { id: string; label: string; taskId: string } }) => {
       const session = sessionItem?.session;
-      if (!session?.id || !sessionManager) {
+      if (!session?.id || !sessionManager || !workspaceRoot) {
         return;
       }
 
-      // Get list of in-progress tasks
-      const inProgressPath = path.join(workspaceRoot, '.ai/tasks/in_progress');
-      let taskIds: string[] = [];
-      try {
-        const entries = await fs.promises.readdir(inProgressPath, { withFileTypes: true });
-        taskIds = entries.filter(e => e.isDirectory()).map(e => e.name);
-      } catch {
-        // No in_progress directory
+      // Get list of tasks from in_progress and todo directories
+      const tasksPath = path.join(workspaceRoot, '.ai/tasks');
+      const tasksByStatus: { taskId: string; status: string }[] = [];
+
+      for (const status of ['in_progress', 'todo']) {
+        const statusPath = path.join(tasksPath, status);
+        try {
+          const entries = await fs.promises.readdir(statusPath, { withFileTypes: true });
+          const tasks = entries.filter(e => e.isDirectory()).map(e => e.name);
+          tasks.forEach(taskId => tasksByStatus.push({ taskId, status }));
+        } catch (error) {
+          // Only ignore ENOENT (directory not found)
+          if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+            console.warn(`AI Cockpit: Error reading task directory ${statusPath}:`, error);
+          }
+        }
       }
 
-      if (taskIds.length === 0) {
-        vscode.window.showWarningMessage('No in-progress tasks to link to');
+      if (tasksByStatus.length === 0) {
+        vscode.window.showWarningMessage('No tasks available to link to');
         return;
       }
 
       // Show quick pick
-      const selectedTask = await vscode.window.showQuickPick(taskIds, {
+      const quickPickItems = tasksByStatus.map(({ taskId, status }) => ({
+        label: taskId,
+        description: status.replace('_', ' ')  // "in_progress" -> "in progress"
+      }));
+
+      const selectedTask = await vscode.window.showQuickPick(quickPickItems, {
         placeHolder: 'Select a task to link this session to'
       });
 
@@ -1057,14 +1070,14 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      const linked = await sessionManager.linkSessionToTask(session.id, selectedTask);
+      const linked = await sessionManager.linkSessionToTask(session.id, selectedTask.label);
       if (linked) {
         taskTreeProvider?.refresh();
         vscode.window.showInformationMessage(
-          `Session "${session.label}" linked to ${selectedTask}`
+          `Session "${session.label}" linked to ${selectedTask.label}`
         );
       } else {
-        vscode.window.showWarningMessage('Session not found');
+        vscode.window.showWarningMessage('Failed to link session. The task may have been deleted.');
       }
     }
   );
@@ -1130,8 +1143,13 @@ export function activate(context: vscode.ExtensionContext) {
   const showFullDiff = vscode.commands.registerCommand(
     'aiCockpit.showFullDiff',
     async (arg: unknown) => {
+      console.log('[showFullDiff] Command called with arg:', arg);
       const shadow = extractShadow(arg);
-      if (shadow) await diffViewer?.showFullDiff(shadow);
+      console.log('[showFullDiff] Extracted shadow:', shadow ? shadow.meta.filePath : 'null');
+      if (shadow) {
+        console.log('[showFullDiff] Opening native diff for', shadow.meta.filePath);
+        await diffViewer?.showFullDiff(shadow);
+      }
     }
   );
 
@@ -1154,7 +1172,9 @@ export function activate(context: vscode.ExtensionContext) {
   const openDiffReview = vscode.commands.registerCommand(
     'aiCockpit.openDiffReview',
     async (arg: unknown) => {
+      console.log('[openDiffReview] Command called with arg:', arg);
       const shadow = extractShadow(arg);
+      console.log('[openDiffReview] Extracted shadow:', shadow ? shadow.meta.filePath : 'null');
       if (!shadow) {
         vscode.window.showWarningMessage('No shadow data provided');
         return;
@@ -1163,6 +1183,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showErrorMessage('CommentManager not initialized');
         return;
       }
+      console.log('[openDiffReview] Opening DiffReviewPanel for', shadow.meta.filePath);
       DiffReviewPanel.createOrShow(context.extensionUri, shadow, commentManager);
     }
   );
