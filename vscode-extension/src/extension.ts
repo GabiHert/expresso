@@ -62,7 +62,7 @@ async function getTaskColorFromYaml(taskId: string, workspaceRoot: string): Prom
   return undefined;
 }
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   console.log('🔍 AI Cockpit extension activated - DEBUG VERSION 2026-01-06-v2');
 
   const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
@@ -85,6 +85,17 @@ export function activate(context: vscode.ExtensionContext) {
   terminalManager = new TerminalManager();
   commentManager = new CommentManager(workspaceRoot);
   context.subscriptions.push({ dispose: () => commentManager?.dispose() });
+
+  // Initialize session database (must complete before other operations)
+  try {
+    await sessionManager.initialize();
+    console.log('AI Cockpit: Session database initialized');
+  } catch (error) {
+    console.error('AI Cockpit: Failed to initialize session database:', error);
+    vscode.window.showErrorMessage(
+      'AI Cockpit: Failed to initialize session database. Some features may not work.'
+    );
+  }
 
   // Initialize task tree provider
   taskTreeProvider = new TaskTreeProvider(fileWatcher, shadowManager, sessionManager, commentManager);
@@ -766,8 +777,8 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(deleteSession);
 
-  // Create cockpit cleanup service
-  const cockpitCleanupService = new CockpitCleanupService(workspaceRoot);
+  // Create cockpit cleanup service (pass sessionManager for proper cleanup)
+  const cockpitCleanupService = new CockpitCleanupService(workspaceRoot, sessionManager);
 
   // Register delete task command
   const deleteTask = vscode.commands.registerCommand(
@@ -1261,7 +1272,18 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(openFeedbackFile);
 }
 
-export function deactivate() {
+export async function deactivate() {
+  // Close database first (saves pending changes)
+  if (sessionManager) {
+    try {
+      await sessionManager.close();
+      console.log('AI Cockpit: Session database closed');
+    } catch (error) {
+      console.error('AI Cockpit: Error closing session database:', error);
+    }
+  }
+
+  // Then dispose other resources
   fileWatcher?.dispose();
   statusBar?.dispose();
   terminalManager?.dispose();

@@ -4,9 +4,7 @@
  * These tests verify the cleanup functionality for task deletion.
  * They use a temporary directory to avoid affecting real data.
  *
- * To run these tests, you'll need to set up a test runner like Mocha.
- * For now, these serve as documentation of expected behavior and can be
- * run manually or integrated into a test suite later.
+ * Updated for SQLite-based SessionManager.
  */
 
 import * as assert from 'assert';
@@ -14,6 +12,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { CockpitCleanupService } from '../../services/CockpitCleanupService';
+import { SessionManager } from '../../services/SessionManager';
 
 /**
  * Helper to create a temporary test directory
@@ -38,14 +37,18 @@ async function cleanupTestWorkspace(testDir: string): Promise<void> {
 // Test Suite: CockpitCleanupService
 describe('CockpitCleanupService', () => {
   let testDir: string;
+  let sessionManager: SessionManager;
   let service: CockpitCleanupService;
 
   beforeEach(async () => {
     testDir = await createTestWorkspace();
-    service = new CockpitCleanupService(testDir);
+    sessionManager = new SessionManager(testDir);
+    await sessionManager.initialize();
+    service = new CockpitCleanupService(testDir, sessionManager);
   });
 
   afterEach(async () => {
+    await sessionManager.close();
     await cleanupTestWorkspace(testDir);
   });
 
@@ -94,19 +97,41 @@ describe('CockpitCleanupService', () => {
       assert.strictEqual(fs.existsSync(shadowsDir), false);
     });
 
-    it('should remove task from sessions.json', async () => {
+    it('should remove task sessions from database', async () => {
       const taskId = 'TEST-001';
-      const sessionsPath = path.join(testDir, '.ai/cockpit/sessions.json');
 
-      // Setup: Create sessions.json with multiple sessions
-      const sessions = {
-        sessions: [
-          { id: 'session-1', taskId: 'TEST-001', label: 'Session 1' },
-          { id: 'session-2', taskId: 'TEST-002', label: 'Session 2' },
-          { id: 'session-3', taskId: 'TEST-001', label: 'Session 3' }
-        ]
-      };
-      await fs.promises.writeFile(sessionsPath, JSON.stringify(sessions));
+      // Setup: Register sessions using SessionManager
+      await sessionManager.registerSession({
+        id: 'session-1',
+        taskId: 'TEST-001',
+        label: 'Session 1',
+        createdAt: new Date().toISOString(),
+        lastActive: new Date().toISOString(),
+        status: 'active',
+        terminalName: 'Test Terminal 1'
+      });
+      await sessionManager.registerSession({
+        id: 'session-2',
+        taskId: 'TEST-002',
+        label: 'Session 2',
+        createdAt: new Date().toISOString(),
+        lastActive: new Date().toISOString(),
+        status: 'active',
+        terminalName: 'Test Terminal 2'
+      });
+      await sessionManager.registerSession({
+        id: 'session-3',
+        taskId: 'TEST-001',
+        label: 'Session 3',
+        createdAt: new Date().toISOString(),
+        lastActive: new Date().toISOString(),
+        status: 'active',
+        terminalName: 'Test Terminal 3'
+      });
+
+      // Verify setup
+      const beforeSessions = await sessionManager.getSessions();
+      assert.strictEqual(beforeSessions.length, 3);
 
       // Execute
       const result = await service.cleanupTask(taskId);
@@ -114,10 +139,9 @@ describe('CockpitCleanupService', () => {
       // Verify
       assert.strictEqual(result.success, true);
 
-      const updatedContent = await fs.promises.readFile(sessionsPath, 'utf8');
-      const updated = JSON.parse(updatedContent);
-      assert.strictEqual(updated.sessions.length, 1);
-      assert.strictEqual(updated.sessions[0].taskId, 'TEST-002');
+      const afterSessions = await sessionManager.getSessions();
+      assert.strictEqual(afterSessions.length, 1);
+      assert.strictEqual(afterSessions[0].taskId, 'TEST-002');
     });
 
     it('should handle missing directories gracefully', async () => {
@@ -177,10 +201,6 @@ describe('CockpitCleanupService', () => {
 
   describe('path traversal prevention', () => {
     it('should not access directories outside allowed paths', async () => {
-      // This test verifies that path traversal attempts are blocked.
-      // The actual protection is in isValidPath(), which validates
-      // that resolved paths stay within allowed directories.
-
       // Try a malicious taskId that attempts path traversal
       const maliciousTaskId = '../../../etc';
 
@@ -189,11 +209,6 @@ describe('CockpitCleanupService', () => {
       const result = await service.cleanupTask(maliciousTaskId);
 
       // The cleanup should fail validation for events/shadows
-      // because the path would resolve outside the allowed directory
-      // Note: The actual behavior depends on the path resolution
-      // In practice, isValidPath prevents the operation
-
-      // At minimum, verify the operation completed without throwing
       assert.ok(result !== undefined);
     });
   });
