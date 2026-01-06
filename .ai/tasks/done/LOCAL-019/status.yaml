@@ -6,37 +6,37 @@ updated: "2026-01-05"
 
 summary:
   total: 5
-  todo: 5
+  todo: 0
   in_progress: 0
-  done: 0
+  done: 5
 
 work_items:
   - id: "01"
     name: "Add Prism.js vendor files"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/01-add-prism-vendor.md"
+    status: done
+    file: "done/01-add-prism-vendor.md"
 
   - id: "02"
     name: "Create VSCode-compatible Prism theme"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/02-prism-vscode-theme.md"
+    status: done
+    file: "done/02-prism-vscode-theme.md"
 
   - id: "03"
     name: "Update DiffReviewPanel HTML template"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/03-update-html-template.md"
+    status: done
+    file: "done/03-update-html-template.md"
 
   - id: "04"
     name: "Implement syntax highlighting in diff-review.js"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/04-implement-highlighting.md"
+    status: done
+    file: "done/04-implement-highlighting.md"
 
   - id: "05"
     name: "Test and verify highlighting"
     repo: "vscode-extension"
-    status: todo
-    file: "todo/05-test-verify.md"
+    status: done
+    file: "done/05-test-verify.md"

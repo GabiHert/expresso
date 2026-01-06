@@ -29,9 +29,9 @@
 
 | Status | Count | Details |
 |--------|-------|---------|
-| **In Progress** | 2 | LOCAL-020: Allow Session Assignment to TODO Tasks, LOCAL-019: Add Syntax Highlighting to Diff Review Panel |
+| **In Progress** | 1 | LOCAL-020: Allow Session Assignment to TODO Tasks |
 | **Todo** | 0 | - |
-| **Recently Done** | 18 | EPIC-001 + LOCAL-001..018: AI Cockpit MVP v2 + Task Colors |
+| **Recently Done** | 19 | EPIC-001 + LOCAL-001..019: AI Cockpit MVP v2 + Task Colors + Syntax Highlighting |
 
 ## Quick Reference
 
