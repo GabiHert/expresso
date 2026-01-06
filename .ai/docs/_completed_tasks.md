@@ -26,3 +26,4 @@ Tasks completed in this project, for reference and learning.
 | 2026-01-06 | [LOCAL-019](.ai/tasks/done/LOCAL-019/) | Syntax Highlighting - Added Prism.js syntax highlighting to diff review panel with support for TypeScript, JavaScript, Python, Go, JSON, YAML, CSS, Bash, SQL and more |
 | 2026-01-06 | [LOCAL-020](.ai/tasks/done/LOCAL-020/) | Session TODO Assignment - Allow assigning unassigned sessions to TODO tasks (not just in-progress), showing task status in quick pick |
 | 2026-01-06 | [LOCAL-021](.ai/tasks/done/LOCAL-021/) | Signal File Session Sync (abandoned) - Implemented signal file approach for session tracking but still had issues; pivoted to SQLite approach in LOCAL-023 |
+| 2026-01-06 | [LOCAL-022](.ai/tasks/done/LOCAL-022/) | Full-file diff as default view - Added `{ context: Infinity }` to diffGenerator.ts so diff review panel shows entire file with changes highlighted instead of limited context |
