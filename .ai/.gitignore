@@ -1,5 +1,6 @@
 # Cockpit - ignore all transient session data
 cockpit/active-task.json
 cockpit/sessions.json
+cockpit/sessions.db
 cockpit/events/
 cockpit/shadows/
