@@ -1,0 +1,125 @@
+# Task Status Index
+#
+# ╔══════════════════════════════════════════════════════════════════╗
+# ║ LAYER: TASK                                                      ║
+# ║ STATUS: Auto-managed - Updated by framework commands            ║
+# ╠══════════════════════════════════════════════════════════════════╣
+# ║ This file tracks all work items for quick reference.             ║
+# ║ Files live in todo/, in_progress/, done/ folders.               ║
+# ║ Commands update this file when moving work items.                ║
+# ╚══════════════════════════════════════════════════════════════════╝
+
+task: "PEOCM-823"
+title: "Use position public_id instead of code in entity transfers"
+created: "2025-12-29"
+updated: "2026-01-05"
+
+# Summary counts (auto-updated)
+summary:
+  total: 16
+  todo: 0
+  in_progress: 0
+  done: 16
+
+# Work items list
+work_items:
+  - id: "01"
+    name: "Update transfer_resources to return public_id"
+    repo: "backend"
+    status: done
+    file: "done/01-update-transfer-resources-public-id.md"
+
+  - id: "02"
+    name: "Add new_position_public_id column"
+    repo: "peo"
+    status: done
+    file: "done/02-add-position-public-id-column.md"
+
+  - id: "03"
+    name: "Migrate existing new_job_code data"
+    repo: "peo"
+    status: done
+    file: "done/03-migrate-job-code-to-public-id.md"
+
+  - id: "04"
+    name: "Drop new_job_code and finalize schema"
+    repo: "peo"
+    status: done
+    file: "done/04-drop-job-code-column.md"
+
+  - id: "05"
+    name: "Update backend types and validation"
+    repo: "backend"
+    status: done
+    file: "done/05-update-backend-types-validation.md"
+
+  - id: "06"
+    name: "Update CheckUnderwritingStep for public_id"
+    repo: "backend"
+    status: done
+    file: "done/06-update-check-underwriting-step.md"
+
+  - id: "07"
+    name: "Update ForceCompleteUnderwritingStep for public_id"
+    repo: "backend"
+    status: done
+    file: "done/07-update-force-complete-underwriting-step.md"
+
+  - id: "08"
+    name: "Update SanityCheckResourcesExist for public_id"
+    repo: "backend"
+    status: done
+    file: "done/08-update-sanity-check-resources-step.md"
+
+  - id: "09"
+    name: "Update CreateContractStep to resolve public_id"
+    repo: "backend"
+    status: done
+    file: "done/09-update-create-contract-step.md"
+
+  - id: "10"
+    name: "Update EntityTransferClientService for public_id"
+    repo: "backend"
+    status: done
+    file: "done/10-update-entity-transfer-client-service.md"
+
+  - id: "11"
+    name: "Convert data migration to post-deployment"
+    repo: "peo"
+    status: done
+    file: "done/11-convert-migrate-to-post-deployment.md"
+    pr_feedback: "marco-galvao-deel"
+
+  - id: "12"
+    name: "Convert finalize schema migration to post-deployment"
+    repo: "peo"
+    status: done
+    file: "done/12-convert-finalize-to-post-deployment.md"
+    pr_feedback: "marco-galvao-deel"
+
+  - id: "13"
+    name: "Add affected rows count to migration comment"
+    repo: "peo"
+    status: done
+    file: "done/13-add-affected-rows-comment.md"
+    pr_feedback: "marco-galvao-deel"
+
+  - id: "14"
+    name: "Remove unnecessary data migration"
+    repo: "peo"
+    status: done
+    file: "done/14-remove-unnecessary-data-migration.md"
+
+  - id: "15"
+    name: "Fix column deprecation to follow Deel pattern"
+    repo: "peo"
+    status: done
+    file: "done/15-fix-column-deprecation-pattern.md"
+    pr_feedback: "marco-galvao-deel"
+
+  - id: "16"
+    name: "Drop new_job_code column directly (not _old pattern)"
+    repo: "peo"
+    status: done
+    file: "done/16-drop-column-directly.md"
+    pr_feedback: "marco-galvao-deel"

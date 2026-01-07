@@ -86,7 +86,29 @@ Work on a specific work item from the current task. This command guides you thro
    - Commit conventions
    - Available MCPs
 
-2. Find the current task:
+2. **EXTENSION CHECK (MANDATORY)**:
+   ```
+   ┌─────────────────────────────────────────────────────────────────┐
+   │ CHECK FOR PROJECT EXTENSION                                     │
+   │                                                                 │
+   │ Look for: .ai/_project/commands/task-work.extend.md            │
+   │                                                                 │
+   │ If file EXISTS:                                                 │
+   │   1. Read the extension file completely                         │
+   │   2. Parse and extract these sections:                          │
+   │      • Context     → Add to orientation announcements           │
+   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
+   │      • Step Overrides → Replace matching steps                  │
+   │      • Agents      → Use specified agents for phases            │
+   │      • Post-Hooks  → Execute AFTER final step                   │
+   │   3. Announce: "✓ Project Extension Active"                     │
+   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
+   │                                                                 │
+   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
+   └─────────────────────────────────────────────────────────────────┘
+   ```
+
+3. Find the current task:
    - Look in `.ai/tasks/in_progress/`
    - If no task found, say: "No task in progress. Use /task-start to begin a task."
    - If multiple tasks found, list them and ask which one to work on:

@@ -84,6 +84,28 @@ When no repository is specified, the command automatically:
 
 2. Read `.ai/INDEX.md` to see existing documentation and avoid duplicates.
 
+3. **EXTENSION CHECK (MANDATORY)**:
+   ```
+   ┌─────────────────────────────────────────────────────────────────┐
+   │ CHECK FOR PROJECT EXTENSION                                     │
+   │                                                                 │
+   │ Look for: .ai/_project/commands/document.extend.md             │
+   │                                                                 │
+   │ If file EXISTS:                                                 │
+   │   1. Read the extension file completely                         │
+   │   2. Parse and extract these sections:                          │
+   │      • Context     → Add to orientation announcements           │
+   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
+   │      • Step Overrides → Replace matching steps                  │
+   │      • Agents      → Use specified agents for phases            │
+   │      • Post-Hooks  → Execute AFTER final step                   │
+   │   3. Announce: "✓ Project Extension Active"                     │
+   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
+   │                                                                 │
+   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
+   └─────────────────────────────────────────────────────────────────┘
+   ```
+
 ### Step 1: Parse Request
 
 **If topic and location provided:**

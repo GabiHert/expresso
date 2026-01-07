@@ -56,7 +56,29 @@ Mark a task as done, log it to history, and move it to the done folder. This pre
    - Notification settings
    - Available MCPs (for notifications)
 
-2. Announce:
+2. **EXTENSION CHECK (MANDATORY)**:
+   ```
+   ┌─────────────────────────────────────────────────────────────────┐
+   │ CHECK FOR PROJECT EXTENSION                                     │
+   │                                                                 │
+   │ Look for: .ai/_project/commands/task-done.extend.md            │
+   │                                                                 │
+   │ If file EXISTS:                                                 │
+   │   1. Read the extension file completely                         │
+   │   2. Parse and extract these sections:                          │
+   │      • Context     → Add to orientation announcements           │
+   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
+   │      • Step Overrides → Replace matching steps                  │
+   │      • Agents      → Use specified agents for phases            │
+   │      • Post-Hooks  → Execute AFTER final step                   │
+   │   3. Announce: "✓ Project Extension Active"                     │
+   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
+   │                                                                 │
+   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
+   └─────────────────────────────────────────────────────────────────┘
+   ```
+
+3. Announce:
 ```
 ╔══════════════════════════════════════════════════════════════════╗
 ║ COMPLETING TASK                                                  ║
@@ -148,13 +170,50 @@ If the file has the placeholder row `| _No tasks completed yet_ | | |`, remove i
 ║ LOCATION: .ai/tasks/done/{task-id}/                             ║
 ```
 
-### Step 6: Update Context
+### Step 6: Deactivate Cockpit Tracking
+
+Deactivate cockpit tracking for the completed task:
+
+1. Check if `.ai/cockpit/active-task.json` exists:
+   ```bash
+   test -f .ai/cockpit/active-task.json
+   ```
+
+2. **If file exists**, read the taskId:
+   ```bash
+   cat .ai/cockpit/active-task.json | jq -r '.taskId'
+   ```
+
+3. **If taskId matches current task**:
+   - Delete the file:
+     ```bash
+     rm .ai/cockpit/active-task.json
+     ```
+   - Announce:
+     ```
+     Cockpit: Task {task-id} tracking stopped
+     ```
+
+4. **If taskId does NOT match current task**:
+   - Warn:
+     ```
+     Warning: Active task is {other-task-id}, not {current-task-id}.
+     The active task file will not be modified.
+     ```
+   - Continue without deleting (different task is active)
+
+5. **If file doesn't exist**:
+   - Continue silently (task wasn't being tracked via cockpit)
+
+**Note**: Events in `.ai/cockpit/events/{task-id}/` are preserved for historical reference.
+
+### Step 7: Update Context
 
 Update `.ai/context.md`:
 - Remove task from "In Progress" in Current State section
 - Add to "Recently Done" count
 
-### Step 7: Offer Documentation
+### Step 8: Offer Documentation
 
 If significant patterns were discovered:
 ```
@@ -175,7 +234,7 @@ If user chooses to document:
 - Create appropriate documentation file
 - Update INDEX.md with new entry
 
-### Step 8: Send Notification
+### Step 9: Send Notification
 
 If `notifications.on_task_done` is true in manifest and notification MCP is available:
 
@@ -188,7 +247,7 @@ Send notification with:
 - Summary: {user's summary}
 - Type: success
 
-### Step 9: Output Summary
+### Step 10: Output Summary
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
@@ -215,7 +274,7 @@ Next Steps:
   • /help                Show commands
 ```
 
-### Step 10: Auto-Sync (if enabled)
+### Step 11: Auto-Sync (if enabled)
 
 Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 

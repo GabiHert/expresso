@@ -82,12 +82,34 @@ project/
 
 ### Step 0: Orientation
 
-Announce:
-```
-╔══════════════════════════════════════════════════════════════════╗
-║ AI-SYNC                                                          ║
-╚══════════════════════════════════════════════════════════════════╝
-```
+1. **EXTENSION CHECK (MANDATORY)**:
+   ```
+   ┌─────────────────────────────────────────────────────────────────┐
+   │ CHECK FOR PROJECT EXTENSION                                     │
+   │                                                                 │
+   │ Look for: .ai/_project/commands/ai-sync.extend.md              │
+   │                                                                 │
+   │ If file EXISTS:                                                 │
+   │   1. Read the extension file completely                         │
+   │   2. Parse and extract these sections:                          │
+   │      • Context     → Add to orientation announcements           │
+   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
+   │      • Step Overrides → Replace matching steps                  │
+   │      • Agents      → Use specified agents for phases            │
+   │      • Post-Hooks  → Execute AFTER final step                   │
+   │   3. Announce: "✓ Project Extension Active"                     │
+   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
+   │                                                                 │
+   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
+   └─────────────────────────────────────────────────────────────────┘
+   ```
+
+2. Announce:
+   ```
+   ╔══════════════════════════════════════════════════════════════════╗
+   ║ AI-SYNC                                                          ║
+   ╚══════════════════════════════════════════════════════════════════╝
+   ```
 
 ### Step 1: Detect Mode and Verify Setup
 

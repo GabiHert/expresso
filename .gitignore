@@ -1,0 +1,22 @@
+# Project files (not part of framework)
+CLAUDE.md
+README.md
+
+# Git worktrees for isolated task work
+worktrees/
+
+# AI cockpit files
+.ai/cockpit/
+
+./accounting
+./benefits
+./backend
+./peo
+./playwright-automation
+./employment
+./time-off
+./payments
+./accounting
+./eor-experience
+./frontend
+./admin

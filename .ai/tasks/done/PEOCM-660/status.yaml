@@ -1,0 +1,116 @@
+task:
+  id: PEOCM-660
+  title: Entity Transfer Tables and Repository Implementation
+  jira: https://letsdeel.atlassian.net/browse/PEOCM-660
+  status: done
+  created: 2025-12-17
+  started: 2025-12-17
+  completed: 2025-12-29
+  repos:
+    - backend
+    - peo
+
+branches:
+  backend: PEOCM-660-entity-transfer-tables
+  peo: PEOCM-660-entity-transfer-tables
+
+work_items:
+  - id: "01"
+    name: PEO database migrations
+    repo: peo
+    status: done
+
+  - id: "02"
+    name: PEO Sequelize models
+    repo: peo
+    status: done
+
+  - id: "03"
+    name: PEO EntityTransferService
+    repo: peo
+    status: done
+
+  - id: "04"
+    name: PEO EntityTransferController
+    repo: peo
+    status: done
+
+  - id: "05"
+    name: Backend EntityTransferClientService
+    repo: backend
+    status: done
+
+  - id: "06"
+    name: Backend EntityTransferRepository update
+    repo: backend
+    status: done
+
+  - id: "07"
+    name: Backend tech ops GET endpoints
+    repo: backend
+    status: done
+
+  - id: "08"
+    name: Unit tests
+    repo: backend, peo
+    status: done
+
+  - id: "10"
+    name: Fix new_employment_payroll_setting_id type (UUID → TEXT)
+    repo: peo
+    status: done
+    file: done/10-fix-payroll-setting-id-type.md
+
+  - id: "11"
+    name: Fix new_pto_policy_id type (VARCHAR → UUID)
+    repo: peo
+    status: done
+    file: done/11-fix-pto-policy-id-type.md
+
+  - id: "12"
+    name: Fix new_work_location_id type (VARCHAR → UUID)
+    repo: peo
+    status: done
+    file: done/12-fix-work-location-id-type.md
+
+  - id: "13"
+    name: Fix new_contract_oid type (VARCHAR(100) → VARCHAR(20))
+    repo: peo
+    status: done
+    file: done/13-fix-contract-oid-type.md
+
+  - id: "14"
+    name: Fix requester_profile_public_id type (INTEGER → UUID)
+    repo: peo
+    status: done
+    file: done/14-fix-requester-profile-public-id-type.md
+
+  - id: "15"
+    name: Fix effectiveDate Zod validation type mismatch
+    repo: backend
+    status: done
+    file: done/15-fix-effective-date-zod-validation.md
+
+  - id: "16"
+    name: Change initial transfer status from DRAFT to PENDING_SIGNATURES
+    repo: peo
+    status: done
+    file: done/16-change-initial-transfer-status.md
+
+  - id: "17"
+    name: Fix handleResumeMode error handling (500 → 404)
+    repo: backend
+    status: done
+    file: done/17-fix-resume-mode-error-handling.md
+
+  - id: "09"
+    name: End-to-end testing
+    repo: backend, peo
+    status: done
+    file: done/09-end-to-end-testing.md
+
+  - id: "18"
+    name: Fix entity transfer step tests (effectiveDate type)
+    repo: backend
+    status: done
+    file: done/18-fix-entity-transfer-step-tests.md

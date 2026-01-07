@@ -67,7 +67,29 @@ Start a task by moving it from todo to in_progress, reading the task context, an
    - Commit conventions
    - Worktree conventions (if `--worktree` flag used)
 
-2. Announce:
+2. **EXTENSION CHECK (MANDATORY)**:
+   ```
+   ┌─────────────────────────────────────────────────────────────────┐
+   │ CHECK FOR PROJECT EXTENSION                                     │
+   │                                                                 │
+   │ Look for: .ai/_project/commands/task-start.extend.md           │
+   │                                                                 │
+   │ If file EXISTS:                                                 │
+   │   1. Read the extension file completely                         │
+   │   2. Parse and extract these sections:                          │
+   │      • Context     → Add to orientation announcements           │
+   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
+   │      • Step Overrides → Replace matching steps                  │
+   │      • Agents      → Use specified agents for phases            │
+   │      • Post-Hooks  → Execute AFTER final step                   │
+   │   3. Announce: "✓ Project Extension Active"                     │
+   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
+   │                                                                 │
+   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
+   └─────────────────────────────────────────────────────────────────┘
+   ```
+
+3. Announce:
 ```
 ╔══════════════════════════════════════════════════════════════════╗
 ║ STARTING TASK                                                    ║
@@ -240,7 +262,99 @@ Would you like me to create these branches now? (y/n)
 Update `.ai/context.md`:
 - Move task from "Todo" to "In Progress" in Current State section
 
-### Step 7: Output Summary
+### Step 7: Activate Cockpit Tracking
+
+Activate cockpit tracking for the task:
+
+1. Ensure `.ai/cockpit/` directory exists:
+   ```bash
+   mkdir -p .ai/cockpit/events
+   ```
+
+2. Check if another task is already active:
+   ```bash
+   cat .ai/cockpit/active-task.json 2>/dev/null | jq -r '.taskId'
+   ```
+
+   **If another task is active**, warn:
+   ```
+   Warning: Task {existing-task-id} is already active.
+   Options:
+     1. Switch to {new-task-id} (replaces active)
+     2. Cancel
+
+   Choice? (1/2)
+   ```
+
+   If user chooses 1, continue. If 2, abort task-start.
+
+3. Get current git branch:
+   ```bash
+   git branch --show-current 2>/dev/null || echo "unknown"
+   ```
+
+4. Generate sessionId (timestamp-based):
+   ```bash
+   date +%s%N | md5sum | head -c 12
+   ```
+
+5. Capture previous task ID for signal file:
+   ```bash
+   # Capture previous task ID for signal file
+   previous_task_id=""
+   if [ -f .ai/cockpit/active-task.json ]; then
+     previous_task_id=$(jq -r '.taskId // empty' .ai/cockpit/active-task.json 2>/dev/null)
+   fi
+   ```
+
+6. Write `active-task.json` atomically:
+   ```bash
+   # Write to temp file first
+   cat > .ai/cockpit/active-task.json.tmp << 'EOF'
+   {
+     "taskId": "{task-id}",
+     "title": "{task-title}",
+     "branch": "{current-git-branch}",
+     "frameworkPath": ".ai/tasks/in_progress/{task-id}",
+     "startedAt": "{ISO-timestamp}",
+     "sessionId": "{generated-session-id}"
+   }
+   EOF
+
+   # Atomic rename
+   mv .ai/cockpit/active-task.json.tmp .ai/cockpit/active-task.json
+   ```
+
+7. Write task-switch-signal to trigger VSCode sync:
+   ```bash
+   # Write task-switch-signal to trigger VSCode sync
+   if [ -n "$previous_task_id" ] && [ "$previous_task_id" != "$task_id" ]; then
+     cat > .ai/cockpit/task-switch-signal.json.tmp << EOF
+   {
+     "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+     "previousTaskId": "$previous_task_id",
+     "newTaskId": "$task_id",
+     "type": "task-switch"
+   }
+   EOF
+
+     # Atomic rename to trigger FileWatcher
+     mv .ai/cockpit/task-switch-signal.json.tmp .ai/cockpit/task-switch-signal.json
+   fi
+   ```
+
+8. Announce activation:
+   ```
+   Cockpit: Task {task-id} is now active
+   All edits will be tracked under this task.
+
+   {if previous_task_id exists and differs from task_id}
+   ✓ Active task switched: {previous_task_id} → {task_id}
+     VSCode extension will be notified automatically
+   {/if}
+   ```
+
+### Step 9: Output Summary
 
 **If worktree mode:**
 ```
@@ -291,7 +405,7 @@ Quick Commands:
   • /task-review               Run code review
 ```
 
-### Step 8: Auto-Sync (if enabled)
+### Step 10: Auto-Sync (if enabled)
 
 Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 
