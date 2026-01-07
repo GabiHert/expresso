@@ -57,12 +57,34 @@ Read and address feedback comments left on task diffs. This command reads the `f
    - Available repositories
    - Project context
 
-2. Announce:
-```
-╔══════════════════════════════════════════════════════════════════╗
-║ ADDRESS FEEDBACK                                                 ║
-╚══════════════════════════════════════════════════════════════════╝
-```
+2. **EXTENSION CHECK (MANDATORY)**:
+   ```
+   ┌─────────────────────────────────────────────────────────────────┐
+   │ CHECK FOR PROJECT EXTENSION                                     │
+   │                                                                 │
+   │ Look for: .ai/_project/commands/address-feedback.extend.md     │
+   │                                                                 │
+   │ If file EXISTS:                                                 │
+   │   1. Read the extension file completely                         │
+   │   2. Parse and extract these sections:                          │
+   │      • Context     → Add to orientation announcements           │
+   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
+   │      • Step Overrides → Replace matching steps                  │
+   │      • Agents      → Use specified agents for phases            │
+   │      • Post-Hooks  → Execute AFTER final step                   │
+   │   3. Announce: "✓ Project Extension Active"                     │
+   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
+   │                                                                 │
+   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
+   └─────────────────────────────────────────────────────────────────┘
+   ```
+
+3. Announce:
+   ```
+   ╔══════════════════════════════════════════════════════════════════╗
+   ║ ADDRESS FEEDBACK                                                 ║
+   ╚══════════════════════════════════════════════════════════════════╝
+   ```
 
 ### Step 1: Resolve Task ID
 
