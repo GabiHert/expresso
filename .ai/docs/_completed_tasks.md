@@ -211,6 +211,23 @@
 
 ---
 
+## 2026-01-07: PEOCM-823 - Use position public_id instead of code in entity transfers
+
+**Repos affected**: backend, peo
+**JIRA**: [PEOCM-823](https://letsdeel.atlassian.net/browse/PEOCM-823)
+
+**Summary**: Replaced job_code with position public_id in entity transfer workflow, updated types, validation, and all related steps.
+
+**Key changes**:
+- Updated transfer_resources to return public_id instead of code
+- Added new_position_public_id column to entity_transfers table
+- Updated backend types, validation, and all entity transfer steps
+- Removed new_job_code column after migration
+
+**Work Items**: 16 completed
+
+---
+
 ## 2025-12-17: PEOCM-661-5 - Change basePeoContractId to basePeoContractOid
 
 **Repos affected**: backend, peo

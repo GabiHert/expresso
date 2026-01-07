@@ -39,9 +39,9 @@
 
 | Status | Count | Details |
 |--------|-------|---------|
-| **In Progress** | 2 | PEOCM-660: Entity Transfer Tables (needs testing), PEOCM-819: Fix HiBob HRIS sync |
+| **In Progress** | 1 | PEOCM-660: Entity Transfer Tables (needs testing) |
 | **Todo** | 0 | - |
-| **Recently Done** | 1 | PEOCM-792-3: Fix Transfer Resources Endpoint Bugs |
+| **Recently Done** | 2 | PEOCM-823: Use position public_id, PEOCM-792-3: Fix Transfer Resources Endpoint Bugs |
 
 ## Quick Reference
 
