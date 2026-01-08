@@ -1,0 +1,30 @@
+# Task Status Index
+task: "LOCAL-016"
+title: "Add --allow-dangerously-skip-permissions to Claude sessions"
+created: "2025-12-30"
+updated: "2025-12-30"
+
+summary:
+  total: 3
+  todo: 0
+  in_progress: 0
+  done: 3
+
+work_items:
+  - id: "WI-01"
+    name: "Create Claude command builder helper"
+    repo: "vscode-extension"
+    status: done
+    file: "done/WI-01-claude-command-builder.md"
+
+  - id: "WI-02"
+    name: "Update all Claude launch points"
+    repo: "vscode-extension"
+    status: done
+    file: "done/WI-02-update-launch-points.md"
+
+  - id: "WI-03"
+    name: "Verify changes work correctly"
+    repo: "vscode-extension"
+    status: done
+    file: "done/WI-03-verify-changes.md"

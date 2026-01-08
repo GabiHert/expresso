@@ -67,7 +67,29 @@ Create a new task with work items organized by repository. This command explores
    - Commit message patterns
    - Available MCPs
 
-2. Announce:
+2. **EXTENSION CHECK (MANDATORY)**:
+   ```
+   ┌─────────────────────────────────────────────────────────────────┐
+   │ CHECK FOR PROJECT EXTENSION                                     │
+   │                                                                 │
+   │ Look for: .ai/_project/commands/task-create.extend.md          │
+   │                                                                 │
+   │ If file EXISTS:                                                 │
+   │   1. Read the extension file completely                         │
+   │   2. Parse and extract these sections:                          │
+   │      • Context     → Add to orientation announcements           │
+   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
+   │      • Step Overrides → Replace matching steps                  │
+   │      • Agents      → Use specified agents for phases            │
+   │      • Post-Hooks  → Execute AFTER final step                   │
+   │   3. Announce: "✓ Project Extension Active"                     │
+   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
+   │                                                                 │
+   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
+   └─────────────────────────────────────────────────────────────────┘
+   ```
+
+3. Announce:
 ```
 ╔══════════════════════════════════════════════════════════════════╗
 ║ TASK CREATION                                                    ║
@@ -232,6 +254,28 @@ Does this look right? Any changes needed?
 
 Iterate until user approves.
 
+### Step 6b: Select Task Color (Optional)
+
+Ask the user to optionally select a color for the task to help with visual identification:
+
+```
+TASK COLOR (optional)
+
+Select a color for this task to help identify it and its sessions:
+
+  1. Red      (charts.red)
+  2. Orange   (charts.orange)
+  3. Yellow   (charts.yellow)
+  4. Green    (charts.green)
+  5. Blue     (charts.blue)
+  6. Purple   (charts.purple)
+  7. None     (use default status-based colors)
+
+Choice (1-7, default: 7):
+```
+
+Store the selected color for use in status.yaml generation. If user presses Enter without selection, use "None" (no color).
+
 ### Step 7: Create Task Structure
 
 **7a. Create task directory:**
@@ -241,6 +285,7 @@ Iterate until user approves.
 - `todo/`
 - `in_progress/`
 - `done/`
+- `feedback/`
 
 **7c. Create README.md** (from `_framework/templates/task-readme.md`, include diagrams from Step 5):
 ```markdown
@@ -317,6 +362,11 @@ See `status.yaml` for full index.
 
 {testing approach from planning}
 
+## Feedback
+
+Review comments can be added to `feedback/diff-review.md`.
+Use `/address-feedback` to discuss feedback with the agent.
+
 ## References
 
 - Related docs: ...
@@ -327,6 +377,9 @@ See `status.yaml` for full index.
 # Task Status Index
 task: "{ticket-id}"
 title: "{title}"
+{if color selected}
+color: "{selected-color}"  # e.g., charts.purple
+{/if}
 created: "{YYYY-MM-DD}"
 updated: "{YYYY-MM-DD}"
 
@@ -345,6 +398,8 @@ work_items:
     file: "todo/{id}-{slug}.md"
 {/for}
 ```
+
+**Note:** The `color` field is optional. Valid values are: `charts.red`, `charts.orange`, `charts.yellow`, `charts.green`, `charts.blue`, `charts.purple`. Only include the color field if the user selected one in Step 6b.
 
 **7e. Create work item files** in `todo/`:
 For each work item, create `{id}-{slug}.md`:
@@ -405,6 +460,22 @@ After completing, run a **code review agent** to check for issues.
 {any additional context or warnings}
 ```
 
+**7f. Create feedback file:**
+Copy the feedback template to the task's feedback folder:
+```
+.ai/_framework/templates/feedback-template.md → .ai/tasks/todo/{ticket-id}/feedback/diff-review.md
+```
+
+If the template doesn't exist, create a minimal feedback file:
+```markdown
+# Diff Feedback
+
+Add your feedback below using the format:
+
+### path/to/file.ts:42
+Your comment here
+```
+
 ### Step 8: Update Context
 
 Update `.ai/context.md` to reflect the new task in "Current State" section.
@@ -430,11 +501,40 @@ Next Steps:
   1. Review the task README: .ai/tasks/todo/{ticket-id}/README.md
   2. Run /task-start {ticket-id} to begin working
   3. Or run /task-status to see all tasks
+  • If session is unassigned, use "Link to Task" in Cockpit sidebar
 
 Quick Commands:
   • /task-start {ticket-id}     Begin this task
   • /task-status                View dashboard
 ```
+
+### Step 9.5: Link Current Session (if applicable)
+
+If running in a Cockpit session that is unassigned, offer to link it to the new task:
+
+1. Check if there's an active unassigned session:
+   - Look for terminal with `COCKPIT_TERMINAL_ID` env var but no `COCKPIT_TASK`
+   - Or check `.ai/cockpit/sessions.json` for active sessions with `taskId: "_unassigned"`
+
+2. If an unassigned session is found, ask:
+   ```
+   LINK SESSION
+
+   You're working in an unassigned session. Link it to {ticket-id}?
+
+   This will associate your current session history with the new task.
+
+   Link session? (y/n)
+   ```
+
+3. If yes, update the session:
+   - Update session's taskId from "_unassigned" to new task ID
+   - Refresh the Cockpit tree view
+
+4. If no, continue without linking.
+
+**Note**: This step requires the AI Cockpit VSCode extension. When running outside
+VSCode or without the extension, this step is skipped silently.
 
 ### Step 10: Auto-Sync (if enabled)
 

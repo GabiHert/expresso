@@ -1,32 +1,43 @@
-<!--
-╔══════════════════════════════════════════════════════════════════╗
-║ LAYER: DOMAIN                                                    ║
-║ LOCATION: .ai/docs/_architecture/                               ║
-╠══════════════════════════════════════════════════════════════════╣
-║ System-level architecture documentation.                         ║
-║ Document high-level system design and component interactions.    ║
-╚══════════════════════════════════════════════════════════════════╝
--->
+# Architecture Documentation
 
-# System Architecture
+System-level architecture and design decisions for AI Cockpit.
 
-This directory contains high-level architecture documentation.
+## Overview
+
+AI Cockpit is a VSCode extension for monitoring and managing AI agents. The system consists of:
+
+```
++------------------+     +-----------------+     +------------------+
+|   Claude Code    |---->|   JSON Files    |<----|  VSCode Panel    |
+|   + Hooks        |     | (.ai/cockpit/)  |     |  (read-only)     |
++------------------+     +-----------------+     +------------------+
+```
+
+## Core Components
+
+### 1. ai-framework (Core)
+The task management framework with commands, templates, and agent behavior definitions.
+
+### 2. vscode-extension (UI)
+The VSCode extension providing:
+- Task status panel
+- Diff history viewer
+- Real-time agent monitoring
+
+## Key Design Decisions
+
+### File-Based Communication
+Using JSON files in `.ai/cockpit/` for IPC between Claude Code and the extension:
+- Simple, no external dependencies
+- Watchable via VSCode file system APIs
+- Persists across sessions
+
+### Claude Code Hooks
+Leveraging Claude Code's hook system to capture:
+- Edit tool calls (with old_string/new_string)
+- Write tool calls (new files)
+- Task status changes
 
 ## Contents
 
-| Document | Description |
-|----------|-------------|
-| [overview.md](./overview.md) | High-level architecture, service map, technologies |
-
-## What Belongs Here
-
-- System overview diagrams
-- Component interaction flows
-- Data flow documentation
-- Integration architecture
-- Deployment architecture
-
-## See Also
-
-- [INDEX.md](../INDEX.md) - Navigation hub
-- [_shared/](../_shared/) - Cross-cutting patterns
+_Add architecture documentation as the system evolves._

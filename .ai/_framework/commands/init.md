@@ -76,15 +76,37 @@ Set up the three-layer AI task framework for a new project. This command gathers
 
 ### Step 0: Orientation
 
-Check that the `.ai/_framework/` directory exists (the framework has been copied to the project).
+1. Check that the `.ai/_framework/` directory exists (the framework has been copied to the project).
 
-If NOT found:
-```
-Framework not found. Please copy the .ai/ directory from the ai-framework
-repository to your project first, then run /init again.
-```
+   If NOT found:
+   ```
+   Framework not found. Please copy the .ai/ directory from the ai-framework
+   repository to your project first, then run /init again.
+   ```
 
-If found, announce:
+2. **EXTENSION CHECK (MANDATORY)**:
+   ```
+   ┌─────────────────────────────────────────────────────────────────┐
+   │ CHECK FOR PROJECT EXTENSION                                     │
+   │                                                                 │
+   │ Look for: .ai/_project/commands/init.extend.md                 │
+   │                                                                 │
+   │ If file EXISTS:                                                 │
+   │   1. Read the extension file completely                         │
+   │   2. Parse and extract these sections:                          │
+   │      • Context     → Add to orientation announcements           │
+   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
+   │      • Step Overrides → Replace matching steps                  │
+   │      • Agents      → Use specified agents for phases            │
+   │      • Post-Hooks  → Execute AFTER final step                   │
+   │   3. Announce: "✓ Project Extension Active"                     │
+   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
+   │                                                                 │
+   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
+   └─────────────────────────────────────────────────────────────────┘
+   ```
+
+3. If framework found, announce:
 ```
 ╔══════════════════════════════════════════════════════════════════╗
 ║ AI TASK FRAMEWORK - INITIALIZATION                               ║

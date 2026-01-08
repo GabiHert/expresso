@@ -14,34 +14,24 @@
 
 | Field | Value |
 |-------|-------|
-| **Project** | Deel Platform |
-| **Description** | Global HR and payroll platform with PEO, EOR, and contractor management services |
-| **Root** | /Users/gabriel.herter/Documents/Projects/deel |
+| **Project** | AI Cockpit |
+| **Description** | VSCode extension for monitoring and managing AI agents - real-time task tracking, diff history, and agent orchestration |
+| **Root** | /Users/gabriel.herter/Documents/Personal/ai-framework |
 
 ## Repositories
 
 | Repo | Path | Tech |
 |------|------|------|
-| backend | ./backend | javascript, typescript, express, sequelize, postgresql, nats |
-| frontend | ./frontend | typescript, react, vite, mobx, capacitor |
-| admin | ./admin | typescript, react, vite, mobx, nx |
-| peo | ./peo | typescript, express, sequelize, postgresql, nats |
-| payroll-processing-api | ./payroll-processing-api | typescript, express, prisma, sequelize, postgresql |
-| benefits | ./benefits | typescript, express, sequelize, postgresql, nats |
-| playwright-automation | ./playwright-automation | typescript, playwright |
-| employment | ./employment | typescript |
-| time-off | ./time-off | typescript |
-| payments | ./payments | typescript |
-| accounting | ./accounting | typescript |
-| eor-experience | ./eor-experience | typescript |
+| ai-framework | ./ | markdown, yaml, typescript |
+| vscode-extension | ./vscode-extension | typescript, vscode-api, webview |
 
 ## Current State
 
 | Status | Count | Details |
 |--------|-------|---------|
-| **In Progress** | 2 | PEOCM-660: Entity Transfer Tables (needs testing), PEOCM-819: Fix HiBob HRIS sync |
+| **In Progress** | 2 | LOCAL-022, LOCAL-023 |
 | **Todo** | 0 | - |
-| **Recently Done** | 1 | PEOCM-792-3: Fix Transfer Resources Endpoint Bugs |
+| **Recently Done** | 21 | EPIC-001 + LOCAL-001..021: AI Cockpit MVP v2 + Task Colors + Syntax Highlighting + Session Sync |
 
 ## Quick Reference
 
@@ -52,17 +42,10 @@
 
 ## Conventions
 
-- **Commits**: [BRANCHNAME]: message...
-- **Branches**: {JIRA}-{short-description}
-- **JIRA Prefix**: PEOCM
-- **Co-Author**: NEVER include co-author attribution for: backend, peo, frontend, admin
-- **Commit Command**: Use `/deel-commit` to build commit messages
-
-## Code Style
-
-- TypeScript strict mode
-- ESLint + Prettier formatting
-- Jest for testing
+- **Commits**: type(scope): description
+- **Branches**: feature/{short-description}
+- **JIRA Prefix**: LOCAL (no JIRA)
+- **Co-author**: Never mention
 
 ## Before Starting Work
 
@@ -71,59 +54,26 @@
 3. Read topic docs in `.ai/docs/{repo}/` - Understand context
 4. Follow patterns in `.ai/docs/_shared/` - Use established conventions
 
-## Shared Patterns
-
-- [Sequelize Patterns](.ai/docs/_shared/sequelize-patterns.md) - ORM conventions
-- [NATS Events](.ai/docs/_shared/nats-events.md) - Event messaging patterns
-- [Architecture Overview](.ai/docs/_architecture/overview.md) - System architecture
-
 ## Available MCPs
 
 | MCP | Description |
 |-----|-------------|
-| sql-query | Direct PostgreSQL database queries |
-| notification-server | Discord notifications for task events |
 | context7 | Library documentation lookup |
+| notification-server | Discord notifications for task events |
 | playwright | Browser automation and testing |
-| peo-manager | PEO contract management operations (optional) |
-| backend-manager | Backend server management (optional) |
+| claude-mermaid | Mermaid diagram generation and preview |
+| markdown-pdf | Markdown to PDF conversion |
 
-## Worktrees
+## Lightweight Agents
 
-Task-grouped worktrees organized in `worktrees/`:
+Cost-optimized subagents using Haiku model (~70% savings):
+- `task-status` - View task dashboard
+- `help` - Show available commands
+- `ai-sync` - Sync .ai/ folder with git
 
-```
-worktrees/
-└── PEOCM-661-FIX_BENEFIT_GROUP/   # Task-grouped worktree
-    ├── backend/                    # git worktree of backend repo
-    ├── peo/                        # git worktree of peo repo
-    ├── .ai -> ../../.ai            # symlink to shared docs
-    ├── .claude -> ../../.claude    # symlink to config
-    └── .cursor -> ../../.cursor    # symlink to cursor config
-```
-
-**Creating**: Use `/task-start` which handles worktree creation automatically.
-
-**Manual creation**:
-```bash
-TASK="PEOCM-661-FIX_BENEFIT_GROUP"
-mkdir -p worktrees/$TASK
-cd worktrees/$TASK
-ln -s ../../.ai .ai && ln -s ../../.claude .claude && ln -s ../../.cursor .cursor
-cd ../../backend && git worktree add ../worktrees/$TASK/backend feature/branch
-cd ../peo && git worktree add ../worktrees/$TASK/peo feature/branch
-```
-
-**Removing**:
-```bash
-cd backend && git worktree remove ../worktrees/<TASK>/backend
-cd ../peo && git worktree remove ../worktrees/<TASK>/peo
-rm -rf worktrees/<TASK>
-```
-
-**Benefits**: Open `worktrees/<TASK>/` as workspace root for all repos + context in one IDE window.
+Usage: "Use the task-status agent to show status"
 
 ---
 
-_Last generated: 2025-12-21_
+_Last generated: 2025-12-27_
 _Run `/init` or `/enhance` to regenerate_

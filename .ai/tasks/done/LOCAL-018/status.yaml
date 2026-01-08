@@ -1,0 +1,49 @@
+# Task Status Index
+task: "LOCAL-018"
+title: "Add Task Color Support"
+color: "charts.purple"
+created: "2025-12-30"
+updated: "2025-01-05"
+
+summary:
+  total: 6
+  todo: 0
+  in_progress: 0
+  done: 6
+
+work_items:
+  - id: "01"
+    name: "Add color property to Task types"
+    repo: "vscode-extension"
+    status: done
+    file: "done/01-task-types-color.md"
+
+  - id: "02"
+    name: "Update status.yaml parsing for color"
+    repo: "vscode-extension"
+    status: done
+    file: "done/02-parse-color-yaml.md"
+
+  - id: "03"
+    name: "Apply task color to TaskItem icons"
+    repo: "vscode-extension"
+    status: done
+    file: "done/03-taskitem-color.md"
+
+  - id: "04"
+    name: "Inherit color in SessionItem display"
+    repo: "vscode-extension"
+    status: done
+    file: "done/04-session-inherit-color.md"
+
+  - id: "05"
+    name: "Add color picker to /task-create flow"
+    repo: "ai-framework"
+    status: done
+    file: "done/05-task-create-color-picker.md"
+
+  - id: "06"
+    name: "Terminal tab color support"
+    repo: "vscode-extension"
+    status: done
+    file: "done/06-terminal-tab-color.md"
