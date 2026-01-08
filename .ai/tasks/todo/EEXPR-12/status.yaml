@@ -1,0 +1,46 @@
+# Task Status Index
+task: "EEXPR-12"
+title: "[BE] Endpoint to retrieve transfer details, status, and signature progress"
+type: epic
+created: "2025-01-08"
+updated: "2025-01-08"
+
+summary:
+  total: 3
+  todo: 3
+  in_progress: 0
+  done: 0
+
+subtasks:
+  - id: "EEXPR-12-1"
+    name: "[PEO] Migration - Fix signature profile_public_id type"
+    repo: peo
+    status: todo
+
+  - id: "EEXPR-12-2"
+    name: "[PEO] GET transfers by source entity endpoint"
+    repo: peo
+    status: todo
+    depends_on: ["EEXPR-12-1"]
+
+  - id: "EEXPR-12-3"
+    name: "[BE] Tech ops endpoint with enrichment"
+    repo: backend
+    status: todo
+    depends_on: ["EEXPR-12-1", "EEXPR-12-2"]
+
+work_items:
+  - id: "01"
+    name: "Create subtask EEXPR-12-1"
+    status: todo
+    file: "todo/01-create-subtask-eexpr-12-1.md"
+
+  - id: "02"
+    name: "Create subtask EEXPR-12-2"
+    status: todo
+    file: "todo/02-create-subtask-eexpr-12-2.md"
+
+  - id: "03"
+    name: "Create subtask EEXPR-12-3"
+    status: todo
+    file: "todo/03-create-subtask-eexpr-12-3.md"
