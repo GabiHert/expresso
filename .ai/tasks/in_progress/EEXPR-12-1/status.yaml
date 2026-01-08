@@ -9,13 +9,13 @@ updated: "2026-01-08"
 
 summary:
   total: 1
-  todo: 1
+  todo: 0
   in_progress: 0
-  done: 0
+  done: 1
 
 work_items:
   - id: "01"
     name: "Create migration file"
     repo: peo
-    status: todo
-    file: "todo/01-create-migration.md"
+    status: done
+    file: "done/01-create-migration.md"
