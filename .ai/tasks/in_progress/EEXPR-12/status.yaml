@@ -7,9 +7,9 @@ updated: "2025-01-08"
 
 summary:
   total: 4
-  todo: 3
+  todo: 0
   in_progress: 0
-  done: 1
+  done: 4
 
 subtasks:
   - id: "EEXPR-12-1"
@@ -43,15 +43,15 @@ work_items:
 
   - id: "02"
     name: "Create subtask EEXPR-12-2"
-    status: todo
-    file: "todo/02-create-subtask-eexpr-12-2.md"
+    status: done
+    file: "done/02-create-subtask-eexpr-12-2.md"
 
   - id: "03"
     name: "Create subtask EEXPR-12-3"
-    status: todo
-    file: "todo/03-create-subtask-eexpr-12-3.md"
+    status: done
+    file: "done/03-create-subtask-eexpr-12-3.md"
 
   - id: "04"
     name: "Create subtask EEXPR-12-4"
-    status: todo
-    file: "todo/04-create-subtask-eexpr-12-4.md"
+    status: done
+    file: "done/04-create-subtask-eexpr-12-4.md"

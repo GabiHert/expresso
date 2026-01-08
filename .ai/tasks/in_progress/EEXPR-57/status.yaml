@@ -6,10 +6,10 @@ created: "2026-01-08"
 updated: "2026-01-08"
 
 summary:
-  total: 3
+  total: 4
   todo: 0
   in_progress: 0
-  done: 3
+  done: 4
 
 work_items:
   - id: "01"
@@ -27,3 +27,8 @@ work_items:
     repo: "backend"
     status: done
     file: "done/03-add-unit-tests.md"
+  - id: "04"
+    name: "Refactor to use contractOid instead of contractId"
+    repo: "backend"
+    status: done
+    file: "done/04-refactor-to-use-contract-oid.md"

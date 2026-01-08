@@ -1,0 +1,46 @@
+# Task Status Index
+task: "EEXPR-12-3"
+title: "[BE] Tech ops endpoint with enrichment"
+parent: "EEXPR-12"
+repo: backend
+branch: "EEXPR-12-3-tech-ops-transfer-enrichment"
+depends_on: ["EEXPR-12-1", "EEXPR-12-2"]
+created: "2026-01-08"
+updated: "2026-01-08"
+
+summary:
+  total: 5
+  todo: 5
+  in_progress: 0
+  done: 0
+
+work_items:
+  - id: "01"
+    name: "Add endpoint URL"
+    repo: backend
+    status: todo
+    file: "todo/01-add-endpoint-url.md"
+
+  - id: "02"
+    name: "Add client service method"
+    repo: backend
+    status: todo
+    file: "todo/02-add-client-service-method.md"
+
+  - id: "03"
+    name: "Create enrichment service"
+    repo: backend
+    status: todo
+    file: "todo/03-create-enrichment-service.md"
+
+  - id: "04"
+    name: "Add tech ops endpoint"
+    repo: backend
+    status: todo
+    file: "todo/04-add-tech-ops-endpoint.md"
+
+  - id: "05"
+    name: "Add route registration"
+    repo: backend
+    status: todo
+    file: "todo/05-add-route-registration.md"

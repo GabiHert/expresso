@@ -1,0 +1,330 @@
+{
+  "new_work_location_ids": [
+    {
+      "new_work_location_id": "8e32605f-8cf6-45f5-a885-ebdb6956169d",
+      "location_name": "MAIN"
+    },
+    {
+      "new_work_location_id": "0e03f1a0-5dc6-49af-8847-2ba1b1fb2107",
+      "location_name": "Office - California"
+    },
+    {
+      "new_work_location_id": "aa4e2c24-cc24-4bdb-b9b2-c14a9b395301",
+      "location_name": "Office-Califonia"
+    },
+    {
+      "new_work_location_id": "300f13b5-6680-4c43-b6f2-9b78a3188ef4",
+      "location_name": "Office - 33 Irving Place"
+    },
+    {
+      "new_work_location_id": "04515eb5-947f-4a55-992e-543a032e89f1",
+      "location_name": "Office - 1900 O'Farrell Street Suite 250"
+    },
+    {
+      "new_work_location_id": "06df6832-2197-4419-b047-8fb971efc48e",
+      "location_name": "Office - 207 E 94th Street Suite 303"
+    },
+    {
+      "new_work_location_id": "1a8a4463-713c-4756-ae55-776d627667bc",
+      "location_name": "Remote - California"
+    },
+    {
+      "new_work_location_id": "e227dded-aa2a-49fd-9f71-732b823953eb",
+      "location_name": "Remote - Colorado"
+    },
+    {
+      "new_work_location_id": "39d8f553-c00a-4511-ab22-bf908bc553bb",
+      "location_name": "Remote - Florida"
+    },
+    {
+      "new_work_location_id": "9be9f22d-9215-498e-b265-4491c49fad01",
+      "location_name": "Remote - Massachusetts"
+    },
+    {
+      "new_work_location_id": "c92980d1-8ed6-48c5-903d-4b6e7d98f8bb",
+      "location_name": "Remote - Maryland"
+    },
+    {
+      "new_work_location_id": "b6768a2f-3574-445a-a620-14aef1de8fce",
+      "location_name": "Remote - Minnesota"
+    },
+    {
+      "new_work_location_id": "0e3a0a18-e699-4ce7-84e7-a51c2bc2fa73",
+      "location_name": "Remote - North Carolina"
+    },
+    {
+      "new_work_location_id": "af069a8d-857f-44e8-b6a8-4d37d86567d3",
+      "location_name": "Remote - New York"
+    },
+    {
+      "new_work_location_id": "5a1351ae-98ec-4252-ad17-b6686e5286f3",
+      "location_name": "Remote - Ohio"
+    },
+    {
+      "new_work_location_id": "23e29013-30d6-45a7-96d6-e871456290b4",
+      "location_name": "Remote - Texas"
+    },
+    {
+      "new_work_location_id": "8196ebe6-a1d0-4b9d-b6cf-8ae690c5ea9a",
+      "location_name": "Remote - Virginia"
+    },
+    {
+      "new_work_location_id": "45bd95fe-49dd-4e99-9381-60621884d6c5",
+      "location_name": "Office - North Carolina"
+    },
+    {
+      "new_work_location_id": "d0ff684e-5dc7-4e69-b6a9-97d9759f884f",
+      "location_name": "Office - 167 S. San Antonio Road, Suite 2"
+    },
+    {
+      "new_work_location_id": "1042bff2-532c-48e3-ac43-5bdf819e7495",
+      "location_name": "Remote - Pennsylvania"
+    },
+    {
+      "new_work_location_id": "09b34390-a51c-4ede-b766-f7788885ea5f",
+      "location_name": "Remote - New Hampshire"
+    }
+  ],
+  "new_pto_policy_ids": [
+    {
+      "new_pto_policy_id": "d8514aa3-6e00-45a0-968e-b521cac3aa61",
+      "policy_name": "CME Time Off"
+    },
+    {
+      "new_pto_policy_id": "35bf96b3-ca39-4172-a419-bc8de732f103",
+      "policy_name": "Bereavement Leave"
+    },
+    {
+      "new_pto_policy_id": "1983a8b5-2666-4fcc-a972-d6a043bf1495",
+      "policy_name": "Jury Duty"
+    },
+    {
+      "new_pto_policy_id": "24ec331a-d83a-4616-9630-b7e036a99373",
+      "policy_name": "Unpaid leave"
+    },
+    {
+      "new_pto_policy_id": "b7098539-e111-4796-8618-44782dc29014",
+      "policy_name": "California and New York Sick Leave (5 Days Annually)"
+    },
+    {
+      "new_pto_policy_id": "899f9fc6-019a-42cd-a9ac-06b006ef6971",
+      "policy_name": "California and New York Vacation (10 Days Annually with 5 Additional Days at 1 Year Anniversary)"
+    },
+    {
+      "new_pto_policy_id": "1f49f574-38f9-4172-8c21-f3375f070451",
+      "policy_name": "15 Days Combined Sick Leave and Vacation (with 5 Additional Days at 1 Year Anniversary)"
+    }
+  ],
+  "new_job_codes": [
+    {
+      "new_job_code": "CPSS",
+      "position_title": "Certified Peer Support Specialist"
+    },
+    {
+      "new_job_code": "CMA",
+      "position_title": "CMA"
+    },
+    {
+      "new_job_code": "ES",
+      "position_title": "Enrollment Specialist"
+    },
+    {
+      "new_job_code": "PCL",
+      "position_title": "Patient Conversion Lead"
+    },
+    {
+      "new_job_code": "PSS",
+      "position_title": "Peer Support Specialist"
+    },
+    {
+      "new_job_code": "CCC",
+      "position_title": "Clinic Care Coordinator"
+    },
+    {
+      "new_job_code": "HC",
+      "position_title": "Health Coach"
+    },
+    {
+      "new_job_code": "COTCA",
+      "position_title": "Clinical Outreach & Treatment"
+    },
+    {
+      "new_job_code": "POM",
+      "position_title": "Practice Operations Manager"
+    },
+    {
+      "new_job_code": "TP",
+      "position_title": "Transition Planner"
+    },
+    {
+      "new_job_code": "SeniorClinicalCareCoordinator",
+      "position_title": "Senior Clinical Care Coordinator"
+    }
+  ],
+  "base_peo_contract_oids": [
+    {
+      "employee_name": "Anthony Darden",
+      "base_peo_contract_oid": "3e5w458"
+    },
+    {
+      "employee_name": "Anushka Bodahanapati",
+      "base_peo_contract_oid": "3erjg56"
+    },
+    {
+      "employee_name": "Billy Hayes",
+      "base_peo_contract_oid": "mn9eepp"
+    },
+    {
+      "employee_name": "Catherine Scott",
+      "base_peo_contract_oid": "m8kx69v"
+    },
+    {
+      "employee_name": "Collin Wang",
+      "base_peo_contract_oid": "m9x9d5j"
+    },
+    {
+      "employee_name": "Courtney Palcic",
+      "base_peo_contract_oid": "3yr6q8x"
+    },
+    {
+      "employee_name": "Deylanis Henderson",
+      "base_peo_contract_oid": "m9vx8je"
+    },
+    {
+      "employee_name": "Jessica Seo",
+      "base_peo_contract_oid": "my67ze2"
+    },
+    {
+      "employee_name": "Jordan Jacobsen",
+      "base_peo_contract_oid": "mqe7dgp"
+    },
+    {
+      "employee_name": "Kayla Rice",
+      "base_peo_contract_oid": "3x8vx6z"
+    },
+    {
+      "employee_name": "Maham Khalid",
+      "base_peo_contract_oid": "m942dpy"
+    },
+    {
+      "employee_name": "Makeda Ramnath",
+      "base_peo_contract_oid": "35xd8qd"
+    },
+    {
+      "employee_name": "Namrata Poola",
+      "base_peo_contract_oid": "35xn2xj"
+    },
+    {
+      "employee_name": "Nicholas DeMattio",
+      "base_peo_contract_oid": "mp6q4y2"
+    },
+    {
+      "employee_name": "Shefali Gupta",
+      "base_peo_contract_oid": "mp6jpwe"
+    },
+    {
+      "employee_name": "Sruthi Ramabadran",
+      "base_peo_contract_oid": "36zg5j7"
+    },
+    {
+      "employee_name": "Holliss Hirsch",
+      "base_peo_contract_oid": "m7rd5zy"
+    },
+    {
+      "employee_name": "Jacqueline Bohrer",
+      "base_peo_contract_oid": "mw6v4jz"
+    },
+    {
+      "employee_name": "Madison Federici",
+      "base_peo_contract_oid": "medywep"
+    },
+    {
+      "employee_name": "Priscilla S Lugo",
+      "base_peo_contract_oid": "mvxpzgx"
+    },
+    {
+      "employee_name": "Taylor L Mayne",
+      "base_peo_contract_oid": "3k59pj8"
+    },
+    {
+      "employee_name": "Tiffany De La Torre",
+      "base_peo_contract_oid": "32qjdnp"
+    }
+  ],
+  "new_benefit_group_ids": [
+    {
+      "new_benefit_group_id": 1,
+      "group_name": "All Employees"
+    }
+  ],
+  "new_payroll_settings_ids": [
+    {
+      "new_payroll_settings_id": "cm5fsobfb01hq01z16lby4qth",
+      "cycle_type": "BIMONTHLY"
+    }
+  ],
+  "legal_entity_public_ids": [
+    {
+      "legal_entity_public_id": "8a40a3cc-0993-4519-83a4-1b16bbc52cc4",
+      "name": "Amae Health Services, LLC"
+    },
+    {
+      "legal_entity_public_id": "26097bc4-1bfa-43ea-9672-9a2e34784492",
+      "name": "Amae Medical Associates North Carolina PC"
+    },
+    {
+      "legal_entity_public_id": "0259b45d-ea1e-41d8-b1d2-8f20a9755a7f",
+      "name": "Scott C Fears MD PC"
+    },
+    {
+      "legal_entity_public_id": "6015febd-d2c7-48c7-aae9-f15df39c4906",
+      "name": "Amae Medical Associates, PC"
+    },
+    {
+      "legal_entity_public_id": "7ac2c15b-ec53-4feb-96c1-4e31ce71e958",
+      "name": "Amae Health, Inc."
+    }
+  ],
+  "new_team_ids": [
+    {
+      "new_team_id": 358112,
+      "team_name": "CA-LA-01-Westwood"
+    },
+    {
+      "new_team_id": 358113,
+      "team_name": "CA-LA-02-Westwood"
+    },
+    {
+      "new_team_id": 358114,
+      "team_name": "CA-SFBay-01-Los Altos"
+    },
+    {
+      "new_team_id": 358115,
+      "team_name": "CA-SFBay-02-San Mateo"
+    },
+    {
+      "new_team_id": 358116,
+      "team_name": "NY-NYC-01-UES"
+    },
+    {
+      "new_team_id": 358117,
+      "team_name": "NY-NYC-02-Brooklyn"
+    },
+    {
+      "new_team_id": 296037,
+      "team_name": "Amae"
+    },
+    {
+      "new_team_id": 358118,
+      "team_name": "NC-RDU-01-NorthHills"
+    },
+    {
+      "new_team_id": 389321,
+      "team_name": "Remote Hourly"
+    },
+    {
+      "new_team_id": 389322,
+      "team_name": "Contract Clinicians"
+    }
+  ]
+}
