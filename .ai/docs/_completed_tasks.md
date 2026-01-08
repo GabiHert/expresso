@@ -243,3 +243,27 @@
 **Learnings**:
 - PEO's `@OnNull(404)` decorator can return 204 in practice - always handle both status codes defensively
 - When changing API parameters from internal IDs to public identifiers, verify the identifier format with actual database values
+
+---
+
+## 2026-01-08: EEXPR-56 - Align CrossHireSanityCheck I-9 validation with PEO
+
+**Repos affected**: backend
+**Task**: [EEXPR-56](.ai/tasks/done/EEXPR-56/)
+
+**Summary**: Aligned Z04 (Alien Authorized) I-9 validation in CrossHireSanityCheckStep with PEO's validateForIntegrate() logic. Changed from requiring ALL 5 I-9 fields to paired-field validation.
+
+**Key changes**:
+- alienRegNumber + expiration: paired (if one exists, other required)
+- passportNumber + passportCountry: paired (only if either present)
+- i94AdmissionNumber: no longer validated (PEO doesn't require it)
+- Added GitHub reference URL to PEO's validateForIntegrate source
+
+**Files modified**:
+- `backend/services/peo/entity_transfer/steps/cross_hire_sanity_check_step.ts`
+- `backend/services/peo/__tests__/entity_transfer/steps/cross_hire_sanity_check_step.spec.ts`
+
+**Learnings**:
+- PEO's validateForIntegrate() auto-defaults alienRegNumber to '000000000' if missing
+- Backend sanity checks should mirror PEO validation to avoid premature rejection
+- Post-deployment discovered separate bug: syncI9InfoToPEoContract updates wrong contract (tracked as EEXPR-57)

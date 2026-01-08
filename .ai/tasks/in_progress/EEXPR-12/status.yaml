@@ -6,10 +6,10 @@ created: "2025-01-08"
 updated: "2025-01-08"
 
 summary:
-  total: 3
+  total: 4
   todo: 3
   in_progress: 0
-  done: 0
+  done: 1
 
 subtasks:
   - id: "EEXPR-12-1"
@@ -29,11 +29,17 @@ subtasks:
     status: todo
     depends_on: ["EEXPR-12-1", "EEXPR-12-2"]
 
+  - id: "EEXPR-12-4"
+    name: "[BE] Public API endpoint for transfers"
+    repo: backend
+    status: todo
+    depends_on: ["EEXPR-12-3"]
+
 work_items:
   - id: "01"
     name: "Create subtask EEXPR-12-1"
-    status: todo
-    file: "todo/01-create-subtask-eexpr-12-1.md"
+    status: done
+    file: "done/01-create-subtask-eexpr-12-1.md"
 
   - id: "02"
     name: "Create subtask EEXPR-12-2"
@@ -44,3 +50,8 @@ work_items:
     name: "Create subtask EEXPR-12-3"
     status: todo
     file: "todo/03-create-subtask-eexpr-12-3.md"
+
+  - id: "04"
+    name: "Create subtask EEXPR-12-4"
+    status: todo
+    file: "todo/04-create-subtask-eexpr-12-4.md"

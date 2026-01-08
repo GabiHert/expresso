@@ -1,0 +1,29 @@
+# Task Status Index
+task: "EEXPR-57"
+title: "Fix syncI9InfoToPEoContract updating wrong contract during entity transfers"
+color: "charts.orange"
+created: "2026-01-08"
+updated: "2026-01-08"
+
+summary:
+  total: 3
+  todo: 0
+  in_progress: 0
+  done: 3
+
+work_items:
+  - id: "01"
+    name: "Add contractId parameter to updateDefaultPEOContractWithI9"
+    repo: "backend"
+    status: done
+    file: "done/01-add-contractid-param.md"
+  - id: "02"
+    name: "Update syncI9InfoToPEoContract to pass contractId"
+    repo: "backend"
+    status: done
+    file: "done/02-update-sync-caller.md"
+  - id: "03"
+    name: "Add unit tests for targeted contract update"
+    repo: "backend"
+    status: done
+    file: "done/03-add-unit-tests.md"
