@@ -1,0 +1,28 @@
+# Task Status Index
+task: "ENGESC-23600"
+title: "Tech Ops Endpoint for Missing PEO Employments"
+created: "2026-01-09"
+updated: "2026-01-09"
+
+summary:
+  total: 2
+  todo: 0
+  in_progress: 0
+  done: 2
+
+work_items:
+  - id: "01"
+    name: "Add service method for creating missing employment"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/01-service-method.md"
+
+  - id: "02"
+    name: "Add tech_ops endpoint"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/02-techops-endpoint.md"
