@@ -99,6 +99,7 @@
 | peo | [docs/peo/](./docs/peo/) | PEO service |
 | peo/entity_transfers | [docs/peo/entity_transfers/](./docs/peo/entity_transfers/) | Entity transfer handlers |
 | peo/hris_integration | [docs/peo/hris_integration/](./docs/peo/hris_integration/) | HRIS integration (BambooHR, Hibob, Workday) |
+| employment | [docs/employment/](./docs/employment/) | Employment service - payroll, employments, payouts |
 | payroll-processing-api | [docs/payroll-processing-api/](./docs/payroll-processing-api/) | Payroll processing |
 | benefits | [docs/benefits/](./docs/benefits/) | Benefits service |
 | playwright-automation | [docs/playwright-automation/](./docs/playwright-automation/) | E2E testing framework |
@@ -118,4 +119,4 @@
 
 ---
 
-_Last Updated: 2025-12-22_
+_Last Updated: 2025-01-09_
