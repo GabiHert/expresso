@@ -324,6 +324,15 @@ See `status.yaml` for full index.
 
 ## Branches
 
+{if ALL affected repos are protected}
+**Note:** All affected repos are protected. No task branches will be created.
+Work will be done on existing branches in the protected repos.
+
+**Protected Repos:**
+{for each affected repo}
+- ⛔ {repo} - stays on `{locked_branch}`
+{/for}
+{else}
 | Repo | Path | Branch |
 |------|------|--------|
 {for each affected repo WHERE protected != true}
@@ -335,6 +344,7 @@ See `status.yaml` for full index.
 {for each affected repo WHERE protected == true}
 - ⛔ {repo} - stays on `{locked_branch}`
 {/for}
+{/if}
 {/if}
 
 ## Technical Context
@@ -407,6 +417,11 @@ work_items:
     file: "todo/{id}-{slug}.md"
 {/for}
 ```
+
+**Path Validation:** Ensure `repo_path` is an absolute path before writing:
+- If manifest `path` is relative (starts with `./`): resolve against `project.root`
+- Verify the resolved path exists and contains a `.git` directory
+- Store the fully resolved absolute path, never a relative path
 
 **Note:** The `color` field is optional. Valid values are: `charts.red`, `charts.orange`, `charts.yellow`, `charts.green`, `charts.blue`, `charts.purple`. Only include the color field if the user selected one in Step 6b.
 

@@ -55,6 +55,36 @@ When `protected: true` is set on a repo:
 2. **Git Operations**: `/task-work` will warn before any git add/commit/push
 3. **Commit Blocking**: Agent will be blocked from committing to protected repos
 4. **Visual Indicator**: Protected repos shown with ⛔ in status messages
+5. **Branch Verification**: If `locked_branch` is specified, agent should verify
+   the repo is on that branch before any operation (to detect unexpected state)
+
+### Path Resolution
+
+When resolving repo paths, follow this pattern:
+
+```bash
+# 1. Get path from manifest
+MANIFEST_PATH="./backend"  # Could be relative or absolute
+
+# 2. Resolve relative paths against project.root
+if [[ "$MANIFEST_PATH" == ./* ]]; then
+  RESOLVED_PATH="${PROJECT_ROOT}/${MANIFEST_PATH#./}"
+else
+  RESOLVED_PATH="$MANIFEST_PATH"
+fi
+
+# 3. Normalize with pwd -P to resolve symlinks
+ABSOLUTE_PATH=$(cd "$RESOLVED_PATH" && pwd -P)
+
+# 4. Verify git root
+GIT_ROOT=$(cd "$ABSOLUTE_PATH" && git rev-parse --show-toplevel)
+GIT_ROOT_RESOLVED=$(cd "$GIT_ROOT" && pwd -P)
+```
+
+**Key Points:**
+- Always use `pwd -P` when comparing paths (resolves symlinks)
+- Store resolved absolute paths in `active-task.json`, never relative
+- Verify git root matches before any git operation
 
 ### Example: Protected Framework Repo
 

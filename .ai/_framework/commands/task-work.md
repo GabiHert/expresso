@@ -327,14 +327,31 @@ cat .ai/cockpit/active-task.json
 - Find matching entry in `affectedRepos` array
 - Get `absolutePath` and `gitRoot`
 
+**If repo not found in affectedRepos:**
+```
+⛔ REPO NOT FOUND IN TASK CONTEXT
+
+Repo '{repo}' is not in active-task.json affectedRepos.
+
+Possible causes:
+  • This repo is protected (no git operations allowed)
+  • This repo was not included when task was started
+  • active-task.json is outdated
+
+Resolution:
+  • For protected repos: commit manually after careful review
+  • Otherwise: re-run /task-start to refresh context
+```
+STOP and do not proceed with git operations.
+
 **3. Navigate and verify:**
 ```bash
 # Navigate to the ABSOLUTE path
 cd {absolutePath}
 
-# Verify git root matches
-ACTUAL_ROOT=$(git rev-parse --show-toplevel)
-EXPECTED_ROOT="{gitRoot}"
+# Verify git root matches (resolve symlinks with pwd -P)
+ACTUAL_ROOT=$(cd "$(git rev-parse --show-toplevel)" && pwd -P)
+EXPECTED_ROOT=$(cd "{gitRoot}" && pwd -P)
 
 if [ "$ACTUAL_ROOT" != "$EXPECTED_ROOT" ]; then
   echo "⛔ GIT ROOT MISMATCH"

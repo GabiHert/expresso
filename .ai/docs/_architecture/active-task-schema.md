@@ -121,19 +121,23 @@ Each entry in `affectedRepos` contains:
 REPO_PATH=$(jq -r '.affectedRepos[] | select(.name=="backend") | .absolutePath' .ai/cockpit/active-task.json)
 EXPECTED_ROOT=$(jq -r '.affectedRepos[] | select(.name=="backend") | .gitRoot' .ai/cockpit/active-task.json)
 
-# Navigate and verify
+# Navigate and verify (use pwd -P to resolve symlinks)
 cd "$REPO_PATH"
-ACTUAL_ROOT=$(git rev-parse --show-toplevel)
+ACTUAL_ROOT=$(cd "$(git rev-parse --show-toplevel)" && pwd -P)
+EXPECTED_ROOT_RESOLVED=$(cd "$EXPECTED_ROOT" && pwd -P)
 
-if [ "$ACTUAL_ROOT" != "$EXPECTED_ROOT" ]; then
+if [ "$ACTUAL_ROOT" != "$EXPECTED_ROOT_RESOLVED" ]; then
   echo "ERROR: Git root mismatch!"
-  echo "Expected: $EXPECTED_ROOT"
+  echo "Expected: $EXPECTED_ROOT_RESOLVED"
   echo "Actual: $ACTUAL_ROOT"
   exit 1
 fi
 
 echo "Verified: Working in correct repository"
 ```
+
+**Note:** Using `pwd -P` ensures symlinks are resolved before comparison,
+preventing false mismatches on systems with symlinked directories.
 
 ---
 

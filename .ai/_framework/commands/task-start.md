@@ -255,7 +255,23 @@ Available for branch creation:
 {/for}
 ```
 
-**For non-protected repos only**, offer to create the branch:
+**If ALL affected repos are protected:**
+```
+ALL REPOS PROTECTED
+
+All affected repositories are marked as protected.
+No task branches will be created.
+
+Work will be done on existing branches:
+{for each repo}
+  ⛔ {repo.name}: stays on {locked_branch}
+{/for}
+
+Proceeding without branch creation.
+```
+Skip to Step 6.
+
+**Otherwise, for non-protected repos only**, offer to create the branch:
 ```
 BRANCHES
 
@@ -405,8 +421,10 @@ Activate cockpit tracking for the task:
 
    **Schema Notes:**
    - `affectedRepos` array contains only non-protected repos with branches created
-   - `absolutePath` is the resolved full path to the repo
-   - `gitRoot` is the path where `.git` directory lives (usually same as absolutePath)
+   - `absolutePath` is the resolved full path to the repo working directory (where you cd to work)
+   - `gitRoot` is the path from `git rev-parse --show-toplevel` - usually same as absolutePath,
+     but differs in worktree scenarios or git submodules. Use gitRoot for verification.
+   - When comparing paths, always use `pwd -P` to resolve symlinks
    - `branch` field at root is kept for backward compatibility
    - `currentWorkRepo` is set to the first work repo (can be updated during work)
 
