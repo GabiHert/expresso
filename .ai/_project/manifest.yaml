@@ -22,6 +22,9 @@ project:
 repos:
   - name: ai-framework
     path: ./
+    protected: true
+    locked_branch: project/ai-cockpit
+    is_framework: true
     description: "Core AI task framework - commands, templates, and agent behavior definitions"
     tech: [markdown, yaml, typescript]
 

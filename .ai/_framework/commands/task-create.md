@@ -324,11 +324,18 @@ See `status.yaml` for full index.
 
 ## Branches
 
-| Repo | Branch |
-|------|--------|
-{for each affected repo}
-| {repo} | `{ticket-id}-{short-description}` |
+| Repo | Path | Branch |
+|------|------|--------|
+{for each affected repo WHERE protected != true}
+| {repo} | `{absolute_path}` | `{ticket-id}-{short-description}` |
 {/for}
+
+{if any protected repos in affected list}
+**Protected Repos (no branches created):**
+{for each affected repo WHERE protected == true}
+- ⛔ {repo} - stays on `{locked_branch}`
+{/for}
+{/if}
 
 ## Technical Context
 
@@ -394,6 +401,8 @@ work_items:
   - id: "{id}"
     name: "{name}"
     repo: "{repo}"
+    repo_path: "{absolute_path}"
+    repo_protected: {true|false}
     status: todo
     file: "todo/{id}-{slug}.md"
 {/for}
@@ -419,7 +428,17 @@ For each work item, create `{id}-{slug}.md`:
 -->
 
 ---
+# Repository Context (LOCAL-026)
 repo: {repo}
+repo_path: {absolute_path}
+branch: {branch_name}
+protected: {true|false}
+
+# Git Safety Reminder
+# Before any git operation:
+#   1. cd {repo_path}
+#   2. Verify: git rev-parse --show-toplevel
+#   3. Verify: git branch --show-current
 ---
 
 # {Work Item Title}
@@ -495,7 +514,16 @@ Work Items:
   {list each work item with id and name}
 
 Branches to Create:
-  {repo}: git checkout -b {branch-name}
+{for each non-protected repo}
+  {repo}: cd {absolute_path} && git checkout -b {branch-name}
+{/for}
+
+{if protected repos exist}
+Protected (no branches):
+{for each protected repo}
+  ⛔ {repo}: stays on {locked_branch}
+{/for}
+{/if}
 
 Next Steps:
   1. Review the task README: .ai/tasks/todo/{ticket-id}/README.md

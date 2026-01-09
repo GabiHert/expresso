@@ -7,43 +7,43 @@ updated: "2026-01-08"
 
 summary:
   total: 6
-  todo: 6
+  todo: 0
   in_progress: 0
-  done: 0
+  done: 6
 
 work_items:
   - id: "01"
     name: "Add protected flag to manifest schema"
     repo: "ai-framework"
-    status: todo
-    file: "todo/01-manifest-protected-flag.md"
+    status: done
+    file: "done/01-manifest-protected-flag.md"
 
   - id: "02"
     name: "Update task-start branch creation"
     repo: "ai-framework"
-    status: todo
-    file: "todo/02-task-start-branch-protection.md"
+    status: done
+    file: "done/02-task-start-branch-protection.md"
 
   - id: "03"
     name: "Update task-create to exclude protected repos"
     repo: "ai-framework"
-    status: todo
-    file: "todo/03-task-create-exclude-protected.md"
+    status: done
+    file: "done/03-task-create-exclude-protected.md"
 
   - id: "04"
     name: "Enhance active-task.json schema"
     repo: "ai-framework"
-    status: todo
-    file: "todo/04-active-task-schema.md"
+    status: done
+    file: "done/04-active-task-schema.md"
 
   - id: "05"
     name: "Add git guardrails to task-work"
     repo: "ai-framework"
-    status: todo
-    file: "todo/05-task-work-git-guardrails.md"
+    status: done
+    file: "done/05-task-work-git-guardrails.md"
 
   - id: "06"
     name: "Update work-item template"
     repo: "ai-framework"
-    status: todo
-    file: "todo/06-work-item-template.md"
+    status: done
+    file: "done/06-work-item-template.md"

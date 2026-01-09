@@ -63,6 +63,7 @@ Start a task by moving it from todo to in_progress, reading the task context, an
 
 1. Read `.ai/_project/manifest.yaml` to understand:
    - Available repositories
+   - **Protected repos (`protected: true`) - NEVER create branches in these**
    - Branch naming conventions
    - Commit conventions
    - Worktree conventions (if `--worktree` flag used)
@@ -233,27 +234,88 @@ Create worktrees now? (y/n)
 
 **Otherwise (normal branch mode):**
 
-For each affected repo, offer to create the branch:
+**First, identify protected repos from manifest:**
+
+Read `manifest.yaml` and separate repos into:
+- **Protected repos**: `protected: true` - NEVER modify git state
+- **Work repos**: `protected: false` or not specified - can create branches
+
+**Show protection status:**
+```
+REPOSITORY PROTECTION STATUS
+
+Protected (git operations blocked):
+{for each repo where protected == true}
+  ⛔ {repo.name} (locked to: {repo.locked_branch})
+{/for}
+
+Available for branch creation:
+{for each repo where protected != true}
+  ✓ {repo.name}
+{/for}
+```
+
+**For non-protected repos only**, offer to create the branch:
 ```
 BRANCHES
 
-The following branches should be created:
+The following branches will be created (protected repos excluded):
 
-  {repo}: git checkout -b {branch-name}
-  {repo}: git checkout -b {branch-name}
+{for each repo where protected != true}
+  {repo}: cd {absolute_path} && git checkout -b {branch-name}
+{/for}
+
+⛔ Skipped (protected):
+{for each repo where protected == true}
+  {repo}: stays on {locked_branch}
+{/for}
 
 Would you like me to create these branches now? (y/n)
 ```
 
-**If yes**, for each repo:
-1. Navigate to the repo directory
-2. Ensure on main/master branch and up to date
-3. Create the feature branch:
+**If yes**, for each **non-protected** repo:
+1. **Resolve absolute path** from manifest:
+   - If `path` starts with `./`: resolve against `project.root`
+   - If `path` is absolute: use as-is
+   - Store as `absolutePath`
+2. Navigate to the repo using absolute path
+3. **Verify git root** matches expected:
    ```bash
-   cd {repo.path}
+   cd {absolutePath}
+   ACTUAL_ROOT=$(git rev-parse --show-toplevel)
+   EXPECTED_ROOT="{repo.git_root or absolutePath}"
+
+   if [ "$ACTUAL_ROOT" != "$EXPECTED_ROOT" ]; then
+     echo "⛔ GIT ROOT MISMATCH"
+     echo "Expected: $EXPECTED_ROOT"
+     echo "Actual: $ACTUAL_ROOT"
+     echo "Aborting - you may be in a nested repo."
+     exit 1
+   fi
+   ```
+4. Ensure on main/master branch and up to date
+5. Create the feature branch:
+   ```bash
    git checkout main && git pull
    git checkout -b {conventions.branches.pattern}
    ```
+6. **Capture branch info** for storing in active-task.json:
+   - Branch name created
+   - Remote URL: `git remote get-url origin`
+   - Absolute path verified
+
+**If user attempts to force branch in protected repo:**
+```
+⛔ PROTECTED REPO - OPERATION BLOCKED
+
+Cannot create branch in '{repo.name}':
+  • This repo is marked as protected: true
+  • It is locked to branch: {locked_branch}
+  • Task branches must be created in work repos only
+
+This protection prevents accidental commits to the framework repo
+when working on nested repositories.
+```
 
 **If no**, proceed without creating branches/worktrees.
 
@@ -307,9 +369,11 @@ Activate cockpit tracking for the task:
    fi
    ```
 
-6. Write `active-task.json` atomically:
+6. Write `active-task.json` atomically with enhanced schema:
    ```bash
-   # Write to temp file first
+   # Build the affectedRepos array from branch creation step
+   # Include all non-protected repos with their absolute paths
+
    cat > .ai/cockpit/active-task.json.tmp << 'EOF'
    {
      "taskId": "{task-id}",
@@ -317,13 +381,34 @@ Activate cockpit tracking for the task:
      "branch": "{current-git-branch}",
      "frameworkPath": ".ai/tasks/in_progress/{task-id}",
      "startedAt": "{ISO-timestamp}",
-     "sessionId": "{generated-session-id}"
+     "sessionId": "{generated-session-id}",
+     "affectedRepos": [
+       {for each non-protected repo where branch was created}
+       {
+         "name": "{repo-name}",
+         "absolutePath": "{resolved-absolute-path}",
+         "gitRoot": "{git-root-path}",
+         "branch": "{created-branch-name}",
+         "remote": "origin",
+         "remoteUrl": "{git-remote-url}",
+         "protected": false
+       }
+       {/for}
+     ],
+     "currentWorkRepo": "{first-non-protected-repo-name}"
    }
    EOF
 
    # Atomic rename
    mv .ai/cockpit/active-task.json.tmp .ai/cockpit/active-task.json
    ```
+
+   **Schema Notes:**
+   - `affectedRepos` array contains only non-protected repos with branches created
+   - `absolutePath` is the resolved full path to the repo
+   - `gitRoot` is the path where `.git` directory lives (usually same as absolutePath)
+   - `branch` field at root is kept for backward compatibility
+   - `currentWorkRepo` is set to the first work repo (can be updated during work)
 
 7. Write task-switch-signal to trigger VSCode sync:
    ```bash

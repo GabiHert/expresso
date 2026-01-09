@@ -29,8 +29,8 @@
 
 | Status | Count | Details |
 |--------|-------|---------|
-| **In Progress** | 2 | LOCAL-022, LOCAL-023 |
-| **Todo** | 1 | LOCAL-026: Git Context Persistence and Repo Protection |
+| **In Progress** | 3 | LOCAL-022, LOCAL-023, LOCAL-026 |
+| **Todo** | 0 | - |
 | **Recently Done** | 21 | EPIC-001 + LOCAL-001..021: AI Cockpit MVP v2 + Task Colors + Syntax Highlighting + Session Sync |
 
 ## Quick Reference
