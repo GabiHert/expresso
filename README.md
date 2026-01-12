@@ -1,20 +1,8 @@
 <div align="center">
 
-```
-    ╔═══════════════════╗
-    ║    ☕ EXPRESSO    ║
-    ╠═══════════════════╣
-    ║  ┌─────────────┐  ║
-    ║  │ ▓▓▓▓▓▓▓▓▓▓▓ │  ║
-    ║  │ ▓ BREWING ▓ │  ║
-    ║  │ ▓▓▓▓▓▓▓▓▓▓▓ │  ║
-    ║  └──────┬──────┘  ║
-    ║         │         ║
-    ║      ╭──┴──╮      ║
-    ║      │~~~~~│      ║
-    ║      ╰─────╯      ║
-    ╚═══════════════════╝
-```
+<img src="media/logo.svg" alt="Expresso Logo" width="128" height="128">
+
+# Expresso
 
 **Brew tasks directly in your code**
 
@@ -23,8 +11,6 @@
 </div>
 
 ---
-
-# Expresso
 
 A developer productivity framework for Claude Code that supercharges your AI-assisted development workflow with inline task annotations, structured task management, and real-time session tracking.
 
