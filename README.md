@@ -1,3 +1,29 @@
+<div align="center">
+
+```
+    ╔═══════════════════╗
+    ║    ☕ EXPRESSO    ║
+    ╠═══════════════════╣
+    ║  ┌─────────────┐  ║
+    ║  │ ▓▓▓▓▓▓▓▓▓▓▓ │  ║
+    ║  │ ▓ BREWING ▓ │  ║
+    ║  │ ▓▓▓▓▓▓▓▓▓▓▓ │  ║
+    ║  └──────┬──────┘  ║
+    ║         │         ║
+    ║      ╭──┴──╮      ║
+    ║      │~~~~~│      ║
+    ║      ╰─────╯      ║
+    ╚═══════════════════╝
+```
+
+**Brew tasks directly in your code**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+</div>
+
+---
+
 # Expresso
 
 A developer productivity framework for Claude Code that supercharges your AI-assisted development workflow with inline task annotations, structured task management, and real-time session tracking.
