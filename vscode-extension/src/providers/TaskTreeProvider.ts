@@ -587,7 +587,7 @@ class ShadowFileItem extends vscode.TreeItem {
     public readonly shadow: Shadow,
     public readonly syncStatus: 'synced' | 'user-modified' | 'file-deleted',
     public readonly taskId: string,
-    public readonly taskStatus: string,
+    _taskStatus: string, // Kept for backwards compatibility
     public readonly commentCount: number = 0
   ) {
     super(
@@ -623,23 +623,12 @@ class ShadowFileItem extends vscode.TreeItem {
 
     this.description = descParts.join(' ');
 
-    // Click action: DiffReviewPanel for in_progress, native diff otherwise
-    console.log(`[ShadowFileItem] taskId=${taskId}, taskStatus="${taskStatus}", comparison=${taskStatus === 'in_progress'}`);
-    if (taskStatus === 'in_progress') {
-      console.log(`[ShadowFileItem] Assigning openDiffReview command for ${shadow.meta.filePath}`);
-      this.command = {
-        command: 'aiCockpit.openDiffReview',
-        title: 'Review Changes',
-        arguments: [shadow]
-      };
-    } else {
-      console.log(`[ShadowFileItem] Assigning showFullDiff command for ${shadow.meta.filePath}`);
-      this.command = {
-        command: 'aiCockpit.showFullDiff',
-        title: 'Show Full Diff',
-        arguments: [shadow]
-      };
-    }
+    // Click action: always use native VSCode diff
+    this.command = {
+      command: 'aiCockpit.showPlainDiff',
+      title: 'Show Diff',
+      arguments: [shadow]
+    };
 
     this.contextValue = `shadow-file-${syncStatus}`;
   }
