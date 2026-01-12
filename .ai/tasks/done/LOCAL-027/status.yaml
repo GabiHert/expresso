@@ -1,0 +1,73 @@
+# Task Status Index
+task: "LOCAL-027"
+title: "Implement @expresso in-code task tags"
+color: "charts.orange"
+created: "2025-01-10"
+updated: "2025-01-10"
+
+summary:
+  total: 10
+  todo: 0
+  in_progress: 0
+  done: 10
+
+work_items:
+  - id: "01"
+    name: "Type Definitions for ExpressoTag"
+    repo: "vscode-extension"
+    status: done
+    file: "done/01-type-definitions.md"
+
+  - id: "02"
+    name: "ExpressoScanner Service"
+    repo: "vscode-extension"
+    status: done
+    file: "done/02-expresso-scanner.md"
+
+  - id: "03"
+    name: "ExpressoDecorator Service"
+    repo: "vscode-extension"
+    status: done
+    file: "done/03-expresso-decorator.md"
+
+  - id: "04"
+    name: "ExpressoCodeLensProvider"
+    repo: "vscode-extension"
+    status: done
+    file: "done/04-codelens-provider.md"
+
+  - id: "05"
+    name: "Clipboard and Toast Functionality"
+    repo: "vscode-extension"
+    status: done
+    file: "done/05-clipboard-toast.md"
+
+  - id: "06"
+    name: "Framework Command /expresso"
+    repo: "ai-framework"
+    status: done
+    file: "done/06-framework-command.md"
+
+  - id: "07"
+    name: "Integration and Testing"
+    repo: "vscode-extension"
+    status: done
+    file: "done/07-integration-testing.md"
+
+  - id: "08"
+    name: "Remove DiffReviewPanel"
+    repo: "vscode-extension"
+    status: done
+    file: "done/08-remove-diff-review-panel.md"
+
+  - id: "09"
+    name: "Remove Review Changes Command"
+    repo: "vscode-extension"
+    status: done
+    file: "done/09-remove-review-changes-command.md"
+
+  - id: "10"
+    name: "Update TreeView Context Menu"
+    repo: "vscode-extension"
+    status: done
+    file: "done/10-update-treeview-context-menu.md"

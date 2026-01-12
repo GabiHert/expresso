@@ -19,9 +19,12 @@ import { getClaudeHistoryPath } from './utils/claudePaths';
 // UUID regex for detecting session IDs in input
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 import { TerminalManager } from './services/TerminalManager';
-import { DiffReviewPanel } from './panels/DiffReviewPanel';
 import { CommentManager } from './services/CommentManager';
 import { CockpitCleanupService } from './services/CockpitCleanupService';
+import { ExpressoScanner } from './services/ExpressoScanner';
+import { ExpressoDecorator } from './services/ExpressoDecorator';
+import { ExpressoCodeLensProvider } from './providers/ExpressoCodeLensProvider';
+import { registerExpressoCommands } from './commands/expresso';
 
 let fileWatcher: CockpitFileWatcher | undefined;
 let statusBar: StatusBarProvider | undefined;
@@ -32,6 +35,8 @@ let shadowManager: ShadowManager | undefined;
 let sessionManager: SessionManager | undefined;
 let terminalManager: TerminalManager | undefined;
 let commentManager: CommentManager | undefined;
+let expressoScanner: ExpressoScanner | undefined;
+let expressoDecorator: ExpressoDecorator | undefined;
 
 export function getTerminalManager(): TerminalManager | undefined {
   return terminalManager;
@@ -88,6 +93,35 @@ export async function activate(context: vscode.ExtensionContext) {
   terminalManager = new TerminalManager();
   commentManager = new CommentManager(workspaceRoot);
   context.subscriptions.push({ dispose: () => commentManager?.dispose() });
+
+  // Initialize Expresso tag scanner and decorations
+  expressoScanner = new ExpressoScanner(workspaceRoot);
+  expressoDecorator = new ExpressoDecorator(expressoScanner, context.extensionUri);
+
+  // Register Expresso CodeLens provider
+  const expressoCodeLensProvider = new ExpressoCodeLensProvider(expressoScanner);
+  const expressoCodeLensRegistration = vscode.languages.registerCodeLensProvider(
+    { scheme: 'file' },
+    expressoCodeLensProvider
+  );
+
+  // Register Expresso commands
+  registerExpressoCommands(context);
+
+  // Start scanning workspace for @expresso tags and watching for changes
+  expressoScanner.scanWorkspace().then(result => {
+    if (result.totalCount > 0) {
+      console.log(`AI Cockpit: Found ${result.totalCount} @expresso tag(s)`);
+    }
+  });
+  expressoScanner.startWatching();
+
+  context.subscriptions.push(
+    expressoScanner,
+    expressoDecorator,
+    expressoCodeLensProvider,
+    expressoCodeLensRegistration
+  );
 
   // Initialize session database (must complete before other operations)
   try {
@@ -829,9 +863,6 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      // Close any open DiffReviewPanels for this task
-      const closedPanels = DiffReviewPanel.closeAllForTask(taskId);
-
       // Clean up cockpit data (events, shadows, sessions, active task)
       const cleanupResult = await cockpitCleanupService.cleanupTask(taskId);
       if (!cleanupResult.success) {
@@ -860,9 +891,6 @@ export async function activate(context: vscode.ExtensionContext) {
         let successMsg = `Task "${taskId}" deleted`;
         if (cleanupResult.wasActive) {
           successMsg += ' (was active task)';
-        }
-        if (closedPanels > 0) {
-          successMsg += ` - closed ${closedPanels} diff panel(s)`;
         }
 
         vscode.window.showInformationMessage(successMsg);
@@ -1218,27 +1246,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(showClaudeChanges, showYourChanges, showFullDiff, showPlainDiff);
 
-  // Register open diff review panel command (GitHub-style review)
-  const openDiffReview = vscode.commands.registerCommand(
-    'aiCockpit.openDiffReview',
-    async (arg: unknown) => {
-      console.log('[openDiffReview] Command called with arg:', arg);
-      const shadow = extractShadow(arg);
-      console.log('[openDiffReview] Extracted shadow:', shadow ? shadow.meta.filePath : 'null');
-      if (!shadow) {
-        vscode.window.showWarningMessage('No shadow data provided');
-        return;
-      }
-      if (!commentManager) {
-        vscode.window.showErrorMessage('CommentManager not initialized');
-        return;
-      }
-      console.log('[openDiffReview] Opening DiffReviewPanel for', shadow.meta.filePath);
-      DiffReviewPanel.createOrShow(context.extensionUri, shadow, commentManager);
-    }
-  );
-
-  context.subscriptions.push(openDiffReview);
 
   // Register open feedback file command
   const openFeedbackFile = vscode.commands.registerCommand(

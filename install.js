@@ -21,10 +21,10 @@
  *   - AI Cockpit VSCode extension (optional)
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execSync, spawnSync } = require('child_process');
-const readline = require('readline');
+const fs = require("fs");
+const path = require("path");
+const { execSync, spawnSync } = require("child_process");
+const readline = require("readline");
 
 // ============================================================
 // CONFIGURATION
@@ -32,36 +32,28 @@ const readline = require('readline');
 
 const SCRIPT_DIR = __dirname;
 
-const FRAMEWORK_DIRS = [
-  '.ai/_framework',
-];
+const FRAMEWORK_DIRS = [".ai/_framework"];
 
-const CLAUDE_DIRS = [
-  '.claude/commands',
-  '.claude/agents',
-  '.claude/hooks',
-];
+const CLAUDE_DIRS = [".claude/commands", ".claude/agents", ".claude/hooks"];
 
-const CLAUDE_FILES = [
-  '.claude/settings.json',
-];
+const CLAUDE_FILES = [".claude/settings.json"];
 
 const DIRS_TO_CREATE = [
-  '.ai/tasks/todo',
-  '.ai/tasks/in_progress',
-  '.ai/tasks/done',
-  '.ai/cockpit/events',
-  '.ai/cockpit/shadows',
-  '.ai/docs',
+  ".ai/tasks/todo",
+  ".ai/tasks/in_progress",
+  ".ai/tasks/done",
+  ".ai/cockpit/events",
+  ".ai/cockpit/shadows",
+  ".ai/docs",
 ];
 
-const VSCODE_EXTENSION = 'vscode-extension/ai-cockpit-0.1.0.vsix';
+const VSCODE_EXTENSION = "vscode-extension/ai-cockpit-0.1.0.vsix";
 
 const COCKPIT_CONFIG = {
-  version: '1.0.0',
+  version: "1.0.0",
   serverPort: 9999,
-  eventStorage: 'file',
-  gitBranchPattern: '([A-Z]+-\\d+)',
+  eventStorage: "file",
+  gitBranchPattern: "([A-Z]+-\\d+)",
   enabled: true,
 };
 
@@ -70,17 +62,17 @@ const COCKPIT_CONFIG = {
 // ============================================================
 
 const colors = {
-  reset: '\x1b[0m',
-  bright: '\x1b[1m',
-  dim: '\x1b[2m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  cyan: '\x1b[36m',
+  reset: "\x1b[0m",
+  bright: "\x1b[1m",
+  dim: "\x1b[2m",
+  red: "\x1b[31m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  blue: "\x1b[34m",
+  cyan: "\x1b[36m",
 };
 
-function log(message, color = '') {
+function log(message, color = "") {
   console.log(`${color}${message}${colors.reset}`);
 }
 
@@ -119,13 +111,13 @@ async function prompt(question) {
 }
 
 async function confirm(question, defaultYes = true) {
-  const suffix = defaultYes ? '[Y/n]' : '[y/N]';
+  const suffix = defaultYes ? "[Y/n]" : "[y/N]";
   const answer = await prompt(`${question} ${suffix}`);
 
-  if (answer === '') {
+  if (answer === "") {
     return defaultYes;
   }
-  return answer === 'y' || answer === 'yes';
+  return answer === "y" || answer === "yes";
 }
 
 function copyDirectory(src, dest) {
@@ -165,7 +157,7 @@ function copyFile(src, dest) {
 }
 
 function createBackup(targetPath) {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
   const backupPath = `${targetPath}.backup-${timestamp}`;
 
   if (fs.existsSync(targetPath)) {
@@ -184,7 +176,7 @@ function mergeSettings(existingPath, newSettings) {
 
   if (fs.existsSync(existingPath)) {
     try {
-      existing = JSON.parse(fs.readFileSync(existingPath, 'utf-8'));
+      existing = JSON.parse(fs.readFileSync(existingPath, "utf-8"));
     } catch (e) {
       logWarning(`Could not parse existing settings.json, will overwrite`);
     }
@@ -202,7 +194,7 @@ function mergeSettings(existingPath, newSettings) {
       for (const newHook of hookConfigs) {
         // Check if this hook already exists (by matcher)
         const existingIndex = merged.hooks[hookType].findIndex(
-          h => h.matcher === newHook.matcher
+          (h) => h.matcher === newHook.matcher
         );
 
         if (existingIndex === -1) {
@@ -220,9 +212,9 @@ function mergeSettings(existingPath, newSettings) {
 
 function isVSCodeAvailable() {
   try {
-    const result = spawnSync('code', ['--version'], {
-      stdio: 'pipe',
-      shell: true
+    const result = spawnSync("code", ["--version"], {
+      stdio: "pipe",
+      shell: true,
     });
     return result.status === 0;
   } catch (e) {
@@ -233,7 +225,7 @@ function isVSCodeAvailable() {
 function installVSCodeExtension(vsixPath) {
   try {
     execSync(`code --install-extension "${vsixPath}" --force`, {
-      stdio: 'pipe',
+      stdio: "pipe",
       shell: true,
     });
     return true;
@@ -293,16 +285,16 @@ async function main() {
   let updateMode = false;
 
   for (const arg of args) {
-    if (arg === '--help' || arg === '-h') {
+    if (arg === "--help" || arg === "-h") {
       printHelp();
       process.exit(0);
-    } else if (arg === '--yes' || arg === '-y') {
+    } else if (arg === "--yes" || arg === "-y") {
       nonInteractive = true;
-    } else if (arg === '--no-extension') {
+    } else if (arg === "--no-extension") {
       skipExtension = true;
-    } else if (arg === '--update') {
+    } else if (arg === "--update") {
       updateMode = true;
-    } else if (!arg.startsWith('-')) {
+    } else if (!arg.startsWith("-")) {
       targetDir = path.resolve(arg);
     }
   }
@@ -315,12 +307,12 @@ ${colors.bright}╔════════════════════�
 `);
 
   log(`Target directory: ${targetDir}`, colors.dim);
-  log(`Mode: ${updateMode ? 'Update' : 'Fresh install'}`, colors.dim);
+  log(`Mode: ${updateMode ? "Update" : "Fresh install"}`, colors.dim);
 
   // --------------------------------------------------------
   // Step 1: Validate target directory
   // --------------------------------------------------------
-  logStep('1/6', 'Validating target directory');
+  logStep("1/6", "Validating target directory");
 
   if (!fs.existsSync(targetDir)) {
     if (nonInteractive) {
@@ -332,54 +324,54 @@ ${colors.bright}╔════════════════════�
         fs.mkdirSync(targetDir, { recursive: true });
         logSuccess(`Created directory: ${targetDir}`);
       } else {
-        logError('Installation cancelled');
+        logError("Installation cancelled");
         process.exit(1);
       }
     }
   } else {
-    logSuccess('Directory exists');
+    logSuccess("Directory exists");
   }
 
   // --------------------------------------------------------
   // Step 2: Check for existing installation
   // --------------------------------------------------------
-  logStep('2/6', 'Checking for existing installation');
+  logStep("2/6", "Checking for existing installation");
 
-  const aiExists = fs.existsSync(path.join(targetDir, '.ai'));
-  const claudeExists = fs.existsSync(path.join(targetDir, '.claude'));
+  const aiExists = fs.existsSync(path.join(targetDir, ".ai"));
+  const claudeExists = fs.existsSync(path.join(targetDir, ".claude"));
 
   if ((aiExists || claudeExists) && !updateMode) {
-    logWarning('Existing installation detected:');
-    if (aiExists) logInfo('  - .ai/ directory found');
-    if (claudeExists) logInfo('  - .claude/ directory found');
+    logWarning("Existing installation detected:");
+    if (aiExists) logInfo("  - .ai/ directory found");
+    if (claudeExists) logInfo("  - .claude/ directory found");
 
     if (!nonInteractive) {
-      const proceed = await confirm('Create backup and continue?');
+      const proceed = await confirm("Create backup and continue?");
       if (!proceed) {
-        logError('Installation cancelled');
+        logError("Installation cancelled");
         process.exit(1);
       }
     }
 
     // Create backups
     if (aiExists) {
-      const backup = createBackup(path.join(targetDir, '.ai'));
+      const backup = createBackup(path.join(targetDir, ".ai"));
       if (backup) logSuccess(`Backed up .ai/ to ${path.basename(backup)}`);
     }
     if (claudeExists) {
-      const backup = createBackup(path.join(targetDir, '.claude'));
+      const backup = createBackup(path.join(targetDir, ".claude"));
       if (backup) logSuccess(`Backed up .claude/ to ${path.basename(backup)}`);
     }
   } else if (updateMode) {
-    logInfo('Update mode: will overwrite framework files only');
+    logInfo("Update mode: will overwrite framework files only");
   } else {
-    logSuccess('No existing installation found');
+    logSuccess("No existing installation found");
   }
 
   // --------------------------------------------------------
   // Step 3: Copy framework files
   // --------------------------------------------------------
-  logStep('3/6', 'Installing framework files');
+  logStep("3/6", "Installing framework files");
 
   for (const dir of FRAMEWORK_DIRS) {
     const src = path.join(SCRIPT_DIR, dir);
@@ -397,7 +389,7 @@ ${colors.bright}╔════════════════════�
   // --------------------------------------------------------
   // Step 4: Copy Claude integration files
   // --------------------------------------------------------
-  logStep('4/6', 'Installing Claude Code integration');
+  logStep("4/6", "Installing Claude Code integration");
 
   for (const dir of CLAUDE_DIRS) {
     const src = path.join(SCRIPT_DIR, dir);
@@ -413,17 +405,17 @@ ${colors.bright}╔════════════════════�
   }
 
   // Handle settings.json merge
-  const settingsSrc = path.join(SCRIPT_DIR, '.claude/settings.json');
-  const settingsDest = path.join(targetDir, '.claude/settings.json');
+  const settingsSrc = path.join(SCRIPT_DIR, ".claude/settings.json");
+  const settingsDest = path.join(targetDir, ".claude/settings.json");
 
   if (fs.existsSync(settingsSrc)) {
     try {
-      const newSettings = JSON.parse(fs.readFileSync(settingsSrc, 'utf-8'));
+      const newSettings = JSON.parse(fs.readFileSync(settingsSrc, "utf-8"));
       const merged = mergeSettings(settingsDest, newSettings);
 
       fs.mkdirSync(path.dirname(settingsDest), { recursive: true });
       fs.writeFileSync(settingsDest, JSON.stringify(merged, null, 2));
-      logSuccess('Merged .claude/settings.json');
+      logSuccess("Merged .claude/settings.json");
     } catch (e) {
       logWarning(`Could not merge settings.json: ${e.message}`);
     }
@@ -432,7 +424,7 @@ ${colors.bright}╔════════════════════�
   // --------------------------------------------------------
   // Step 5: Create directory structure
   // --------------------------------------------------------
-  logStep('5/6', 'Creating directory structure');
+  logStep("5/6", "Creating directory structure");
 
   for (const dir of DIRS_TO_CREATE) {
     const fullPath = path.join(targetDir, dir);
@@ -445,61 +437,64 @@ ${colors.bright}╔════════════════════�
   }
 
   // Create cockpit config
-  const cockpitConfigPath = path.join(targetDir, '.ai/cockpit/config.json');
+  const cockpitConfigPath = path.join(targetDir, ".ai/cockpit/config.json");
   if (!fs.existsSync(cockpitConfigPath)) {
-    fs.writeFileSync(cockpitConfigPath, JSON.stringify(COCKPIT_CONFIG, null, 2));
-    logSuccess('Created .ai/cockpit/config.json');
+    fs.writeFileSync(
+      cockpitConfigPath,
+      JSON.stringify(COCKPIT_CONFIG, null, 2)
+    );
+    logSuccess("Created .ai/cockpit/config.json");
   }
 
   // Create .gitkeep files for empty directories
   const gitkeepDirs = [
-    '.ai/tasks/todo',
-    '.ai/tasks/in_progress',
-    '.ai/tasks/done',
-    '.ai/cockpit/events',
-    '.ai/cockpit/shadows',
+    ".ai/tasks/todo",
+    ".ai/tasks/in_progress",
+    ".ai/tasks/done",
+    ".ai/cockpit/events",
+    ".ai/cockpit/shadows",
   ];
 
   for (const dir of gitkeepDirs) {
-    const gitkeepPath = path.join(targetDir, dir, '.gitkeep');
+    const gitkeepPath = path.join(targetDir, dir, ".gitkeep");
     if (!fs.existsSync(gitkeepPath)) {
-      fs.writeFileSync(gitkeepPath, '');
+      fs.writeFileSync(gitkeepPath, "");
     }
   }
 
   // --------------------------------------------------------
   // Step 6: Install VSCode extension
   // --------------------------------------------------------
-  logStep('6/6', 'VSCode extension');
+  logStep("6/6", "VSCode extension");
 
   if (skipExtension) {
-    logInfo('Skipped (--no-extension flag)');
+    logInfo("Skipped (--no-extension flag)");
   } else {
     const vsixPath = path.join(SCRIPT_DIR, VSCODE_EXTENSION);
 
     if (!fs.existsSync(vsixPath)) {
-      logWarning('Extension file not found, skipping');
+      logWarning("Extension file not found, skipping");
       logInfo(`Expected: ${vsixPath}`);
     } else if (!isVSCodeAvailable()) {
-      logWarning('VSCode CLI not available, skipping extension install');
-      logInfo('Install manually: code --install-extension ' + vsixPath);
+      logWarning("VSCode CLI not available, skipping extension install");
+      logInfo("Install manually: code --install-extension " + vsixPath);
     } else {
       let shouldInstall = true;
 
       if (!nonInteractive) {
-        shouldInstall = await confirm('Install AI Cockpit VSCode extension?');
+        shouldInstall = await confirm("Install AI Cockpit VSCode extension?");
       }
 
       if (shouldInstall) {
         const success = installVSCodeExtension(vsixPath);
         if (success) {
-          logSuccess('AI Cockpit extension installed');
+          logSuccess("AI Cockpit extension installed");
         } else {
-          logWarning('Failed to install extension');
-          logInfo('Install manually: code --install-extension ' + vsixPath);
+          logWarning("Failed to install extension");
+          logInfo("Install manually: code --install-extension " + vsixPath);
         }
       } else {
-        logInfo('Skipped by user');
+        logInfo("Skipped by user");
       }
     }
   }

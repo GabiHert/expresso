@@ -78,3 +78,6 @@ export interface TaskSwitchSignal {
   newTaskId: string;
   type: 'task-switch';
 }
+
+// Expresso tag types
+export * from './expresso';

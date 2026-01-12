@@ -106,11 +106,6 @@
         "icon": "$(comment-discussion)"
       },
       {
-        "command": "aiCockpit.openDiffReview",
-        "title": "Review Changes",
-        "icon": "$(comment-discussion)"
-      },
-      {
         "command": "aiCockpit.showPlainDiff",
         "title": "Show Plain Diff",
         "icon": "$(diff)"
@@ -119,6 +114,23 @@
         "command": "aiCockpit.deleteTask",
         "title": "Delete Task",
         "icon": "$(trash)"
+      },
+      {
+        "command": "aiCockpit.brewExpresso",
+        "title": "AI Cockpit: Brew Expresso",
+        "icon": "$(coffee)"
+      },
+      {
+        "command": "aiCockpit.scanExpresso",
+        "title": "AI Cockpit: Scan for @expresso Tags"
+      },
+      {
+        "command": "aiCockpit.listExpresso",
+        "title": "AI Cockpit: List @expresso Tags"
+      },
+      {
+        "command": "aiCockpit.goToExpressoTag",
+        "title": "AI Cockpit: Go to @expresso Tag"
       }
     ],
     "configuration": {
@@ -143,6 +155,50 @@
           "type": "boolean",
           "default": true,
           "description": "Automatically detect Claude history location"
+        },
+        "aiCockpit.expresso.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable @expresso tag scanning and highlighting"
+        },
+        "aiCockpit.expresso.showCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show 'Brew this' button above @expresso tags"
+        },
+        "aiCockpit.expresso.showDecorations": {
+          "type": "boolean",
+          "default": true,
+          "description": "Highlight @expresso tags in the editor"
+        },
+        "aiCockpit.expresso.fileExtensions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "ts",
+            "tsx",
+            "js",
+            "jsx",
+            "py",
+            "go",
+            "rs",
+            "java",
+            "c",
+            "cpp",
+            "h",
+            "hpp",
+            "cs",
+            "rb",
+            "php",
+            "swift",
+            "kt",
+            "scala",
+            "vue",
+            "svelte"
+          ],
+          "description": "File extensions to scan for @expresso tags"
         }
       }
     },
@@ -208,14 +264,9 @@
           "group": "inline"
         },
         {
-          "command": "aiCockpit.openDiffReview",
-          "when": "view == aiCockpit.tasks && viewItem =~ /shadow-file/",
-          "group": "navigation@1"
-        },
-        {
           "command": "aiCockpit.showPlainDiff",
           "when": "view == aiCockpit.tasks && viewItem =~ /shadow-file/",
-          "group": "navigation@2"
+          "group": "navigation@1"
         },
         {
           "command": "aiCockpit.showClaudeChanges",
