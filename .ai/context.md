@@ -14,16 +14,16 @@
 
 | Field | Value |
 |-------|-------|
-| **Project** | AI Cockpit |
-| **Description** | VSCode extension for monitoring and managing AI agents - real-time task tracking, diff history, and agent orchestration |
-| **Root** | /Users/gabriel.herter/Documents/Personal/ai-framework |
+| **Project** | Expresso |
+| **Description** | Developer productivity framework for Claude Code - inline @expresso task tags, structured task management, and real-time session tracking |
+| **Root** | /Users/gabriel.herter/Documents/Personal/expresso |
 
 ## Repositories
 
 | Repo | Path | Tech |
 |------|------|------|
-| ai-framework | ./ | markdown, yaml, typescript |
-| vscode-extension | ./vscode-extension | typescript, vscode-api, webview |
+| expresso | ./ | markdown, yaml, typescript |
+| vscode-extension | ./vscode-extension | typescript, vscode-api |
 
 ## Current State
 

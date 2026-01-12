@@ -12,26 +12,25 @@
 # PROJECT IDENTITY
 # ============================================================
 project:
-  name: "AI Cockpit"
-  description: "VSCode extension for monitoring and managing AI agents - real-time task tracking, diff history, and agent orchestration"
-  root: "/Users/gabriel.herter/Documents/Personal/ai-framework"
+  name: "Expresso"
+  description: "Developer productivity framework for Claude Code - inline @expresso task tags, structured task management, and real-time session tracking"
+  root: "/Users/gabriel.herter/Documents/Personal/expresso"
 
 # ============================================================
 # REPOSITORIES
 # ============================================================
 repos:
-  - name: ai-framework
+  - name: expresso
     path: ./
     protected: true
-    locked_branch: project/ai-cockpit
     is_framework: true
-    description: "Core AI task framework - commands, templates, and agent behavior definitions"
+    description: "Core Expresso framework - commands, templates, @expresso tags, and agent behavior"
     tech: [markdown, yaml, typescript]
 
   - name: vscode-extension
     path: ./vscode-extension
-    description: "VSCode extension for AI Cockpit UI (to be created)"
-    tech: [typescript, vscode-api, webview]
+    description: "VSCode extension for Expresso - session tracking, diff history, @expresso CodeLens"
+    tech: [typescript, vscode-api]
 
 # ============================================================
 # MCP INTEGRATIONS
@@ -90,8 +89,8 @@ notifications:
 # FRAMEWORK VERSION CONTROL
 # ============================================================
 framework:
-  repo: "GabiHert/ai-framework"
-  branch: "project/ai-cockpit"
+  repo: "GabiHert/expresso"
+  branch: "main"
   track_customizations: true
 
 # ============================================================

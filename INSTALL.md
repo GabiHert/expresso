@@ -1,19 +1,19 @@
-# AI Framework Installation Guide
+# Expresso Installation Guide
 
-Quick setup for the AI Cockpit framework and VSCode extension.
+Quick setup for the Expresso framework and VSCode extension.
 
 ## Quick Start
 
 ```bash
 # Clone the repository
-git clone https://github.com/GabiHert/ai-framework.git
+git clone https://github.com/GabiHert/expresso.git
 
 # Install to your project
-node ai-framework/install.js /path/to/your/project
+node expresso/install.js /path/to/your/project
 
 # Or install to current directory
 cd /path/to/your/project
-node /path/to/ai-framework/install.js
+node /path/to/expresso/install.js
 ```
 
 ## Installation Options
@@ -111,7 +111,7 @@ Look for the **AI Cockpit** icon in the VSCode activity bar (sidebar).
 To update an existing installation:
 
 ```bash
-node ai-framework/install.js /path/to/your/project --update
+node expresso/install.js /path/to/your/project --update
 ```
 
 This will:
@@ -180,5 +180,5 @@ Verify `.claude/settings.json` contains the hook configuration:
 
 ## Support
 
-- GitHub Issues: https://github.com/GabiHert/ai-framework/issues
+- GitHub Issues: https://github.com/GabiHert/expresso/issues
 - Documentation: See `.ai/_framework/README.md` after installation
