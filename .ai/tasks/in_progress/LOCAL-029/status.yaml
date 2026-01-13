@@ -7,9 +7,9 @@ updated: "2026-01-13"
 
 summary:
   total: 6
-  todo: 6
+  todo: 0
   in_progress: 0
-  done: 0
+  done: 6
 
 work_items:
   - id: "01"
@@ -17,45 +17,45 @@ work_items:
     repo: "vscode-extension"
     repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
     repo_protected: false
-    status: todo
-    file: "todo/01-create-command-registry.md"
+    status: done
+    file: "done/01-create-command-registry.md"
 
   - id: "02"
     name: "Update ExpressoScanner integration"
     repo: "vscode-extension"
     repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
     repo_protected: false
-    status: todo
-    file: "todo/02-update-expresso-scanner.md"
+    status: done
+    file: "done/02-update-expresso-scanner.md"
 
   - id: "03"
     name: "Update ExpressoCompletionProvider"
     repo: "vscode-extension"
     repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
     repo_protected: false
-    status: todo
-    file: "todo/03-update-completion-provider.md"
+    status: done
+    file: "done/03-update-completion-provider.md"
 
   - id: "04"
     name: "Update extension activation"
     repo: "vscode-extension"
     repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
     repo_protected: false
-    status: todo
-    file: "todo/04-update-extension-activation.md"
+    status: done
+    file: "done/04-update-extension-activation.md"
 
   - id: "05"
     name: "Cleanup deprecated code"
     repo: "vscode-extension"
     repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
     repo_protected: false
-    status: todo
-    file: "todo/05-cleanup-deprecated-code.md"
+    status: done
+    file: "done/05-cleanup-deprecated-code.md"
 
   - id: "06"
     name: "Add/update tests"
     repo: "vscode-extension"
     repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
     repo_protected: false
-    status: todo
-    file: "todo/06-add-update-tests.md"
+    status: done
+    file: "done/06-add-update-tests.md"

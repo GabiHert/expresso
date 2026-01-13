@@ -24,6 +24,8 @@ import { CockpitCleanupService } from './services/CockpitCleanupService';
 import { ExpressoScanner } from './services/ExpressoScanner';
 import { ExpressoDecorator } from './services/ExpressoDecorator';
 import { ExpressoCodeLensProvider } from './providers/ExpressoCodeLensProvider';
+import { ExpressoCompletionProvider } from './providers/ExpressoCompletionProvider';
+import { CommandRegistry } from './services/CommandRegistry';
 import { registerExpressoCommands } from './commands/expresso';
 
 let fileWatcher: CockpitFileWatcher | undefined;
@@ -94,8 +96,13 @@ export async function activate(context: vscode.ExtensionContext) {
   commentManager = new CommentManager(workspaceRoot);
   context.subscriptions.push({ dispose: () => commentManager?.dispose() });
 
-  // Initialize Expresso tag scanner and decorations
-  expressoScanner = new ExpressoScanner(workspaceRoot);
+  // Initialize CommandRegistry first (source of truth for Claude commands)
+  const commandRegistry = new CommandRegistry(workspaceRoot);
+  await commandRegistry.initialize();
+  console.log('[Expresso] CommandRegistry initialized');
+
+  // Initialize Expresso tag scanner with command registry
+  expressoScanner = new ExpressoScanner(workspaceRoot, commandRegistry);
   expressoDecorator = new ExpressoDecorator(expressoScanner, context.extensionUri);
 
   // Register Expresso CodeLens provider
@@ -103,6 +110,14 @@ export async function activate(context: vscode.ExtensionContext) {
   const expressoCodeLensRegistration = vscode.languages.registerCodeLensProvider(
     { scheme: 'file' },
     expressoCodeLensProvider
+  );
+
+  // Register Expresso completion provider with command registry
+  const expressoCompletionProvider = new ExpressoCompletionProvider(commandRegistry);
+  const expressoCompletionRegistration = vscode.languages.registerCompletionItemProvider(
+    { scheme: 'file' },  // All file types
+    expressoCompletionProvider,
+    '/'  // Trigger on '/' character
   );
 
   // Register Expresso commands
@@ -117,10 +132,12 @@ export async function activate(context: vscode.ExtensionContext) {
   expressoScanner.startWatching();
 
   context.subscriptions.push(
+    commandRegistry,
     expressoScanner,
     expressoDecorator,
     expressoCodeLensProvider,
-    expressoCodeLensRegistration
+    expressoCodeLensRegistration,
+    expressoCompletionRegistration
   );
 
   // Initialize session database (must complete before other operations)

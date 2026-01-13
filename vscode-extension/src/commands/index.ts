@@ -4,7 +4,8 @@ import { StatusBarProvider } from '../providers/StatusBarProvider';
 export function registerCommands(
   context: vscode.ExtensionContext,
   statusBar: StatusBarProvider
-): void {
+): void { 
+
   const showTaskMenu = vscode.commands.registerCommand(
     'aiCockpit.showTaskMenu',
     async () => {

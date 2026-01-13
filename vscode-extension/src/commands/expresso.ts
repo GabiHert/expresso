@@ -1,8 +1,8 @@
-import * as vscode from 'vscode';
-import { ExpressoTag, EXPRESSO_VARIANT_STYLES } from '../types/expresso';
+import * as vscode from "vscode";
+import { EXPRESSO_VARIANT_STYLES, ExpressoTag } from "../types/expresso";
 
 /**
- * Format the /expresso command for clipboard
+ * Format @expresso /task-start the /expresso command for clipboard
  */
 function formatExpressoCommand(tag: ExpressoTag): string {
   // Escape double quotes in task description
@@ -15,13 +15,15 @@ function formatExpressoCommand(tag: ExpressoTag): string {
 /**
  * Register all expresso-related commands
  */
-export function registerExpressoCommands(context: vscode.ExtensionContext): void {
+export function registerExpressoCommands(
+  context: vscode.ExtensionContext
+): void {
   // Main brew command - triggered by CodeLens click
   const brewCommand = vscode.commands.registerCommand(
-    'aiCockpit.brewExpresso',
+    "aiCockpit.brewExpresso",
     async (tag: ExpressoTag) => {
       if (!tag) {
-        vscode.window.showErrorMessage('No expresso tag provided');
+        vscode.window.showErrorMessage("No expresso tag provided");
         return;
       }
 
@@ -38,12 +40,12 @@ export function registerExpressoCommands(context: vscode.ExtensionContext): void
         // Show toast notification with action button
         const action = await vscode.window.showInformationMessage(
           `${style.emoji} Ready to brew! Paste in terminal`,
-          'Open Terminal'
+          "Open Terminal"
         );
 
         // Optionally open terminal if user clicks the button
-        if (action === 'Open Terminal') {
-          vscode.commands.executeCommand('workbench.action.terminal.focus');
+        if (action === "Open Terminal") {
+          vscode.commands.executeCommand("workbench.action.terminal.focus");
         }
       } catch (error) {
         vscode.window.showErrorMessage(`Failed to copy: ${error}`);
@@ -53,9 +55,9 @@ export function registerExpressoCommands(context: vscode.ExtensionContext): void
 
   // Command to manually scan workspace for expresso tags
   const scanCommand = vscode.commands.registerCommand(
-    'aiCockpit.scanExpresso',
+    "aiCockpit.scanExpresso",
     async () => {
-      vscode.window.showInformationMessage('☕ Scanning for @expresso tags...');
+      vscode.window.showInformationMessage("☕ Scanning for @expresso tags...");
       // The actual scanning will be triggered by the scanner service
       // This command is a placeholder for manual trigger
     }
@@ -63,17 +65,17 @@ export function registerExpressoCommands(context: vscode.ExtensionContext): void
 
   // Command to show all expresso tags (future: opens sidebar panel)
   const listCommand = vscode.commands.registerCommand(
-    'aiCockpit.listExpresso',
+    "aiCockpit.listExpresso",
     async () => {
       vscode.window.showInformationMessage(
-        '☕ Expresso tag list coming soon! For now, tags are shown in the editor.'
+        "☕ Expresso tag list coming soon! For now, tags are shown in the editor."
       );
     }
   );
 
   // Command to go to a specific expresso tag
   const goToTagCommand = vscode.commands.registerCommand(
-    'aiCockpit.goToExpressoTag',
+    "aiCockpit.goToExpressoTag",
     async (tag: ExpressoTag) => {
       if (!tag) {
         return;
@@ -96,5 +98,10 @@ export function registerExpressoCommands(context: vscode.ExtensionContext): void
     }
   );
 
-  context.subscriptions.push(brewCommand, scanCommand, listCommand, goToTagCommand);
+  context.subscriptions.push(
+    brewCommand,
+    scanCommand,
+    listCommand,
+    goToTagCommand
+  );
 }

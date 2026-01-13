@@ -6,25 +6,52 @@ import {
   ExpressoVariant,
   ExpressoConfig,
   DEFAULT_EXPRESSO_CONFIG,
+  CommandMatch,
 } from '../types/expresso';
 import { generateTagFingerprint } from '../utils/expressoIdGenerator';
+import { CommandRegistry } from './CommandRegistry';
 
 /**
  * Scans workspace files for @expresso tags, caches results, and watches for changes
  */
 export class ExpressoScanner implements vscode.Disposable {
   private cache: Map<string, ExpressoTag[]> = new Map();
+  private commandCache: Map<string, CommandMatch[]> = new Map();
   private disposables: vscode.Disposable[] = [];
   private config: ExpressoConfig;
+  private commandPattern: RegExp | null = null;
 
   private readonly onChangeEmitter = new vscode.EventEmitter<ExpressoScanResult>();
   public readonly onChange: vscode.Event<ExpressoScanResult> = this.onChangeEmitter.event;
 
   constructor(
     private workspaceRoot: string,
+    private commandRegistry: CommandRegistry,
     config?: Partial<ExpressoConfig>
   ) {
     this.config = { ...DEFAULT_EXPRESSO_CONFIG, ...config };
+
+    // Subscribe to registry changes to invalidate command pattern
+    this.disposables.push(
+      this.commandRegistry.onChange(() => {
+        this.commandPattern = null;
+        this.emitCurrentState();
+      })
+    );
+  }
+
+  /**
+   * Build regex pattern from command registry
+   */
+  private buildCommandPattern(): RegExp {
+    const commands = this.commandRegistry.getCommandNames();
+    if (commands.length === 0) {
+      return /(?!)/g; // Pattern that matches nothing
+    }
+    return new RegExp(
+      `(${commands.map(cmd => cmd.replace('/', '\\/')).join('|')})(?=\\s|$|[^a-zA-Z0-9-])`,
+      'g'
+    );
   }
 
   /**
@@ -82,6 +109,10 @@ export class ExpressoScanner implements vscode.Disposable {
 
     // Update cache
     this.cache.set(filePath, tags);
+
+    // Also scan for commands in this document
+    const commands = this.scanDocumentForCommands(document);
+    this.commandCache.set(filePath, commands);
 
     return tags;
   }
@@ -361,6 +392,69 @@ export class ExpressoScanner implements vscode.Disposable {
   }
 
   /**
+   * Get command matches for a specific file
+   */
+  public getCommandsForFile(filePath: string): CommandMatch[] {
+    return this.commandCache.get(filePath) || [];
+  }
+
+  /**
+   * Check if a line is a comment (supports //, /*, *, #, /**, <!--)
+   */
+  private isCommentLine(line: string): boolean {
+    const trimmed = line.trim();
+    return (
+      trimmed.startsWith('//') ||
+      trimmed.startsWith('/*') ||
+      trimmed.startsWith('*') ||
+      trimmed.startsWith('#') ||
+      trimmed.startsWith('<!--') ||
+      trimmed.includes('*/') ||
+      trimmed.includes('-->')
+    );
+  }
+
+  /**
+   * Scan a document for valid Claude commands in comments
+   */
+  public scanDocumentForCommands(document: vscode.TextDocument): CommandMatch[] {
+    const matches: CommandMatch[] = [];
+    const text = document.getText();
+    const lines = text.split('\n');
+    const filePath = document.uri.fsPath;
+
+    // Use cached pattern, rebuild if needed
+    if (!this.commandPattern) {
+      this.commandPattern = this.buildCommandPattern();
+    }
+
+    for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+      const line = lines[lineIndex];
+
+      // Only scan comment lines
+      if (!this.isCommentLine(line)) {
+        continue;
+      }
+
+      // Reset regex lastIndex for each line
+      this.commandPattern.lastIndex = 0;
+
+      let match;
+      while ((match = this.commandPattern.exec(line)) !== null) {
+        matches.push({
+          command: match[1],
+          line: lineIndex + 1, // 1-based
+          columnStart: match.index,
+          columnEnd: match.index + match[1].length,
+          filePath,
+        });
+      }
+    }
+
+    return matches;
+  }
+
+  /**
    * Get all cached tags
    */
   public getAllTags(): ExpressoTag[] {
@@ -414,6 +508,7 @@ export class ExpressoScanner implements vscode.Disposable {
       watcher.onDidDelete(uri => {
         if (this.cache.has(uri.fsPath)) {
           this.cache.delete(uri.fsPath);
+          this.commandCache.delete(uri.fsPath);
           this.emitCurrentState();
         }
       })
@@ -514,6 +609,7 @@ export class ExpressoScanner implements vscode.Disposable {
    */
   public clearCache(): void {
     this.cache.clear();
+    this.commandCache.clear();
   }
 
   /**
@@ -539,6 +635,7 @@ export class ExpressoScanner implements vscode.Disposable {
     }
     this.disposables = [];
     this.cache.clear();
+    this.commandCache.clear();
     this.onChangeEmitter.dispose();
   }
 }

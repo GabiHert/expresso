@@ -47,7 +47,7 @@ const DIRS_TO_CREATE = [
   ".ai/docs",
 ];
 
-const VSCODE_EXTENSION = "vscode-extension/ai-cockpit-0.1.0.vsix";
+const VSCODE_EXTENSION = "vscode-extension/ai-cockpit.vsix";
 
 const COCKPIT_CONFIG = {
   version: "1.0.0",
