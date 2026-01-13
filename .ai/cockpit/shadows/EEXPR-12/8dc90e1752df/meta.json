@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-12-3/todo/03-create-enrichment-service.md",
+  "taskId": "EEXPR-12",
+  "baseline": {
+    "capturedAt": "2026-01-08T18:59:16.351Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T18:59:16.351Z",
+    "hash": "514a197ad8ca6f53",
+    "size": 8854,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T18:59:16.351Z",
+    "actualFileHash": "514a197ad8ca6f53",
+    "status": "synced"
+  }
+}

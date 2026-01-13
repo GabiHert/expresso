@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-12/todo/01-create-subtask-eexpr-12-1.md",
+  "taskId": "session-dd73030c-1dff-4bc1-a371-2f1717e04e8f",
+  "baseline": {
+    "capturedAt": "2026-01-08T15:44:04.953Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T15:44:04.953Z",
+    "hash": "ffb806fd39b895a8",
+    "size": 3850,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T15:44:04.953Z",
+    "actualFileHash": "ffb806fd39b895a8",
+    "status": "synced"
+  }
+}

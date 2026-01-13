@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-57/todo/02-update-sync-caller.md",
+  "taskId": "EEXPR-56",
+  "baseline": {
+    "capturedAt": "2026-01-08T18:23:37.658Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T18:23:37.658Z",
+    "hash": "90a4ab0beefa195c",
+    "size": 2874,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T18:23:37.658Z",
+    "actualFileHash": "90a4ab0beefa195c",
+    "status": "synced"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "id": "evt-1767991001533-1je7vizgq",
+  "taskId": "ENGESC-23600",
+  "taskIdSource": "active-task-file",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Identify task changes in affected repos",
+        "status": "completed",
+        "activeForm": "Identifying task changes"
+      },
+      {
+        "content": "Launch code reviewer agent",
+        "status": "completed",
+        "activeForm": "Launching code reviewer"
+      },
+      {
+        "content": "Compile and output review report",
+        "status": "completed",
+        "activeForm": "Compiling review report"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [
+      {
+        "content": "Identify task changes in affected repos",
+        "status": "completed",
+        "activeForm": "Identifying task changes"
+      },
+      {
+        "content": "Launch code reviewer agent",
+        "status": "completed",
+        "activeForm": "Launching code reviewer"
+      },
+      {
+        "content": "Compile and output review report",
+        "status": "in_progress",
+        "activeForm": "Compiling review report"
+      }
+    ],
+    "newTodos": [
+      {
+        "content": "Identify task changes in affected repos",
+        "status": "completed",
+        "activeForm": "Identifying task changes"
+      },
+      {
+        "content": "Launch code reviewer agent",
+        "status": "completed",
+        "activeForm": "Launching code reviewer"
+      },
+      {
+        "content": "Compile and output review report",
+        "status": "completed",
+        "activeForm": "Compiling review report"
+      }
+    ]
+  },
+  "sessionId": "02f0f4e9-5821-4d98-a210-caa2f7fae2ec",
+  "timestamp": "2026-01-09T20:36:41.533Z"
+}

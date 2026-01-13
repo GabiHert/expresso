@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/backend/services/peo/entity_transfer/steps/cross_hire_sanity_check_step.ts",
+  "taskId": "EEXPR-56",
+  "baseline": {
+    "capturedAt": "2026-01-08T00:24:48.225Z",
+    "hash": "a84d34a90bb43afb",
+    "size": 9758
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T00:48:44.275Z",
+    "hash": "0c08ed3d6e6b0eab",
+    "size": 11132,
+    "editCount": 3
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T00:48:44.275Z",
+    "actualFileHash": "0c08ed3d6e6b0eab",
+    "status": "synced"
+  }
+}

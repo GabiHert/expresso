@@ -1,0 +1,18 @@
+# Task Status Index
+task: "EEXPR-59"
+title: "Fix Entity Transfer Missing Employment Creation"
+created: "2026-01-09"
+updated: "2026-01-09"
+
+summary:
+  total: 1
+  todo: 1
+  in_progress: 0
+  done: 0
+
+work_items:
+  - id: "01"
+    name: "Add jobTitle lookup in CreateContractStep"
+    repo: "backend"
+    status: todo
+    file: "todo/01-add-jobtitle-lookup.md"

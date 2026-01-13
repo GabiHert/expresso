@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-57/todo/01-add-contractid-param.md",
+  "taskId": "EEXPR-56",
+  "baseline": {
+    "capturedAt": "2026-01-08T18:23:25.804Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T18:23:25.805Z",
+    "hash": "0e7dd8351aa2dd21",
+    "size": 3483,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T18:23:25.805Z",
+    "actualFileHash": "0e7dd8351aa2dd21",
+    "status": "synced"
+  }
+}

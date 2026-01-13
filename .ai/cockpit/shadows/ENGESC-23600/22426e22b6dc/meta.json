@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-59/todo/01-add-jobtitle-lookup.md",
+  "taskId": "ENGESC-23600",
+  "baseline": {
+    "capturedAt": "2026-01-09T21:03:48.003Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-09T21:03:48.003Z",
+    "hash": "0408c72b920f0f71",
+    "size": 8681,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-09T21:03:48.003Z",
+    "actualFileHash": "0408c72b920f0f71",
+    "status": "synced"
+  }
+}

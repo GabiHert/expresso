@@ -1,0 +1,372 @@
+import {Controller, Get, Joi, Middleware, Post} from '../../../modules/core/controllers/decorators';
+import {peoBenefitGroupService} from '../../../services/peo/benefit_group_service';
+import {EntityTransferService} from '../../../services/peo/entity_transfer/entity_transfer_service';
+import {EntityTransferRepository} from '../../../services/peo/entity_transfer/repositories/entity_transfer_repository';
+import {transferResourcesService} from '../../../services/peo/entity_transfer/services/transfer_resources_service';
+import {TransferItemStatus, TransferStatus} from '../../../services/peo/entity_transfer/types';
+import {peoContractHrisIntegrationDataService} from '../../../services/peo/peo_contract_hris_integration_data_service';
+import {peoContractService} from '../../../services/peo/peo_contract_service';
+import {peoContractSyncService} from '../../../services/peo/peo_contract_sync_service';
+import {peoHrisIntegrationService} from '../../../services/peo/peo_hris_integration_service';
+import {HttpError} from '../../../utils/error';
+import {HTTP_CODES} from '../../../utils/http';
+
+@Controller('admin/peo/tech_ops', {admin: true})
+export class TechOpsAdminController {
+    @Get('/contract/:oid/prism_sync_analysis')
+    @Joi((joi, db) => ({
+        params: joi.object().keys({
+            oid: joi.publicId(db.Contract).permission('admin:contracts.read', db.Contract).secure().resolve(false).required(),
+        }),
+    }))
+    async prismSyncAnalysis({req, res}) {
+        const {oid: contractOid} = req.params;
+        const syncAnalysis = await peoContractSyncService.getPrismSyncAnalysisForContractOid(contractOid);
+
+        return res.json(syncAnalysis);
+    }
+
+    /**
+     * check https://wiki.deel.network/i/32161 for L2(tech ops) instructions on how to use this endpoint
+     */
+    @Post('/contract/:oid/update_start_date')
+    @Joi((joi, db) => ({
+        params: joi.object().keys({
+            oid: joi.publicId(db.Contract).permission('admin:contracts.write', db.Contract).secure().resolve(false).required(),
+        }),
+        body: joi.object().keys({
+            deelPeoStartDate: joi.plainDateString().required(),
+            startDate: joi.plainDateString().required(),
+            forceUpdate: joi.boolean().optional(),
+        }),
+    }))
+    async updateStartDate({req, params, body, res}) {
+        const {oid: contractOid} = params;
+        const {deelPeoStartDate, startDate, forceUpdate} = body;
+
+        await peoContractService.updateContractStartDate({contractOid, deelPeoStartDate, startDate, forceUpdate, profileId: req?.profile?.id});
+
+        res.sendStatus(HTTP_CODES.ok);
+    }
+
+    /**
+     * This endpoint can be used to reimport benefit groups for a client. Example of ticket where this could have been used:https://letsdeel.atlassian.net/browse/ENGESC-4076
+     * if a new benefit group was added to the client in Prism, this endpoint can be used to reimport the benefit groups for the client.
+     */
+    @Post('/entity/:id/reimport_benefit_groups')
+    @Joi((joi, db) => ({
+        params: joi.object().keys({
+            id: joi.publicId(db.LegalEntity).permission('admin:contracts.read', db.LegalEntity).required(),
+        }),
+    }))
+    async reimportBenefitGroups({params, res}) {
+        const {id: legalEntityId} = params;
+
+        await peoBenefitGroupService.reimportBenefitGroups(legalEntityId);
+
+        res.sendStatus(HTTP_CODES.ok);
+    }
+
+    /**
+     * This endpoint can be used to clean the peo contract hris integration data by contract, making it possible a sync retry to be able to collect updates from HRIS integration.
+     */
+    @Post('/hris_integration/clean_contract_data/:oid')
+    @Joi((joi, db) => ({
+        params: joi.object().keys({
+            oid: joi.publicId(db.Contract).permission('admin:contracts.read', db.Contract).resolve(false).required(),
+        }),
+    }))
+    async cleanPeoContractHrisIntegrationDataByContract({params, res}) {
+        const {oid} = params;
+
+        await peoContractHrisIntegrationDataService.deletePeoContractHrisIntegrationDataByContract(oid);
+
+        res.sendStatus(HTTP_CODES.ok);
+    }
+
+    /**
+     * This endpoint can be used to clean the peo contract hris integration data by client, making it possible a sync retry to be able to collect updates from HRIS integration.
+     */
+    @Post('/hris_integration/clean_client_data/:entityId')
+    @Joi((joi, db) => ({
+        params: joi.object().keys({
+            entityId: joi.publicId(db.LegalEntity).permission('admin:contracts.read', db.LegalEntity).resolve(false).required(),
+        }),
+    }))
+    async cleanPeoContractHrisIntegrationDataByLegalEntityId({params, res}) {
+        const {entityId} = params;
+
+        await peoContractHrisIntegrationDataService.deletePeoContractHrisIntegrationDataByEntity(entityId);
+
+        res.sendStatus(HTTP_CODES.ok);
+    }
+
+    /**
+     * This endpoint can be used to link a peo contract by an HrisIntegrationProviderId. Example of ticket where this could have been used:https://letsdeel.atlassian.net/browse/PPEO-2438
+     */
+    @Post('/hris_integration/set_provider_id/:oid')
+    @Joi((joi, db) => ({
+        params: joi.object().keys({
+            oid: joi.publicId(db.Contract).permission('admin:contracts.read', db.Contract).resolve(false).required(),
+        }),
+        body: joi.object().keys({
+            hrisIntegrationProviderId: joi.string(),
+        }),
+    }))
+    async setHrisIntegrationProviderIdByContract({params, body, res}) {
+        const {oid} = params;
+        const {hrisIntegrationProviderId} = body;
+
+        await peoContractService.updatePeoContractHrisIntegrationProviderId({
+            deelContractOid: oid,
+            hrisIntegrationProviderId,
+        });
+
+        res.sendStatus(HTTP_CODES.ok);
+    }
+
+    /**
+     * This endpoint can be used to move compliance documents from a cancelled/terminated contract to a new contract belonging to the same profile i.e. in a PEO employee rehire scenario.
+     * Example of ticket where this could have been used: https://letsdeel.atlassian.net/browse/ENGESC-765
+     */
+    @Post('/contract/move_compliance_documents')
+    @Joi((joi, db) => ({
+        body: joi.object().keys({
+            fromContractOid: joi.publicId(db.Contract).permission('admin:contracts.write', db.Contract).secure().resolve(false).required(),
+            toContractOid: joi.publicId(db.Contract).permission('admin:contracts.write', db.Contract).secure().resolve(false).required(),
+        }),
+    }))
+    async moveComplianceDocuments({body, res}) {
+        const {fromContractOid, toContractOid} = body;
+
+        await peoContractService.moveComplianceDocuments({fromContractOid, toContractOid});
+
+        res.sendStatus(HTTP_CODES.ok);
+    }
+
+    /**
+     * This endpoint can be used to evaluate the PEO VIP tag assignment for a contract.
+     * It will check if the contract should have the PEO VIP tag assigned or removed based on the current conditions.
+     */
+    @Post('/contract/evaluate_peo_vip_assignment/:oid')
+    @Joi((joi, db) => ({
+        params: joi.object().keys({
+            oid: joi.publicId(db.Contract).permission('admin:contracts.read', db.Contract).resolve(false).required(),
+        }),
+    }))
+    async evaluatePeoVipAssignment({params, res}) {
+        const {oid} = params;
+
+        const response = await peoContractService.evaluatePeoVipTagAssignment({contractOid: oid});
+
+        res.send(response);
+    }
+
+    /**
+     * This endpoint can be used to see invalid employees by an HRIS Integration.
+     * It will check employees returned by the HRIS Integration provider that were filtered out, due to something missing, helping understand why employees are not appearing in the mass onboarding drawer.
+     */
+    @Get('/hris_integration/:integrationId/invalid_employees')
+    @Middleware((app) => app.permissions('admin:contracts.read'))
+    @Joi((joi) => ({
+        params: joi.object().keys({
+            integrationId: joi.standardPublicId(), // We have to used a standardPublicId here because the integrationId can be in both schemas hr."Integrations".id or integrations.integrations.public_id
+        }),
+    }))
+    async getInvalidEmployeesByHrisIntegration({params, res}) {
+        const {integrationId} = params;
+
+        const response = await peoHrisIntegrationService.getInvalidEmployeesByIntegration(integrationId);
+
+        res.send(response);
+    }
+
+    /**
+     * Fetches available resources for entity transfer destination selection.
+     * Returns benefit groups, payroll settings, PTO policies, work locations, job codes, and teams
+     * for the specified legal entity.
+     */
+    @Get('/legal-entities/:legalEntityPublicId/transfer-resources')
+    @Middleware((app) => app.permissions('admin:contracts.read'))
+    @Joi((joi) => ({
+        params: joi.object().keys({
+            legalEntityPublicId: joi.string().uuid().required(),
+        }),
+    }))
+    async getTransferResources({params, res}) {
+        const {legalEntityPublicId} = params;
+
+        try {
+            const resources = await transferResourcesService.getTransferResources(legalEntityPublicId);
+            return res.status(HTTP_CODES.ok).json(resources);
+        } catch (error) {
+            const statusCode =
+                typeof error.statusCode === 'number' && error.statusCode >= 100 && error.statusCode <= 599 ? error.statusCode : HTTP_CODES.internalServerError;
+            return res.status(statusCode).json({
+                success: false,
+                error: error.message,
+                details: error.data || error.details,
+            });
+        }
+    }
+
+    @Post('/entity_transfer')
+    @Middleware((app) => app.permissions('admin:contracts.write'))
+    @Joi((joi) => ({
+        body: joi.object().keys({
+            // Transfer fields - Number IDs
+            organizationId: joi.number().integer().min(1).required(),
+            // basePeoContractOid is peo_contracts.deel_contract_oid (employee number on PrismHR)
+            basePeoContractOid: joi.string().required(),
+            newTeamId: joi.number().integer().min(1).optional(),
+            // Transfer fields - UUIDs
+            newPayrollSettingsId: joi.string().required(), // employment.payroll_settings.id
+            requesterProfilePublicId: joi.string().uuid().required(),
+            sourceLegalEntityPublicId: joi.string().uuid().required(),
+            destinationLegalEntityPublicId: joi.string().uuid().required(),
+            // Transfer fields - Date
+            effectiveDate: joi.plainDateString().required(),
+            // Transfer fields - String IDs with length limits
+            agreementId: joi.string().min(1).max(100).optional(),
+            // Transfer item fields - Prism IDs with database-aligned constraints
+            newBenefitGroupId: joi.string().min(1).max(10).required(),
+            newPtoPolicyId: joi.string().min(1).max(64).required(),
+            newWorkLocationId: joi.string().min(1).max(100).required(),
+            newJobCode: joi.string().min(1).max(64).required(),
+            // Resume execution from a specific step (for testing retry behavior)
+            resumeFromStep: joi.string().min(1).max(100).optional(),
+            // New contract OID for resume scenarios (when contract was already created)
+            newContractOid: joi.string().min(5).max(20).optional(),
+        }),
+    }))
+    async executeEntityTransfer({body, res}) {
+        let transferId = 'unknown';
+        let itemId = 'unknown';
+
+        try {
+            const {
+                organizationId,
+                requesterProfilePublicId,
+                sourceLegalEntityPublicId,
+                destinationLegalEntityPublicId,
+                effectiveDate,
+                agreementId,
+                basePeoContractOid,
+                newBenefitGroupId,
+                newPayrollSettingsId,
+                newPtoPolicyId,
+                newTeamId,
+                newWorkLocationId,
+                newJobCode,
+                resumeFromStep,
+                newContractOid,
+            } = body;
+
+            // TODO: PEOCM-660 - Replace mock data with real database inserts
+            // Current: Creating in-memory mock objects for testing entity transfer logic
+            // Future: INSERT INTO entity_transfer.peo_employee_transfers (...) RETURNING id
+            //         INSERT INTO entity_transfer.peo_employee_transfer_items (...) RETURNING id
+            //
+            // When PEOCM-660 is implemented, this endpoint will:
+            // 1. Insert transfer record into entity_transfer.peo_employee_transfers
+            // 2. Insert transfer item into entity_transfer.peo_employee_transfer_items
+            // 3. Execute transfer using repository.loadTransferWithItems(transferId)
+            // 4. Status updates will persist to database instead of in-memory only
+            const mockTransfer = {
+                id: 'test-transfer-123',
+                organizationId,
+                status: TransferStatus.SCHEDULED,
+                effectiveDate,
+                requesterProfilePublicId,
+                sourceLegalEntityPublicId,
+                destinationLegalEntityPublicId,
+                agreementId: agreementId || `TEST-AGREEMENT-${Date.now()}`,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
+            transferId = mockTransfer.id;
+
+            const mockTransferItem = {
+                id: 'test-item-1',
+                transferId: mockTransfer.id,
+                basePeoContractOid,
+                status: TransferItemStatus.PENDING,
+                newBenefitGroupId,
+                newPayrollSettingsId,
+                newPtoPolicyId,
+                newWorkLocationId,
+                newJobCode,
+                newTeamId,
+                errorMessage: null,
+                warningMessage: null,
+                crossHireCompleted: false,
+                resumeFromStep,
+                newContractOid,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
+            itemId = mockTransferItem.id;
+
+            const repository = new EntityTransferRepository();
+            const entityTransferService = new EntityTransferService(repository);
+
+            const result = await entityTransferService.executeTransfer(mockTransfer, mockTransferItem);
+
+            let errorDetails: unknown = result.error?.message || result.error?.toString();
+            if (errorDetails) {
+                try {
+                    errorDetails = JSON.parse(errorDetails as string);
+                } catch {
+                    // If not JSON, keep as string
+                }
+            }
+
+            const response = {
+                success: result.success,
+                transferId: mockTransfer.id,
+                itemId: mockTransferItem.id,
+                status: result.status,
+                completedSteps: result.completedSteps,
+                crossHireCompleted: result.crossHireCompleted,
+                workLocationId: newWorkLocationId,
+                jobCode: newJobCode,
+                ...(result.newContractOid && {newContractOid: result.newContractOid}),
+                ...(result.resumeFromStep && {resumeFromStep: result.resumeFromStep}),
+                ...(errorDetails && {error: errorDetails}),
+                ...(result.error && {
+                    errorDetails: {
+                        message: result.error.message,
+                        stack: result.error.stack,
+                        name: result.error.name,
+                    },
+                }),
+                ...(result.rollbackErrors && {rollbackErrors: result.rollbackErrors}),
+            };
+            const hasErrors = (result.rollbackErrors && result.rollbackErrors.length > 0) || errorDetails;
+
+            return res.status(hasErrors ? HTTP_CODES.unprocessable_entity : HTTP_CODES.ok).json(response);
+        } catch (error) {
+            if (error instanceof HttpError) {
+                throw error;
+            }
+
+            // Parse Zod validation errors if present
+            let errorDetails = error.message;
+            try {
+                errorDetails = JSON.parse(error.message);
+            } catch {
+                // If not JSON, keep as string
+            }
+
+            return res.status(HTTP_CODES.unprocessable_entity).json({
+                success: false,
+                transferId,
+                itemId,
+                error: errorDetails,
+                errorMessage: error.message,
+                errorName: error.name,
+                stack: error.stack,
+            });
+        }
+    }
+}

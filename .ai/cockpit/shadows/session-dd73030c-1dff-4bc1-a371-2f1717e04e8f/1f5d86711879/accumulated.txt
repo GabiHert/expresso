@@ -1,0 +1,340 @@
+<!--
+╔══════════════════════════════════════════════════════════════════╗
+║ LAYER: TASK (EPIC)                                               ║
+║ LOCATION: .ai/tasks/todo/EEXPR-12/                              ║
+╠══════════════════════════════════════════════════════════════════╣
+║ THIS IS AN EPIC - Parent task with subtasks                      ║
+║                                                                  ║
+║ SUBTASKS:                                                        ║
+║   EEXPR-12-1: [PEO] Migration - Fix signature profile_public_id  ║
+║   EEXPR-12-2: [PEO] GET transfers by source entity endpoint      ║
+║   EEXPR-12-3: [BE] Tech ops endpoint with enrichment             ║
+║   EEXPR-12-4: [BE] Public API endpoint for transfers             ║
+║                                                                  ║
+║ WORK ITEMS IN THIS EPIC:                                         ║
+║   01-create-subtask-eexpr-12-1.md                                ║
+║   02-create-subtask-eexpr-12-2.md                                ║
+║   03-create-subtask-eexpr-12-3.md                                ║
+║   04-create-subtask-eexpr-12-4.md                                ║
+╚══════════════════════════════════════════════════════════════════╝
+-->
+
+# EEXPR-12: [BE] Endpoint to retrieve transfer details, status, and signature progress
+
+## Problem Statement
+
+We need an endpoint to retrieve entity transfer details by source legal entity public ID. This endpoint will return:
+- Transfer details (status, effective date, organization)
+- Source and destination legal entity metadata (name, country code)
+- Transfer items with employee information
+- Signature progress (admin and employee signatures)
+- Agreement data (PDF URL, type)
+
+**Endpoint:** `GET /admin/peo/tech_ops/entity_transfer/source/{source_entity_public_id}`
+
+## Expected Response Format
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "transfer": {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "status": "DRAFT",
+        "organizationId": 106252,
+        "requesterPublicProfileId": "bfad0491-eca1-4857-ac9a-7e30002a44d4",
+        "sourceLegalEntity": {
+          "publicId": "13c44a93-cf52-4dd3-a1ba-cf8e8404cd10",
+          "legalName": "Deel PEO - California",
+          "countryCode": "US"
+        },
+        "destinationLegalEntity": {
+          "publicId": "6569739c-33d5-4897-82f5-5284d2b17e71",
+          "legalName": "Deel PEO - Texas",
+          "countryCode": "US"
+        },
+        "effectiveDate": "2025-02-01",
+        "items": [
+          {
+            "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+            "peoContractOid": "EMP12345",
+            "employeeName": "John Doe",
+            "employeeEmail": "john.doe@company.com",
+            "status": "PENDING",
+            "benefitGroupId": "400",
+            "payGroupId": "cmj1mkiml01to01cngrnz3z1h",
+            "ptoPolicyId": "7422d56a-a372-46c5-adbd-9463d16d58cb",
+            "workLocationId": "1eb08af5-4ce9-4fb1-8ddd-ab8ae5bb23c6",
+            "positionPublicId": "f6355dbb-861d-45e2-9c55-b206ad4c7647",
+            "teamId": 205923,
+            "newContractOid": null,
+            "resumeFromStep": null
+          }
+        ],
+        "signatures": {
+          "admins": [
+            {
+              "publicProfileId": "99b7c17f-3420-4a50-b7d2-58c8c8940f6b",
+              "name": "Sarah Chen",
+              "email": "sarah.chen@company.com",
+              "role": "ADMIN",
+              "agreementType": "ENTITY_ASSIGNMENT_AGREEMENT",
+              "status": "AWAITING_SIGNATURE",
+              "signedAt": null
+            }
+          ],
+          "employees": [
+            {
+              "publicProfileId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "name": "John Doe",
+              "email": "john.doe@company.com",
+              "jobTitle": "Software Developer",
+              "role": "EMPLOYEE",
+              "agreementType": "ENTITY_ASSIGNMENT_AGREEMENT",
+              "status": "AWAITING_SIGNATURE",
+              "signedAt": null
+            }
+          ]
+        },
+        "agreementId": "d4e5f6a7-b8c9-0123-4567-890abcdef123",
+        "createdAt": "2025-01-15T10:30:00Z",
+        "updatedAt": "2025-01-15T10:30:00Z"
+      },
+      "agreement": {
+        "id": "d4e5f6a7-b8c9-0123-4567-890abcdef123",
+        "pdfUrl": "https://s3.amazonaws.com/deel-documents/agreements/permanent-agreement-2025.pdf",
+        "type": "ENTITY_ASSIGNMENT_AGREEMENT",
+        "createdAt": "2025-01-15T10:30:00Z",
+        "expiresAt": null
+      }
+    }
+  ],
+  "cursor": null,
+  "hasMore": false
+}
+```
+
+## Acceptance Criteria
+
+- [ ] Migration fixes `profile_public_id` type from INTEGER to UUID in signatures table
+- [ ] PEO endpoint returns raw transfer data with cursor-based pagination
+- [ ] Backend endpoint enriches data with legal entity, profile, and email information
+- [ ] Employee name comes from `peo_contracts.first_name/last_name`
+- [ ] Employee email enriched from `Contract → Profile.email` join
+- [ ] Signature profiles enriched from `Profile` table (name, email, jobTitle)
+- [ ] Legal entities enriched from `LegalEntities` table (name, country code)
+- [ ] Agreement data includes `pdfUrl` constructed from `peo_files.persisted_path_pattern`
+- [ ] Signatures grouped by role (admins, employees) in response
+- [ ] All batch queries use `Op.in` pattern to avoid N+1 queries
+- [ ] Public API endpoint exposed at `/peo_integration/legal_entities/entity_transfer/:legalEntityId/transfers`
+- [ ] Public API validates CLIENT role and PEO legal entity access
+
+## Subtasks
+
+| ID | Name | Repo | Status | Description |
+|----|------|------|--------|-------------|
+| EEXPR-12-1 | Migration - Fix signature profile_public_id | peo | todo | Fix INTEGER → UUID type mismatch |
+| EEXPR-12-2 | GET transfers by source entity endpoint | peo | todo | New PEO endpoint returning raw data |
+| EEXPR-12-3 | Tech ops endpoint with enrichment | backend | todo | Backend enrichment + tech ops exposure |
+| EEXPR-12-4 | Public API endpoint for transfers | backend | todo | Client-facing endpoint like transfer_resources |
+
+## Work Items (Epic Level)
+
+| ID | Name | Status |
+|----|------|--------|
+| 01 | Create subtask EEXPR-12-1 | todo |
+| 02 | Create subtask EEXPR-12-2 | todo |
+| 03 | Create subtask EEXPR-12-3 | todo |
+| 04 | Create subtask EEXPR-12-4 | todo |
+
+## Branches
+
+| Repo | Branch |
+|------|--------|
+| peo | `EEXPR-12-get-transfer-details` |
+| backend | `EEXPR-12-get-transfer-details` |
+
+## Architecture
+
+### Service Boundary Constraint
+
+**CRITICAL**: Backend CANNOT query PEO database tables directly. Must use PEO service HTTP endpoints.
+
+### Data Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                            BACKEND SERVICE                              │
+│  GET /admin/peo/tech_ops/entity_transfer/source/:sourceEntityPublicId  │
+│                                                                         │
+│  1. Call PEO endpoint → Get RAW transfer data                          │
+│                                                                         │
+│  2. Batch enrich (using established patterns):                         │
+│     ┌────────────────────────────────────────────────────────────┐     │
+│     │ Employee Email:                                             │     │
+│     │   Contract.findAll({where: {id: {Op.in: contractIds}}})    │     │
+│     │   include: [{model: Profile, as: 'Contractor'}]            │     │
+│     ├────────────────────────────────────────────────────────────┤     │
+│     │ Signature Profiles:                                         │     │
+│     │   Profile.findAll({where: {publicId: {Op.in: profileIds}}})│     │
+│     │   attributes: ['publicId', 'firstName', 'lastName',        │     │
+│     │                'email', 'jobTitle']                         │     │
+│     ├────────────────────────────────────────────────────────────┤     │
+│     │ Legal Entities:                                             │     │
+│     │   LegalEntity.findAll({where: {publicId: {Op.in: ids}}})   │     │
+│     │   attributes: ['publicId', 'name', 'address']              │     │
+│     └────────────────────────────────────────────────────────────┘     │
+│                                                                         │
+│  3. Build Maps for O(1) lookup during enrichment                       │
+│  4. Return complete enriched response                                   │
+└─────────────────────────────────────────────────────────────────────────┘
+                              │
+                              │ HTTP
+                              ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                             PEO SERVICE                                 │
+│  NEW: GET /peo/entity-transfer/transfers/source/:sourceEntityPublicId  │
+│                                                                         │
+│  Returns RAW data only (no enrichment):                                │
+│  {                                                                      │
+│    transfers: [{                                                        │
+│      id, status, organizationId, effectiveDate,                        │
+│      requesterProfilePublicId,     // UUID                             │
+│      sourceLegalEntityPublicId,    // UUID                             │
+│      destinationLegalEntityPublicId, // UUID                           │
+│      items: [{                                                          │
+│        id, status, baseContractOid,                                    │
+│        deelContractId,             // INTEGER (for email lookup)       │
+│        employeeName,               // from peo_contracts               │
+│        benefitGroupId, payGroupId, ptoPolicyId,                        │
+│        workLocationId, positionPublicId, teamId,                       │
+│        newContractOid, resumeFromStep                                  │
+│      }],                                                                │
+│      signatures: [{                                                     │
+│        id, profilePublicId,        // UUID (after migration)           │
+│        role, agreementType, signedAt                                   │
+│      }],                                                                │
+│      agreement: {                                                       │
+│        id, type, pdfUrl, createdAt                                     │
+│      }                                                                  │
+│    }],                                                                  │
+│    cursor, hasMore                                                      │
+│  }                                                                      │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+## Technical Context
+
+### Database Tables
+
+**PEO Database:**
+
+| Table | Purpose |
+|-------|---------|
+| `peo.peo_employee_transfers` | Master transfer records |
+| `peo.peo_employee_transfer_items` | Individual employee transfers |
+| `peo.peo_employee_transfer_signatures` | Signature tracking |
+| `peo.peo_contracts` | Employee name (first_name, last_name) |
+| `peo.peo_agreements` | Agreement metadata |
+| `peo.peo_file_submissions` | Links to files |
+| `peo.peo_files` | File paths (persisted_path_pattern) |
+
+**Backend Database:**
+
+| Table | Purpose |
+|-------|---------|
+| `public.LegalEntities` | Legal entity name, address.country |
+| `public.profile` | Profile name, email, jobTitle |
+| `public.contract` | Links to profile (contractor_id) |
+
+### Data Mapping
+
+| Data | Source | Notes |
+|------|--------|-------|
+| Employee name | `peo_contracts.first_name/last_name` | Already in PEO |
+| Employee email | `Contract → Profile.email` | Backend enrichment |
+| Signature name/email/jobTitle | `Profile` by `public_id` | Backend enrichment |
+| Legal entity name | `LegalEntities.name` | Backend enrichment |
+| Legal entity country | `LegalEntities.address->>'country'` | Returns "US", "BR", etc. |
+| Agreement pdfUrl | `peo_files.persisted_path_pattern` | PEO constructs URL |
+
+### Key SQL Patterns
+
+**Employee Email (Backend):**
+```sql
+SELECT c.id, p.email
+FROM contract c
+JOIN profile p ON c.contractor_id = p.id
+WHERE c.id IN (...)
+```
+
+**Signature Profile (Backend):**
+```sql
+SELECT public_id, first_name, last_name, email, job_title
+FROM profile
+WHERE public_id IN (...)
+```
+
+**Legal Entity (Backend):**
+```sql
+SELECT public_id, name, address->>'country' as country_code
+FROM "LegalEntities"
+WHERE public_id IN (...)
+```
+
+### Type Issue to Fix
+
+**Problem:** `peo_employee_transfer_signatures.profile_public_id` is INTEGER but should be UUID.
+
+**Current:** Stores `profile.id` (INTEGER)
+**Expected:** Should store `profile.public_id` (UUID)
+
+This is fixed in EEXPR-12-1 migration.
+
+### Enrichment Patterns (Backend)
+
+Use established patterns from codebase:
+
+1. **Op.in Batch Query** - Fetch multiple records by ID array
+2. **Map-Based Enrichment** - O(1) lookup during enrichment
+3. **Promise.all** - Parallel fetching of enrichment data
+4. **Cursor Pagination** - Efficient large dataset handling
+
+Reference files:
+- `backend/services/ems/decorator.js` - Batch enrichment with maps
+- `backend/services/organizations/common/twofa_enrichment_service.js` - Enrichment service pattern
+- `backend/utils/sequelize_batch.js` - Cursor-based processing
+
+## Deployment Order
+
+1. **EEXPR-12-1 (PEO migration)** - Fix profile_public_id type
+2. **EEXPR-12-2 (PEO endpoint)** - New raw data endpoint
+3. **EEXPR-12-3 (Backend)** - Enrichment + tech ops endpoint
+4. **EEXPR-12-4 (Backend)** - Public API endpoint for clients
+
+**Breaking change**: No - this is additive functionality
+
+## Risks & Considerations
+
+- **Migration data integrity**: Ensure all existing profile_public_id values can be mapped to profile.public_id
+- **Performance**: Batch queries with Op.in pattern to avoid N+1
+- **Service boundaries**: PEO returns raw IDs, Backend enriches - no circular HTTP calls
+
+## Testing Strategy
+
+1. **Unit tests** for each service method
+2. **Integration tests** for PEO endpoint
+3. **Integration tests** for Backend enrichment
+4. **E2E test** with real data
+
+## Related Tasks
+
+- [PEOCM-660](../done/PEOCM-660/README.md) - Entity Transfer Tables Implementation
+- [PEOCM-823](../in_progress/PEOCM-823/README.md) - Position Public ID Migration
+
+## References
+
+- [Entity Transfers Documentation](../../../docs/backend/entity_transfers/README.md)
+- [PEOCM-660 Entity Transfer Tables Schema](../done/PEOCM-660/entity-transfer-tables-schema.md)
+- [PEOCM-823 Entity Transfer Data Structure](../in_progress/PEOCM-823/entity-transfer-data-structure.md)

@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/in_progress/EEXPR-57/todo/04-refactor-to-use-contract-oid.md",
+  "taskId": "EEXPR-57",
+  "baseline": {
+    "capturedAt": "2026-01-08T19:09:19.686Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T19:09:19.686Z",
+    "hash": "ccfacca4162d5a58",
+    "size": 5342,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T19:09:19.686Z",
+    "actualFileHash": "ccfacca4162d5a58",
+    "status": "synced"
+  }
+}

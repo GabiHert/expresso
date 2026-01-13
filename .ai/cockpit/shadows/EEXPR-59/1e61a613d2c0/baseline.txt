@@ -1,0 +1,869 @@
+// Set environment variable before any imports to prevent axios "Invalid URL" errors
+process.env.PEO_INTEGRATION_URL = 'http://localhost:3000';
+
+import {Transaction} from 'sequelize';
+
+import {PEOLogger} from '../../../../../modules/peo/utils/peo_logger';
+import {CreateContractStep} from '../../../entity_transfer/steps/create_contract_step';
+import {StepExecutionResult} from '../../../entity_transfer/steps/i_transfer_step';
+import {TransferContext} from '../../../entity_transfer/transfer_context';
+import {hasCrossHireCompleted} from '../../../entity_transfer/transfer_context';
+import {PeoContractOrigin} from '../../../schemas';
+
+jest.mock('../../../base_peo_service', () => ({
+    BasePEOService: class MockBasePEOService {
+        client = {
+            get: jest.fn(),
+            post: jest.fn(),
+            patch: jest.fn().mockResolvedValue({
+                data: {
+                    success: true,
+                    data: undefined,
+                },
+            }),
+            delete: jest.fn(),
+        };
+        log = {
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+        };
+        get db() {
+            return {};
+        }
+    },
+    PEOEndpoints: {
+        updateTransferItem: (itemId: string) => `/peo/entity-transfer/item/${itemId}`,
+        syncContractWithPrism: () => '/peo/peo-contract/integrate',
+    },
+}));
+
+jest.mock('@/services/peo/peo_contract_service');
+jest.mock('@/services/peo/peo_position_service');
+jest.mock('@/services/peo/peo_scope_of_work_service');
+jest.mock('../../../entity_transfer/transfer_context', () => ({
+    ...jest.requireActual('../../../entity_transfer/transfer_context'),
+    hasCrossHireCompleted: jest.fn(),
+}));
+
+import {peoContractService} from '@/services/peo/peo_contract_service';
+import {peoPositionService} from '@/services/peo/peo_position_service';
+import {peoScopeOfWorkService} from '@/services/peo/peo_scope_of_work_service';
+
+const mockCreateContract = peoContractService.createContract as jest.MockedFunction<typeof peoContractService.createContract>;
+const mockGetByFilters = peoPositionService.getByFilters as jest.MockedFunction<typeof peoPositionService.getByFilters>;
+const mockGetPeoScopeOfWorkByPeoContract = peoScopeOfWorkService.getPeoScopeOfWorkByPeoContract as jest.MockedFunction<
+    typeof peoScopeOfWorkService.getPeoScopeOfWorkByPeoContract
+>;
+const mockHasCrossHireCompleted = hasCrossHireCompleted as jest.MockedFunction<typeof hasCrossHireCompleted>;
+
+describe('CreateContractStep', () => {
+    let step: CreateContractStep;
+    let mockLogger: jest.Mocked<PEOLogger>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Mock database object with dynamic model properties
+    let mockDb: Record<string, any>;
+    let mockTransaction: Transaction;
+    let baseContext: TransferContext;
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+
+        mockLogger = ({
+            info: jest.fn(),
+            warn: jest.fn(),
+            error: jest.fn(),
+        } as unknown) as jest.Mocked<PEOLogger>;
+
+        mockTransaction = ({
+            afterCommit: jest.fn(),
+        } as unknown) as Transaction;
+
+        mockDb = {
+            HrisProfile: {
+                findByPk: jest.fn(),
+            },
+            Address: {
+                findByPk: jest.fn(),
+            },
+            Contract: {
+                findByPk: jest.fn(),
+                destroy: jest.fn(),
+            },
+            WorkStatement: {
+                destroy: jest.fn(),
+            },
+            UserContract: {
+                destroy: jest.fn(),
+            },
+            EmployeeOnboardingStep: {
+                destroy: jest.fn(),
+            },
+            ContractActionEvent: {
+                destroy: jest.fn(),
+            },
+            Guarantee: {
+                destroy: jest.fn(),
+            },
+            PeoContract: {
+                destroy: jest.fn(),
+            },
+            PeoTransactionalOutboxEvent: {
+                create: jest.fn().mockResolvedValue({id: 1}),
+            },
+            sequelize: {
+                query: jest.fn(),
+                transaction: jest.fn(async (callback) => callback(mockTransaction)),
+            },
+        };
+
+        step = new CreateContractStep(mockLogger, mockDb);
+
+        baseContext = ({
+            request: {
+                transfer: {
+                    id: 'transfer-1',
+                    effectiveDate: new Date('2025-02-01'),
+                },
+                item: {
+                    id: 'item-1',
+                    newBenefitGroupId: 'BG-NEW-1',
+                    newPayrollSettingsId: 'mock-payroll-settings-100',
+                    newWorkLocationId: 'WL-NEW-1',
+                    newPositionPublicId: '66666666-6666-4666-a666-666666666666',
+                },
+            },
+            contracts: {
+                old: {
+                    id: 123,
+                    HrisProfileId: 444,
+                    invitedClientEmail: 'client@example.com',
+                    peoContract: {
+                        firstName: 'John',
+                        lastName: 'Doe',
+                        ssn: '123-45-6789',
+                        birthDate: '1990-01-01',
+                        gender: 'M',
+                        maritalStatus: 'S',
+                        citizenStatus: 'US',
+                        fedFileStatus: 'M1',
+                        stateCode: 'NY',
+                        employeeTypeCode: 'F',
+                        payRate: '75000',
+                        payMethod: 'SALARY',
+                        workHoursPerWeek: 40,
+                        variableCompensations: 'Bonus: $5000',
+                        addressLine1: '123 Main St',
+                        address: '',
+                        city: 'New York',
+                        zipCode: '10001',
+                        county: 'New York County',
+                        deelAddressId: 789,
+                    },
+                },
+            },
+            legalEntities: {
+                source: {
+                    id: 200,
+                    publicId: '550e8400-e29b-41d4-a716-446655440001',
+                },
+                destination: {
+                    id: 200,
+                    publicId: '550e8400-e29b-41d4-a716-446655440002',
+                },
+            },
+            initiator: {
+                creator: {id: 999, name: 'Admin User'},
+                organization: {id: 555, name: 'Test Org'},
+                teamId: 777,
+            },
+            stepState: {completedSteps: []},
+            stepResults: {},
+        } as unknown) as TransferContext;
+
+        // Default mocks
+        mockDb.HrisProfile.findByPk.mockResolvedValue({
+            id: 444,
+            userId: 1001,
+            email: 'john.doe@example.com',
+            workerId: 'W-123',
+            externalId: 'EXT-456',
+        });
+
+        mockDb.Address.findByPk.mockResolvedValue({
+            geoCode: 'NYC-001',
+        });
+
+        mockGetPeoScopeOfWorkByPeoContract.mockResolvedValue({
+            holidays: 10,
+            timeOffType: 'PTO',
+            scopeId: 'SCOPE-1',
+            jobScope: 'Engineering',
+            seniorityId: 'SENIOR-1',
+        });
+
+        // Mock position service to return position with matching publicId
+        mockGetByFilters.mockResolvedValue([{publicId: '66666666-6666-4666-a666-666666666666', code: 'JOB-001', title: 'Software Engineer'}] as any);
+
+        mockCreateContract.mockResolvedValue({
+            id: 999,
+            oid: 'new-contract-oid',
+            HrisProfileId: 444,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Mock return value for createContract
+        } as any);
+
+        // Mock sequelize query for PEO contract deletion
+        mockDb.sequelize.query.mockResolvedValue([null, 1]);
+
+        // Default: cross-hire not completed
+        mockHasCrossHireCompleted.mockReturnValue(false);
+    });
+
+    describe('validate()', () => {
+        it('should pass when all required fields present', () => {
+            expect(() => step.validate(baseContext)).not.toThrow();
+        });
+
+        it('should throw when old contract id is missing', () => {
+            const invalidContext = ({
+                ...baseContext,
+                contracts: {
+                    old: {
+                        invitedClientEmail: 'client@example.com',
+                        peoContract: baseContext.contracts.old.peoContract,
+                    },
+                },
+            } as unknown) as TransferContext;
+
+            expect(() => step.validate(invalidContext)).toThrow();
+        });
+
+        it('should throw when peoContract is missing required fields', () => {
+            const invalidContext = ({
+                ...baseContext,
+                contracts: {
+                    old: {
+                        id: 123,
+                        invitedClientEmail: 'client@example.com',
+                        peoContract: {
+                            firstName: 'John',
+                        },
+                    },
+                },
+            } as unknown) as TransferContext;
+
+            expect(() => step.validate(invalidContext)).toThrow();
+        });
+    });
+
+    describe('execute()', () => {
+        describe('Happy Path', () => {
+            it('should create contract successfully', async () => {
+                const result = await step.execute(baseContext, mockTransaction);
+
+                expect(mockCreateContract).toHaveBeenCalled();
+                expect(result.context.contracts.new).toBeDefined();
+                expect(result.context.contracts.new?.id).toBe(999);
+                expect(result.context.contracts.new?.HrisProfileId).toBe(444);
+                expect(result.result).toBe(StepExecutionResult.CONTINUE);
+                expect(result.context.stepState.completedSteps).toContain('CreateContract');
+            });
+
+            it('should copy all employee data from old contract', async () => {
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockCreateContract).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        contractDetails: expect.objectContaining({
+                            employeeFirstName: 'John',
+                            employeeLastName: 'Doe',
+                            ssn: '123-45-6789',
+                            birthDate: '1990-01-01',
+                            gender: 'M',
+                            maritalStatus: 'S',
+                            citizenStatus: 'US',
+                            fedFileStatus: 'M1',
+                        }),
+                    }),
+                    true
+                );
+            });
+
+            it('should apply destination entity parameters', async () => {
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockCreateContract).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        contractDetails: expect.objectContaining({
+                            clientLegalEntityId: 200,
+                            benefitsGroup: 'BG-NEW-1',
+                            // payGroup is NOT set here - resolved by PEO microservice using employmentPayrollSettingId
+                            jobCode: 'JOB-001', // From position lookup by publicId
+                            workingLocationId: 'WL-NEW-1',
+                        }),
+                    }),
+                    true
+                );
+            });
+
+            it('should reuse HrisProfile from old contract', async () => {
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockDb.HrisProfile.findByPk).toHaveBeenCalledWith(444, expect.any(Object));
+                expect(mockCreateContract).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        contractDetails: expect.objectContaining({
+                            hrisProfileId: 444,
+                            employeeEmail: 'john.doe@example.com',
+                            workerId: 'W-123',
+                            externalId: 'EXT-456',
+                        }),
+                    }),
+                    true
+                );
+            });
+
+            it('should copy scope of work when available', async () => {
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockGetPeoScopeOfWorkByPeoContract).toHaveBeenCalledWith(123);
+                expect(mockCreateContract).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        contractDetails: expect.objectContaining({
+                            holidays: 10,
+                            timeOffType: 'PTO',
+                            scopeId: 'SCOPE-1',
+                            jobScope: 'Engineering',
+                            seniorityId: 'SENIOR-1',
+                        }),
+                    }),
+                    true
+                );
+            });
+
+            it('should use effective date as start date', async () => {
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockCreateContract).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        contractDetails: expect.objectContaining({
+                            peoStartDate: new Date('2025-02-01'),
+                            startDate: new Date('2025-02-01'),
+                        }),
+                    }),
+                    true
+                );
+            });
+
+            it('should handle addressLine1 when present', async () => {
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockCreateContract).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        contractDetails: expect.objectContaining({
+                            employeeAddress: expect.objectContaining({
+                                street: '123 Main St',
+                            }),
+                        }),
+                    }),
+                    true
+                );
+            });
+
+            it('should fallback to address field when addressLine1 is empty', async () => {
+                const contextWithAddress = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                addressLine1: '',
+                                address: '456 Oak Ave',
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await step.execute(contextWithAddress, mockTransaction);
+
+                expect(mockCreateContract).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        contractDetails: expect.objectContaining({
+                            employeeAddress: expect.objectContaining({
+                                street: '456 Oak Ave',
+                            }),
+                        }),
+                    }),
+                    true
+                );
+            });
+
+            it('should get geoCode from Address when available', async () => {
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockDb.Address.findByPk).toHaveBeenCalledWith(789, expect.any(Object));
+                expect(mockCreateContract).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        contractDetails: expect.objectContaining({
+                            employeeAddress: expect.objectContaining({
+                                geoCode: 'NYC-001',
+                            }),
+                        }),
+                    }),
+                    true
+                );
+            });
+
+            it('should map employeeTypeCode F to Full-time', async () => {
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockCreateContract).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        contractDetails: expect.objectContaining({
+                            employmentType: 'Full-time',
+                        }),
+                    }),
+                    true
+                );
+            });
+
+            it('should map employeeTypeCode P to Part-time', async () => {
+                const contextWithPartTime = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                employeeTypeCode: 'P',
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await step.execute(contextWithPartTime, mockTransaction);
+
+                expect(mockCreateContract).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        contractDetails: expect.objectContaining({
+                            employmentType: 'Part-time',
+                        }),
+                    }),
+                    true
+                );
+            });
+
+            it('should map employeeTypeCode S to Seasonal', async () => {
+                const contextWithSeasonal = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                employeeTypeCode: 'S',
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await step.execute(contextWithSeasonal, mockTransaction);
+
+                expect(mockCreateContract).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        contractDetails: expect.objectContaining({
+                            employmentType: 'Seasonal',
+                        }),
+                    }),
+                    true
+                );
+            });
+
+            it('should default unknown employeeTypeCode to Full-time', async () => {
+                const contextWithUnknownType = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                employeeTypeCode: 'X',
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await step.execute(contextWithUnknownType, mockTransaction);
+
+                expect(mockCreateContract).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        contractDetails: expect.objectContaining({
+                            employmentType: 'Full-time',
+                        }),
+                    }),
+                    true
+                );
+            });
+
+            it('should include optional fields when present', async () => {
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockCreateContract).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        contractDetails: expect.objectContaining({
+                            workHoursPerWeek: 40,
+                            variableCompensations: 'Bonus: $5000',
+                            county: 'New York County',
+                            fedFileStatus: 'M1',
+                        }),
+                    }),
+                    true
+                );
+            });
+
+            it('should not include optional fields when missing', async () => {
+                const contextWithoutOptionals = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                workHoursPerWeek: null,
+                                variableCompensations: null,
+                                county: null,
+                                fedFileStatus: null,
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await step.execute(contextWithoutOptionals, mockTransaction);
+
+                const callArgs = mockCreateContract.mock.calls[0][0];
+                expect(callArgs.contractDetails).not.toHaveProperty('workHoursPerWeek');
+                expect(callArgs.contractDetails).not.toHaveProperty('variableCompensations');
+                expect(callArgs.contractDetails).not.toHaveProperty('county');
+                expect(callArgs.contractDetails).not.toHaveProperty('fedFileStatus');
+            });
+
+            it('should use EntityTransfer as origin', async () => {
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockCreateContract).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        contractDetails: expect.objectContaining({
+                            origin: PeoContractOrigin.EntityTransfer,
+                        }),
+                    }),
+                    true
+                );
+            });
+
+            it('should fetch HrisProfileId if not returned by createContract', async () => {
+                mockCreateContract.mockResolvedValue({
+                    id: 999,
+                    oid: 'new-contract-oid',
+                    HrisProfileId: undefined,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Mock return value for createContract
+                } as any);
+
+                mockDb.Contract.findByPk.mockResolvedValue({
+                    id: 999,
+                    HrisProfileId: 444,
+                });
+
+                const result = await step.execute(baseContext, mockTransaction);
+
+                expect(mockDb.Contract.findByPk).toHaveBeenCalledWith(999, {
+                    attributes: ['id', 'HrisProfileId'],
+                    transaction: mockTransaction,
+                    useMaster: true,
+                });
+                expect(result.context.contracts.new?.HrisProfileId).toBe(444);
+            });
+
+            it('should pass transaction to createContract', async () => {
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockCreateContract).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        transaction: mockTransaction,
+                    }),
+                    true
+                );
+            });
+
+            it('should pass creator, organization, and teamId to createContract', async () => {
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockCreateContract).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        creator: baseContext.initiator.creator,
+                        organization: baseContext.initiator.organization,
+                        teamId: 777,
+                    }),
+                    true
+                );
+            });
+
+            it('should log contract creation with duration', async () => {
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockLogger.info).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        message: '[CreateContractStep] Contract created successfully',
+                        transferId: 'transfer-1',
+                        itemId: 'item-1',
+                        newContractId: 999,
+                        hrisProfileId: 444,
+                        duration: expect.any(Number),
+                    })
+                );
+            });
+        });
+
+        describe('Error Handling', () => {
+            it('should throw when HrisProfile not found', async () => {
+                mockDb.HrisProfile.findByPk.mockResolvedValue(null);
+
+                await expect(step.execute(baseContext, mockTransaction)).rejects.toThrow('HrisProfile not found for contract 123');
+            });
+
+            it('should log warning when scope of work fails', async () => {
+                const testError = new Error('Scope fetch failed');
+                mockGetPeoScopeOfWorkByPeoContract.mockRejectedValue(testError);
+
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockLogger.warn).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        message: '[CreateContractStep] Failed to load scope of work',
+                        oldContractId: 123,
+                        error: testError,
+                    })
+                );
+
+                const callArgs = mockCreateContract.mock.calls[0][0];
+                expect(callArgs.contractDetails).not.toHaveProperty('holidays');
+                expect(callArgs.contractDetails).not.toHaveProperty('timeOffType');
+            });
+
+            it('should log warning when geoCode fetch fails', async () => {
+                const testError = new Error('GeoCode fetch failed');
+                mockDb.Address.findByPk.mockRejectedValue(testError);
+
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockLogger.warn).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        message: '[CreateContractStep] Failed to get geoCode from address',
+                        deelAddressId: 789,
+                        error: testError,
+                    })
+                );
+
+                const callArgs = mockCreateContract.mock.calls[0][0];
+                expect(callArgs.contractDetails.employeeAddress).not.toHaveProperty('geoCode');
+            });
+
+            it('should log error and re-throw when createContract fails', async () => {
+                const testError = new Error('Contract creation failed');
+                mockCreateContract.mockRejectedValue(testError);
+
+                await expect(step.execute(baseContext, mockTransaction)).rejects.toThrow('Contract creation failed');
+
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        message: '[CreateContractStep] Contract creation failed',
+                        err: testError,
+                        transferId: 'transfer-1',
+                        itemId: 'item-1',
+                    })
+                );
+            });
+
+            it('should throw when HrisProfileId not found after refresh', async () => {
+                mockCreateContract.mockResolvedValue({
+                    id: 999,
+                    oid: 'new-contract-oid',
+                    HrisProfileId: undefined,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Mock return value for createContract
+                } as any);
+
+                mockDb.Contract.findByPk.mockResolvedValue({
+                    id: 999,
+                    HrisProfileId: null,
+                });
+
+                await expect(step.execute(baseContext, mockTransaction)).rejects.toThrow('Created contract 999 has no HrisProfileId');
+            });
+        });
+    });
+
+    describe('rollback()', () => {
+        describe('Rollback Flow', () => {
+            it('should delete contract and all related records in order', async () => {
+                const contextWithNewContract = ({
+                    ...baseContext,
+                    contracts: {
+                        ...baseContext.contracts,
+                        new: {id: 999, oid: 'new-contract-oid'},
+                    },
+                } as unknown) as TransferContext;
+
+                mockDb.WorkStatement.destroy.mockResolvedValue(2);
+                mockDb.UserContract.destroy.mockResolvedValue(1);
+                mockDb.EmployeeOnboardingStep.destroy.mockResolvedValue(3);
+                mockDb.ContractActionEvent.destroy.mockResolvedValue(5);
+                mockDb.Guarantee.destroy.mockResolvedValue(0);
+                mockDb.Contract.destroy.mockResolvedValue(1);
+
+                await step.rollback(contextWithNewContract, mockTransaction);
+
+                expect(mockDb.WorkStatement.destroy).toHaveBeenCalledWith({
+                    where: {ContractId: 999},
+                    transaction: mockTransaction,
+                });
+                expect(mockDb.UserContract.destroy).toHaveBeenCalledWith({
+                    where: {contractId: 999},
+                    transaction: mockTransaction,
+                });
+                expect(mockDb.EmployeeOnboardingStep.destroy).toHaveBeenCalledWith({
+                    where: {contractId: 999},
+                    transaction: mockTransaction,
+                });
+                expect(mockDb.ContractActionEvent.destroy).toHaveBeenCalledWith({
+                    where: {contractId: 999},
+                    transaction: mockTransaction,
+                });
+                expect(mockDb.Guarantee.destroy).toHaveBeenCalledWith({
+                    where: {ContractId: 999},
+                    transaction: mockTransaction,
+                });
+                expect(mockDb.Contract.destroy).toHaveBeenCalledWith({
+                    where: {id: 999},
+                    transaction: mockTransaction,
+                });
+            });
+
+            it('should block rollback when cross-hire completed', async () => {
+                // Mock the function to return true for this test
+                mockHasCrossHireCompleted.mockReturnValue(true);
+
+                const contextWithCrossHire = ({
+                    ...baseContext,
+                    contracts: {
+                        ...baseContext.contracts,
+                        new: {id: 999, oid: 'new-contract-oid'},
+                    },
+                    stepState: {
+                        completedSteps: ['CrossHire'], // Use CrossHireStep.stepName value
+                    },
+                } as unknown) as TransferContext;
+
+                await step.rollback(contextWithCrossHire, mockTransaction);
+
+                expect(mockHasCrossHireCompleted).toHaveBeenCalledWith(contextWithCrossHire, 'CrossHire');
+                expect(mockDb.WorkStatement.destroy).not.toHaveBeenCalled();
+                expect(mockDb.Contract.destroy).not.toHaveBeenCalled();
+                expect(mockDb.sequelize.query).not.toHaveBeenCalled();
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        message: '[CreateContractStep] Rollback skipped - cross-hire already completed',
+                        newContractId: 999,
+                        warning: 'Contract has PrismHR employee associated - manual cleanup required',
+                    })
+                );
+            });
+
+            it('should skip rollback when no contract created', async () => {
+                await step.rollback(baseContext, mockTransaction);
+
+                expect(mockDb.WorkStatement.destroy).not.toHaveBeenCalled();
+                expect(mockLogger.warn).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        message: '[CreateContractStep] Rollback skipped - no contract to delete',
+                    })
+                );
+            });
+
+            it('should log deletion counts for each table', async () => {
+                const contextWithNewContract = ({
+                    ...baseContext,
+                    contracts: {
+                        ...baseContext.contracts,
+                        new: {id: 999, oid: 'new-contract-oid'},
+                    },
+                } as unknown) as TransferContext;
+
+                mockDb.WorkStatement.destroy.mockResolvedValue(2);
+                mockDb.UserContract.destroy.mockResolvedValue(1);
+                mockDb.EmployeeOnboardingStep.destroy.mockResolvedValue(3);
+                mockDb.ContractActionEvent.destroy.mockResolvedValue(5);
+                mockDb.Guarantee.destroy.mockResolvedValue(0);
+                mockDb.Contract.destroy.mockResolvedValue(1);
+
+                await step.rollback(contextWithNewContract, mockTransaction);
+
+                expect(mockLogger.info).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        message: '[CreateContractStep] Contract hard deleted successfully during rollback',
+                        summary: {
+                            peoContractRollbackEventPublished: true,
+                            workStatements: 2,
+                            userContracts: 1,
+                            onboardingSteps: 3,
+                            actionEvents: 5,
+                            guarantees: 0,
+                        },
+                    })
+                );
+            });
+
+            it('should clear context.contracts.new after successful deletion', async () => {
+                const contextWithNewContract = ({
+                    ...baseContext,
+                    contracts: {
+                        ...baseContext.contracts,
+                        new: {id: 999, oid: 'new-contract-oid'},
+                    },
+                } as unknown) as TransferContext;
+
+                mockDb.WorkStatement.destroy.mockResolvedValue(2);
+                mockDb.UserContract.destroy.mockResolvedValue(1);
+                mockDb.EmployeeOnboardingStep.destroy.mockResolvedValue(3);
+                mockDb.ContractActionEvent.destroy.mockResolvedValue(5);
+                mockDb.Guarantee.destroy.mockResolvedValue(0);
+                mockDb.Contract.destroy.mockResolvedValue(1);
+
+                await step.rollback(contextWithNewContract, mockTransaction);
+
+                expect(contextWithNewContract.contracts.new).toBeUndefined();
+            });
+
+            it('should log error and re-throw when rollback fails', async () => {
+                const contextWithNewContract = ({
+                    ...baseContext,
+                    contracts: {
+                        ...baseContext.contracts,
+                        new: {id: 999, oid: 'new-contract-oid'},
+                    },
+                } as unknown) as TransferContext;
+
+                const testError = new Error('Deletion failed');
+                mockDb.WorkStatement.destroy.mockRejectedValue(testError);
+
+                await expect(step.rollback(contextWithNewContract, mockTransaction)).rejects.toThrow('Deletion failed');
+
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        message: '[CreateContractStep] Rollback failed',
+                        err: testError,
+                        newContractId: 999,
+                    })
+                );
+            });
+        });
+    });
+});

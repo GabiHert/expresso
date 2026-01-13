@@ -1,0 +1,47 @@
+{
+  "id": "evt-1767990270635-n3uftgfx3",
+  "taskId": "ENGESC-23600",
+  "taskIdSource": "active-task-file",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Identify task changes in affected repos",
+        "status": "in_progress",
+        "activeForm": "Identifying task changes"
+      },
+      {
+        "content": "Launch code reviewer agent",
+        "status": "pending",
+        "activeForm": "Launching code reviewer"
+      },
+      {
+        "content": "Compile and output review report",
+        "status": "pending",
+        "activeForm": "Compiling review report"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [],
+    "newTodos": [
+      {
+        "content": "Identify task changes in affected repos",
+        "status": "in_progress",
+        "activeForm": "Identifying task changes"
+      },
+      {
+        "content": "Launch code reviewer agent",
+        "status": "pending",
+        "activeForm": "Launching code reviewer"
+      },
+      {
+        "content": "Compile and output review report",
+        "status": "pending",
+        "activeForm": "Compiling review report"
+      }
+    ]
+  },
+  "sessionId": "02f0f4e9-5821-4d98-a210-caa2f7fae2ec",
+  "timestamp": "2026-01-09T20:24:30.635Z"
+}

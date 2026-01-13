@@ -1,0 +1,7 @@
+{
+  "version": "1.0.0",
+  "serverPort": 9999,
+  "eventStorage": "file",
+  "gitBranchPattern": "([A-Z]+-\\d+)",
+  "enabled": true
+}

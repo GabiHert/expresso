@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/cockpit/active-task.json",
+  "taskId": "EEXPR-12",
+  "baseline": {
+    "capturedAt": "2026-01-08T18:45:20.699Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T18:45:20.699Z",
+    "hash": "262ed52377149ce5",
+    "size": 260,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T18:45:20.699Z",
+    "actualFileHash": "262ed52377149ce5",
+    "status": "synced"
+  }
+}

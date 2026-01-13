@@ -1,0 +1,78 @@
+{
+  "id": "evt-1767908413397-kvm9lld3t",
+  "taskId": "EEXPR-12-1",
+  "taskIdSource": "env-var",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Fetch dev branch from remote",
+        "status": "completed",
+        "activeForm": "Fetching dev branch from remote"
+      },
+      {
+        "content": "Create worktree for EEXPR-12-1",
+        "status": "completed",
+        "activeForm": "Creating worktree for EEXPR-12-1"
+      },
+      {
+        "content": "Set up symlinks for .ai and .claude",
+        "status": "completed",
+        "activeForm": "Setting up symlinks"
+      },
+      {
+        "content": "Activate cockpit tracking",
+        "status": "in_progress",
+        "activeForm": "Activating cockpit tracking"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [
+      {
+        "content": "Fetch dev branch from remote",
+        "status": "completed",
+        "activeForm": "Fetching dev branch from remote"
+      },
+      {
+        "content": "Create worktree for EEXPR-12-1",
+        "status": "completed",
+        "activeForm": "Creating worktree for EEXPR-12-1"
+      },
+      {
+        "content": "Set up symlinks for .ai and .claude",
+        "status": "in_progress",
+        "activeForm": "Setting up symlinks"
+      },
+      {
+        "content": "Activate cockpit tracking",
+        "status": "pending",
+        "activeForm": "Activating cockpit tracking"
+      }
+    ],
+    "newTodos": [
+      {
+        "content": "Fetch dev branch from remote",
+        "status": "completed",
+        "activeForm": "Fetching dev branch from remote"
+      },
+      {
+        "content": "Create worktree for EEXPR-12-1",
+        "status": "completed",
+        "activeForm": "Creating worktree for EEXPR-12-1"
+      },
+      {
+        "content": "Set up symlinks for .ai and .claude",
+        "status": "completed",
+        "activeForm": "Setting up symlinks"
+      },
+      {
+        "content": "Activate cockpit tracking",
+        "status": "in_progress",
+        "activeForm": "Activating cockpit tracking"
+      }
+    ]
+  },
+  "sessionId": "94528b48-30b5-4fdb-9cfc-3f7b3ded4353",
+  "timestamp": "2026-01-08T21:40:13.397Z"
+}

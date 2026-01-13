@@ -1,0 +1,47 @@
+{
+  "id": "evt-1768310442258-re08hcd1g",
+  "taskId": "EEXPR-12-2",
+  "taskIdSource": "active-task-file",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Projects/deel/peo/src/controllers/entityTransfer/entityTransferController.ts",
+    "old_string": "import { CreateTransferSchema, GetReadyTransfersSchema, UpdateTransferItemSchema, UpdateTransferStatusSchema } from './entityTransferDto';",
+    "new_string": "import {\n    CreateTransferSchema,\n    GetReadyTransfersSchema,\n    GetTransfersBySourceEntityParamsSchema,\n    GetTransfersBySourceEntityQuerySchema,\n    UpdateTransferItemSchema,\n    UpdateTransferStatusSchema,\n} from './entityTransferDto';",
+    "replace_all": false
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Projects/deel/peo/src/controllers/entityTransfer/entityTransferController.ts",
+    "oldString": "import { CreateTransferSchema, GetReadyTransfersSchema, UpdateTransferItemSchema, UpdateTransferStatusSchema } from './entityTransferDto';",
+    "newString": "import {\n    CreateTransferSchema,\n    GetReadyTransfersSchema,\n    GetTransfersBySourceEntityParamsSchema,\n    GetTransfersBySourceEntityQuerySchema,\n    UpdateTransferItemSchema,\n    UpdateTransferStatusSchema,\n} from './entityTransferDto';",
+    "originalFile": "import EntityTransferService from '@services/entityTransfer/entityTransferService';\nimport { StatusCodes } from 'http-status-codes';\nimport { Body, Get, HttpError, JsonController, Param, Patch, Post, QueryParams } from 'routing-controllers';\nimport { Container } from 'typedi';\n\nimport { CreateTransferSchema, GetReadyTransfersSchema, UpdateTransferItemSchema, UpdateTransferStatusSchema } from './entityTransferDto';\n\n@JsonController('/peo/entity-transfer')\nclass EntityTransferController {\n    private entityTransferService: EntityTransferService;\n\n    constructor() {\n        this.entityTransferService = Container.get(EntityTransferService);\n    }\n\n    @Post('/transfers')\n    async createTransfer(@Body() body: unknown) {\n        const validation = CreateTransferSchema.safeParse(body);\n        if (!validation.success) {\n            throw new HttpError(StatusCodes.BAD_REQUEST, `Validation error: ${validation.error.message}`);\n        }\n\n        const input = validation.data;\n        log.info({ message: 'Creating entity transfer', organizationId: input.organizationId });\n\n        const transfer = await this.entityTransferService.createTransfer({\n            organizationId: input.organizationId,\n            requesterProfilePublicId: input.requesterProfilePublicId,\n            sourceLegalEntityPublicId: input.sourceLegalEntityPublicId,\n            destinationLegalEntityPublicId: input.destinationLegalEntityPublicId,\n            effectiveDate: new Date(input.effectiveDate),\n            agreementId: input.agreementId,\n            items: input.items,\n        });\n\n        return {\n            success: true,\n            data: transfer,\n        };\n    }\n\n    @Get('/transfers/ready')\n    async getReadyTransfers(@QueryParams() query: unknown) {\n        const validation = GetReadyTransfersSchema.safeParse(query);\n        if (!validation.success) {\n            throw new HttpError(StatusCodes.BAD_REQUEST, `Validation error: ${validation.error.message}`);\n        }\n\n        const { effectiveDate, limit } = validation.data;\n        log.info({ message: 'Getting ready transfers', effectiveDate, limit });\n\n        const transfers = await this.entityTransferService.getReadyTransfers(new Date(effectiveDate), limit);\n\n        return {\n            success: true,\n            data: transfers,\n            count: transfers.length,\n        };\n    }\n\n    @Get('/items/:id')\n    async getTransferItemById(@Param('id') id: string) {\n        log.info({ message: 'Getting transfer item', itemId: id });\n\n        const item = await this.entityTransferService.getTransferItemByIdWithTransfer(id);\n\n        if (!item) {\n            throw new HttpError(StatusCodes.NOT_FOUND, `Transfer item not found: ${id}`);\n        }\n\n        return {\n            success: true,\n            data: item,\n        };\n    }\n\n    @Get('/transfers/:id')\n    async getTransferById(@Param('id') id: string) {\n        log.info({ message: 'Getting transfer', transferId: id });\n\n        const transfer = await this.entityTransferService.getTransferById(id, true);\n\n        if (!transfer) {\n            throw new HttpError(StatusCodes.NOT_FOUND, `Transfer not found: ${id}`);\n        }\n\n        return {\n            success: true,\n            data: transfer,\n        };\n    }\n\n    @Patch('/transfers/:id/status')\n    async updateTransferStatus(@Param('id') id: string, @Body() body: unknown) {\n        const validation = UpdateTransferStatusSchema.safeParse(body);\n        if (!validation.success) {\n            throw new HttpError(StatusCodes.BAD_REQUEST, `Validation error: ${validation.error.message}`);\n        }\n\n        log.info({ message: 'Updating transfer status', transferId: id, status: validation.data.status });\n\n        await this.entityTransferService.updateTransferStatus(id, validation.data.status);\n\n        return {\n            success: true,\n            message: 'Transfer status updated',\n        };\n    }\n\n    @Patch('/items/:id')\n    async updateTransferItem(@Param('id') id: string, @Body() body: unknown) {\n        const validation = UpdateTransferItemSchema.safeParse(body);\n        if (!validation.success) {\n            throw new HttpError(StatusCodes.BAD_REQUEST, `Validation error: ${validation.error.message}`);\n        }\n\n        log.info({ message: 'Updating transfer item', itemId: id, updates: validation.data });\n\n        await this.entityTransferService.updateTransferItem(id, validation.data);\n\n        return {\n            success: true,\n            message: 'Transfer item updated',\n        };\n    }\n}\n\nexport default EntityTransferController;\n",
+    "structuredPatch": [
+      {
+        "oldStart": 3,
+        "oldLines": 7,
+        "newStart": 3,
+        "newLines": 14,
+        "lines": [
+          " import { Body, Get, HttpError, JsonController, Param, Patch, Post, QueryParams } from 'routing-controllers';",
+          " import { Container } from 'typedi';",
+          " ",
+          "-import { CreateTransferSchema, GetReadyTransfersSchema, UpdateTransferItemSchema, UpdateTransferStatusSchema } from './entityTransferDto';",
+          "+import {",
+          "+    CreateTransferSchema,",
+          "+    GetReadyTransfersSchema,",
+          "+    GetTransfersBySourceEntityParamsSchema,",
+          "+    GetTransfersBySourceEntityQuerySchema,",
+          "+    UpdateTransferItemSchema,",
+          "+    UpdateTransferStatusSchema,",
+          "+} from './entityTransferDto';",
+          " ",
+          " @JsonController('/peo/entity-transfer')",
+          " class EntityTransferController {"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "c7c4ee6e-0d35-4ca7-beb2-ca7eacb8f723",
+  "timestamp": "2026-01-13T13:20:42.258Z"
+}

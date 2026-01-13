@@ -1,0 +1,827 @@
+const faker = require('faker');
+
+const {mockTimeTrackingOnPEOContext} = require('../../../jest/mock/time_tracking_service');
+const employmentService = require('../../employee/employment');
+const {EMSEmploymentsService} = require('../../ems/ems_services');
+const featureFlagsProvider = require('../../feature_flags');
+const ModificationReasonService = require('../../hris/modification_reasons');
+const {peoClientMasterService} = require('../client_master_service');
+const {peoLocationService} = require('../location_service');
+const {peoContractService} = require('../peo_contract_service');
+const {peoPrismResourceRequestService} = require('../peo_prism_resource_request_service');
+const {peoScopeOfWorkService} = require('../peo_scope_of_work_service');
+// eslint-disable-next-line import/order -- we need to import OrgStructureService after mocking it
+const {peoWorkLocationService} = require('../work_location_service');
+
+const updateHrisProfileFieldsSpy = jest.fn().mockResolvedValue();
+
+jest.mock('../../../services/hris/profiles', () => ({
+    updateHrisProfileFields: updateHrisProfileFieldsSpy,
+}));
+
+jest.mock('../../hris/org_structure/org_structure');
+jest.mock('../../hris/modification_reasons');
+jest.mock('../../feature_flags');
+jest.mock('../../../services/globalPayroll/contract_data_changes/gp_contract_data_changes_service', () => ({
+    gpContractDataChangesService: {
+        Salary: {
+            getActiveDataForContract: jest.fn(),
+            addChanges: jest.fn(),
+        },
+    },
+}));
+// eslint-disable-next-line import/order -- should be after jest.mock
+const OrgStructureService = require('../../hris/org_structure/org_structure');
+
+const jobTitle = faker.name.jobTitle();
+const department = 'Engineering';
+OrgStructureService.mockImplementation(() => ({
+    getAllOrgStructures: jest.fn().mockResolvedValue([
+        {
+            id: 1,
+            teams: [
+                {id: 1, name: faker.datatype.string()},
+                {id: 2, name: faker.datatype.string()},
+                {id: 3, name: faker.datatype.string()},
+                {id: 4, name: faker.datatype.string()},
+            ],
+            roles: [
+                {id: 1, name: faker.name.jobTitle()},
+                {id: 2, name: faker.name.jobTitle()},
+                {id: 3, name: faker.name.jobTitle()},
+            ],
+        },
+        {
+            id: 2,
+            teams: [
+                {id: 11, name: department},
+                {id: 12, name: faker.datatype.string()},
+                {id: 13, name: faker.datatype.string()},
+                {id: 14, name: faker.datatype.string()},
+            ],
+            roles: [
+                {id: 11, name: jobTitle},
+                {id: 12, name: faker.name.jobTitle()},
+                {id: 13, name: faker.name.jobTitle()},
+            ],
+        },
+    ]),
+}));
+
+jest.mock('../../../modules/work_records');
+// eslint-disable-next-line import/order -- should be after jest.mock
+const {PeoSidecarService} = require('../../../modules/work_records');
+
+const getWorkTypeMock = jest.fn().mockReturnValue('FULL_TIME');
+const getFtePercentageMock = jest.fn().mockReturnValue(null);
+const saveSidecarMock = jest.fn().mockResolvedValue(null);
+PeoSidecarService.mockImplementation(() => ({
+    getWorkType: getWorkTypeMock,
+    getFtePercentage: getFtePercentageMock,
+    saveSidecar: saveSidecarMock,
+}));
+
+describe('peoContractService', () => {
+    beforeEach(() => {
+        mockTimeTrackingOnPEOContext();
+    });
+
+    afterAll(() => {
+        jest.clearAllMocks();
+    });
+
+    describe('updateContractPartially', () => {
+        const mockTransaction = {
+            afterCommit: jest.fn(),
+        };
+        const dbMock = {
+            sequelize: {
+                transaction: jest.fn(),
+            },
+            Sequelize: {
+                Op: {or: 'or'},
+            },
+            EORCountryData: {
+                get: jest.fn(),
+            },
+            LegalEntity: {},
+            Organization: {},
+            HrisProfile: {
+                update: jest.fn(),
+                findFirst: jest.fn(),
+            },
+            HrisProfileAddresses: {
+                findFirst: jest.fn(),
+                Types: {HOME: 'HOME'},
+            },
+            Address: {
+                findFirst: jest.fn(),
+                update: jest.fn(),
+            },
+            Contract: {
+                findFirst: jest.fn(),
+                update: jest.fn(),
+            },
+            UserContract: {
+                findFirst: jest.fn(),
+                update: jest.fn(),
+            },
+            Profile: {
+                findFirst: jest.fn(),
+                update: jest.fn(),
+                PROFILE_TYPES_ENUM: {peo_employee: 'peo_employee'},
+            },
+            Seniority: {
+                findFirst: jest.fn(),
+            },
+            WorkStatement: {
+                update: jest.fn(),
+            },
+        };
+        const workLocations = [
+            {
+                id: faker.datatype.number(),
+                locationName: 'test',
+            },
+            {
+                id: faker.datatype.number(),
+                locationName: faker.address.streetAddress(),
+            },
+        ];
+        const peoContract = {
+            id: faker.datatype.number(),
+            deelContractId: faker.datatype.number(),
+            jobCode: 'SE',
+        };
+        const contract = {
+            id: peoContract.deelContractId,
+            name: 'Contract Test',
+            clientLegalEntityId: faker.datatype.number(),
+            contractorId: faker.datatype.number(),
+            timezone: 'America/Los_Angeles',
+            jobTitleName: 'Software Engineer',
+            effectivePlainDate: '2025-02-01',
+            ClientLegalEntity: {id: faker.datatype.number(), OrganizationId: faker.datatype.number()},
+            HrisProfile: {
+                id: faker.datatype.number(),
+                oid: faker.datatype.uuid(),
+                HrisProfileAddresses: [
+                    {
+                        type: 'HOME',
+                        effectiveDate: '2024-03-20',
+                        status: 'APPLIED',
+                        createdAt: new Date('2024-03-20'),
+                        Address: {id: faker.datatype.number()},
+                    },
+                ],
+            },
+        };
+        const profile = {
+            id: faker.datatype.number(),
+        };
+        const seniority = {
+            id: faker.datatype.number(),
+        };
+        const managerHrisProfile = {
+            id: faker.datatype.number(),
+        };
+        const userContract = {
+            teamId: 9999,
+            contractId: peoContract.deelContractId,
+            userId: profile.id,
+        };
+
+        beforeAll(() => {
+            jest.spyOn(peoContractService, 'db', 'get').mockReturnValue(dbMock);
+            jest.spyOn(peoContractService, 'getPEOContract').mockReturnValue({});
+            jest.spyOn(peoContractService, 'updatePEOContract').mockResolvedValue({});
+            jest.spyOn(peoWorkLocationService, 'getPEOWorkLocationByDeelEntity').mockResolvedValue(workLocations);
+            jest.spyOn(EMSEmploymentsService, 'updateDeelStartDate').mockResolvedValue({});
+            jest.spyOn(employmentService, 'updateTerms').mockResolvedValue({});
+            jest.spyOn(peoLocationService, 'validateAndGetEntityGeoCode').mockResolvedValue({geoCode: 'geoCode'});
+            jest.spyOn(peoScopeOfWorkService, 'upsertPeoScopeOfWork').mockResolvedValue({});
+            jest.spyOn(peoContractService, 'updatePEOContract').mockResolvedValue({});
+            jest.spyOn(peoClientMasterService, 'getPEOJobCodesByEntityId').mockResolvedValue([{}]);
+
+            dbMock.sequelize.transaction.mockImplementation(async (callback) => {
+                await callback(mockTransaction);
+            });
+
+            dbMock.UserContract.update.mockResolvedValue(userContract);
+            dbMock.HrisProfileAddresses.findFirst.mockResolvedValue({});
+            dbMock.Contract.findFirst.mockResolvedValue(contract);
+            dbMock.Profile.findFirst.mockResolvedValue(profile);
+            dbMock.Seniority.findFirst.mockResolvedValue(seniority);
+            dbMock.HrisProfile.findFirst.mockResolvedValue(managerHrisProfile);
+            dbMock.Address.findFirst.mockResolvedValue({});
+            dbMock.EORCountryData.get.mockResolvedValue({});
+        });
+
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
+        it('should update UserContract.teamId and save sidecar', async () => {
+            const contractDetails = {
+                employmentType: 'peo',
+                startDate: '2025-01-01',
+                teamId: 9999,
+                name: 'Contract Test',
+            };
+
+            const oid = 'testoid';
+            const creator = {};
+            const teamId = 9999;
+            const organization = {
+                id: 999,
+            };
+
+            await peoContractService.updateContractPartially({oid, contractDetails, creator, teamId, organization});
+
+            expect(dbMock.Contract.update).toHaveBeenCalledWith(
+                {
+                    teamId,
+                    initialEffectiveDate: contractDetails.startDate,
+                    initialEffectivePlainDate: contractDetails.startDate,
+                    name: contractDetails.name,
+                    status: 'under_review',
+                },
+                {where: {id: contract.id}, transaction: expect.any(Object)}
+            );
+
+            expect(dbMock.UserContract.update).toHaveBeenCalledWith({teamId}, {where: {contractId: contract.id}, transaction: expect.any(Object)});
+
+            expect(saveSidecarMock).toHaveBeenCalledTimes(1);
+            expect(saveSidecarMock).toHaveBeenCalledWith({
+                contractId: contract.id,
+                payload: {
+                    contractId: oid,
+                    workType: 'FULL_TIME',
+                    workStartDate: expect.any(Object),
+                    workStatus: 'ACTIVE',
+                },
+                transaction: expect.any(Object),
+                withContractUpdates: true,
+            });
+        });
+    });
+
+    describe('updateAgreement', () => {
+        const contractOid = faker.datatype.number();
+        const reasonOid = faker.datatype.uuid();
+        const salary = faker.datatype.number().toString();
+        const teamId = 9999;
+        const jobTitle = 'TestJobTitle';
+        const workHoursPerWeek = faker.datatype.number();
+        const payMethod = faker.datatype.string();
+        const HrisProfileId = faker.datatype.uuid();
+        const organizationId = 9999;
+        const timezone = 'America/New_York';
+        const payload = {
+            workEmail: faker.datatype.string(),
+            personalEmail: faker.datatype.string(),
+            teamId,
+            startDate: '2025-01-01',
+            peoStartDate: '2025-01-01',
+            salary,
+            jobTitle,
+            variableCompensations: faker.datatype.float(),
+            effectiveDate: '2025-01-01',
+            updateReason: reasonOid,
+            reasonAdditionalInfo: null,
+            scopeId: null,
+            jobScope: null,
+            seniorityId: null,
+            employmentType: 'Full-time',
+            payMethod,
+            workHoursPerWeek,
+            reason: reasonOid,
+            additionalDetail: null,
+        };
+        const profile = {id: faker.datatype.uuid()};
+        const mockInject = jest.fn();
+        const dbMock = {
+            sequelize: {
+                transaction: jest.fn(),
+            },
+            LegalEntity: {
+                findFirst: jest.fn(),
+            },
+            Contract: {
+                findFirst: jest.fn(),
+                update: jest.fn(),
+            },
+            HrisProfile: {
+                update: jest.fn(),
+                findFirst: jest.fn(),
+            },
+            UserContract: {
+                findFirst: jest.fn(),
+                update: jest.fn(),
+            },
+            WorkStatement: {
+                update: jest.fn(),
+            },
+        };
+        beforeAll(() => {
+            jest.spyOn(peoContractService, 'db', 'get').mockReturnValue(dbMock);
+            jest.spyOn(peoContractService, 'getPEOContract').mockReturnValue({
+                payRate: salary,
+                jobCode: jobTitle,
+                employeeTypeCode: 'F',
+                workHoursPerWeek,
+                payMethod,
+            });
+
+            jest.spyOn(peoClientMasterService, 'getPEOJobCodesByEntityId').mockResolvedValue([{jobTitle}]);
+            jest.spyOn(peoPrismResourceRequestService, 'getPrismResourceRequestByLegalEntityId').mockResolvedValue([]);
+            jest.spyOn(peoContractService, 'updatePEOContract').mockResolvedValue({});
+            jest.spyOn(employmentService, 'updateTerms').mockResolvedValue({});
+
+            dbMock.sequelize.transaction.mockImplementation(async (callback) => {
+                await callback({});
+            });
+            ModificationReasonService.mockImplementation(() => ({
+                injectFieldModificationReasons: mockInject,
+            }));
+            featureFlagsProvider.getFlags.mockReturnValue({
+                peo: {enableModificationReasonCall: true},
+            });
+        });
+
+        it('should update agreement and save sidecar', async () => {
+            dbMock.Contract.findFirst.mockResolvedValue({timezone, teamId, id: contractOid, HrisProfileId, organizationId});
+            dbMock.LegalEntity.findFirst.mockResolvedValue({publicId: faker.datatype.uuid()});
+
+            await peoContractService.updateAgreement({contractOid, payload, profile});
+
+            expect(mockInject).toHaveBeenCalledTimes(1);
+            expect(mockInject).toHaveBeenCalledWith({
+                fields: [],
+                reasonOid,
+                additionalInfo: null,
+                hrisProfileId: HrisProfileId,
+                organizationId,
+                transaction: {},
+            });
+            expect(saveSidecarMock).toHaveBeenCalledTimes(1);
+            expect(saveSidecarMock).toHaveBeenCalledWith({
+                payload: {
+                    contractId: contractOid,
+                    workType: 'FULL_TIME',
+                    workStartDate: payload.peoStartDate,
+                    workStatus: 'ACTIVE',
+                },
+                transaction: {},
+                withContractUpdates: true,
+            });
+        });
+
+        it('should not invoke modification reasons', async () => {
+            dbMock.Contract.findFirst.mockResolvedValue({timezone, teamId, id: contractOid, HrisProfileId, organizationId});
+            dbMock.LegalEntity.findFirst.mockResolvedValue({publicId: faker.datatype.uuid()});
+            const payloadWithoutReason = {...payload, ...{updateReason: undefined}};
+
+            await peoContractService.updateAgreement({contractOid, payload: payloadWithoutReason, profile});
+
+            expect(mockInject).toHaveBeenCalledTimes(0);
+        });
+    });
+
+    describe('enrichPEOContractWithHrisProfileInfo', () => {
+        let dbMock;
+        let peoContract;
+        let hrisProfileInfo;
+
+        beforeEach(() => {
+            dbMock = {
+                HrisProfile: {
+                    findFirst: jest.fn(),
+                },
+                Contract: {},
+            };
+
+            peoContract = {
+                deelContractOid: faker.datatype.uuid(),
+                firstName: 'Original First Name',
+                lastName: 'Original Last Name',
+                origHireDate: '2023-01-01',
+                lastHireDate: '2023-01-01',
+            };
+
+            hrisProfileInfo = {
+                firstName: 'Updated First Name',
+                lastName: 'Updated Last Name',
+                startDate: '2024-01-01',
+            };
+
+            jest.spyOn(peoContractService, 'db', 'get').mockReturnValue(dbMock);
+        });
+
+        it('should enrich PEO contract with HRIS profile info when profile exists', async () => {
+            dbMock.HrisProfile.findFirst.mockResolvedValue(hrisProfileInfo);
+
+            const result = await peoContractService.enrichPEOContractWithHrisProfileInfo(peoContract);
+
+            expect(dbMock.HrisProfile.findFirst).toHaveBeenCalledWith({
+                attributes: ['firstName', 'lastName', 'startDate'],
+                include: [
+                    {
+                        model: dbMock.Contract,
+                        attributes: [],
+                        where: {
+                            oid: peoContract.deelContractOid,
+                        },
+                        required: true,
+                    },
+                ],
+                useMaster: false,
+                raw: true,
+            });
+
+            expect(result.firstName).toBe(hrisProfileInfo.firstName);
+            expect(result.lastName).toBe(hrisProfileInfo.lastName);
+            expect(result.origHireDate).toBe(hrisProfileInfo.startDate);
+            expect(result.lastHireDate).toBe(hrisProfileInfo.startDate);
+        });
+
+        it('should enrich PEO contract with custom attributes when provided', async () => {
+            const customAttributes = ['firstName', 'lastName', 'email'];
+            const peoContract = {
+                deelContractOid: faker.datatype.uuid(),
+                firstName: 'Original First Name',
+                lastName: 'Original Last Name',
+                origHireDate: '2023-01-01',
+                lastHireDate: '2023-01-01',
+            };
+
+            const hrisProfileInfo = {
+                firstName: 'Updated First Name',
+                lastName: 'Updated Last Name',
+            };
+
+            dbMock.HrisProfile.findFirst.mockResolvedValue(hrisProfileInfo);
+
+            const result = await peoContractService.enrichPEOContractWithHrisProfileInfo(peoContract, customAttributes);
+
+            expect(dbMock.HrisProfile.findFirst).toHaveBeenCalledWith({
+                attributes: customAttributes,
+                include: [
+                    {
+                        model: dbMock.Contract,
+                        attributes: [],
+                        where: {
+                            oid: peoContract.deelContractOid,
+                        },
+                        required: true,
+                    },
+                ],
+                useMaster: false,
+                raw: true,
+            });
+            expect(result.firstName).toBe(hrisProfileInfo.firstName);
+            expect(result.lastName).toBe(hrisProfileInfo.lastName);
+            expect(result.origHireDate).toBe(peoContract.origHireDate);
+        });
+
+        it('should keep original values when HRIS profile info is null', async () => {
+            dbMock.HrisProfile.findFirst.mockResolvedValue(null);
+
+            const result = await peoContractService.enrichPEOContractWithHrisProfileInfo(peoContract);
+
+            expect(result.firstName).toBe(peoContract.firstName);
+            expect(result.lastName).toBe(peoContract.lastName);
+            expect(result.origHireDate).toBe(peoContract.origHireDate);
+            expect(result.lastHireDate).toBe(peoContract.lastHireDate);
+        });
+
+        it('should keep original values when HRIS profile fields are null/undefined', async () => {
+            const hrisProfileWithNullFields = {
+                firstName: null,
+                lastName: undefined,
+                startDate: null,
+            };
+            dbMock.HrisProfile.findFirst.mockResolvedValue(hrisProfileWithNullFields);
+
+            const result = await peoContractService.enrichPEOContractWithHrisProfileInfo(peoContract);
+
+            expect(result.firstName).toBe(peoContract.firstName);
+            expect(result.lastName).toBe(peoContract.lastName);
+            expect(result.origHireDate).toBe(peoContract.origHireDate);
+            expect(result.lastHireDate).toBe(peoContract.lastHireDate);
+        });
+
+        it('should return original contract when database query throws error', async () => {
+            const error = new Error('Database connection failed');
+            dbMock.HrisProfile.findFirst.mockRejectedValue(error);
+
+            const result = await peoContractService.enrichPEOContractWithHrisProfileInfo(peoContract);
+
+            expect(result).toEqual(peoContract);
+            expect(result.firstName).toBe(peoContract.firstName);
+            expect(result.lastName).toBe(peoContract.lastName);
+            expect(result.origHireDate).toBe(peoContract.origHireDate);
+            expect(result.lastHireDate).toBe(peoContract.lastHireDate);
+        });
+
+        it('should use HRIS profile values when they exist and fallback to original when they do not', async () => {
+            const partialHrisProfile = {
+                firstName: 'Updated First Name',
+                lastName: null, // This should fallback to original
+                startDate: '2024-01-01',
+            };
+            dbMock.HrisProfile.findFirst.mockResolvedValue(partialHrisProfile);
+
+            const result = await peoContractService.enrichPEOContractWithHrisProfileInfo(peoContract);
+
+            expect(result.firstName).toBe(partialHrisProfile.firstName);
+            expect(result.lastName).toBe(peoContract.lastName); // Fallback to original
+            expect(result.origHireDate).toBe(peoContract.origHireDate);
+            expect(result.lastHireDate).toBe(peoContract.lastHireDate);
+        });
+    });
+
+    describe('getPEOContractsByFilter', () => {
+        const {EMSPayrollSettingsService} = require('../../ems/ems_services');
+        const {gpContractDataChangesService} = require('../../globalPayroll/contract_data_changes/gp_contract_data_changes_service');
+        let clientGetSpy;
+        let mockPeoContracts;
+
+        beforeEach(() => {
+            jest.clearAllMocks();
+
+            mockPeoContracts = [
+                {
+                    id: faker.datatype.number(),
+                    deelContractId: faker.datatype.number(),
+                    deelContractOid: faker.datatype.uuid(),
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    payRate: '100000',
+                    payPeriod: 'Y',
+                    workHoursPerWeek: 40,
+                },
+                {
+                    id: faker.datatype.number(),
+                    deelContractId: faker.datatype.number(),
+                    deelContractOid: faker.datatype.uuid(),
+                    firstName: 'Jane',
+                    lastName: 'Smith',
+                    payRate: '50',
+                    payPeriod: 'H',
+                    workHoursPerWeek: 40,
+                },
+            ];
+
+            clientGetSpy = jest.spyOn(peoContractService.client, 'get').mockResolvedValue({
+                data: mockPeoContracts,
+                status: 200,
+            });
+        });
+
+        it('should return empty array when status is 404', async () => {
+            clientGetSpy.mockResolvedValue({
+                data: {},
+                status: 404,
+            });
+
+            const result = await peoContractService.getPEOContractsByFilter({deelEntityIds: ['123']});
+
+            expect(result).toEqual([]);
+        });
+
+        it('should throw HttpError when status is not 200 or 404', async () => {
+            const errorMessage = 'Internal server error';
+            clientGetSpy.mockResolvedValue({
+                data: {message: errorMessage},
+                status: 500,
+            });
+
+            await expect(peoContractService.getPEOContractsByFilter({deelEntityIds: ['123']})).rejects.toThrow(
+                `Integration to get peo contracts by filter failed: ${errorMessage}`
+            );
+        });
+
+        it('should return peo contracts without additional data when no options provided', async () => {
+            const result = await peoContractService.getPEOContractsByFilter({deelEntityIds: ['123']});
+
+            expect(result).toEqual(mockPeoContracts);
+            expect(result).toHaveLength(2);
+        });
+
+        it('should include payroll settings when includePayrollSettings is true', async () => {
+            const mockPayrollSettingsIds = [{id: 'ps-1'}];
+            const mockPayrollSettings = {
+                id: 'ps-1',
+                name: 'Test Payroll Settings',
+                paymentFrequency: 'MONTHLY',
+            };
+
+            jest.spyOn(EMSPayrollSettingsService, 'getPayrollSettingsForContractOid').mockResolvedValue(mockPayrollSettingsIds);
+            jest.spyOn(EMSPayrollSettingsService, 'getById').mockResolvedValue(mockPayrollSettings);
+
+            const result = await peoContractService.getPEOContractsByFilter({deelEntityIds: ['123']}, {includePayrollSettings: true});
+
+            expect(EMSPayrollSettingsService.getPayrollSettingsForContractOid).toHaveBeenCalledTimes(2);
+            expect(EMSPayrollSettingsService.getById).toHaveBeenCalledWith('ps-1');
+            expect(result[0].payrollSettings).toEqual(mockPayrollSettings);
+            expect(result[1].payrollSettings).toEqual(mockPayrollSettings);
+        });
+
+        it('should set payrollSettings to null when no payroll settings found', async () => {
+            jest.spyOn(EMSPayrollSettingsService, 'getPayrollSettingsForContractOid').mockResolvedValue([]);
+
+            const result = await peoContractService.getPEOContractsByFilter({deelEntityIds: ['123']}, {includePayrollSettings: true});
+
+            expect(result[0].payrollSettings).toBeNull();
+            expect(result[1].payrollSettings).toBeNull();
+        });
+
+        it('should include active salary when includeActiveSalary is true', async () => {
+            const mockPayrollSettingsIds = [{id: 'ps-1'}];
+            const mockPayrollSettings = {
+                id: 'ps-1',
+                name: 'Test Payroll Settings',
+            };
+
+            const mockActiveSalaryChanges = [
+                {
+                    contractOid: mockPeoContracts[0].deelContractOid,
+                    data: {
+                        rate: 105000,
+                        scale: 'YEAR',
+                    },
+                    effectiveDate: '2025-01-01',
+                },
+                {
+                    contractOid: mockPeoContracts[1].deelContractOid,
+                    data: {
+                        rate: 55,
+                        scale: 'HOUR',
+                    },
+                    effectiveDate: '2025-02-01',
+                },
+            ];
+
+            jest.spyOn(EMSPayrollSettingsService, 'getPayrollSettingsForContractOid').mockResolvedValue(mockPayrollSettingsIds);
+            jest.spyOn(EMSPayrollSettingsService, 'getById').mockResolvedValue(mockPayrollSettings);
+
+            gpContractDataChangesService.Salary.getActiveDataForContract.mockResolvedValue(mockActiveSalaryChanges);
+
+            const result = await peoContractService.getPEOContractsByFilter({deelEntityIds: ['123']}, {includeActiveSalary: true});
+
+            expect(gpContractDataChangesService.Salary.getActiveDataForContract).toHaveBeenCalledWith({
+                contractOids: [mockPeoContracts[0].deelContractOid, mockPeoContracts[1].deelContractOid],
+            });
+
+            expect(result[0].currentCompensationDetails).toEqual({
+                rate: 105000,
+                scale: 'YEAR',
+                effectiveDate: '2025-01-01',
+                workHoursPerWeek: mockPeoContracts[0].workHoursPerWeek,
+            });
+
+            expect(result[1].currentCompensationDetails).toEqual({
+                rate: 55,
+                scale: 'HOUR',
+                effectiveDate: '2025-02-01',
+                workHoursPerWeek: mockPeoContracts[1].workHoursPerWeek,
+            });
+        });
+
+        it('should set currentCompensationDetails to null values when no active salary found', async () => {
+            const mockPayrollSettingsIds = [{id: 'ps-1'}];
+            const mockPayrollSettings = {id: 'ps-1', name: 'Test Payroll Settings'};
+
+            jest.spyOn(EMSPayrollSettingsService, 'getPayrollSettingsForContractOid').mockResolvedValue(mockPayrollSettingsIds);
+            jest.spyOn(EMSPayrollSettingsService, 'getById').mockResolvedValue(mockPayrollSettings);
+
+            gpContractDataChangesService.Salary.getActiveDataForContract.mockResolvedValue([]);
+
+            const result = await peoContractService.getPEOContractsByFilter({deelEntityIds: ['123']}, {includeActiveSalary: true});
+
+            expect(result[0].currentCompensationDetails).toEqual({
+                rate: null,
+                scale: null,
+                effectiveDate: null,
+                workHoursPerWeek: null,
+            });
+
+            expect(result[1].currentCompensationDetails).toEqual({
+                rate: null,
+                scale: null,
+                effectiveDate: null,
+                workHoursPerWeek: null,
+            });
+        });
+
+        it('should skip contracts without payroll settings when includeActiveSalary is true', async () => {
+            jest.spyOn(EMSPayrollSettingsService, 'getPayrollSettingsForContractOid').mockImplementation((contractOid) => {
+                // Return payroll settings only for the first contract
+                if (contractOid === mockPeoContracts[0].deelContractOid) {
+                    return Promise.resolve([{id: 'ps-1'}]);
+                }
+                return Promise.resolve([]);
+            });
+
+            jest.spyOn(EMSPayrollSettingsService, 'getById').mockResolvedValue({
+                id: 'ps-1',
+                name: 'Test Payroll Settings',
+            });
+
+            const mockActiveSalaryChanges = [
+                {
+                    contractOid: mockPeoContracts[0].deelContractOid,
+                    data: {
+                        rate: 105000,
+                        scale: 'YEAR',
+                    },
+                    effectiveDate: '2025-01-01',
+                },
+            ];
+
+            gpContractDataChangesService.Salary.getActiveDataForContract.mockResolvedValue(mockActiveSalaryChanges);
+
+            const result = await peoContractService.getPEOContractsByFilter({deelEntityIds: ['123']}, {includeActiveSalary: true});
+
+            // Only first contract should have payroll settings
+            expect(result[0].payrollSettings).not.toBeNull();
+            expect(result[1].payrollSettings).toBeNull();
+
+            // Only first contract OID should be included in the query
+            expect(gpContractDataChangesService.Salary.getActiveDataForContract).toHaveBeenCalledWith({
+                contractOids: [mockPeoContracts[0].deelContractOid],
+            });
+
+            // First contract should have compensation details
+            expect(result[0].currentCompensationDetails).toEqual({
+                rate: 105000,
+                scale: 'YEAR',
+                effectiveDate: '2025-01-01',
+                workHoursPerWeek: mockPeoContracts[0].workHoursPerWeek,
+            });
+
+            // Second contract should have null compensation details
+            expect(result[1].currentCompensationDetails).toEqual({
+                rate: null,
+                scale: null,
+                effectiveDate: null,
+                workHoursPerWeek: null,
+            });
+        });
+
+        it('should handle errors gracefully when processing salary data', async () => {
+            const mockPayrollSettingsIds = [{id: 'ps-1'}];
+            const mockPayrollSettings = {id: 'ps-1', name: 'Test Payroll Settings'};
+
+            jest.spyOn(EMSPayrollSettingsService, 'getPayrollSettingsForContractOid').mockResolvedValue(mockPayrollSettingsIds);
+            jest.spyOn(EMSPayrollSettingsService, 'getById').mockResolvedValue(mockPayrollSettings);
+
+            // Create invalid salary data that will throw an error
+            const mockActiveSalaryChanges = [
+                {
+                    contractOid: mockPeoContracts[0].deelContractOid,
+                    // Missing 'data' property to cause an error
+                },
+            ];
+
+            gpContractDataChangesService.Salary.getActiveDataForContract.mockResolvedValue(mockActiveSalaryChanges);
+
+            const result = await peoContractService.getPEOContractsByFilter({deelEntityIds: ['123']}, {includeActiveSalary: true});
+
+            // Should still set compensation details with null values
+            expect(result[0].currentCompensationDetails).toEqual({
+                rate: null,
+                scale: null,
+                effectiveDate: null,
+                workHoursPerWeek: 40,
+            });
+        });
+
+        it('should cache payroll settings when multiple contracts have the same payroll setting', async () => {
+            const mockPayrollSettingsIds = [{id: 'ps-1'}];
+            const mockPayrollSettings = {
+                id: 'ps-1',
+                name: 'Test Payroll Settings',
+            };
+
+            jest.spyOn(EMSPayrollSettingsService, 'getPayrollSettingsForContractOid').mockResolvedValue(mockPayrollSettingsIds);
+            const getByIdSpy = jest.spyOn(EMSPayrollSettingsService, 'getById').mockResolvedValue(mockPayrollSettings);
+
+            await peoContractService.getPEOContractsByFilter({deelEntityIds: ['123']}, {includePayrollSettings: true});
+
+            // Should only call getById once even though we have 2 contracts with the same payroll settings
+            expect(getByIdSpy).toHaveBeenCalledTimes(1);
+            expect(getByIdSpy).toHaveBeenCalledWith('ps-1');
+        });
+
+        it('should not call salary service when no contracts have payroll settings and includeActiveSalary is true', async () => {
+            jest.spyOn(EMSPayrollSettingsService, 'getPayrollSettingsForContractOid').mockResolvedValue([]);
+
+            await peoContractService.getPEOContractsByFilter({deelEntityIds: ['123']}, {includeActiveSalary: true});
+
+            // Should not call the salary service since no contracts have payroll settings
+            expect(gpContractDataChangesService.Salary.getActiveDataForContract).not.toHaveBeenCalled();
+        });
+    });
+});

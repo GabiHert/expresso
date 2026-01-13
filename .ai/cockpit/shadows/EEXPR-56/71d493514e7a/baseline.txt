@@ -1,0 +1,236 @@
+import {Transaction} from 'sequelize';
+import {z} from 'zod4';
+
+import {PEOLogger} from '../../../../modules/peo/utils/peo_logger';
+import {TransferContext} from '../transfer_context';
+
+import {ITransferStep, StepExecutionResult, StepExecutionReturn, StepType} from './i_transfer_step';
+
+const nonEmptyString = (fieldName: string) => z.string({message: `${fieldName} is required for cross-hire`}).min(1, `${fieldName} is required for cross-hire`);
+
+const peoContractSchema = z
+    .object({
+        deelContractOid: nonEmptyString('Deel Contract OID'),
+        prismClientId: nonEmptyString('Prism Client ID'),
+        firstName: nonEmptyString('First Name'),
+        lastName: nonEmptyString('Last Name'),
+        employeeStatusCode: nonEmptyString('Employee Status Code'),
+        benefitsGroup: nonEmptyString('Benefits Group'),
+        ssn: nonEmptyString('SSN'),
+        birthDate: nonEmptyString('Birth Date'),
+        gender: nonEmptyString('Gender'),
+        maritalStatus: nonEmptyString('Marital Status'),
+        employeeTypeCode: nonEmptyString('Employee Type Code'),
+        payRate: nonEmptyString('Pay Rate'),
+        payPeriod: nonEmptyString('Pay Period'),
+        peoStartDate: nonEmptyString('PEO Start Date'),
+        jobCode: nonEmptyString('Job Code'),
+        payMethod: nonEmptyString('Pay Method'),
+        origHireDate: nonEmptyString('Original Hire Date'),
+        workLocationCode: nonEmptyString('Work Location Code'),
+        citizenStatus: nonEmptyString('Citizen Status'),
+        lastHireDate: nonEmptyString('Last Hire Date'),
+        // Cross-hire prerequisites
+        prismEmployeeId: nonEmptyString('Prism Employee ID (required as previousPrismEmployeeId)'),
+        // Address fields (city, stateCode required; addressLine1/address and zipCode validated in superRefine)
+        city: nonEmptyString('City'),
+        stateCode: nonEmptyString('State Code'),
+        // Optional fields for conditional validation
+        fedFileStatus: z.string().nullish(),
+        addressLine1: z.string().nullish(),
+        address: z.string().nullish(),
+        zipCode: z.string().nullish(),
+        i9AlienRegistrationNumber: z.string().nullish(),
+        i9AlienRegistrationExpiration: z.string().nullish(),
+        i94AdmissionNumber: z.string().nullish(),
+        i9ForeignPassportNumber: z.string().nullish(),
+        i9PassportIssuingCountry: z.string().nullish(),
+    })
+    .passthrough()
+    .superRefine((data, ctx) => {
+        // Address validation: either addressLine1 or address must be present
+        const hasAddressLine1 = data.addressLine1 && data.addressLine1.trim() !== '';
+        const hasAddress = data.address && data.address.trim() !== '';
+        if (!hasAddressLine1 && !hasAddress) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Address Line 1 is required for cross-hire',
+                path: ['addressLine1'],
+            });
+        }
+
+        // Zip code validation
+        if (!data.zipCode || data.zipCode.trim() === '') {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Zip Code is required for cross-hire',
+                path: ['zipCode'],
+            });
+        }
+
+        // Pay method conditional: fedFileStatus required unless payMethod is 'N' (NonPaidOwner)
+        if (data.payMethod && data.payMethod !== 'N') {
+            if (!data.fedFileStatus || data.fedFileStatus.trim() === '') {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: `Federal File Status is required for payMethod '${data.payMethod}'`,
+                    path: ['fedFileStatus'],
+                });
+            }
+        }
+
+        // Citizen status conditional: Z03 (Permanent Resident)
+        if (data.citizenStatus === 'Z03') {
+            if (!data.i9AlienRegistrationNumber || data.i9AlienRegistrationNumber.trim() === '') {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'I-9 Alien Registration Number is required for Permanent Resident status',
+                    path: ['i9AlienRegistrationNumber'],
+                });
+            }
+        }
+
+        // Citizen status conditional: Z04 (Alien Authorized)
+        if (data.citizenStatus === 'Z04') {
+            const i9Fields = [
+                {field: 'i9AlienRegistrationNumber', name: 'I-9 Alien Registration Number'},
+                {field: 'i9AlienRegistrationExpiration', name: 'I-9 Alien Registration Expiration'},
+                {field: 'i94AdmissionNumber', name: 'I-94 Admission Number'},
+                {field: 'i9ForeignPassportNumber', name: 'I-9 Foreign Passport Number'},
+                {field: 'i9PassportIssuingCountry', name: 'I-9 Passport Issuing Country'},
+            ] as const;
+
+            for (const {field, name} of i9Fields) {
+                const value = data[field];
+                if (!value || value.trim() === '') {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: `${name} is required for Alien Authorized status`,
+                        path: [field],
+                    });
+                }
+            }
+        }
+    });
+
+const crossHireSanityCheckSchema = z
+    .object({
+        contracts: z
+            .object({
+                old: z
+                    .object({
+                        oid: z.string({
+                            message: 'Old contract OID is required',
+                        }),
+                        peoContract: peoContractSchema,
+                    })
+                    .passthrough(),
+            })
+            .passthrough(),
+    })
+    .passthrough();
+
+/**
+ * Cross-Hire Sanity Check Step
+ * Order: 1 (First validation step)
+ * Type: DATABASE
+ *
+ * ## WHY This Step Exists
+ *
+ * Cross-hiring an employee in PrismHR requires 21+ mandatory fields. If any field is missing,
+ * the cross-hire API call (Step 7) will fail AFTER we've already:
+ * - Created a new Deel contract
+ * - Shared compliance documents
+ * - Updated time-off records
+ * - Modified multiple databases
+ *
+ * By validating ALL required data FIRST, we prevent expensive partial failures that require
+ * complex compensation logic. This "fail-fast" approach saves time, reduces rollback complexity,
+ * and prevents leaving the system in an inconsistent state.
+ *
+ * ## What It Does
+ *
+ * Validates the old contract has complete data for PrismHR cross-hire:
+ * - **21 core fields**: SSN, birthDate, name, address, employment details
+ * - **Conditional fields**: I-9 data for non-citizens, pay-method specific fields
+ * - **Address validation**: Ensures zip code is exactly 5 characters (Prism requirement)
+ * - **Cross-hire prerequisites**: prismEmployeeId (used as previousPrismEmployeeId)
+ *
+ * ## Dependencies
+ * - Requires: oldContract, oldContract.peoContract populated in context
+ *
+ * ## External Calls
+ * None - read-only validation
+ *
+ * ## Rollback
+ * Not applicable - no state changes to roll back
+ *
+ * ## Special Cases
+ * - Different required fields based on citizenStatus (Z03=Permanent Resident, Z04=Alien Authorized)
+ * - payMethod 'N' (NonPaidOwner) exempts from fedFileStatus requirement
+ * - Address can be in either addressLine1 or address field (legacy data)
+ */
+export class CrossHireSanityCheckStep implements ITransferStep {
+    readonly name = 'CrossHireSanityCheck';
+    readonly type = StepType.DATABASE;
+
+    constructor(private readonly log: PEOLogger, private readonly db: Deel.Db) {}
+
+    validate(context: TransferContext): void {
+        crossHireSanityCheckSchema.parse(context);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- transaction parameter required by ITransferStep interface but not used in validation-only step
+    async execute(context: TransferContext, transaction?: Transaction): Promise<StepExecutionReturn> {
+        const contractOid = context.contracts?.old?.oid ?? 'unknown';
+
+        this.log.info({
+            message: '[CrossHireSanityCheckStep] Starting cross-hire prerequisite validation',
+            transferId: context.request.transfer.id,
+            itemId: context.request.item.id,
+            oldContractOid: contractOid,
+        });
+
+        const startTime = Date.now();
+
+        const result = crossHireSanityCheckSchema.safeParse(context);
+
+        if (!result.success) {
+            const errors = result.error.issues.map((issue) => `${issue.message} (contract: ${contractOid})`);
+
+            const errorMessage = `Cross-hire sanity check failed with ${errors.length} error(s):\n${errors.map((e, i) => `  ${i + 1}. ${e}`).join('\n')}`;
+
+            this.log.error({
+                message: '[CrossHireSanityCheckStep] Validation failed',
+                transferId: context.request.transfer.id,
+                itemId: context.request.item.id,
+                oldContractOid: contractOid,
+                errorCount: errors.length,
+                errors,
+            });
+
+            throw new Error(errorMessage);
+        }
+
+        const duration = Date.now() - startTime;
+
+        this.log.info({
+            message: '[CrossHireSanityCheckStep] All cross-hire prerequisites validated successfully',
+            transferId: context.request.transfer.id,
+            itemId: context.request.item.id,
+            oldContractOid: contractOid,
+            duration,
+        });
+
+        return {
+            context: {
+                ...context,
+                stepState: {
+                    ...context.stepState,
+                    completedSteps: [...context.stepState.completedSteps, this.name],
+                },
+            },
+            result: StepExecutionResult.CONTINUE,
+        };
+    }
+}

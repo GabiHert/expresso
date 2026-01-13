@@ -1,0 +1,57 @@
+{
+  "id": "evt-1767886894017-67mxisoa6",
+  "taskId": "session-dd73030c-1dff-4bc1-a371-2f1717e04e8f",
+  "taskIdSource": "session-fallback",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Create EEXPR-12 epic task folder structure",
+        "status": "in_progress",
+        "activeForm": "Creating EEXPR-12 epic task folder structure"
+      },
+      {
+        "content": "Create EEXPR-12-1 subtask (PEO migration)",
+        "status": "pending",
+        "activeForm": "Creating EEXPR-12-1 subtask"
+      },
+      {
+        "content": "Create EEXPR-12-2 subtask (PEO endpoint)",
+        "status": "pending",
+        "activeForm": "Creating EEXPR-12-2 subtask"
+      },
+      {
+        "content": "Create EEXPR-12-3 subtask (Backend enrichment)",
+        "status": "pending",
+        "activeForm": "Creating EEXPR-12-3 subtask"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [],
+    "newTodos": [
+      {
+        "content": "Create EEXPR-12 epic task folder structure",
+        "status": "in_progress",
+        "activeForm": "Creating EEXPR-12 epic task folder structure"
+      },
+      {
+        "content": "Create EEXPR-12-1 subtask (PEO migration)",
+        "status": "pending",
+        "activeForm": "Creating EEXPR-12-1 subtask"
+      },
+      {
+        "content": "Create EEXPR-12-2 subtask (PEO endpoint)",
+        "status": "pending",
+        "activeForm": "Creating EEXPR-12-2 subtask"
+      },
+      {
+        "content": "Create EEXPR-12-3 subtask (Backend enrichment)",
+        "status": "pending",
+        "activeForm": "Creating EEXPR-12-3 subtask"
+      }
+    ]
+  },
+  "sessionId": "dd73030c-1dff-4bc1-a371-2f1717e04e8f",
+  "timestamp": "2026-01-08T15:41:34.017Z"
+}

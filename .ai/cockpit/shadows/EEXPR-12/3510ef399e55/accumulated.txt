@@ -1,0 +1,314 @@
+<!--
+╔══════════════════════════════════════════════════════════════════╗
+║ WORK ITEM: 06-add-integration-tests.md                           ║
+║ TASK: EEXPR-12-3                                                 ║
+╚══════════════════════════════════════════════════════════════════╝
+-->
+
+---
+repo: backend
+---
+
+# Add Integration Tests: Tech Ops Entity Transfer
+
+## Objective
+
+Add comprehensive tests for the tech ops endpoint and enrichment service.
+
+## Implementation Steps
+
+### Step 1: Add enrichment service tests
+
+**File:** `backend/services/peo/entity_transfer/helpers/transfer_enrichment_service.test.js`
+
+```javascript
+const { TransferEnrichmentService } = require('./transfer_enrichment_service');
+const db = require('../../../../models');
+
+jest.mock('../../../../models');
+
+describe('TransferEnrichmentService', () => {
+  let service;
+
+  beforeEach(() => {
+    service = new TransferEnrichmentService();
+    jest.clearAllMocks();
+  });
+
+  describe('fetchLegalEntities', () => {
+    it('should return empty map for empty input', async () => {
+      const result = await service.fetchLegalEntities([]);
+      expect(result.size).toBe(0);
+    });
+
+    it('should fetch legal entities by publicIds', async () => {
+      const mockEntities = [
+        { publicId: 'entity-1', name: 'Deel PEO - California', address: { country: 'US' } },
+        { publicId: 'entity-2', name: 'Deel PEO - Texas', address: { country: 'US' } },
+      ];
+
+      db.LegalEntity.findAll.mockResolvedValue(mockEntities);
+
+      const result = await service.fetchLegalEntities(['entity-1', 'entity-2']);
+
+      expect(db.LegalEntity.findAll).toHaveBeenCalledWith({
+        where: { publicId: { [Op.in]: ['entity-1', 'entity-2'] } },
+        attributes: ['publicId', 'name', 'address'],
+        useMaster: false,
+      });
+
+      expect(result.get('entity-1')).toEqual({
+        publicId: 'entity-1',
+        legalName: 'Deel PEO - California',
+        countryCode: 'US',
+      });
+    });
+  });
+
+  describe('fetchContractEmails', () => {
+    it('should fetch emails via Contract -> Profile join', async () => {
+      const mockContracts = [
+        { id: 123, Contractor: { email: 'john@example.com' } },
+        { id: 456, Contractor: { email: 'jane@example.com' } },
+      ];
+
+      db.Contract.findAll.mockResolvedValue(mockContracts);
+
+      const result = await service.fetchContractEmails([123, 456]);
+
+      expect(result.get(123)).toBe('john@example.com');
+      expect(result.get(456)).toBe('jane@example.com');
+    });
+
+    it('should handle missing Contractor gracefully', async () => {
+      db.Contract.findAll.mockResolvedValue([{ id: 123, Contractor: null }]);
+
+      const result = await service.fetchContractEmails([123]);
+
+      expect(result.get(123)).toBeNull();
+    });
+  });
+
+  describe('fetchProfiles', () => {
+    it('should fetch profiles by publicIds', async () => {
+      const mockProfiles = [
+        {
+          publicId: 'profile-1',
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john@example.com',
+          jobTitle: 'Engineer',
+        },
+      ];
+
+      db.Profile.findAll.mockResolvedValue(mockProfiles);
+
+      const result = await service.fetchProfiles(['profile-1']);
+
+      expect(result.get('profile-1')).toEqual({
+        publicId: 'profile-1',
+        name: 'John Doe',
+        email: 'john@example.com',
+        jobTitle: 'Engineer',
+      });
+    });
+  });
+
+  describe('enrichTransfers', () => {
+    it('should enrich transfers with all data', async () => {
+      const rawTransfers = [createMockRawTransfer()];
+
+      db.LegalEntity.findAll.mockResolvedValue([
+        { publicId: 'source-entity', name: 'Source Entity', address: { country: 'US' } },
+        { publicId: 'dest-entity', name: 'Dest Entity', address: { country: 'US' } },
+      ]);
+      db.Contract.findAll.mockResolvedValue([
+        { id: 12345, Contractor: { email: 'employee@example.com' } },
+      ]);
+      db.Profile.findAll.mockResolvedValue([
+        {
+          publicId: 'admin-profile',
+          firstName: 'Admin',
+          lastName: 'User',
+          email: 'admin@example.com',
+          jobTitle: 'HR Manager',
+        },
+      ]);
+
+      const result = await service.enrichTransfers(rawTransfers);
+
+      expect(result[0].sourceLegalEntity.legalName).toBe('Source Entity');
+      expect(result[0].items[0].employeeEmail).toBe('employee@example.com');
+      expect(result[0].signatures.admins[0].name).toBe('Admin User');
+    });
+
+    it('should group signatures by role', async () => {
+      const rawTransfers = [
+        createMockRawTransfer({
+          signatures: [
+            { profilePublicId: 'admin-1', role: 'ADMIN', agreementType: 'EAA', signedAt: null },
+            { profilePublicId: 'emp-1', role: 'EMPLOYEE', agreementType: 'EAA', signedAt: null },
+          ],
+        }),
+      ];
+
+      db.LegalEntity.findAll.mockResolvedValue([]);
+      db.Contract.findAll.mockResolvedValue([]);
+      db.Profile.findAll.mockResolvedValue([]);
+
+      const result = await service.enrichTransfers(rawTransfers);
+
+      expect(result[0].signatures.admins).toHaveLength(1);
+      expect(result[0].signatures.employees).toHaveLength(1);
+    });
+  });
+});
+
+function createMockRawTransfer(overrides = {}) {
+  return {
+    id: 'transfer-1',
+    status: 'DRAFT',
+    organizationId: 12345,
+    requesterProfilePublicId: 'requester-profile',
+    sourceLegalEntityPublicId: 'source-entity',
+    destinationLegalEntityPublicId: 'dest-entity',
+    effectiveDate: '2025-02-01',
+    items: [
+      {
+        id: 'item-1',
+        status: 'PENDING',
+        baseContractOid: 'EMP12345',
+        deelContractId: 12345,
+        employeeName: 'John Doe',
+        benefitGroupId: '400',
+        payGroupId: 'pay-1',
+        ptoPolicyId: 'pto-1',
+        workLocationId: 'wl-1',
+        positionPublicId: 'pos-1',
+        teamId: 100,
+        newContractOid: null,
+        resumeFromStep: null,
+      },
+    ],
+    signatures: [
+      {
+        id: 'sig-1',
+        profilePublicId: 'admin-profile',
+        role: 'ADMIN',
+        agreementType: 'ENTITY_ASSIGNMENT_AGREEMENT',
+        signedAt: null,
+      },
+    ],
+    agreement: {
+      id: 'agreement-1',
+      type: 'ENTITY_ASSIGNMENT_AGREEMENT',
+      pdfUrl: 'https://example.com/doc.pdf',
+      createdAt: '2025-01-15T10:00:00Z',
+    },
+    createdAt: '2025-01-15T10:00:00Z',
+    updatedAt: '2025-01-15T10:00:00Z',
+    ...overrides,
+  };
+}
+```
+
+### Step 2: Add controller integration tests
+
+**File:** `backend/controllers/admin/peo/tech_ops.test.js`
+
+```javascript
+const request = require('supertest');
+const app = require('../../../app');
+const { entityTransferClientService } = require('../../../services/peo/entity_transfer_client_service');
+const { transferEnrichmentService } = require('../../../services/peo/entity_transfer/helpers/transfer_enrichment_service');
+
+jest.mock('../../../services/peo/entity_transfer_client_service');
+jest.mock('../../../services/peo/entity_transfer/helpers/transfer_enrichment_service');
+
+describe('GET /admin/peo/tech_ops/entity_transfer/source/:sourceEntityPublicId', () => {
+  const validUuid = '123e4567-e89b-12d3-a456-426614174000';
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should return enriched transfers', async () => {
+    const mockRawResponse = {
+      transfers: [{ id: 'transfer-1' }],
+      cursor: null,
+      hasMore: false,
+    };
+    const mockEnrichedTransfers = [{ id: 'transfer-1', enriched: true }];
+
+    entityTransferClientService.getTransfersBySourceEntity.mockResolvedValue(mockRawResponse);
+    transferEnrichmentService.enrichTransfers.mockResolvedValue(mockEnrichedTransfers);
+
+    const response = await request(app)
+      .get(`/admin/peo/tech_ops/entity_transfer/source/${validUuid}`)
+      .set('Authorization', 'Bearer admin-token')
+      .expect(200);
+
+    expect(response.body.success).toBe(true);
+    expect(response.body.data).toHaveLength(1);
+    expect(entityTransferClientService.getTransfersBySourceEntity).toHaveBeenCalledWith(
+      validUuid,
+      { cursor: undefined, limit: 100 }
+    );
+  });
+
+  it('should pass cursor and limit to PEO service', async () => {
+    entityTransferClientService.getTransfersBySourceEntity.mockResolvedValue({
+      transfers: [],
+      cursor: null,
+      hasMore: false,
+    });
+    transferEnrichmentService.enrichTransfers.mockResolvedValue([]);
+
+    await request(app)
+      .get(`/admin/peo/tech_ops/entity_transfer/source/${validUuid}`)
+      .query({ cursor: 'abc123', limit: '50' })
+      .set('Authorization', 'Bearer admin-token')
+      .expect(200);
+
+    expect(entityTransferClientService.getTransfersBySourceEntity).toHaveBeenCalledWith(
+      validUuid,
+      { cursor: 'abc123', limit: 50 }
+    );
+  });
+
+  it('should return 400 for invalid UUID', async () => {
+    await request(app)
+      .get('/admin/peo/tech_ops/entity_transfer/source/invalid-uuid')
+      .set('Authorization', 'Bearer admin-token')
+      .expect(400);
+  });
+
+  it('should return 401 without auth', async () => {
+    await request(app)
+      .get(`/admin/peo/tech_ops/entity_transfer/source/${validUuid}`)
+      .expect(401);
+  });
+
+  it('should handle PEO service errors', async () => {
+    entityTransferClientService.getTransfersBySourceEntity.mockRejectedValue(
+      new Error('PEO unavailable')
+    );
+
+    const response = await request(app)
+      .get(`/admin/peo/tech_ops/entity_transfer/source/${validUuid}`)
+      .set('Authorization', 'Bearer admin-token')
+      .expect(500);
+
+    expect(response.body.success).toBe(false);
+  });
+});
+```
+
+## Acceptance Criteria
+
+- [ ] Enrichment service unit tests cover all methods
+- [ ] Controller integration tests cover happy path
+- [ ] Tests for error handling (PEO unavailable)
+- [ ] Tests for input validation
+- [ ] Tests for auth/authorization
+- [ ] All tests pass: `npm test -- tech_ops`

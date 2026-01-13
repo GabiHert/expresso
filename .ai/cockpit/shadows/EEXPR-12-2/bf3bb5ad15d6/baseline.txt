@@ -1,0 +1,171 @@
+import { PeoEmployeeTransfer, PeoEmployeeTransferItem, TransferItemStatus, TransferStatus } from '@models/entityTransfer';
+import { Op, Transaction } from 'sequelize';
+import { Service } from 'typedi';
+
+export interface CreateTransferInput {
+    organizationId: number;
+    requesterProfilePublicId: string; // UUID - profile.public_id
+    sourceLegalEntityPublicId: string;
+    destinationLegalEntityPublicId: string;
+    effectiveDate: Date;
+    agreementId?: string;
+    items: CreateTransferItemInput[];
+}
+
+export interface CreateTransferItemInput {
+    baseContractOid: string;
+    newBenefitPrismGroupId: string;
+    newEmploymentPayrollSettingId: string;
+    newPtoPolicyId: string;
+    newWorkLocationId: string;
+    newPositionPublicId: string;
+    newTeamId?: number;
+}
+
+export interface UpdateTransferItemInput {
+    status?: TransferItemStatus;
+    newContractOid?: string;
+    resumeFromStep?: string;
+}
+
+@Service()
+export default class EntityTransferService {
+    async createTransfer(input: CreateTransferInput, transaction?: Transaction): Promise<PeoEmployeeTransfer> {
+        log.info({
+            message: 'Creating entity transfer',
+            organizationId: input.organizationId,
+            itemCount: input.items.length,
+        });
+
+        const transfer = await PeoEmployeeTransfer.create(
+            {
+                organizationId: input.organizationId,
+                requesterProfilePublicId: input.requesterProfilePublicId,
+                sourceLegalEntityPublicId: input.sourceLegalEntityPublicId,
+                destinationLegalEntityPublicId: input.destinationLegalEntityPublicId,
+                effectiveDate: input.effectiveDate,
+                agreementId: input.agreementId || null,
+                status: TransferStatus.PENDING_SIGNATURES,
+            },
+            { transaction },
+        );
+
+        const items: PeoEmployeeTransferItem[] = [];
+        for (const item of input.items) {
+            const createdItem = await PeoEmployeeTransferItem.create(
+                {
+                    organizationId: input.organizationId,
+                    transferId: transfer.id,
+                    baseContractOid: item.baseContractOid,
+                    newBenefitPrismGroupId: item.newBenefitPrismGroupId,
+                    newEmploymentPayrollSettingId: item.newEmploymentPayrollSettingId,
+                    newPtoPolicyId: item.newPtoPolicyId,
+                    newWorkLocationId: item.newWorkLocationId,
+                    newPositionPublicId: item.newPositionPublicId,
+                    newTeamId: item.newTeamId || null,
+                    status: TransferItemStatus.PENDING,
+                },
+                { transaction },
+            );
+            items.push(createdItem);
+        }
+
+        log.info({
+            message: 'Entity transfer created',
+            transferId: transfer.id,
+            itemIds: items.map(i => i.id),
+        });
+
+        // Return transfer with items
+        return this.getTransferById(transfer.id, true, transaction) as Promise<PeoEmployeeTransfer>;
+    }
+
+    async getTransferById(id: string, includeItems = true, transaction?: Transaction): Promise<PeoEmployeeTransfer | null> {
+        const include: any[] = [];
+
+        if (includeItems) {
+            include.push({ model: PeoEmployeeTransferItem, as: 'items' });
+        }
+
+        return PeoEmployeeTransfer.findByPk(id, {
+            include,
+            transaction,
+            useMaster: !!transaction, // Use master if in transaction, replica otherwise
+        });
+    }
+
+    async getTransferItemById(id: string, transaction?: Transaction): Promise<PeoEmployeeTransferItem | null> {
+        return PeoEmployeeTransferItem.findByPk(id, {
+            transaction,
+            useMaster: !!transaction, // Use master if in transaction, replica otherwise
+        });
+    }
+
+    async getTransferItemByIdWithTransfer(id: string, transaction?: Transaction): Promise<PeoEmployeeTransferItem | null> {
+        return PeoEmployeeTransferItem.findByPk(id, {
+            include: [
+                {
+                    model: PeoEmployeeTransfer,
+                    as: 'transfer',
+                    include: [{ model: PeoEmployeeTransferItem, as: 'items' }],
+                },
+            ],
+            transaction,
+            useMaster: !!transaction, // Use master if in transaction, replica otherwise
+        });
+    }
+
+    async getReadyTransfers(effectiveDate: Date, limit = 100): Promise<PeoEmployeeTransfer[]> {
+        return PeoEmployeeTransfer.findAll({
+            where: {
+                status: TransferStatus.SCHEDULED,
+                effectiveDate: {
+                    [Op.lte]: effectiveDate,
+                },
+            },
+            include: [{ model: PeoEmployeeTransferItem, as: 'items' }],
+            limit,
+            order: [['effectiveDate', 'ASC']],
+            useMaster: false, // Always use replica for batch queries
+        });
+    }
+
+    async updateTransferStatus(id: string, status: TransferStatus, transaction?: Transaction): Promise<void> {
+        log.info({ message: 'Updating transfer status', transferId: id, status });
+
+        const [affectedCount] = await PeoEmployeeTransfer.update({ status }, { where: { id }, transaction });
+
+        if (affectedCount === 0) {
+            throw new Error(`Transfer not found: ${id}`);
+        }
+    }
+
+    async updateTransferItem(id: string, updates: UpdateTransferItemInput, transaction?: Transaction): Promise<void> {
+        log.info({ message: 'Updating transfer item', itemId: id, updates });
+
+        const updateData: Partial<PeoEmployeeTransferItem> = {};
+
+        if (updates.status !== undefined) {
+            updateData.status = updates.status;
+        }
+        if (updates.newContractOid !== undefined) {
+            updateData.newContractOid = updates.newContractOid;
+        }
+        if (updates.resumeFromStep !== undefined) {
+            updateData.resumeFromStep = updates.resumeFromStep;
+        }
+
+        const [affectedCount] = await PeoEmployeeTransferItem.update(updateData, {
+            where: { id },
+            transaction,
+        });
+
+        if (affectedCount === 0) {
+            throw new Error(`Transfer item not found: ${id}`);
+        }
+    }
+
+    async updateTransferItemStatus(id: string, status: TransferItemStatus, transaction?: Transaction): Promise<void> {
+        await this.updateTransferItem(id, { status }, transaction);
+    }
+}

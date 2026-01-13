@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/backend/services/peo/peo_contract_service.ts",
+  "taskId": "ENGESC-23600",
+  "baseline": {
+    "capturedAt": "2026-01-09T20:04:42.741Z",
+    "hash": "40906cb82cd9458b",
+    "size": 211015
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-10T04:49:25.867Z",
+    "hash": "7c2e47fef7c79915",
+    "size": 219981,
+    "editCount": 9
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-10T04:49:25.868Z",
+    "actualFileHash": "7c2e47fef7c79915",
+    "status": "synced"
+  }
+}

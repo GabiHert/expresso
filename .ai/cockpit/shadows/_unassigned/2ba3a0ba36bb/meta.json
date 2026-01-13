@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-56/feedback/diff-review.md",
+  "taskId": "_unassigned",
+  "baseline": {
+    "capturedAt": "2026-01-08T00:14:55.486Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T00:14:55.486Z",
+    "hash": "37836543486447ab",
+    "size": 101,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T00:14:55.486Z",
+    "actualFileHash": "37836543486447ab",
+    "status": "synced"
+  }
+}

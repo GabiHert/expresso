@@ -1,0 +1,577 @@
+import {Transaction} from 'sequelize';
+
+import {PEOLogger} from '../../../../../modules/peo/utils/peo_logger';
+import {CrossHireSanityCheckStep} from '../../../entity_transfer/steps/cross_hire_sanity_check_step';
+import {StepExecutionResult} from '../../../entity_transfer/steps/i_transfer_step';
+import {TransferContext} from '../../../entity_transfer/transfer_context';
+
+describe('CrossHireSanityCheckStep', () => {
+    let step: CrossHireSanityCheckStep;
+    let mockLogger: jest.Mocked<PEOLogger>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mockDb is a test mock that doesn't need full type definition
+    let mockDb: Record<string, any>;
+    let mockTransaction: Transaction;
+    let baseContext: TransferContext;
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+
+        mockLogger = ({
+            info: jest.fn(),
+            warn: jest.fn(),
+            error: jest.fn(),
+        } as unknown) as jest.Mocked<PEOLogger>;
+
+        mockDb = {};
+
+        mockTransaction = {} as Transaction;
+
+        step = new CrossHireSanityCheckStep(mockLogger, mockDb);
+
+        baseContext = ({
+            request: {
+                transfer: {id: 'transfer-1'},
+                item: {id: 'item-1'},
+            },
+            contracts: {
+                old: {
+                    oid: 'contract-123',
+                    peoContract: {
+                        // 21 core required fields
+                        deelContractOid: 'contract-123',
+                        prismClientId: 'CLIENT-1',
+                        prismEmployeeId: 'EMP-123',
+                        firstName: 'John',
+                        lastName: 'Doe',
+                        employeeStatusCode: 'A',
+                        benefitsGroup: 'BG-1',
+                        ssn: '123-45-6789',
+                        birthDate: '1990-01-01',
+                        gender: 'M',
+                        maritalStatus: 'S',
+                        employeeTypeCode: 'F',
+                        payGroup: 'PG-1',
+                        payRate: '75000',
+                        payPeriod: 'M',
+                        peoStartDate: '2024-01-01',
+                        jobCode: 'JOB-1',
+                        payMethod: 'D',
+                        origHireDate: '2024-01-01',
+                        workLocationCode: 'WL-1',
+                        citizenStatus: 'Z01',
+                        lastHireDate: '2024-01-01',
+                        // Address fields
+                        addressLine1: '123 Main St',
+                        city: 'New York',
+                        stateCode: 'NY',
+                        zipCode: '10001',
+                        // Conditional: payMethod != 'N'
+                        fedFileStatus: 'M',
+                    },
+                },
+            },
+            legalEntities: {
+                source: {
+                    id: 200,
+                    publicId: '550e8400-e29b-41d4-a716-446655440001',
+                },
+                destination: {
+                    id: 100,
+                    publicId: '550e8400-e29b-41d4-a716-446655440002',
+                },
+            },
+            stepState: {
+                completedSteps: [],
+            },
+            stepResults: {},
+        } as unknown) as TransferContext;
+    });
+
+    describe('validate()', () => {
+        it('should pass validation when context has required contract structure', () => {
+            expect(() => step.validate(baseContext)).not.toThrow();
+        });
+
+        it('should throw when contracts.old.oid missing', () => {
+            const invalidContext = ({
+                ...baseContext,
+                contracts: {
+                    old: {
+                        peoContract: baseContext.contracts.old.peoContract,
+                    },
+                },
+            } as unknown) as TransferContext;
+
+            expect(() => step.validate(invalidContext)).toThrow('Old contract OID is required');
+        });
+
+        it('should throw when prismEmployeeId missing', () => {
+            const invalidContext = ({
+                ...baseContext,
+                contracts: {
+                    old: {
+                        oid: 'contract-123',
+                        peoContract: {
+                            ...baseContext.contracts.old.peoContract,
+                            prismEmployeeId: undefined,
+                        },
+                    },
+                },
+            } as unknown) as TransferContext;
+
+            expect(() => step.validate(invalidContext)).toThrow('Prism Employee ID (required as previousPrismEmployeeId) is required for cross-hire');
+        });
+
+        it('should throw when prismClientId missing', () => {
+            const invalidContext = ({
+                ...baseContext,
+                contracts: {
+                    old: {
+                        oid: 'contract-123',
+                        peoContract: {
+                            ...baseContext.contracts.old.peoContract,
+                            prismClientId: undefined,
+                        },
+                    },
+                },
+            } as unknown) as TransferContext;
+
+            expect(() => step.validate(invalidContext)).toThrow('Prism Client ID is required for cross-hire');
+        });
+    });
+
+    describe('execute()', () => {
+        describe('Happy Path', () => {
+            it('should validate all 21 core required fields and pass', async () => {
+                const result = await step.execute(baseContext, mockTransaction);
+
+                expect(result.result).toBe(StepExecutionResult.CONTINUE);
+                expect(result.context.stepState.completedSteps).toContain('CrossHireSanityCheck');
+            });
+
+            it('should validate address fields when addressLine1 populated', async () => {
+                const contextWithAddressLine1 = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                addressLine1: '123 Main St',
+                                address: '',
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                const result = await step.execute(contextWithAddressLine1, mockTransaction);
+
+                expect(result.result).toBe(StepExecutionResult.CONTINUE);
+            });
+
+            it('should validate address fields when address populated', async () => {
+                const contextWithAddress = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                addressLine1: '',
+                                address: '456 Oak Ave',
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                const result = await step.execute(contextWithAddress, mockTransaction);
+
+                expect(result.result).toBe(StepExecutionResult.CONTINUE);
+            });
+
+            it('should validate zip codes with 5 characters pass', async () => {
+                const contextWith5CharZip = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                zipCode: '12345',
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                const result = await step.execute(contextWith5CharZip, mockTransaction);
+
+                expect(result.result).toBe(StepExecutionResult.CONTINUE);
+            });
+
+            it('should validate zip codes with 10 characters pass', async () => {
+                const contextWith10CharZip = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                zipCode: '12345-6789',
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                const result = await step.execute(contextWith10CharZip, mockTransaction);
+
+                expect(result.result).toBe(StepExecutionResult.CONTINUE);
+            });
+
+            it('should log validation start and success', async () => {
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockLogger.info).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        message: '[CrossHireSanityCheckStep] Starting cross-hire prerequisite validation',
+                        transferId: 'transfer-1',
+                        itemId: 'item-1',
+                        oldContractOid: 'contract-123',
+                    })
+                );
+
+                expect(mockLogger.info).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        message: '[CrossHireSanityCheckStep] All cross-hire prerequisites validated successfully',
+                        transferId: 'transfer-1',
+                        itemId: 'item-1',
+                        oldContractOid: 'contract-123',
+                        duration: expect.any(Number),
+                    })
+                );
+            });
+        });
+
+        describe('Validation Error Tests - Core Fields', () => {
+            it('should fail when firstName missing', async () => {
+                const invalidContext = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                firstName: null,
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await expect(step.execute(invalidContext, mockTransaction)).rejects.toThrow('First Name is required for cross-hire');
+            });
+
+            it('should fail when SSN missing', async () => {
+                const invalidContext = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                ssn: '',
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await expect(step.execute(invalidContext, mockTransaction)).rejects.toThrow('SSN is required for cross-hire');
+            });
+
+            it('should fail when birthDate missing', async () => {
+                const invalidContext = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                birthDate: undefined,
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await expect(step.execute(invalidContext, mockTransaction)).rejects.toThrow('Birth Date is required for cross-hire');
+            });
+
+            it('should collect ALL missing fields in single error', async () => {
+                const invalidContext = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                firstName: null,
+                                lastName: '',
+                                ssn: undefined,
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await expect(step.execute(invalidContext, mockTransaction)).rejects.toThrow(/failed with 3 error\(s\)/);
+
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        message: '[CrossHireSanityCheckStep] Validation failed',
+                        errorCount: 3,
+                        errors: expect.arrayContaining([
+                            expect.stringContaining('First Name is required'),
+                            expect.stringContaining('Last Name is required'),
+                            expect.stringContaining('SSN is required'),
+                        ]),
+                    })
+                );
+            });
+
+            it('should fail when prismEmployeeId missing (cross-hire prerequisite)', async () => {
+                const invalidContext = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                prismEmployeeId: '',
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await expect(step.execute(invalidContext, mockTransaction)).rejects.toThrow(
+                    'Prism Employee ID (required as previousPrismEmployeeId) is required for cross-hire'
+                );
+            });
+        });
+
+        describe('Validation Error Tests - Conditional Fields (payMethod)', () => {
+            it("should require fedFileStatus when payMethod is not 'N'", async () => {
+                const invalidContext = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                payMethod: 'S',
+                                fedFileStatus: null,
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await expect(step.execute(invalidContext, mockTransaction)).rejects.toThrow("Federal File Status is required for payMethod 'S'");
+            });
+
+            it("should NOT require fedFileStatus when payMethod is 'N' (NonPaidOwner)", async () => {
+                const contextWithNonPaid = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                payMethod: 'N',
+                                fedFileStatus: null,
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                const result = await step.execute(contextWithNonPaid, mockTransaction);
+
+                expect(result.result).toBe(StepExecutionResult.CONTINUE);
+            });
+        });
+
+        describe('Validation Error Tests - Conditional Fields (citizenStatus)', () => {
+            it('should require i9AlienRegistrationNumber when citizenStatus is Z03 (Permanent Resident)', async () => {
+                const invalidContext = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                citizenStatus: 'Z03',
+                                i9AlienRegistrationNumber: '',
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await expect(step.execute(invalidContext, mockTransaction)).rejects.toThrow(
+                    'I-9 Alien Registration Number is required for Permanent Resident status'
+                );
+            });
+
+            it('should require 5 I-9 fields when citizenStatus is Z04 (Alien Authorized)', async () => {
+                const invalidContext = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                citizenStatus: 'Z04',
+                                i9AlienRegistrationNumber: '',
+                                i9AlienRegistrationExpiration: null,
+                                i94AdmissionNumber: undefined,
+                                i9ForeignPassportNumber: '',
+                                i9PassportIssuingCountry: null,
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await expect(step.execute(invalidContext, mockTransaction)).rejects.toThrow(/failed with 5 error\(s\)/);
+
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        errorCount: 5,
+                        errors: expect.arrayContaining([
+                            expect.stringContaining('I-9 Alien Registration Number is required for Alien Authorized status'),
+                            expect.stringContaining('I-9 Alien Registration Expiration is required for Alien Authorized status'),
+                            expect.stringContaining('I-94 Admission Number is required for Alien Authorized status'),
+                            expect.stringContaining('I-9 Foreign Passport Number is required for Alien Authorized status'),
+                            expect.stringContaining('I-9 Passport Issuing Country is required for Alien Authorized status'),
+                        ]),
+                    })
+                );
+            });
+
+            it('should NOT require I-9 fields when citizenStatus is Z01 (US Citizen)', async () => {
+                const contextWithCitizen = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                citizenStatus: 'Z01',
+                                i9AlienRegistrationNumber: undefined,
+                                i9AlienRegistrationExpiration: undefined,
+                                i94AdmissionNumber: undefined,
+                                i9ForeignPassportNumber: undefined,
+                                i9PassportIssuingCountry: undefined,
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                const result = await step.execute(contextWithCitizen, mockTransaction);
+
+                expect(result.result).toBe(StepExecutionResult.CONTINUE);
+            });
+        });
+
+        describe('Address Validation Tests', () => {
+            it('should fail when both addressLine1 and address are empty', async () => {
+                const invalidContext = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                addressLine1: '',
+                                address: '',
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await expect(step.execute(invalidContext, mockTransaction)).rejects.toThrow('Address Line 1 is required for cross-hire');
+            });
+
+            it('should fail when city missing', async () => {
+                const invalidContext = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                city: null,
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await expect(step.execute(invalidContext, mockTransaction)).rejects.toThrow('City is required for cross-hire');
+            });
+
+            it('should fail when stateCode missing', async () => {
+                const invalidContext = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                stateCode: '',
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await expect(step.execute(invalidContext, mockTransaction)).rejects.toThrow('State Code is required for cross-hire');
+            });
+        });
+
+        describe('Logging Tests', () => {
+            it('should log all validation errors before throwing', async () => {
+                const invalidContext = ({
+                    ...baseContext,
+                    contracts: {
+                        old: {
+                            ...baseContext.contracts.old,
+                            peoContract: {
+                                ...baseContext.contracts.old.peoContract,
+                                firstName: null,
+                                lastName: '',
+                            },
+                        },
+                    },
+                } as unknown) as TransferContext;
+
+                await expect(step.execute(invalidContext, mockTransaction)).rejects.toThrow();
+
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        message: '[CrossHireSanityCheckStep] Validation failed',
+                        transferId: 'transfer-1',
+                        itemId: 'item-1',
+                        oldContractOid: 'contract-123',
+                        errorCount: 2,
+                        errors: expect.any(Array),
+                    })
+                );
+            });
+
+            it('should log validation success with duration', async () => {
+                await step.execute(baseContext, mockTransaction);
+
+                expect(mockLogger.info).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        message: '[CrossHireSanityCheckStep] All cross-hire prerequisites validated successfully',
+                        transferId: 'transfer-1',
+                        itemId: 'item-1',
+                        oldContractOid: 'contract-123',
+                        duration: expect.any(Number),
+                    })
+                );
+            });
+        });
+    });
+});

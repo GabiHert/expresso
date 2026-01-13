@@ -1,0 +1,20 @@
+{
+  "taskId": "ENGESC-23600",
+  "title": "Tech Ops Endpoint for Missing PEO Employments",
+  "branch": "ENGESC-23600-create-missing-employment-endpoint",
+  "frameworkPath": ".ai/tasks/in_progress/ENGESC-23600",
+  "startedAt": "2026-01-09T22:10:00Z",
+  "sessionId": "803f6ffca45d",
+  "affectedRepos": [
+    {
+      "name": "backend",
+      "absolutePath": "/Users/gabriel.herter/Documents/Projects/deel/backend",
+      "gitRoot": "/Users/gabriel.herter/Documents/Projects/deel/backend",
+      "branch": "ENGESC-23600-create-missing-employment-endpoint",
+      "remote": "origin",
+      "remoteUrl": "git@github.com:GabiHert/peo.git",
+      "protected": false
+    }
+  ],
+  "currentWorkRepo": "backend"
+}

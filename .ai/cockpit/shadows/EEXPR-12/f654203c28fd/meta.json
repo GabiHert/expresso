@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-12-4/todo/03-add-unit-tests.md",
+  "taskId": "EEXPR-12",
+  "baseline": {
+    "capturedAt": "2026-01-08T19:02:13.331Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T19:02:13.331Z",
+    "hash": "3b0f083915c90394",
+    "size": 9626,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T19:02:13.331Z",
+    "actualFileHash": "3b0f083915c90394",
+    "status": "synced"
+  }
+}

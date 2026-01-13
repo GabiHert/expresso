@@ -1,0 +1,266 @@
+const { schema, publicSchema } = require('./config');
+
+module.exports = {
+    /**
+     * EEXPR-12-1: Fix profile_public_id type in peo_employee_transfer_signatures
+     *
+     * This migration converts profile_public_id from INTEGER to UUID.
+     * The column was incorrectly storing profile.id instead of profile.public_id.
+     *
+     * Strategy: Column replacement (safe approach)
+     * 1. Validate all records can be migrated (no orphaned profiles)
+     * 2. Add new UUID column
+     * 3. Migrate data by looking up profile.public_id from profile.id
+     * 4. Verify all records were migrated
+     * 5. Drop old INTEGER column
+     * 6. Rename new column
+     * 7. Set NOT NULL constraint
+     * 8. Recreate indexes
+     *
+     * @param {import("sequelize").QueryInterface} queryInterface
+     * @param {typeof import('sequelize')} Sequelize
+     * @returns {Promise<void>}
+     */
+    up: async (queryInterface, Sequelize) => {
+        await queryInterface.sequelize.transaction(async transaction => {
+            // Step 1: Check for orphaned records BEFORE migration
+            const [orphanedRecords] = await queryInterface.sequelize.query(
+                `
+                SELECT COUNT(*) as count
+                FROM "${schema}"."peo_employee_transfer_signatures" s
+                LEFT JOIN "${publicSchema}"."profile" p ON s.profile_public_id = p.id
+                WHERE p.id IS NULL AND s.profile_public_id IS NOT NULL
+                `,
+                { transaction }
+            );
+
+            if (parseInt(orphanedRecords[0].count, 10) > 0) {
+                throw new Error(
+                    `Migration aborted: Found ${orphanedRecords[0].count} signature records with invalid profile_public_id. ` +
+                    `Clean up orphaned records before running this migration.`
+                );
+            }
+
+            // Step 2: Add new UUID column
+            await queryInterface.addColumn(
+                { tableName: 'peo_employee_transfer_signatures', schema },
+                'profile_public_id_new',
+                {
+                    type: Sequelize.UUID,
+                    allowNull: true,
+                    comment: 'FK to profiles.public_id - Person required to sign (UUID)',
+                },
+                { transaction }
+            );
+
+            // Step 3: Migrate data - lookup profile.public_id from profile.id
+            await queryInterface.sequelize.query(
+                `
+                UPDATE "${schema}"."peo_employee_transfer_signatures" s
+                SET profile_public_id_new = p.public_id
+                FROM "${publicSchema}"."profile" p
+                WHERE s.profile_public_id = p.id
+                `,
+                { transaction }
+            );
+
+            // Step 4: Verify all records were migrated (no NULLs for non-NULL original values)
+            const [unmigrated] = await queryInterface.sequelize.query(
+                `
+                SELECT COUNT(*) as count
+                FROM "${schema}"."peo_employee_transfer_signatures"
+                WHERE profile_public_id_new IS NULL AND profile_public_id IS NOT NULL
+                `,
+                { transaction }
+            );
+
+            if (parseInt(unmigrated[0].count, 10) > 0) {
+                throw new Error(
+                    `Migration failed: ${unmigrated[0].count} records still have NULL profile_public_id_new after migration`
+                );
+            }
+
+            // Step 5: Drop unique index that includes profile_public_id
+            await queryInterface.sequelize.query(
+                `DROP INDEX IF EXISTS "${schema}"."idx_peo_employee_transfer_signatures_unique"`,
+                { transaction }
+            );
+
+            // Step 6: Drop old index on profile_public_id
+            await queryInterface.sequelize.query(
+                `DROP INDEX IF EXISTS "${schema}"."idx_peo_employee_transfer_signatures_profile_public_id"`,
+                { transaction }
+            );
+
+            // Step 7: Drop old INTEGER column
+            await queryInterface.removeColumn(
+                { tableName: 'peo_employee_transfer_signatures', schema },
+                'profile_public_id',
+                { transaction }
+            );
+
+            // Step 8: Rename new column to profile_public_id
+            await queryInterface.renameColumn(
+                { tableName: 'peo_employee_transfer_signatures', schema },
+                'profile_public_id_new',
+                'profile_public_id',
+                { transaction }
+            );
+
+            // Step 9: Set NOT NULL constraint to match model definition
+            await queryInterface.changeColumn(
+                { tableName: 'peo_employee_transfer_signatures', schema },
+                'profile_public_id',
+                {
+                    type: Sequelize.UUID,
+                    allowNull: false,
+                    comment: 'FK to profiles.public_id - Person required to sign (UUID)',
+                },
+                { transaction }
+            );
+
+            // Step 10: Recreate index on profile_public_id (now UUID)
+            await queryInterface.sequelize.query(
+                `
+                CREATE INDEX IF NOT EXISTS "idx_peo_employee_transfer_signatures_profile_public_id"
+                ON "${schema}"."peo_employee_transfer_signatures" ("profile_public_id")
+                `,
+                { transaction }
+            );
+
+            // Step 11: Recreate unique constraint
+            await queryInterface.sequelize.query(
+                `
+                CREATE UNIQUE INDEX IF NOT EXISTS "idx_peo_employee_transfer_signatures_unique"
+                ON "${schema}"."peo_employee_transfer_signatures" ("transfer_id", "profile_public_id", "agreement_type")
+                `,
+                { transaction }
+            );
+        });
+    },
+
+    /**
+     * Rollback: Convert profile_public_id from UUID back to INTEGER
+     *
+     * @param {import("sequelize").QueryInterface} queryInterface
+     * @param {typeof import('sequelize')} Sequelize
+     * @returns {Promise<void>}
+     */
+    down: async (queryInterface, Sequelize) => {
+        await queryInterface.sequelize.transaction(async transaction => {
+            // Step 1: Check for orphaned records BEFORE rollback
+            const [orphanedRecords] = await queryInterface.sequelize.query(
+                `
+                SELECT COUNT(*) as count
+                FROM "${schema}"."peo_employee_transfer_signatures" s
+                LEFT JOIN "${publicSchema}"."profile" p ON s.profile_public_id = p.public_id
+                WHERE p.public_id IS NULL AND s.profile_public_id IS NOT NULL
+                `,
+                { transaction }
+            );
+
+            if (parseInt(orphanedRecords[0].count, 10) > 0) {
+                throw new Error(
+                    `Rollback aborted: Found ${orphanedRecords[0].count} signature records with invalid profile_public_id (UUID). ` +
+                    `Clean up orphaned records before rolling back this migration.`
+                );
+            }
+
+            // Step 2: Add INTEGER column back
+            await queryInterface.addColumn(
+                { tableName: 'peo_employee_transfer_signatures', schema },
+                'profile_public_id_old',
+                {
+                    type: Sequelize.INTEGER,
+                    allowNull: true,
+                    comment: 'FK to profiles.id - Person required to sign (INTEGER)',
+                },
+                { transaction }
+            );
+
+            // Step 3: Migrate data back - lookup profile.id from profile.public_id
+            await queryInterface.sequelize.query(
+                `
+                UPDATE "${schema}"."peo_employee_transfer_signatures" s
+                SET profile_public_id_old = p.id
+                FROM "${publicSchema}"."profile" p
+                WHERE s.profile_public_id = p.public_id
+                `,
+                { transaction }
+            );
+
+            // Step 4: Verify all records were migrated back
+            const [unmigrated] = await queryInterface.sequelize.query(
+                `
+                SELECT COUNT(*) as count
+                FROM "${schema}"."peo_employee_transfer_signatures"
+                WHERE profile_public_id_old IS NULL AND profile_public_id IS NOT NULL
+                `,
+                { transaction }
+            );
+
+            if (parseInt(unmigrated[0].count, 10) > 0) {
+                throw new Error(
+                    `Rollback failed: ${unmigrated[0].count} records still have NULL profile_public_id_old after migration`
+                );
+            }
+
+            // Step 5: Drop unique index
+            await queryInterface.sequelize.query(
+                `DROP INDEX IF EXISTS "${schema}"."idx_peo_employee_transfer_signatures_unique"`,
+                { transaction }
+            );
+
+            // Step 6: Drop index on profile_public_id
+            await queryInterface.sequelize.query(
+                `DROP INDEX IF EXISTS "${schema}"."idx_peo_employee_transfer_signatures_profile_public_id"`,
+                { transaction }
+            );
+
+            // Step 7: Drop UUID column
+            await queryInterface.removeColumn(
+                { tableName: 'peo_employee_transfer_signatures', schema },
+                'profile_public_id',
+                { transaction }
+            );
+
+            // Step 8: Rename back
+            await queryInterface.renameColumn(
+                { tableName: 'peo_employee_transfer_signatures', schema },
+                'profile_public_id_old',
+                'profile_public_id',
+                { transaction }
+            );
+
+            // Step 9: Set NOT NULL constraint to match original model definition
+            await queryInterface.changeColumn(
+                { tableName: 'peo_employee_transfer_signatures', schema },
+                'profile_public_id',
+                {
+                    type: Sequelize.INTEGER,
+                    allowNull: false,
+                    comment: 'FK to profiles.id - Person required to sign (INTEGER)',
+                },
+                { transaction }
+            );
+
+            // Step 10: Recreate index on profile_public_id (now INTEGER)
+            await queryInterface.sequelize.query(
+                `
+                CREATE INDEX IF NOT EXISTS "idx_peo_employee_transfer_signatures_profile_public_id"
+                ON "${schema}"."peo_employee_transfer_signatures" ("profile_public_id")
+                `,
+                { transaction }
+            );
+
+            // Step 11: Recreate unique constraint
+            await queryInterface.sequelize.query(
+                `
+                CREATE UNIQUE INDEX IF NOT EXISTS "idx_peo_employee_transfer_signatures_unique"
+                ON "${schema}"."peo_employee_transfer_signatures" ("transfer_id", "profile_public_id", "agreement_type")
+                `,
+                { transaction }
+            );
+        });
+    },
+};

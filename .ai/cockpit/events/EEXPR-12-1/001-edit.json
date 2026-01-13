@@ -1,0 +1,40 @@
+{
+  "id": "evt-1767908244218-fjqskw5wb",
+  "taskId": "EEXPR-12-1",
+  "taskIdSource": "env-var",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/in_progress/EEXPR-12-1/README.md",
+    "old_string": "║ LOCATION: .ai/tasks/todo/EEXPR-12-1/                            ║",
+    "new_string": "║ LOCATION: .ai/tasks/in_progress/EEXPR-12-1/                     ║",
+    "replace_all": false
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/in_progress/EEXPR-12-1/README.md",
+    "oldString": "║ LOCATION: .ai/tasks/todo/EEXPR-12-1/                            ║",
+    "newString": "║ LOCATION: .ai/tasks/in_progress/EEXPR-12-1/                     ║",
+    "originalFile": "<!--\n╔══════════════════════════════════════════════════════════════════╗\n║ LAYER: TASK (SUBTASK)                                            ║\n║ LOCATION: .ai/tasks/todo/EEXPR-12-1/                            ║\n╠══════════════════════════════════════════════════════════════════╣\n║ PARENT EPIC: EEXPR-12                                            ║\n║ REPO: peo                                                        ║\n║ BRANCH: EEXPR-12-1-fix-signature-profile-id-type                ║\n╚══════════════════════════════════════════════════════════════════╝\n-->\n\n# EEXPR-12-1: [PEO] Migration - Fix signature profile_public_id type\n\n## Problem Statement\n\nThe `peo_employee_transfer_signatures.profile_public_id` column has the wrong data type:\n\n| Current State | Required State |\n|---------------|----------------|\n| Type: INTEGER | Type: UUID |\n| Stores: `profile.id` | Stores: `profile.public_id` |\n\nThis prevents the EEXPR-12 endpoint from properly linking signatures to profiles using the public UUID.\n\n## Migration Strategy\n\n### Approach: Column Replacement (Safe)\n\nThis approach is safer than in-place type conversion:\n\n1. **Add** new column `profile_public_id_new` (UUID, nullable)\n2. **Migrate** data by looking up `profile.public_id` from `profile.id`\n3. **Drop** old column `profile_public_id`\n4. **Rename** new column to `profile_public_id`\n\n### Why Not ALTER COLUMN?\n\nPostgreSQL doesn't support direct INTEGER → UUID conversion. We must:\n- Create a new UUID column\n- Populate it with the mapped values\n- Replace the old column\n\n## SQL Implementation\n\n### Up Migration\n\n```sql\n-- Step 1: Add new UUID column\nALTER TABLE peo.peo_employee_transfer_signatures\nADD COLUMN profile_public_id_new UUID;\n\n-- Step 2: Migrate data from profile.id to profile.public_id\nUPDATE peo.peo_employee_transfer_signatures s\nSET profile_public_id_new = p.public_id\nFROM public.profile p\nWHERE s.profile_public_id = p.id;\n\n-- Step 3: Drop old INTEGER column\nALTER TABLE peo.peo_employee_transfer_signatures\nDROP COLUMN profile_public_id;\n\n-- Step 4: Rename new column\nALTER TABLE peo.peo_employee_transfer_signatures\nRENAME COLUMN profile_public_id_new TO profile_public_id;\n\n-- Step 5: Add index for query performance (optional)\nCREATE INDEX IF NOT EXISTS idx_transfer_signatures_profile_public_id\nON peo.peo_employee_transfer_signatures(profile_public_id);\n```\n\n### Down Migration (Rollback)\n\n```sql\n-- Step 1: Add INTEGER column back\nALTER TABLE peo.peo_employee_transfer_signatures\nADD COLUMN profile_public_id_old INTEGER;\n\n-- Step 2: Migrate data back (UUID → INTEGER via profile lookup)\nUPDATE peo.peo_employee_transfer_signatures s\nSET profile_public_id_old = p.id\nFROM public.profile p\nWHERE s.profile_public_id = p.public_id;\n\n-- Step 3: Drop index\nDROP INDEX IF EXISTS peo.idx_transfer_signatures_profile_public_id;\n\n-- Step 4: Drop UUID column\nALTER TABLE peo.peo_employee_transfer_signatures\nDROP COLUMN profile_public_id;\n\n-- Step 5: Rename back\nALTER TABLE peo.peo_employee_transfer_signatures\nRENAME COLUMN profile_public_id_old TO profile_public_id;\n```\n\n## Pre-Deployment Checks\n\nBefore deploying, verify:\n\n1. **Data exists to migrate:**\n   ```sql\n   SELECT COUNT(*) FROM peo.peo_employee_transfer_signatures;\n   ```\n\n2. **All profile_public_id values have matching profiles:**\n   ```sql\n   SELECT COUNT(*)\n   FROM peo.peo_employee_transfer_signatures s\n   LEFT JOIN public.profile p ON s.profile_public_id = p.id\n   WHERE p.id IS NULL;\n   -- Should return 0\n   ```\n\n3. **No NULL profile_public_id values (if column is NOT NULL):**\n   ```sql\n   SELECT COUNT(*)\n   FROM peo.peo_employee_transfer_signatures\n   WHERE profile_public_id IS NULL;\n   ```\n\n## Post-Deployment Verification\n\nAfter migration, verify:\n\n```sql\n-- Check column type changed\nSELECT column_name, data_type\nFROM information_schema.columns\nWHERE table_schema = 'peo'\n  AND table_name = 'peo_employee_transfer_signatures'\n  AND column_name = 'profile_public_id';\n-- Expected: data_type = 'uuid'\n\n-- Check data was migrated correctly\nSELECT s.profile_public_id, p.public_id\nFROM peo.peo_employee_transfer_signatures s\nJOIN public.profile p ON s.profile_public_id = p.public_id\nLIMIT 5;\n```\n\n## Acceptance Criteria\n\n- [ ] Migration file created in `peo/migrations/`\n- [ ] Up migration converts INTEGER to UUID with data migration\n- [ ] Down migration provides rollback capability\n- [ ] Pre-deployment checks pass\n- [ ] Post-deployment verification confirms type change\n\n## Work Items\n\n| ID | Name | Status |\n|----|------|--------|\n| 01 | Create migration file | todo |\n\n## Technical Context\n\n### Table Location\n- Schema: `peo`\n- Table: `peo_employee_transfer_signatures`\n- Column: `profile_public_id`\n\n### Related Tables\n- `public.profile` - Source of `public_id` UUID\n- `peo.peo_employee_transfers` - Parent transfer records\n- `peo.peo_employee_transfer_items` - Transfer items\n\n### Model File\n`peo/src/models/entityTransfer/PeoEmployeeTransferSignature.ts`\n\n## Dependencies\n\n**This migration must deploy BEFORE:**\n- EEXPR-12-2: PEO GET transfers endpoint\n- EEXPR-12-3: Backend tech ops endpoint\n\n## Risks\n\n1. **Data loss** - Mitigated by column replacement approach (old data preserved until drop)\n2. **Missing profiles** - Pre-check ensures all INTEGER IDs map to valid profiles\n3. **Application errors** - Deploy during low-traffic period, ensure app handles UUID type\n\n## Parent Epic\n\n[EEXPR-12: Endpoint to retrieve transfer details](../in_progress/EEXPR-12/README.md)\n",
+    "structuredPatch": [
+      {
+        "oldStart": 1,
+        "oldLines": 7,
+        "newStart": 1,
+        "newLines": 7,
+        "lines": [
+          " <!--",
+          " ╔══════════════════════════════════════════════════════════════════╗",
+          " ║ LAYER: TASK (SUBTASK)                                            ║",
+          "-║ LOCATION: .ai/tasks/todo/EEXPR-12-1/                            ║",
+          "+║ LOCATION: .ai/tasks/in_progress/EEXPR-12-1/                     ║",
+          " ╠══════════════════════════════════════════════════════════════════╣",
+          " ║ PARENT EPIC: EEXPR-12                                            ║",
+          " ║ REPO: peo                                                        ║"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "94528b48-30b5-4fdb-9cfc-3f7b3ded4353",
+  "timestamp": "2026-01-08T21:37:24.218Z"
+}

@@ -1,0 +1,657 @@
+import {Transaction} from 'sequelize';
+import {z} from 'zod4';
+
+import {PEOLogger} from '../../../../modules/peo/utils/peo_logger';
+import {peoClientMasterService} from '../../client_master_service';
+import {peoContractService} from '../../peo_contract_service';
+import {peoPositionService} from '../../peo_position_service';
+import {peoScopeOfWorkService} from '../../peo_scope_of_work_service';
+import {PeoContractOrigin} from '../../schemas';
+import {PeoTransactionalEventService} from '../../transactional_outbox/transactional_outbox_events';
+import {EntityTransferRepository} from '../repositories/entity_transfer_repository';
+import {PeoContractRepository} from '../repositories/peo_contract_repository';
+import {hasCrossHireCompleted, TransferContext} from '../transfer_context';
+
+import {CrossHireStep} from './cross_hire_step';
+import {ITransferStep, StepExecutionResult, StepExecutionReturn, StepType} from './i_transfer_step';
+
+const createContractValidationSchema = z
+    .object({
+        contracts: z
+            .object({
+                old: z
+                    .object({
+                        id: z.number({
+                            message: 'Old contract ID is required',
+                        }),
+                        invitedClientEmail: z.string({
+                            message: 'Client email is required',
+                        }),
+                        peoContract: z
+                            .object({
+                                firstName: z.string({
+                                    message: 'First name is required',
+                                }),
+                                lastName: z.string({
+                                    message: 'Last name is required',
+                                }),
+                                stateCode: z.string({
+                                    message: 'State code is required',
+                                }),
+                                employeeTypeCode: z.string({
+                                    message: 'Employee type code is required',
+                                }),
+                                payRate: z.string({
+                                    message: 'Pay rate is required',
+                                }),
+                                payMethod: z.string({
+                                    message: 'Pay method is required',
+                                }),
+                                workHoursPerWeek: z.union([z.number(), z.string(), z.null()]).optional().nullable(),
+                                city: z.string({
+                                    message: 'City is required',
+                                }),
+                                zipCode: z.string({
+                                    message: 'Zip code is required',
+                                }),
+                                // Personal information required for cross-hire
+                                ssn: z.string({
+                                    message: 'SSN is required for cross-hire',
+                                }),
+                                birthDate: z.string({
+                                    message: 'Birth date is required for cross-hire',
+                                }),
+                                gender: z.string({
+                                    message: 'Gender is required for cross-hire',
+                                }),
+                                maritalStatus: z.string({
+                                    message: 'Marital status is required for cross-hire',
+                                }),
+                                citizenStatus: z.string({
+                                    message: 'Citizen status is required for cross-hire',
+                                }),
+                            })
+                            .passthrough(),
+                    })
+                    .passthrough(),
+            })
+            .passthrough(),
+        request: z
+            .object({
+                item: z
+                    .object({
+                        newBenefitGroupId: z.string({
+                            message: 'New benefit group ID is required',
+                        }),
+                        newPayrollSettingsId: z.string({
+                            message: 'New employment payroll setting ID is required',
+                        }),
+                        newWorkLocationId: z.string({
+                            message: 'New work location ID is required',
+                        }),
+                        newPositionPublicId: z.string().uuid({
+                            message: 'New position public ID is required',
+                        }),
+                    })
+                    .passthrough(),
+                transfer: z
+                    .object({
+                        id: z.string({
+                            message: 'Transfer ID is required',
+                        }),
+                        effectiveDate: z.date({
+                            message: 'Effective date is required',
+                        }),
+                    })
+                    .passthrough(),
+            })
+            .passthrough(),
+        legalEntities: z
+            .object({
+                destination: z
+                    .object({
+                        id: z.number({
+                            message: 'Destination legal entity internal ID is required',
+                        }),
+                    })
+                    .passthrough(),
+            })
+            .passthrough(),
+        initiator: z
+            .object({
+                creator: z.any().refine((val) => val !== null && val !== undefined, {
+                    message: 'Creator is required',
+                }),
+                organization: z.any().refine((val) => val !== null && val !== undefined, {
+                    message: 'Organization is required',
+                }),
+                teamId: z.number({
+                    message: 'Team ID is required',
+                }),
+            })
+            .passthrough(),
+    })
+    .passthrough();
+
+/**
+ * Create Contract Step
+ * Order: 6
+ * Type: DATABASE (transactional)
+ *
+ * ## WHY This Step Exists
+ *
+ * An entity transfer is fundamentally about moving an employee from one legal entity to another.
+ * In Deel's system, each legal entity relationship is represented by a separate Contract record.
+ *
+ * We CANNOT simply update the existing contract's legal entity because:
+ * - Historical payroll records are tied to the old contract
+ * - Compliance documents were signed for the old legal entity
+ * - The old contract must remain for audit trail
+ * - Cross-hire in PrismHR creates a NEW employee record (not an update)
+ *
+ * This step creates the NEW contract in the destination entity while preserving the OLD contract.
+ * Critically, it REUSES the same HrisProfile (same userId), maintaining the employee's identity
+ * across entities while establishing a new legal relationship.
+ *
+ * ## What It Does
+ *
+ * Creates a new Deel contract by:
+ * 1. **Copying employee data** from old contract: SSN, birthDate, gender, name, address, compensation
+ * 2. **Applying new destination values**: legal entity, benefit group, pay group, work location, job code
+ * 3. **Reusing HrisProfile**: Same userId/employee, new contract
+ * 4. **Copying scope of work**: holidays, timeOffType, jobScope, seniority
+ * 5. **Using effective date as start date**: Contract begins on transfer effective date
+ *
+ * **IMPORTANT**: HrisProfileId must be populated for cross-hire. If createContract doesn't return it,
+ * we explicitly fetch it (ORM limitation workaround).
+ *
+ * ## Dependencies
+ * - Requires: oldContract (with peoContract data), item (destination resource IDs), transfer, creator, organization, teamId
+ * - Populates: newContract (with id, oid, HrisProfileId)
+ *
+ * ## External Calls
+ * - peoScopeOfWorkService.getPeoScopeOfWorkByPeoContract() - copy scope of work
+ * - peoContractService.createContract() - create new contract in PEO service + Deel DB
+ *
+ * ## Rollback
+ * ✅ CAN rollback BEFORE cross-hire (hard delete contract + all related records)
+ * ❌ CANNOT rollback AFTER cross-hire (would create Deel/PrismHR inconsistency)
+ *
+ * Rollback deletes (in order):
+ * 1. WorkStatements
+ * 2. UserContracts
+ * 3. EmployeeOnboardingSteps
+ * 4. ContractActionEvents
+ * 5. Guarantees
+ * 6. PEO contract (via repository, direct SQL)
+ * 7. Contract record
+ *
+ * **Blocked if crossHireCompleted = true** - manual cleanup required
+ *
+ * ## Special Cases
+ * - **Reuses HrisProfile**: Same person (userId), different entity
+ * - **Origin**: Uses EntityTransfer origin for entity transfer contracts
+ * - **Rollback blocked after cross-hire**: Employee exists in PrismHR, auto-delete would cause inconsistency
+ * - **Address handling**: Uses addressLine1 if present, falls back to address field (legacy data)
+ */
+export class CreateContractStep implements ITransferStep {
+    readonly name = 'CreateContract';
+    readonly type = StepType.DATABASE;
+    private readonly peoContractRepository: PeoContractRepository;
+    private readonly entityTransferRepository: EntityTransferRepository;
+
+    constructor(private readonly log: PEOLogger, private readonly db: Deel.Db) {
+        const peoTransactionalEventService = new PeoTransactionalEventService(db);
+        this.peoContractRepository = new PeoContractRepository(db, log, peoTransactionalEventService);
+        this.entityTransferRepository = new EntityTransferRepository();
+    }
+
+    validate(context: TransferContext): void {
+        createContractValidationSchema.parse(context);
+    }
+
+    async execute(context: TransferContext, transaction?: Transaction): Promise<StepExecutionReturn> {
+        this.log.info({
+            message: '[CreateContractStep] Starting contract creation',
+            transferId: context.request.transfer.id,
+            itemId: context.request.item.id,
+            oldContractId: context.contracts.old.id,
+        });
+
+        this.validate(context);
+
+        const startTime = Date.now();
+
+        try {
+            // Look up position to get its Prism code
+            const positionCode = await this.getPositionCode(context.request.item.newPositionPublicId, context.request.transfer.id);
+
+            // Lookup jobTitle from jobCode using destination entity's job master
+            let jobTitle: string | undefined;
+            try {
+                const jobCodesList = await peoClientMasterService.getPEOJobCodesByEntityId(
+                    context.legalEntities.destination.id
+                );
+                const matchedJob = jobCodesList.find(
+                    (job: {id: string; jobTitle: string}) => job.id === positionCode
+                );
+                jobTitle = matchedJob?.jobTitle;
+
+                if (jobTitle) {
+                    this.log.info({
+                        message: '[CreateContractStep] Resolved jobTitle from jobCode',
+                        transferId: context.request.transfer.id,
+                        itemId: context.request.item.id,
+                        jobCode: positionCode,
+                        jobTitle,
+                    });
+                } else {
+                    this.log.warn({
+                        message: '[CreateContractStep] Could not find jobTitle for jobCode, using jobCode as fallback',
+                        transferId: context.request.transfer.id,
+                        itemId: context.request.item.id,
+                        jobCode: positionCode,
+                        destinationLegalEntityId: context.legalEntities.destination.id,
+                    });
+                    // Fallback: use jobCode as jobTitle (better than nothing)
+                    jobTitle = positionCode;
+                }
+            } catch (error) {
+                this.log.warn({
+                    message: '[CreateContractStep] Failed to lookup jobTitle from jobCode, using jobCode as fallback',
+                    transferId: context.request.transfer.id,
+                    itemId: context.request.item.id,
+                    jobCode: positionCode,
+                    destinationLegalEntityId: context.legalEntities.destination.id,
+                    error,
+                });
+                // Fallback: use jobCode as jobTitle
+                jobTitle = positionCode;
+            }
+
+            const contractDetails = await this.buildContractDetails(context, positionCode);
+
+            const newContract = await peoContractService.createContract(
+                {
+                    contractDetails,
+                    creator: context.initiator.creator,
+                    organization: context.initiator.organization,
+                    contractEventLogger: undefined,
+                    teamId: context.initiator.teamId,
+                    ip: null,
+                    transaction,
+                    transitionId: undefined,
+                    draftQuoteId: undefined,
+                    peopleFirstPayload: {
+                        validatedData: {
+                            jobCode: positionCode,
+                            jobTitle,
+                        },
+                    },
+                },
+                true
+            );
+            if (!newContract.HrisProfileId) {
+                const refreshedContract = await this.db.Contract.findByPk(newContract.id, {
+                    attributes: ['id', 'HrisProfileId'],
+                    transaction,
+                    useMaster: Boolean(transaction),
+                });
+                if (refreshedContract?.HrisProfileId) {
+                    newContract.HrisProfileId = refreshedContract.HrisProfileId;
+                } else {
+                    throw new Error(`Created contract ${newContract.id} has no HrisProfileId`);
+                }
+            }
+
+            const duration = Date.now() - startTime;
+
+            if (!context.request.item.newContractOid) {
+                await this.entityTransferRepository.updateTransferItem(context.request.item.id, {newContractOid: newContract.oid}, transaction);
+            }
+
+            this.log.info({
+                message: '[CreateContractStep] Contract created successfully',
+                transferId: context.request.transfer.id,
+                itemId: context.request.item.id,
+                newContractId: newContract.id,
+                newContractOid: newContract.oid,
+                hrisProfileId: newContract.HrisProfileId,
+                duration,
+            });
+
+            return {
+                context: {
+                    ...context,
+                    contracts: {
+                        ...context.contracts,
+                        new: newContract,
+                    },
+                    stepState: {
+                        ...context.stepState,
+                        completedSteps: [...context.stepState.completedSteps, this.name],
+                    },
+                },
+                result: StepExecutionResult.CONTINUE,
+            };
+        } catch (error) {
+            this.log.error({
+                message: '[CreateContractStep] Contract creation failed',
+                err: error,
+                transferId: context.request.transfer.id,
+                itemId: context.request.item.id,
+            });
+            throw error;
+        }
+    }
+
+    private async getPositionCode(positionPublicId: string, transferId: string): Promise<string> {
+        this.log.info({
+            message: '[CreateContractStep] Looking up position by public ID',
+            transferId,
+            positionPublicId,
+        });
+
+        const positions = (await peoPositionService.getByFilters({
+            positionPublicIds: [positionPublicId],
+        })) as Array<{publicId: string; code: string | null; title: string}>;
+
+        if (!positions || positions.length === 0) {
+            throw new Error(`Position not found: ${positionPublicId}`);
+        }
+
+        const position = positions[0];
+
+        if (!position.code) {
+            throw new Error(`Position ${positionPublicId} has no Prism code - position may still be in underwriting`);
+        }
+
+        this.log.info({
+            message: '[CreateContractStep] Position code resolved',
+            transferId,
+            positionPublicId,
+            positionCode: position.code,
+            positionTitle: position.title,
+        });
+
+        return position.code;
+    }
+
+    private async buildContractDetails(context: TransferContext, jobCode: string) {
+        const oldContract = context.contracts.old;
+        const transfer = context.request.transfer;
+        const destinationLegalEntityId = context.legalEntities.destination.id;
+
+        const hrisProfile = await this.db.HrisProfile.findByPk(oldContract.HrisProfileId, {
+            attributes: ['id', 'userId', 'email', 'workerId', 'externalId'],
+        });
+
+        if (!hrisProfile) {
+            throw new Error(`HrisProfile not found for contract ${oldContract.id}`);
+        }
+
+        let holidays, timeOffType, scopeId, jobScope, seniorityId;
+        try {
+            const scopeOfWork = await peoScopeOfWorkService.getPeoScopeOfWorkByPeoContract(oldContract.id);
+            if (scopeOfWork) {
+                holidays = scopeOfWork.holidays;
+                timeOffType = scopeOfWork.timeOffType;
+                scopeId = scopeOfWork.scopeId;
+                jobScope = scopeOfWork.jobScope;
+                seniorityId = scopeOfWork.seniorityId;
+            }
+        } catch (error) {
+            this.log.warn({
+                message: '[CreateContractStep] Failed to load scope of work',
+                oldContractId: oldContract.id,
+                error,
+            });
+        }
+
+        const workingLocationId = context.request.item.newWorkLocationId;
+
+        let geoCode: string | undefined;
+        if (oldContract.peoContract.deelAddressId) {
+            try {
+                const address = await this.db.Address.findByPk(oldContract.peoContract.deelAddressId, {
+                    attributes: ['geoCode'],
+                });
+                if (address?.geoCode) {
+                    geoCode = address.geoCode;
+                }
+            } catch (error) {
+                this.log.warn({
+                    message: '[CreateContractStep] Failed to get geoCode from address',
+                    deelAddressId: oldContract.peoContract.deelAddressId,
+                    error,
+                });
+            }
+        }
+
+        return {
+            employeeFirstName: oldContract.peoContract.firstName,
+            employeeLastName: oldContract.peoContract.lastName,
+            employeeEmail: hrisProfile.email, // Use the actual HrisProfile email to ensure it finds and reuses the existing profile
+            employeeNationality: 'US',
+            origin: PeoContractOrigin.EntityTransfer,
+
+            hrisProfileId: hrisProfile.id,
+            ...(hrisProfile.workerId && {workerId: hrisProfile.workerId}),
+            ...(hrisProfile.externalId && {externalId: hrisProfile.externalId}),
+
+            ssn: oldContract.peoContract.ssn,
+            birthDate: oldContract.peoContract.birthDate,
+            gender: oldContract.peoContract.gender,
+            maritalStatus: oldContract.peoContract.maritalStatus,
+            citizenStatus: oldContract.peoContract.citizenStatus,
+            ...(oldContract.peoContract.fedFileStatus && {fedFileStatus: oldContract.peoContract.fedFileStatus}),
+
+            employmentState: oldContract.peoContract.stateCode,
+            employmentType: this.mapEmployeeTypeCode(oldContract.peoContract.employeeTypeCode),
+            jobCode,
+            peoStartDate: transfer.effectiveDate,
+            startDate: transfer.effectiveDate,
+            endDate: null,
+            salary: Number(oldContract.peoContract.payRate),
+            payMethod: oldContract.peoContract.payMethod,
+            ...(oldContract.peoContract.workHoursPerWeek && {
+                workHoursPerWeek: Number(oldContract.peoContract.workHoursPerWeek),
+            }),
+            currency: 'USD',
+            cycle: 'calendar-month',
+            ...(oldContract.peoContract.variableCompensations && {
+                variableCompensations: oldContract.peoContract.variableCompensations,
+            }),
+
+            employeeAddress: {
+                street: oldContract.peoContract.addressLine1 || oldContract.peoContract.address,
+                city: oldContract.peoContract.city,
+                state: oldContract.peoContract.stateCode,
+                zip: oldContract.peoContract.zipCode,
+                country: 'US',
+                ...(geoCode && {geoCode}),
+            },
+
+            clientLegalEntityId: destinationLegalEntityId,
+            benefitsGroup: context.request.item.newBenefitGroupId,
+
+            ...(workingLocationId && {workingLocationId}),
+
+            ...(holidays !== undefined && {holidays}),
+            ...(timeOffType && {timeOffType}),
+            ...(scopeId && {scopeId}),
+            ...(jobScope && {jobScope}),
+            ...(seniorityId && {seniorityId}),
+            ...(oldContract.peoContract.county && {county: oldContract.peoContract.county}),
+            workVisa: false,
+        };
+    }
+
+    private mapEmployeeTypeCode(code: string): string {
+        const mapping: Record<string, string> = {
+            F: 'Full-time',
+            P: 'Part-time',
+            S: 'Seasonal',
+        };
+        return mapping[code] || 'Full-time';
+    }
+
+    async rollback(context: TransferContext, transaction?: Transaction): Promise<void> {
+        if (!context.contracts.new?.id) {
+            this.log.warn({
+                message: '[CreateContractStep] Rollback skipped - no contract to delete',
+                transferId: context.request.transfer.id,
+                itemId: context.request.item.id,
+            });
+            return;
+        }
+
+        // IMPORTANT: If cross-hire was completed, do NOT delete the contract automatically.
+        // The new contract now has a PrismHR employee associated with it.
+        // Deleting it would create inconsistency between Deel and PrismHR.
+        if (hasCrossHireCompleted(context, CrossHireStep.stepName)) {
+            this.log.error({
+                message: '[CreateContractStep] Rollback skipped - cross-hire already completed',
+                transferId: context.request.transfer.id,
+                itemId: context.request.item.id,
+                newContractId: context.contracts.new.id,
+                newContractOid: context.contracts.new.oid,
+                warning: 'Contract has PrismHR employee associated - manual cleanup required',
+                requiredActions: [
+                    'Do NOT delete this contract automatically',
+                    'First clean up PrismHR employee via manual intervention',
+                    'Then manually delete the contract if needed',
+                ],
+            });
+            return;
+        }
+
+        this.log.warn({
+            message: '[CreateContractStep] Rolling back: Deleting created contract',
+            transferId: context.request.transfer.id,
+            itemId: context.request.item.id,
+            newContractId: context.contracts.new.id,
+            newContractOid: context.contracts.new.oid,
+            crossHireCompleted: false,
+        });
+
+        try {
+            const contractId = context.contracts.new.id;
+            const contractOid = context.contracts.new.oid;
+
+            this.log.info({
+                message: '[CreateContractStep] Starting hard delete with cleanup',
+                transferId: context.request.transfer.id,
+                itemId: context.request.item.id,
+                contractId,
+                contractOid,
+            });
+
+            const workStatementsDeleted = await this.db.WorkStatement.destroy({
+                where: {ContractId: contractId},
+                transaction,
+            });
+
+            this.log.info({
+                message: '[CreateContractStep] Deleted WorkStatements',
+                count: workStatementsDeleted,
+                contractId,
+            });
+
+            const userContractsDeleted = await this.db.UserContract.destroy({
+                where: {contractId},
+                transaction,
+            });
+
+            this.log.info({
+                message: '[CreateContractStep] Deleted UserContracts',
+                count: userContractsDeleted,
+                contractId,
+            });
+
+            const onboardingStepsDeleted = await this.db.EmployeeOnboardingStep.destroy({
+                where: {contractId},
+                transaction,
+            });
+
+            this.log.info({
+                message: '[CreateContractStep] Deleted EmployeeOnboardingSteps',
+                count: onboardingStepsDeleted,
+                contractId,
+            });
+
+            const actionEventsDeleted = await this.db.ContractActionEvent.destroy({
+                where: {contractId},
+                transaction,
+            });
+
+            this.log.info({
+                message: '[CreateContractStep] Deleted ContractActionEvents',
+                count: actionEventsDeleted,
+                contractId,
+            });
+
+            const guaranteesDeleted = await this.db.Guarantee.destroy({
+                where: {ContractId: contractId},
+                transaction,
+            });
+
+            if (guaranteesDeleted > 0) {
+                this.log.info({
+                    message: '[CreateContractStep] Deleted Guarantees',
+                    count: guaranteesDeleted,
+                    contractId,
+                });
+            }
+
+            await this.peoContractRepository.deletePeoContract(
+                {
+                    deelContractId: contractId,
+                    transferId: context.request.transfer.id,
+                    itemId: context.request.item.id,
+                },
+                transaction
+            );
+
+            this.log.info({
+                message: '[CreateContractStep] PEO contract rollback event published',
+                contractId,
+            });
+
+            const contractsDeleted = await this.db.Contract.destroy({
+                where: {id: contractId},
+                transaction,
+            });
+
+            this.log.info({
+                message: '[CreateContractStep] Contract hard deleted successfully during rollback',
+                transferId: context.request.transfer.id,
+                itemId: context.request.item.id,
+                contractId,
+                contractOid,
+                contractsDeleted,
+                summary: {
+                    peoContractRollbackEventPublished: true,
+                    workStatements: workStatementsDeleted,
+                    userContracts: userContractsDeleted,
+                    onboardingSteps: onboardingStepsDeleted,
+                    actionEvents: actionEventsDeleted,
+                    guarantees: guaranteesDeleted,
+                },
+            });
+
+            await this.entityTransferRepository.updateTransferItem(context.request.item.id, {newContractOid: null}, transaction);
+
+            context.contracts.new = undefined;
+        } catch (error) {
+            this.log.error({
+                message: '[CreateContractStep] Rollback failed',
+                err: error,
+                transferId: context.request.transfer.id,
+                itemId: context.request.item.id,
+                newContractId: context.contracts.new.id,
+            });
+            throw error;
+        }
+    }
+}

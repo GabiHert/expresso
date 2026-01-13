@@ -1,0 +1,48 @@
+{
+  "id": "evt-1767898840726-h6h9uzi0j",
+  "taskId": "EEXPR-12",
+  "taskIdSource": "active-task-file",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Create EEXPR-12-3 subtask (Backend enrichment)",
+        "status": "completed",
+        "activeForm": "Creating EEXPR-12-3 subtask"
+      },
+      {
+        "content": "Create EEXPR-12-4 subtask (Public API endpoint)",
+        "status": "in_progress",
+        "activeForm": "Creating EEXPR-12-4 subtask"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [
+      {
+        "content": "Create EEXPR-12-3 subtask (Backend enrichment)",
+        "status": "in_progress",
+        "activeForm": "Creating EEXPR-12-3 subtask"
+      },
+      {
+        "content": "Create EEXPR-12-4 subtask (Public API endpoint)",
+        "status": "pending",
+        "activeForm": "Creating EEXPR-12-4 subtask"
+      }
+    ],
+    "newTodos": [
+      {
+        "content": "Create EEXPR-12-3 subtask (Backend enrichment)",
+        "status": "completed",
+        "activeForm": "Creating EEXPR-12-3 subtask"
+      },
+      {
+        "content": "Create EEXPR-12-4 subtask (Public API endpoint)",
+        "status": "in_progress",
+        "activeForm": "Creating EEXPR-12-4 subtask"
+      }
+    ]
+  },
+  "sessionId": "dd73030c-1dff-4bc1-a371-2f1717e04e8f",
+  "timestamp": "2026-01-08T19:00:40.726Z"
+}

@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/backend/controllers/admin/peo/tech_ops.ts",
+  "taskId": "ENGESC-23600",
+  "baseline": {
+    "capturedAt": "2026-01-09T20:08:34.464Z",
+    "hash": "3e0e8c944a19b2bd",
+    "size": 16588
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-09T20:15:28.373Z",
+    "hash": "5b1ac16ef97f8b7e",
+    "size": 23820,
+    "editCount": 3
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-09T20:15:28.373Z",
+    "actualFileHash": "5b1ac16ef97f8b7e",
+    "status": "synced"
+  }
+}

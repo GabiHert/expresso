@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/INDEX.md",
+  "taskId": "EEXPR-12-1",
+  "baseline": {
+    "capturedAt": "2026-01-09T18:09:44.449Z",
+    "hash": "4d58ae014f563e91",
+    "size": 6344
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-09T18:10:11.434Z",
+    "hash": "d7e06c5c4296946f",
+    "size": 6453,
+    "editCount": 2
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-09T18:10:11.435Z",
+    "actualFileHash": "d7e06c5c4296946f",
+    "status": "synced"
+  }
+}

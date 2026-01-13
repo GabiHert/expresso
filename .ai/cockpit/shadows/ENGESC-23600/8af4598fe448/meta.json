@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/in_progress/ENGESC-23600/todo/01-service-method.md",
+  "taskId": "ENGESC-23600",
+  "baseline": {
+    "capturedAt": "2026-01-09T19:52:46.579Z",
+    "hash": "51ba2a541b78dd54",
+    "size": 8346
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-09T19:52:49.753Z",
+    "hash": "04128b46d9f3a11f",
+    "size": 8780,
+    "editCount": 3
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-09T19:52:49.753Z",
+    "actualFileHash": "04128b46d9f3a11f",
+    "status": "synced"
+  }
+}

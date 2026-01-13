@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/ENGESC-23600/feedback/diff-review.md",
+  "taskId": "EEXPR-12-1",
+  "baseline": {
+    "capturedAt": "2026-01-09T19:03:42.923Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-09T19:03:42.923Z",
+    "hash": "37836543486447ab",
+    "size": 101,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-09T19:03:42.923Z",
+    "actualFileHash": "37836543486447ab",
+    "status": "synced"
+  }
+}

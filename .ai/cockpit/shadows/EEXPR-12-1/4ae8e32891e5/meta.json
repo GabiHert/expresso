@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/worktrees/EEXPR-12-1/peo/migrations/20260108183000-fix_signature_profile_public_id_type__pre_release.js",
+  "taskId": "EEXPR-12-1",
+  "baseline": {
+    "capturedAt": "2026-01-08T21:46:30.543Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T21:48:40.452Z",
+    "hash": "ad9e51903e93d2d1",
+    "size": 10971,
+    "editCount": 2
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T21:48:40.452Z",
+    "actualFileHash": "ad9e51903e93d2d1",
+    "status": "synced"
+  }
+}

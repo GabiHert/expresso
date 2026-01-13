@@ -1,0 +1,343 @@
+import 'reflect-metadata';
+
+import { TransferItemStatus, TransferStatus } from '@models/entityTransfer';
+import EntityTransferService from '@services/entityTransfer/entityTransferService';
+
+import EntityTransferController from './entityTransferController';
+
+// Mock the service
+jest.mock('@services/entityTransfer/entityTransferService', () => ({
+    __esModule: true,
+    default: jest.fn(),
+}));
+
+// Mock typedi completely
+jest.mock('typedi', () => ({
+    Container: {
+        get: jest.fn(),
+    },
+    Service: () => (target: Function) => target,
+    Inject: () => (_target: any, _propertyKey: string | symbol | undefined, _parameterIndex: number) => {
+        // Mock implementation for Inject decorator
+    },
+}));
+
+describe('EntityTransferController', () => {
+    let controller: EntityTransferController;
+    let mockService: jest.Mocked<EntityTransferService>;
+
+    beforeEach(() => {
+        // Reset all mocks
+        jest.clearAllMocks();
+
+        // Create mock instance
+        mockService = {
+            createTransfer: jest.fn(),
+            getTransferById: jest.fn(),
+            getTransferItemById: jest.fn(),
+            getTransferItemByIdWithTransfer: jest.fn(),
+            getReadyTransfers: jest.fn(),
+            getTransfersBySourceEntity: jest.fn(),
+            updateTransferStatus: jest.fn(),
+            updateTransferItem: jest.fn(),
+            updateTransferItemStatus: jest.fn(),
+        } as jest.Mocked<EntityTransferService>;
+
+        // Mock Container.get to return our mock service
+        const { Container } = require('typedi');
+        Container.get.mockImplementation((serviceClass: any) => {
+            if (serviceClass === EntityTransferService) {
+                return mockService;
+            }
+            return null;
+        });
+
+        // Create the actual controller instance
+        controller = new EntityTransferController();
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    describe('createTransfer', () => {
+        const validBody = {
+            organizationId: 100,
+            requesterProfilePublicId: '00000000-0000-0000-0000-000000000001',
+            sourceLegalEntityPublicId: '11111111-1111-1111-1111-111111111111',
+            destinationLegalEntityPublicId: '22222222-2222-2222-2222-222222222222',
+            effectiveDate: '2025-01-15',
+            items: [
+                {
+                    baseContractOid: '12345',
+                    newBenefitPrismGroupId: '400',
+                    newEmploymentPayrollSettingId: 'clu6rwbbl0km9uu01oxe3xts9', // CUID format
+                    newPtoPolicyId: '44444444-4444-4444-4444-444444444444',
+                    newWorkLocationId: '55555555-5555-5555-5555-555555555555',
+                    newPositionPublicId: '66666666-6666-4666-a666-666666666666',
+                },
+            ],
+        };
+
+        it('should create transfer and return success response', async () => {
+            const mockTransfer = { id: 'transfer-uuid', items: [] };
+            mockService.createTransfer.mockResolvedValue(mockTransfer as any);
+
+            const result = await controller.createTransfer(validBody);
+
+            expect(result.success).toBe(true);
+            expect(result.data).toEqual(mockTransfer);
+            expect(mockService.createTransfer).toHaveBeenCalled();
+        });
+
+        it('should throw 400 error for invalid input', async () => {
+            const invalidBody = { organizationId: 'not-a-number' };
+
+            await expect(controller.createTransfer(invalidBody)).rejects.toThrow();
+        });
+
+        it('should throw 400 error when items array is empty', async () => {
+            const invalidBody = { ...validBody, items: [] };
+
+            await expect(controller.createTransfer(invalidBody)).rejects.toThrow();
+        });
+    });
+
+    describe('getTransferById', () => {
+        it('should return transfer when found', async () => {
+            const mockTransfer = { id: 'transfer-uuid', items: [] };
+            mockService.getTransferById.mockResolvedValue(mockTransfer as any);
+
+            const result = await controller.getTransferById('transfer-uuid');
+
+            expect(result.success).toBe(true);
+            expect(result.data).toEqual(mockTransfer);
+        });
+
+        it('should throw 404 when transfer not found', async () => {
+            mockService.getTransferById.mockResolvedValue(null);
+
+            await expect(controller.getTransferById('nonexistent')).rejects.toThrow('Transfer not found');
+        });
+    });
+
+    describe('getTransferItemById', () => {
+        it('should return item when found', async () => {
+            const mockItem = { id: 'item-uuid', transfer: {} };
+            mockService.getTransferItemByIdWithTransfer.mockResolvedValue(mockItem as any);
+
+            const result = await controller.getTransferItemById('item-uuid');
+
+            expect(result.success).toBe(true);
+            expect(result.data).toEqual(mockItem);
+        });
+
+        it('should throw 404 when item not found', async () => {
+            mockService.getTransferItemByIdWithTransfer.mockResolvedValue(null);
+
+            await expect(controller.getTransferItemById('nonexistent')).rejects.toThrow('Transfer item not found');
+        });
+    });
+
+    describe('getReadyTransfers', () => {
+        it('should return ready transfers', async () => {
+            const mockTransfers = [{ id: 'transfer-1' }, { id: 'transfer-2' }];
+            mockService.getReadyTransfers.mockResolvedValue(mockTransfers as any);
+
+            const result = await controller.getReadyTransfers({
+                effectiveDate: '2025-01-15',
+                limit: '100',
+            });
+
+            expect(result.success).toBe(true);
+            expect(result.data).toEqual(mockTransfers);
+            expect(result.count).toBe(2);
+        });
+
+        it('should throw 400 for invalid date format', async () => {
+            await expect(
+                controller.getReadyTransfers({
+                    effectiveDate: 'invalid-date',
+                    limit: '100',
+                }),
+            ).rejects.toThrow();
+        });
+    });
+
+    describe('updateTransferStatus', () => {
+        it('should update status and return success', async () => {
+            mockService.updateTransferStatus.mockResolvedValue(undefined);
+
+            const result = await controller.updateTransferStatus('transfer-uuid', {
+                status: TransferStatus.PROCESSING,
+            });
+
+            expect(result.success).toBe(true);
+            expect(mockService.updateTransferStatus).toHaveBeenCalledWith('transfer-uuid', TransferStatus.PROCESSING);
+        });
+
+        it('should throw 400 for invalid status', async () => {
+            await expect(
+                controller.updateTransferStatus('transfer-uuid', {
+                    status: 'INVALID_STATUS' as any,
+                }),
+            ).rejects.toThrow();
+        });
+    });
+
+    describe('updateTransferItem', () => {
+        it('should update item and return success', async () => {
+            mockService.updateTransferItem.mockResolvedValue(undefined);
+
+            const result = await controller.updateTransferItem('item-uuid', {
+                status: TransferItemStatus.COMPLETED,
+                newContractOid: 'new-contract-123',
+            });
+
+            expect(result.success).toBe(true);
+            expect(mockService.updateTransferItem).toHaveBeenCalledWith(
+                'item-uuid',
+                expect.objectContaining({
+                    status: TransferItemStatus.COMPLETED,
+                    newContractOid: 'new-contract-123',
+                }),
+            );
+        });
+
+        it('should allow partial updates', async () => {
+            mockService.updateTransferItem.mockResolvedValue(undefined);
+
+            const result = await controller.updateTransferItem('item-uuid', {
+                resumeFromStep: 'STEP_3',
+            });
+
+            expect(result.success).toBe(true);
+            expect(mockService.updateTransferItem).toHaveBeenCalledWith(
+                'item-uuid',
+                expect.objectContaining({
+                    resumeFromStep: 'STEP_3',
+                }),
+            );
+        });
+    });
+
+    describe('getTransfersBySourceEntity', () => {
+        const validSourceEntityPublicId = '11111111-1111-1111-1111-111111111111';
+
+        it('should return transfers for source entity', async () => {
+            const mockResponse = {
+                transfers: [
+                    {
+                        id: 'transfer-1',
+                        status: 'DRAFT',
+                        organizationId: 100,
+                        requesterProfilePublicId: '00000000-0000-0000-0000-000000000001',
+                        sourceLegalEntityPublicId: validSourceEntityPublicId,
+                        destinationLegalEntityPublicId: '22222222-2222-2222-2222-222222222222',
+                        effectiveDate: '2025-01-15',
+                        agreementId: null,
+                        items: [],
+                        signatures: [],
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
+                ],
+                cursor: null,
+                hasMore: false,
+            };
+            mockService.getTransfersBySourceEntity.mockResolvedValue(mockResponse);
+
+            const result = await controller.getTransfersBySourceEntity(validSourceEntityPublicId, {});
+
+            expect(result.success).toBe(true);
+            expect(result.data).toEqual(mockResponse);
+            expect(mockService.getTransfersBySourceEntity).toHaveBeenCalledWith(validSourceEntityPublicId, {
+                cursor: undefined,
+                limit: 100,
+            });
+        });
+
+        it('should pass cursor and limit to service', async () => {
+            const mockResponse = { transfers: [], cursor: null, hasMore: false };
+            mockService.getTransfersBySourceEntity.mockResolvedValue(mockResponse);
+
+            const cursor = '33333333-3333-3333-3333-333333333333';
+            const result = await controller.getTransfersBySourceEntity(validSourceEntityPublicId, {
+                cursor,
+                limit: '50',
+            });
+
+            expect(result.success).toBe(true);
+            expect(mockService.getTransfersBySourceEntity).toHaveBeenCalledWith(validSourceEntityPublicId, {
+                cursor,
+                limit: 50,
+            });
+        });
+
+        it('should return empty transfers array when none found', async () => {
+            const mockResponse = { transfers: [], cursor: null, hasMore: false };
+            mockService.getTransfersBySourceEntity.mockResolvedValue(mockResponse);
+
+            const result = await controller.getTransfersBySourceEntity(validSourceEntityPublicId, {});
+
+            expect(result.success).toBe(true);
+            expect(result.data.transfers).toEqual([]);
+            expect(result.data.hasMore).toBe(false);
+        });
+
+        it('should return hasMore=true when more results exist', async () => {
+            const mockResponse = {
+                transfers: [{ id: 'transfer-1' }],
+                cursor: 'transfer-1',
+                hasMore: true,
+            };
+            mockService.getTransfersBySourceEntity.mockResolvedValue(mockResponse as any);
+
+            const result = await controller.getTransfersBySourceEntity(validSourceEntityPublicId, { limit: '1' });
+
+            expect(result.success).toBe(true);
+            expect(result.data.hasMore).toBe(true);
+            expect(result.data.cursor).toBe('transfer-1');
+        });
+
+        it('should throw 400 for invalid source entity UUID', async () => {
+            await expect(controller.getTransfersBySourceEntity('not-a-uuid', {})).rejects.toThrow('Validation error');
+        });
+
+        it('should throw 400 for invalid cursor UUID', async () => {
+            await expect(
+                controller.getTransfersBySourceEntity(validSourceEntityPublicId, {
+                    cursor: 'not-a-uuid',
+                }),
+            ).rejects.toThrow('Validation error');
+        });
+
+        it('should throw 400 for limit greater than 100', async () => {
+            await expect(
+                controller.getTransfersBySourceEntity(validSourceEntityPublicId, {
+                    limit: '150',
+                }),
+            ).rejects.toThrow('Validation error');
+        });
+
+        it('should throw 400 for limit less than 1', async () => {
+            await expect(
+                controller.getTransfersBySourceEntity(validSourceEntityPublicId, {
+                    limit: '0',
+                }),
+            ).rejects.toThrow('Validation error');
+        });
+
+        it('should use default limit of 100 when not provided', async () => {
+            const mockResponse = { transfers: [], cursor: null, hasMore: false };
+            mockService.getTransfersBySourceEntity.mockResolvedValue(mockResponse);
+
+            await controller.getTransfersBySourceEntity(validSourceEntityPublicId, {});
+
+            expect(mockService.getTransfersBySourceEntity).toHaveBeenCalledWith(validSourceEntityPublicId, {
+                cursor: undefined,
+                limit: 100,
+            });
+        });
+    });
+});

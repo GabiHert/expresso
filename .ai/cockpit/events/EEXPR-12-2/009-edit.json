@@ -1,0 +1,47 @@
+{
+  "id": "evt-1768310420388-o8jxgu3kc",
+  "taskId": "EEXPR-12-2",
+  "taskIdSource": "active-task-file",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Projects/deel/peo/src/controllers/entityTransfer/entityTransferDto.ts",
+    "old_string": "export const GetReadyTransfersSchema = z.object({\n    effectiveDate: z\n        .string()\n        .regex(/^\\d{4}-\\d{2}-\\d{2}$/, 'Invalid date format, expected YYYY-MM-DD')\n        .refine(\n            dateStr => {\n                const [year, month, day] = dateStr.split('-').map(Number);\n                const date = new Date(Date.UTC(year, month - 1, day));\n                return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;\n            },\n            {\n                message: 'Invalid date value',\n            },\n        ),\n    limit: z.coerce.number().int().positive().max(100).default(100),\n});",
+    "new_string": "export const GetReadyTransfersSchema = z.object({\n    effectiveDate: z\n        .string()\n        .regex(/^\\d{4}-\\d{2}-\\d{2}$/, 'Invalid date format, expected YYYY-MM-DD')\n        .refine(\n            dateStr => {\n                const [year, month, day] = dateStr.split('-').map(Number);\n                const date = new Date(Date.UTC(year, month - 1, day));\n                return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;\n            },\n            {\n                message: 'Invalid date value',\n            },\n        ),\n    limit: z.coerce.number().int().positive().max(100).default(100),\n});\n\nexport const GetTransfersBySourceEntityParamsSchema = z.object({\n    sourceEntityPublicId: z.string().uuid('Invalid source entity public ID'),\n});\n\nexport const GetTransfersBySourceEntityQuerySchema = z.object({\n    cursor: z.string().uuid().optional(),\n    limit: z.coerce.number().int().positive().max(100).default(100),\n});",
+    "replace_all": false
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Projects/deel/peo/src/controllers/entityTransfer/entityTransferDto.ts",
+    "oldString": "export const GetReadyTransfersSchema = z.object({\n    effectiveDate: z\n        .string()\n        .regex(/^\\d{4}-\\d{2}-\\d{2}$/, 'Invalid date format, expected YYYY-MM-DD')\n        .refine(\n            dateStr => {\n                const [year, month, day] = dateStr.split('-').map(Number);\n                const date = new Date(Date.UTC(year, month - 1, day));\n                return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;\n            },\n            {\n                message: 'Invalid date value',\n            },\n        ),\n    limit: z.coerce.number().int().positive().max(100).default(100),\n});",
+    "newString": "export const GetReadyTransfersSchema = z.object({\n    effectiveDate: z\n        .string()\n        .regex(/^\\d{4}-\\d{2}-\\d{2}$/, 'Invalid date format, expected YYYY-MM-DD')\n        .refine(\n            dateStr => {\n                const [year, month, day] = dateStr.split('-').map(Number);\n                const date = new Date(Date.UTC(year, month - 1, day));\n                return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;\n            },\n            {\n                message: 'Invalid date value',\n            },\n        ),\n    limit: z.coerce.number().int().positive().max(100).default(100),\n});\n\nexport const GetTransfersBySourceEntityParamsSchema = z.object({\n    sourceEntityPublicId: z.string().uuid('Invalid source entity public ID'),\n});\n\nexport const GetTransfersBySourceEntityQuerySchema = z.object({\n    cursor: z.string().uuid().optional(),\n    limit: z.coerce.number().int().positive().max(100).default(100),\n});",
+    "originalFile": "import { TransferItemStatus, TransferStatus } from '@models/entityTransfer';\nimport { z } from 'zod';\n\nexport const CreateTransferItemSchema = z.object({\n    baseContractOid: z.string().min(1).max(20),\n    newBenefitPrismGroupId: z.string().min(1).max(10),\n    newEmploymentPayrollSettingId: z.string().min(1),\n    newPtoPolicyId: z.string().uuid(),\n    newWorkLocationId: z.string().uuid(),\n    newPositionPublicId: z.string().uuid(),\n    newTeamId: z.number().int().positive().optional(),\n});\n\nexport const CreateTransferSchema = z.object({\n    organizationId: z.number().int().positive(),\n    requesterProfilePublicId: z.string().uuid(),\n    sourceLegalEntityPublicId: z.string().uuid(),\n    destinationLegalEntityPublicId: z.string().uuid(),\n    effectiveDate: z\n        .string()\n        .regex(/^\\d{4}-\\d{2}-\\d{2}$/, 'Invalid date format, expected YYYY-MM-DD')\n        .refine(\n            (dateStr: string) => {\n                const [year, month, day] = dateStr.split('-').map(Number);\n                const date = new Date(Date.UTC(year, month - 1, day));\n                return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;\n            },\n            {\n                message: 'Invalid date value',\n            },\n        ),\n    agreementId: z.string().uuid().optional(),\n    items: z.array(CreateTransferItemSchema).min(1),\n});\n\nexport const UpdateTransferStatusSchema = z.object({\n    status: z.nativeEnum(TransferStatus),\n});\n\nexport const UpdateTransferItemSchema = z.object({\n    status: z.nativeEnum(TransferItemStatus).optional(),\n    newContractOid: z.string().max(20).optional(),\n    resumeFromStep: z.string().max(100).optional(),\n});\n\nexport const GetReadyTransfersSchema = z.object({\n    effectiveDate: z\n        .string()\n        .regex(/^\\d{4}-\\d{2}-\\d{2}$/, 'Invalid date format, expected YYYY-MM-DD')\n        .refine(\n            dateStr => {\n                const [year, month, day] = dateStr.split('-').map(Number);\n                const date = new Date(Date.UTC(year, month - 1, day));\n                return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;\n            },\n            {\n                message: 'Invalid date value',\n            },\n        ),\n    limit: z.coerce.number().int().positive().max(100).default(100),\n});\n\nexport type CreateTransferDto = z.infer<typeof CreateTransferSchema>;\nexport type CreateTransferItemDto = z.infer<typeof CreateTransferItemSchema>;\nexport type UpdateTransferStatusDto = z.infer<typeof UpdateTransferStatusSchema>;\nexport type UpdateTransferItemDto = z.infer<typeof UpdateTransferItemSchema>;\nexport type GetReadyTransfersDto = z.infer<typeof GetReadyTransfersSchema>;\n",
+    "structuredPatch": [
+      {
+        "oldStart": 60,
+        "oldLines": 6,
+        "newStart": 60,
+        "newLines": 15,
+        "lines": [
+          "     limit: z.coerce.number().int().positive().max(100).default(100),",
+          " });",
+          " ",
+          "+export const GetTransfersBySourceEntityParamsSchema = z.object({",
+          "+    sourceEntityPublicId: z.string().uuid('Invalid source entity public ID'),",
+          "+});",
+          "+",
+          "+export const GetTransfersBySourceEntityQuerySchema = z.object({",
+          "+    cursor: z.string().uuid().optional(),",
+          "+    limit: z.coerce.number().int().positive().max(100).default(100),",
+          "+});",
+          "+",
+          " export type CreateTransferDto = z.infer<typeof CreateTransferSchema>;",
+          " export type CreateTransferItemDto = z.infer<typeof CreateTransferItemSchema>;",
+          " export type UpdateTransferStatusDto = z.infer<typeof UpdateTransferStatusSchema>;"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "c7c4ee6e-0d35-4ca7-beb2-ca7eacb8f723",
+  "timestamp": "2026-01-13T13:20:20.388Z"
+}

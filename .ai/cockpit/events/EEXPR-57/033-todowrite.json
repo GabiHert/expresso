@@ -1,0 +1,113 @@
+{
+  "id": "evt-1767923010048-qgxx6ho8i",
+  "taskId": "EEXPR-57",
+  "taskIdSource": "env-var",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Find Z04 (Alien Authorized) employees in the database",
+        "status": "completed",
+        "activeForm": "Finding Z04 employees"
+      },
+      {
+        "content": "Validate the employee has valid I-9 data",
+        "status": "completed",
+        "activeForm": "Validating I-9 data"
+      },
+      {
+        "content": "Find organizations with multiple PEO entities for transfer testing",
+        "status": "completed",
+        "activeForm": "Finding multi-entity organizations"
+      },
+      {
+        "content": "Explore organization 191800 entities and contracts",
+        "status": "in_progress",
+        "activeForm": "Exploring organization 191800"
+      },
+      {
+        "content": "Select a contract to update with Z04 status",
+        "status": "pending",
+        "activeForm": "Selecting contract for Z04 update"
+      },
+      {
+        "content": "Clean up test data for entity transfer",
+        "status": "pending",
+        "activeForm": "Cleaning up test data"
+      },
+      {
+        "content": "Generate valid transfer payload",
+        "status": "pending",
+        "activeForm": "Generating transfer payload"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [
+      {
+        "content": "Find Z04 (Alien Authorized) employees in the database",
+        "status": "in_progress",
+        "activeForm": "Finding Z04 employees"
+      },
+      {
+        "content": "Validate the employee has valid I-9 data",
+        "status": "pending",
+        "activeForm": "Validating I-9 data"
+      },
+      {
+        "content": "Find organizations with multiple PEO entities for transfer testing",
+        "status": "pending",
+        "activeForm": "Finding multi-entity organizations"
+      },
+      {
+        "content": "Clean up test data for entity transfer",
+        "status": "pending",
+        "activeForm": "Cleaning up test data"
+      },
+      {
+        "content": "Generate valid transfer payload",
+        "status": "pending",
+        "activeForm": "Generating transfer payload"
+      }
+    ],
+    "newTodos": [
+      {
+        "content": "Find Z04 (Alien Authorized) employees in the database",
+        "status": "completed",
+        "activeForm": "Finding Z04 employees"
+      },
+      {
+        "content": "Validate the employee has valid I-9 data",
+        "status": "completed",
+        "activeForm": "Validating I-9 data"
+      },
+      {
+        "content": "Find organizations with multiple PEO entities for transfer testing",
+        "status": "completed",
+        "activeForm": "Finding multi-entity organizations"
+      },
+      {
+        "content": "Explore organization 191800 entities and contracts",
+        "status": "in_progress",
+        "activeForm": "Exploring organization 191800"
+      },
+      {
+        "content": "Select a contract to update with Z04 status",
+        "status": "pending",
+        "activeForm": "Selecting contract for Z04 update"
+      },
+      {
+        "content": "Clean up test data for entity transfer",
+        "status": "pending",
+        "activeForm": "Cleaning up test data"
+      },
+      {
+        "content": "Generate valid transfer payload",
+        "status": "pending",
+        "activeForm": "Generating transfer payload"
+      }
+    ]
+  },
+  "sessionId": "609cdfb5-d0f6-4eec-9cc5-1b82129b0c07",
+  "timestamp": "2026-01-09T01:43:30.048Z"
+}

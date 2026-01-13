@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-12-3/todo/04-add-tech-ops-endpoint.md",
+  "taskId": "EEXPR-12",
+  "baseline": {
+    "capturedAt": "2026-01-08T19:00:13.535Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T19:00:13.535Z",
+    "hash": "76cb85790f75daea",
+    "size": 3310,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T19:00:13.535Z",
+    "actualFileHash": "76cb85790f75daea",
+    "status": "synced"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "evt-1767898755502-kpnavhdp0",
+  "taskId": "EEXPR-12",
+  "taskIdSource": "active-task-file",
+  "tool": "Write",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-12-3/todo/01-add-endpoint-url.md",
+    "content": "<!--\n╔══════════════════════════════════════════════════════════════════╗\n║ WORK ITEM: 01-add-endpoint-url.md                                ║\n║ TASK: EEXPR-12-3                                                 ║\n╚══════════════════════════════════════════════════════════════════╝\n-->\n\n---\nrepo: backend\n---\n\n# Add Endpoint URL: getTransfersBySourceEntity\n\n## Objective\n\nAdd the PEO endpoint URL for retrieving transfers by source entity.\n\n## Implementation Steps\n\n### Step 1: Add endpoint to config\n\n**File:** `backend/services/peo/endpoints/entity_transfer_endpoints.ts`\n\n```typescript\nexport const entityTransferEndpoints = {\n  // ... existing endpoints\n\n  getTransfersBySourceEntity: (sourceEntityPublicId: string) =>\n    `/peo/entity-transfer/transfers/source/${sourceEntityPublicId}`,\n};\n```\n\n## Acceptance Criteria\n\n- [ ] Endpoint URL function added\n- [ ] Accepts sourceEntityPublicId parameter\n- [ ] Returns properly formatted path\n"
+  },
+  "response": {
+    "type": "create",
+    "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-12-3/todo/01-add-endpoint-url.md",
+    "content": "<!--\n╔══════════════════════════════════════════════════════════════════╗\n║ WORK ITEM: 01-add-endpoint-url.md                                ║\n║ TASK: EEXPR-12-3                                                 ║\n╚══════════════════════════════════════════════════════════════════╝\n-->\n\n---\nrepo: backend\n---\n\n# Add Endpoint URL: getTransfersBySourceEntity\n\n## Objective\n\nAdd the PEO endpoint URL for retrieving transfers by source entity.\n\n## Implementation Steps\n\n### Step 1: Add endpoint to config\n\n**File:** `backend/services/peo/endpoints/entity_transfer_endpoints.ts`\n\n```typescript\nexport const entityTransferEndpoints = {\n  // ... existing endpoints\n\n  getTransfersBySourceEntity: (sourceEntityPublicId: string) =>\n    `/peo/entity-transfer/transfers/source/${sourceEntityPublicId}`,\n};\n```\n\n## Acceptance Criteria\n\n- [ ] Endpoint URL function added\n- [ ] Accepts sourceEntityPublicId parameter\n- [ ] Returns properly formatted path\n",
+    "structuredPatch": [],
+    "originalFile": null
+  },
+  "sessionId": "dd73030c-1dff-4bc1-a371-2f1717e04e8f",
+  "timestamp": "2026-01-08T18:59:15.502Z"
+}

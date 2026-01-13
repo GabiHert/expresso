@@ -1,0 +1,56 @@
+{
+  "id": "evt-1768018218695-6y32gbwbd",
+  "taskId": "EEXPR-59",
+  "taskIdSource": "env-var",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/in_progress/EEXPR-59/README.md",
+    "old_string": "| ID | Name | Repo | Status |\n|----|------|------|--------|\n| 01 | Add jobTitle lookup in CreateContractStep | backend | todo |\n\n## Branches\n\n| Repo | Branch |\n|------|--------|\n| backend | `EEXPR-59-fix-entity-transfer-employment` |",
+    "new_string": "| ID | Name | Repo | Status |\n|----|------|------|--------|\n| 01 | Add jobTitle lookup in CreateContractStep | backend | done |\n\n## Worktree\n\nThis task uses a worktree at:\n```\n/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-59/\n```\n\n## Branches\n\n| Repo | Branch | Base |\n|------|--------|------|\n| backend | `EEXPR-59` | `dev` |",
+    "replace_all": false
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/in_progress/EEXPR-59/README.md",
+    "oldString": "| ID | Name | Repo | Status |\n|----|------|------|--------|\n| 01 | Add jobTitle lookup in CreateContractStep | backend | todo |\n\n## Branches\n\n| Repo | Branch |\n|------|--------|\n| backend | `EEXPR-59-fix-entity-transfer-employment` |",
+    "newString": "| ID | Name | Repo | Status |\n|----|------|------|--------|\n| 01 | Add jobTitle lookup in CreateContractStep | backend | done |\n\n## Worktree\n\nThis task uses a worktree at:\n```\n/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-59/\n```\n\n## Branches\n\n| Repo | Branch | Base |\n|------|--------|------|\n| backend | `EEXPR-59` | `dev` |",
+    "originalFile": "<!--\n╔══════════════════════════════════════════════════════════════════╗\n║ LAYER: TASK                                                      ║\n║ LOCATION: .ai/tasks/in_progress/EEXPR-59/                       ║\n╠══════════════════════════════════════════════════════════════════╣\n║ BEFORE WORKING ON THIS TASK:                                     ║\n║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)          ║\n║ 2. Read this entire README first                                 ║\n║ 3. Check which work items are in todo/ vs done/                 ║\n║ 4. Work on ONE item at a time from todo/                        ║\n╚══════════════════════════════════════════════════════════════════╝\n-->\n\n# EEXPR-59: Fix Entity Transfer Missing Employment Creation\n\n## Problem Statement\n\nEntity transfers are creating contracts but **failing to create employment records** in the Employment microservice. This causes:\n\n1. Payroll cannot be processed for transferred employees\n2. Various PEO features dependent on employments don't work\n3. Manual intervention required to fix affected employees\n\n### Root Cause\n\nThe `CreateContractStep` in entity transfer calls `peoContractService.createContract()` which has an `afterCommit` callback that creates employments. However, the employment creation fails silently because:\n\n1. **`jobTitle` is required** by the Employment microservice schema\n2. Entity transfer only passes `jobCode` (not `jobTitle`) in `peopleFirstPayload.validatedData`\n3. The `afterCommit` callback errors become unhandled promise rejections (no global handler)\n4. The callback partially succeeds (creates `peo_contracts`) then fails at `createPEOEmployment()`\n\n### Evidence\n\n- Production data shows 19/20 entity transfer contracts missing employments\n- `peo_contracts` records exist (callback runs partially)\n- `employments` and `employment_terms` records are missing\n\n## Acceptance Criteria\n\n- [ ] Entity transfers create employments correctly\n- [ ] `jobTitle` is resolved from `jobCode` using destination entity's job master\n- [ ] Proper logging added for debugging job code resolution\n- [ ] Graceful fallback if job lookup fails (use jobCode as jobTitle)\n- [ ] Existing entity transfer tests pass\n- [ ] New unit test for jobTitle resolution\n\n## Work Items\n\nSee `status.yaml` for full index.\n\n| ID | Name | Repo | Status |\n|----|------|------|--------|\n| 01 | Add jobTitle lookup in CreateContractStep | backend | todo |\n\n## Branches\n\n| Repo | Branch |\n|------|--------|\n| backend | `EEXPR-59-fix-entity-transfer-employment` |\n\n## Technical Context\n\n### Key Files\n\n| File | Purpose | Lines |\n|------|---------|-------|\n| `backend/services/peo/entity_transfer/steps/create_contract_step.ts` | Creates contract during entity transfer | 226-244 |\n| `backend/services/peo/peo_contract_service.ts` | Contract service with afterCommit callback | 1003-1216 |\n| `backend/services/peo/peo_contract_service.ts` | jobTitle/jobCode validation | 135-155 |\n| `employment/src/controllers/employment/dtos/Employment.dto.ts` | Employment schema (jobTitle required) | 22 |\n\n### Current Flow (Broken)\n\n```\nCreateContractStep.execute()\n    │\n    ├── buildContractDetails()  ← Returns jobCode, NO jobTitle\n    │\n    └── peoContractService.createContract({\n            peopleFirstPayload: {\n                validatedData: {\n                    jobCode: item.newJobCode  ← Only jobCode!\n                }\n            }\n        })\n        │\n        └── afterCommit callback\n            │\n            ├── createPEOContract() ✅ Succeeds\n            │\n            └── createPEOEmployment({\n                    jobTitle: undefined  ← MISSING!\n                }) ❌ Validation fails silently\n```\n\n### Expected Flow (Fixed)\n\n```\nCreateContractStep.execute()\n    │\n    ├── peoClientMasterService.getPEOJobCodesByEntityId()  ← NEW: Lookup jobTitle\n    │\n    ├── buildContractDetails()\n    │\n    └── peoContractService.createContract({\n            peopleFirstPayload: {\n                validatedData: {\n                    jobCode: item.newJobCode,\n                    jobTitle: resolvedJobTitle  ← NOW PROVIDED!\n                }\n            }\n        })\n        │\n        └── afterCommit callback\n            │\n            ├── createPEOContract() ✅ Succeeds\n            │\n            └── createPEOEmployment({\n                    jobTitle: \"Software Engineer\"  ← Has value!\n                }) ✅ Succeeds\n```\n\n## Implementation Approach\n\nAdd `jobTitle` resolution in `CreateContractStep` before calling `createContract()`:\n\n1. Import `peoClientMasterService`\n2. Lookup job codes for destination legal entity\n3. Find matching job by `jobCode` (item.newJobCode)\n4. Extract `jobTitle` from matched job\n5. Pass `jobTitle` in `peopleFirstPayload.validatedData`\n\nThis mirrors how `workers_service.ts` handles regular contract creation.\n\n## Risks & Considerations\n\n- **Risk**: Job code lookup may fail if destination entity has no job master configured\n  - **Mitigation**: Add try/catch, fallback to using jobCode as jobTitle, log warning\n\n- **Risk**: Performance impact from additional DB/API call\n  - **Mitigation**: Job lookup is cached in peoClientMasterService, minimal impact\n\n## Testing Strategy\n\n1. **Unit Test**: Mock `peoClientMasterService.getPEOJobCodesByEntityId()` and verify jobTitle is passed\n2. **Integration Test**: Verify employment is created after entity transfer\n3. **Manual Test**: Execute entity transfer via tech_ops endpoint, verify employment exists\n\n## Related Escalations\n\n- ENGESC-23650: Entity transfers for Amae Health missing employments\n- ENGESC-23600: Same issue, additional affected employees\n\n## References\n\n- [Entity Transfer Service](../../../backend/services/peo/entity_transfer/)\n- [PEO Contract Service](../../../backend/services/peo/peo_contract_service.ts)\n- [Employment DTO Schema](../../../employment/src/controllers/employment/dtos/Employment.dto.ts)\n",
+    "structuredPatch": [
+      {
+        "oldStart": 51,
+        "oldLines": 13,
+        "newStart": 51,
+        "newLines": 20,
+        "lines": [
+          " ",
+          " | ID | Name | Repo | Status |",
+          " |----|------|------|--------|",
+          "-| 01 | Add jobTitle lookup in CreateContractStep | backend | todo |",
+          "+| 01 | Add jobTitle lookup in CreateContractStep | backend | done |",
+          " ",
+          "+## Worktree",
+          "+",
+          "+This task uses a worktree at:",
+          "+```",
+          "+/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-59/",
+          "+```",
+          "+",
+          " ## Branches",
+          " ",
+          "-| Repo | Branch |",
+          "-|------|--------|",
+          "-| backend | `EEXPR-59-fix-entity-transfer-employment` |",
+          "+| Repo | Branch | Base |",
+          "+|------|--------|------|",
+          "+| backend | `EEXPR-59` | `dev` |",
+          " ",
+          " ## Technical Context",
+          " "
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "fed5c400-81e9-4a7b-b894-15d95411edd8",
+  "timestamp": "2026-01-10T04:10:18.695Z"
+}

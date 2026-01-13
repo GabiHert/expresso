@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/ENGESC-23600/README.md",
+  "taskId": "EEXPR-12-1",
+  "baseline": {
+    "capturedAt": "2026-01-09T19:02:23.449Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-09T19:20:18.374Z",
+    "hash": "68748d9088fc58c0",
+    "size": 7643,
+    "editCount": 3
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-09T19:20:18.374Z",
+    "actualFileHash": "68748d9088fc58c0",
+    "status": "synced"
+  }
+}

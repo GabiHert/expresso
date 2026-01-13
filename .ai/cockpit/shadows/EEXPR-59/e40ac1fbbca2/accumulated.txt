@@ -1,0 +1,11 @@
+#!/bin/bash
+CURSOR="${1:-}"
+URL="https://api-admin.demo.deel.com/peo_integration/hris_integration/82385071-1350-4d6b-a1a2-584eaa517db2/employees"
+if [ -n "$CURSOR" ]; then
+  URL="${URL}?cursor=${CURSOR}"
+fi
+curl -s "$URL" \
+  -H "accept: application/json" \
+  -H "x-api-version: 2" \
+  -H "x-auth-token: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0aW1lc3RhbXAiOjE3NjgyMjU1OTUyMTIsInByb2ZpbGUiOjI3ODI2OTI1LCJocmlzT3JnYW5pemF0aW9uSWQiOm51bGwsInRlYW0iOm51bGwsImFjdG9yIjp7InR5cGUiOiJhZG1pbiJ9LCJkZWVsIjoiZ2FicmllbC5oZXJ0ZXJAZGVlbC5jb20iLCJvcmdhbml6YXRpb25JZCI6MTgyMzA4LCJyZWFkT25seSI6dHJ1ZSwiaWQiOjI3NjA3ODM4LCJpYXQiOjE3NjgyMjU1OTUsImV4cCI6MTc2ODI0MzU5NSwiYXVkIjoiZGVtbyIsImlzcyI6ImFwaS5kZW1vLmRlZWwuY29tIiwic3ViIjoiYXBpIn0.QiO2zBk31IGh7y16qK74gCtfHdfZTDgnjSmNdiSVteonctPCP6wLFNBgQxh3RmPQ8Rg7ivtKYGC_6y3C7x9AEM_JyTDHbFXWUPqZScm-u1geBvuSc3a1p4C_d3f8pFfYswHFdtND4hNkz2BUnlnkZ4pdyjprav-pDoEeLwMOb8oHRvcGPQbzsyUiVo2xJDrWVpGe1z7KT_r3j7mDvpaKWYibXVak0qllnG8LBxPghLjABEmL5qLpZhdAKe0STylHViDLvBkjjehDROhv2ZbwjuiDgUR-fFN4vwhDf_C8EqMi3CMeyzs-qbRn2AX9lzal0jUSouIZy9FF_Aj8Hg26Ag" \
+  -H "x-request-id: test-request-${2:-001}"

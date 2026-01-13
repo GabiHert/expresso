@@ -1,0 +1,9 @@
+{
+  "taskId": "EEXPR-59",
+  "title": "Fix Entity Transfer Missing Employment Creation",
+  "branch": "EEXPR-59-fix-entity-transfer-employment",
+  "frameworkPath": ".ai/tasks/in_progress/EEXPR-59",
+  "startedAt": "2026-01-09T23:10:00Z",
+  "sessionId": "eexpr59start",
+  "worktreePath": "/Users/gabriel.herter/Documents/Projects/worktrees/EEXPR-59/backend"
+}

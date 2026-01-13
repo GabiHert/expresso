@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/cockpit/task-switch-signal.json",
+  "taskId": "ENGESC-23600",
+  "baseline": {
+    "capturedAt": "2026-01-09T19:50:31.846Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-09T19:50:31.846Z",
+    "hash": "7de2feb70365805c",
+    "size": 132,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-09T19:50:31.846Z",
+    "actualFileHash": "7de2feb70365805c",
+    "status": "synced"
+  }
+}

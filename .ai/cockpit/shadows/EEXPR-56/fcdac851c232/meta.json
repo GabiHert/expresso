@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-57/status.yaml",
+  "taskId": "EEXPR-56",
+  "baseline": {
+    "capturedAt": "2026-01-08T18:23:09.398Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T18:25:25.016Z",
+    "hash": "8f3a899c7496032a",
+    "size": 723,
+    "editCount": 2
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T18:25:25.016Z",
+    "actualFileHash": "8f3a899c7496032a",
+    "status": "synced"
+  }
+}

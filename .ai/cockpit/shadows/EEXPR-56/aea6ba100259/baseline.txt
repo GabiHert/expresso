@@ -1,0 +1,188 @@
+<!--
+╔══════════════════════════════════════════════════════════════════╗
+║ LAYER: TASK                                                      ║
+║ LOCATION: .ai/tasks/todo/EEXPR-57/                               ║
+╠══════════════════════════════════════════════════════════════════╣
+║ BEFORE WORKING ON THIS TASK:                                     ║
+║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)           ║
+║ 2. Read this entire README first                                 ║
+║ 3. Check which work items are in todo/ vs done/                  ║
+║ 4. Work on ONE item at a time from todo/                         ║
+╚══════════════════════════════════════════════════════════════════╝
+-->
+
+# EEXPR-57: Fix syncI9InfoToPEoContract updating wrong contract during entity transfers
+
+## Problem Statement
+
+During entity transfers, the `syncI9InfoToPEoContract` function in `peo_contract_service.ts` syncs I-9 data to the **wrong contract**. This causes entity transfers for Z04 (Alien Authorized) employees to fail with validation errors like "i9AlienRegistrationExpiration is required" even when the data exists in the database.
+
+### Root Cause
+
+The bug occurs in the following call chain:
+
+1. `CopyI9DataStep.execute()` copies I9Section1/I9Section2 data from old to new contract
+2. It calls `syncI9InfoToPEoContract(newContractOid)` with the correct new contract OID
+3. `syncI9InfoToPEoContract` retrieves the contract by OID and gets the profileId
+4. It then calls `updateDefaultPEOContractWithI9(profileId, {...})` passing **only the profileId**
+5. `updateDefaultPEOContractWithI9` calls `getDefaultContract(profileId)`
+6. **BUG:** `getDefaultContract` returns the **first active contract** for the profile (non-deterministic order)
+7. During entity transfers, both old and new contracts are active, so it may return the **old contract**
+8. The I-9 data gets synced to the wrong (old) contract
+
+### Why Z04 Employees Are Affected Visibly
+
+- Z04 (Alien Authorized) employees have stricter I-9 validation: paired fields like `alienRegNumber` + `expiration`
+- Other citizenship statuses (Z01, Z03) have either no I-9 requirements or only `alienRegNumber` required
+- The bug affects ALL transfers, but only Z04 employees hit validation failures due to missing synced data
+
+## Acceptance Criteria
+
+- [ ] `updateDefaultPEOContractWithI9` accepts optional `contractId` parameter to target specific contract
+- [ ] `syncI9InfoToPEoContract` passes the contract ID to `updateDefaultPEOContractWithI9`
+- [ ] Entity transfers for Z04 employees complete successfully with I-9 data properly synced
+- [ ] Existing code paths (without contractId) continue to work with fallback to `getDefaultContract`
+- [ ] Unit tests cover the new parameter
+
+## Work Items
+
+See `status.yaml` for full index.
+
+| ID | Name | Repo | Status |
+|----|------|------|--------|
+| 01 | Add contractId parameter to updateDefaultPEOContractWithI9 | backend | todo |
+| 02 | Update syncI9InfoToPEoContract to pass contractId | backend | todo |
+| 03 | Add unit tests for targeted contract update | backend | todo |
+
+## Branches
+
+| Repo | Branch |
+|------|--------|
+| backend | `EEXPR-57-fix-sync-i9-contract-targeting` |
+
+## Technical Context
+
+### Affected Files
+
+- **backend/services/peo/peo_contract_service.ts**
+  - `getDefaultContract()` (lines 3923-3936): Returns first active contract
+  - `updateDefaultPEOContractWithI9()` (lines 3984-4016): Needs contractId param
+  - `syncI9InfoToPEoContract()` (lines 4018-4031): Has contractOid but passes profileId
+
+### Code Flow
+
+```
+CopyI9DataStep.execute()
+    │
+    ▼
+syncI9InfoToPEoContract(newContractOid)  ← Has correct OID
+    │
+    ├─ db.peo_contract.findOne({ where: { deelContractOid } })  ← Finds correct contract
+    │
+    ▼
+updateDefaultPEOContractWithI9(profileId, i9Data)  ← BUG: Loses contract reference
+    │
+    ▼
+getDefaultContract(profileId)  ← Returns WRONG contract (first active, non-deterministic)
+```
+
+### Proposed Fix
+
+```typescript
+// peo_contract_service.ts
+
+async updateDefaultPEOContractWithI9(
+    profileId: number,
+    i9Data: {...},
+    contractId?: number  // NEW: Optional parameter to target specific contract
+): Promise<void> {
+    let contract;
+    if (contractId) {
+        contract = await this.db.peo_contract.findByPk(contractId);
+    } else {
+        contract = await this.getDefaultContract(profileId);  // Fallback for existing callers
+    }
+    // ... rest of function
+}
+
+async syncI9InfoToPEoContract(contractOid: string): Promise<void> {
+    const contract = await this.db.peo_contract.findOne({
+        where: { deelContractOid: contractOid }
+    });
+    // Pass contract.id to ensure correct contract is updated
+    await this.updateDefaultPEOContractWithI9(
+        contract.profileId,
+        { ...i9Data },
+        contract.id  // NEW: Pass contract ID
+    );
+}
+```
+
+## Architecture Diagrams
+
+### Current (Buggy) Flow
+
+```mermaid
+sequenceDiagram
+    participant Copy as CopyI9DataStep
+    participant Sync as syncI9InfoToPEoContract
+    participant Update as updateDefaultPEOContractWithI9
+    participant Default as getDefaultContract
+    participant DB as Database
+
+    Copy->>Sync: syncI9InfoToPEoContract(newContractOid)
+    Sync->>DB: findOne({ deelContractOid })
+    DB-->>Sync: newContract (correct)
+    Sync->>Update: updateDefaultPEOContractWithI9(profileId, i9Data)
+    Note over Update: Contract reference lost!
+    Update->>Default: getDefaultContract(profileId)
+    Default->>DB: findAll({ profileId, isActive: true })
+    DB-->>Default: [oldContract, newContract]
+    Default-->>Update: oldContract (first in list)
+    Note over Update: Wrong contract returned!
+    Update->>DB: update oldContract with i9Data
+    Note over DB: I-9 data on wrong contract!
+```
+
+### Fixed Flow
+
+```mermaid
+sequenceDiagram
+    participant Copy as CopyI9DataStep
+    participant Sync as syncI9InfoToPEoContract
+    participant Update as updateDefaultPEOContractWithI9
+    participant DB as Database
+
+    Copy->>Sync: syncI9InfoToPEoContract(newContractOid)
+    Sync->>DB: findOne({ deelContractOid })
+    DB-->>Sync: newContract (correct)
+    Sync->>Update: updateDefaultPEOContractWithI9(profileId, i9Data, contractId)
+    Note over Update: Contract ID preserved!
+    Update->>DB: findByPk(contractId)
+    DB-->>Update: newContract (correct)
+    Update->>DB: update newContract with i9Data
+    Note over DB: I-9 data on correct contract!
+```
+
+## Risks & Considerations
+
+- **Backward Compatibility**: The `contractId` parameter is optional, so existing callers continue to work
+- **Testing**: Need to ensure existing tests pass and new tests cover targeted updates
+- **Other Callers**: Check if other code paths call `updateDefaultPEOContractWithI9` and should use the new param
+
+## Testing Strategy
+
+1. Unit test `updateDefaultPEOContractWithI9` with explicit contractId
+2. Unit test `updateDefaultPEOContractWithI9` without contractId (fallback)
+3. Integration test: entity transfer with Z04 employee verifies I-9 on new contract
+
+## Feedback
+
+Review comments can be added to `feedback/diff-review.md`.
+Use `/address-feedback` to discuss feedback with the agent.
+
+## References
+
+- Related task: EEXPR-56 (aligned CrossHireSanityCheck validation)
+- PEO validateForIntegrate: https://github.com/letsdeel/peo/blob/master/src/models/peoContract/peoContract.ts#L211-L239
+- Bug discovery: Namrata Poola entity transfer failure post-EEXPR-56 deployment

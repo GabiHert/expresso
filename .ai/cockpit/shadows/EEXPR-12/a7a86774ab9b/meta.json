@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-12-2/todo/02-add-validation-schema.md",
+  "taskId": "EEXPR-12",
+  "baseline": {
+    "capturedAt": "2026-01-08T18:54:37.380Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T18:54:37.380Z",
+    "hash": "d95419c7895b1f4c",
+    "size": 4383,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T18:54:37.380Z",
+    "actualFileHash": "d95419c7895b1f4c",
+    "status": "synced"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/test-curl.sh",
+  "taskId": "EEXPR-59",
+  "baseline": {
+    "capturedAt": "2026-01-12T14:09:40.174Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-12T14:10:35.008Z",
+    "hash": "c3f33c7f05bbe5c7",
+    "size": 1107,
+    "editCount": 2
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-12T14:10:35.008Z",
+    "actualFileHash": "c3f33c7f05bbe5c7",
+    "status": "synced"
+  }
+}

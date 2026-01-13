@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-59/backend/services/peo/entity_transfer/steps/create_contract_step.ts",
+  "taskId": "EEXPR-59",
+  "baseline": {
+    "capturedAt": "2026-01-10T04:31:05.212Z",
+    "hash": "305d868c00b532b4",
+    "size": 27517
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-10T04:55:34.644Z",
+    "hash": "7fe1c7c91f84f9dd",
+    "size": 26396,
+    "editCount": 4
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-10T04:55:34.644Z",
+    "actualFileHash": "7fe1c7c91f84f9dd",
+    "status": "synced"
+  }
+}

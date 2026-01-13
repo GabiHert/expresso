@@ -1,0 +1,182 @@
+<!--
+╔══════════════════════════════════════════════════════════════════╗
+║ LAYER: TASK                                                      ║
+║ LOCATION: .ai/tasks/todo/ENGESC-23600/                          ║
+╠══════════════════════════════════════════════════════════════════╣
+║ BEFORE WORKING ON THIS TASK:                                     ║
+║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)          ║
+║ 2. Read this entire README first                                 ║
+║ 3. Check which work items are in todo/ vs done/                 ║
+║ 4. Work on ONE item at a time from todo/                        ║
+╚══════════════════════════════════════════════════════════════════╝
+-->
+
+# ENGESC-23600: Tech Ops Endpoint for Missing PEO Employments
+
+## Problem Statement
+
+Entity transfer contracts are missing employment records in the Employment microservice. This is caused by a bug where the `afterCommit` callback in `peoContractService.createContract()` fails silently because `jobTitle` is not passed from `CreateContractStep`.
+
+**Root Cause**:
+- Entity transfer only passes `jobCode` in `peopleFirstPayload.validatedData`
+- The Employment microservice requires `jobTitle` (Zod validation)
+- Error is swallowed as unhandled promise rejection
+
+**Affected Contracts**: 19 contracts for Amae Health, Inc. (org 386153) transferred on 2026-01-01 and 2026-01-03.
+
+**Related Escalations**: ENGESC-23650, ENGESC-23600
+
+## Acceptance Criteria
+
+- [ ] New tech_ops endpoint `POST /admin/peo/tech_ops/contract/:oid/create_missing_employment` exists
+- [ ] Endpoint requires `startDate` parameter (YYYY-MM-DD)
+- [ ] Endpoint checks if employment already exists (idempotent - skips if exists)
+- [ ] Endpoint fetches all data from NEW contract (no old contract needed)
+- [ ] Endpoint resolves `jobTitle` from `jobCode` (falls back to jobCode if not found)
+- [ ] Endpoint follows existing tech_ops patterns (Joi validation, permissions, error handling)
+- [ ] Endpoint is documented with wiki reference comment
+- [ ] Can be used to fix the 19 affected contracts
+
+## Work Items
+
+See `status.yaml` for full index.
+
+| ID | Name | Repo | Status |
+|----|------|------|--------|
+| 01 | Add service method for creating missing employment | backend | todo |
+| 02 | Add tech_ops endpoint | backend | todo |
+
+## Branches
+
+| Repo | Path | Branch |
+|------|------|--------|
+| backend | `/Users/gabriel.herter/Documents/Projects/deel/backend` | `ENGESC-23600-create-missing-employment-endpoint` |
+
+## Technical Context
+
+### Existing Patterns
+
+The endpoint should follow patterns from existing tech_ops endpoints:
+
+**Reference Endpoints** (`backend/controllers/admin/peo/tech_ops.ts`):
+- `/contract/:oid/update_start_date` (lines 32-50) - POST with path param and body
+- `/contract/move_compliance_documents` (lines 132-145) - POST with body validation
+
+**Service Pattern** (`backend/services/peo/peo_contract_service.ts`):
+- `updateContractNotRegular()` (lines 2193-2214) - Has fallback employment creation logic we can reference
+
+### Required Data for Employment Creation
+
+All data is fetched from the NEW contract - no old contract reference needed:
+
+```typescript
+{
+  contractOid: string,           // NEW contract.oid
+  country: "US",                 // NEW contract.country
+  state: string,                 // NEW peo_contracts.state_code
+  clientTeamId: number,          // NEW contract.team_id
+  jobTitle: string,              // Resolved from NEW peo_contracts.job_code
+  rate: string,                  // NEW peo_contracts.pay_rate
+  scale: "YEAR" | "HOUR",        // NEW peo_contracts.pay_method
+  email: string,                 // NEW contract.invited_client_email
+  startDate: string,             // REQUIRED parameter (transfer effective date)
+  employeeKey: string,           // Employee.id (via HrisProfile)
+  employeeId: number,            // Profile.id (via HrisProfile)
+  payrollLegalEntityId: number,  // NEW contract.client_legal_entity_id
+  ICPId: number,                 // Query: SELECT id FROM "ICP" WHERE name = 'PrismHR'
+  gpContractId: number,          // NEW contract.id
+  // payrollSettingsId auto-looked up by Employment service
+}
+```
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `backend/controllers/admin/peo/tech_ops.ts` | Add new endpoint |
+| `backend/services/peo/peo_contract_service.ts` | Add service method |
+| `backend/services/employee/employment.js` | Employment service client |
+| `employment/src/controllers/employment/dtos/Employment.dto.ts` | Schema validation reference |
+
+## Architecture Diagram
+
+```mermaid
+sequenceDiagram
+    participant Admin as Tech Ops Admin
+    participant API as tech_ops.ts
+    participant Service as peoContractService
+    participant EMS as EMSEmploymentsService
+    participant Employment as Employment Microservice
+
+    Admin->>API: POST /contract/:oid/create_missing_employment
+    API->>Service: createMissingEmploymentForContract()
+
+    Service->>EMS: searchEmployments({contractOids: [oid]})
+    EMS-->>Service: [] (empty - no employment)
+
+    Service->>Service: Fetch contract, peo_contract, employee data
+    Service->>Service: Resolve jobTitle from jobCode
+
+    Service->>Employment: createPEOEmployment(data)
+    Employment-->>Service: {id: employment_id}
+
+    Service-->>API: {success: true, employmentId}
+    API-->>Admin: 200 OK {success, employmentId}
+```
+
+## Implementation Approach
+
+1. **Service Method First**: Add `createMissingEmploymentForContract()` to `peoContractService`
+2. **Endpoint Second**: Add POST endpoint to `tech_ops.ts` that calls the service
+3. **Test with one contract**: Verify it works for one affected contract
+4. **Fix all 19**: Run against all affected contracts
+
+## Risks & Considerations
+
+1. **Idempotency**: Must check if employment exists before creating (avoid duplicates)
+2. **jobTitle Resolution**: If jobCode doesn't exist in job master, should fallback to using jobCode as jobTitle
+3. **Transaction Safety**: Employment creation is an HTTP call - not transactional with other DB operations
+4. **Permissions**: Requires `admin:contracts.write` permission
+
+## Testing Strategy
+
+1. **Unit Test**: Mock employment service and verify correct data is passed
+2. **Manual Test**:
+   - Call endpoint for a contract that already has employment (should skip)
+   - Call endpoint for affected contract (should create)
+   - Verify employment exists in Employment microservice
+
+## Affected Contracts Reference
+
+| Employee | Contract OID | Start Date |
+|----------|-------------|------------|
+| Anushka Bodahanapati | 3dzvvwg | 2026-01-03 |
+| Jacqueline Bohrer | 32n67rk | 2026-01-03 |
+| Anthony Darden | 3e5w458 | 2026-01-03 |
+| Tiffany De La Torre | 3yq77rx | 2026-01-03 |
+| Nicholas DeMattio | 3rz8745 | 2026-01-03 |
+| Madison Federici | mqrxxzp | 2026-01-03 |
+| Shefali Gupta | m2pkzvz | 2026-01-03 |
+| Deylanis Henderson | 3yq7pzn | 2026-01-03 |
+| Holliss Hirsch | 3yq7per | 2026-01-03 |
+| Jordan Jacobsen | 39p95dw | 2026-01-03 |
+| Maham Khalid | 39p95e4 | 2026-01-03 |
+| Priscilla Lugo | 34pvkev | 2026-01-03 |
+| Taylor L Mayne | 3475r45 | 2026-01-03 |
+| Sruthi Ramabadran | 35p22xk | 2026-01-01 |
+| Makeda Ramnath | mzdg745 | 2026-01-01 |
+| Kayla Rice | 3e5w7xx | 2026-01-01 |
+| Catherine Scott | 3dq6djq | 2026-01-01 |
+| Jessica Seo | m7pw922 | 2026-01-01 |
+| Collin Wang | m6p829e | 2026-01-01 |
+
+## Feedback
+
+Review comments can be added to `feedback/diff-review.md`.
+Use `/address-feedback` to discuss feedback with the agent.
+
+## References
+
+- Escalation: ENGESC-23650, ENGESC-23600
+- Related bug: Entity transfer missing jobTitle in CreateContractStep
+- Future fix needed: PEOCM-XXX to fix CreateContractStep to pass jobTitle

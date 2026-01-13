@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/peo/src/controllers/entityTransfer/entityTransferController.spec.ts",
+  "taskId": "EEXPR-12-2",
+  "baseline": {
+    "capturedAt": "2026-01-13T13:21:19.813Z",
+    "hash": "bbdbaf3726585e97",
+    "size": 8188
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-13T13:21:47.729Z",
+    "hash": "a542caacc4d16baa",
+    "size": 13298,
+    "editCount": 2
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-13T13:21:47.729Z",
+    "actualFileHash": "a542caacc4d16baa",
+    "status": "synced"
+  }
+}

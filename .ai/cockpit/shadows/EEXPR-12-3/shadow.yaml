@@ -1,0 +1,15 @@
+# Cockpit Shadow for EEXPR-12-3
+task: "EEXPR-12-3"
+title: "[BE] Tech ops endpoint with enrichment"
+status: in_progress
+repo: backend
+branch: "EEXPR-12-3-tech-ops-transfer-enrichment"
+worktree: "/Users/gabriel.herter/Documents/Projects/worktrees/EEXPR-12-3/backend"
+created: "2026-01-13T11:30:00Z"
+updated: "2026-01-13T11:30:00Z"
+
+work_items:
+  total: 5
+  completed: 0
+
+last_action: "Task started with worktree"

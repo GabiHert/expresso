@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/worktrees/EEXPR-12-1/peo/src/models/entityTransfer/PeoEmployeeTransferSignature.ts",
+  "taskId": "EEXPR-12-1",
+  "baseline": {
+    "capturedAt": "2026-01-08T21:46:45.988Z",
+    "hash": "cccd985423fe4196",
+    "size": 4359
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T21:46:50.401Z",
+    "hash": "9c14a98b2d478981",
+    "size": 4363,
+    "editCount": 2
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T21:46:50.401Z",
+    "actualFileHash": "9c14a98b2d478981",
+    "status": "synced"
+  }
+}

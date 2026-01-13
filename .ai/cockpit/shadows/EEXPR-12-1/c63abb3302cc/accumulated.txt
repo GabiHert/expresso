@@ -1,0 +1,250 @@
+<!--
+╔══════════════════════════════════════════════════════════════════╗
+║ WORK ITEM: 01-service-method.md                                  ║
+║ TASK: ENGESC-23600                                               ║
+╠══════════════════════════════════════════════════════════════════╣
+║ WORKFLOW:                                                        ║
+║ 1. Move this file to in_progress/ when starting                 ║
+║ 2. Update status.yaml with new status                           ║
+║ 3. Complete ALL steps below                                      ║
+║ 4. Move to done/ when complete, update status.yaml              ║
+║ 5. Update task README with any learnings                        ║
+╚══════════════════════════════════════════════════════════════════╝
+-->
+
+---
+# Repository Context
+repo: backend
+repo_path: /Users/gabriel.herter/Documents/Projects/deel/backend
+branch: ENGESC-23600-create-missing-employment-endpoint
+protected: false
+
+# Git Safety Reminder
+# Before any git operation:
+#   1. cd /Users/gabriel.herter/Documents/Projects/deel/backend
+#   2. Verify: git rev-parse --show-toplevel
+#   3. Verify: git branch --show-current
+---
+
+# Add Service Method for Creating Missing Employment
+
+## Objective
+
+Add a new method `createMissingEmploymentForContract()` to `peoContractService` that can create an employment record for a contract that is missing one.
+
+## Pre-Implementation
+
+Reference these existing patterns:
+- `updateContractNotRegular()` at lines 2193-2214 for employment creation logic
+- `_validateAndGetJobTitleCode()` at lines 135-155 for jobTitle resolution
+
+## Implementation Steps
+
+### Step 1: Add the service method
+
+**File**: `backend/services/peo/peo_contract_service.ts`
+
+**Location**: Add after `evaluatePeoVipTagAssignment` method (around line 4600)
+
+**Instructions**:
+
+Add the following method:
+
+```typescript
+/**
+ * Creates employment for a contract that is missing one.
+ * Used by tech_ops endpoint for fixing entity transfer contracts.
+ *
+ * All data is fetched from the NEW contract and its peo_contracts record.
+ * No need to reference the old contract - data was already copied during transfer.
+ *
+ * @param contractOid - The contract OID to create employment for
+ * @param startDate - Employment start date (YYYY-MM-DD) - required
+ * @returns Object with success status and employment ID
+ */
+async createMissingEmploymentForContract({
+    contractOid,
+    startDate,
+}: {
+    contractOid: string;
+    startDate: string;
+}): Promise<{success: boolean; message: string; employmentId?: string; skipped?: boolean}> {
+
+    // 1. Check if employment already exists (idempotent)
+    const existingEmployments = await EMSEmploymentsService.searchEmployments({
+        contractOids: [contractOid],
+        includePayrollSettings: true,
+    });
+
+    if (existingEmployments && existingEmployments.length > 0) {
+        return {
+            success: true,
+            skipped: true,
+            message: `Employment already exists for contract ${contractOid}`,
+            employmentId: existingEmployments[0].id,
+        };
+    }
+
+    // 2. Fetch contract data
+    const contract = await this.db.Contract.findFirst({
+        attributes: ['id', 'oid', 'country', 'teamId', 'invitedClientEmail', 'clientLegalEntityId', 'HrisProfileId'],
+        where: {oid: contractOid},
+        useMaster: true,
+    });
+
+    if (!contract) {
+        throw new HttpError.NotFound(`Contract not found: ${contractOid}`);
+    }
+
+    // 3. Fetch PEO contract data
+    const peoContract = await peoContractRepository.findByDeelContractOid(contractOid);
+
+    if (!peoContract) {
+        throw new HttpError.NotFound(`PEO contract not found for: ${contractOid}`);
+    }
+
+    // 4. Get profile and employee data via HrisProfile
+    const hrisProfile = await this.db.HrisProfile.findByPk(contract.HrisProfileId, {
+        attributes: ['id', 'profileId', 'email'],
+    });
+
+    if (!hrisProfile) {
+        throw new HttpError.NotFound(`HrisProfile not found for contract: ${contractOid}`);
+    }
+
+    const profile = await this.db.Profile.findByPk(hrisProfile.profileId, {
+        attributes: ['id'],
+    });
+
+    if (!profile) {
+        throw new HttpError.NotFound(`Profile not found for HrisProfile: ${hrisProfile.id}`);
+    }
+
+    const employee = await this.db.Employee.findFirst({
+        attributes: ['id'],
+        where: {profileId: profile.id},
+    });
+
+    if (!employee) {
+        throw new HttpError.NotFound(`Employee not found for profile: ${profile.id}`);
+    }
+
+    // 5. Get ICP (PrismHR)
+    const prismIcp = await this.db.ICP.findFirst({
+        attributes: ['id'],
+        where: {name: 'PrismHR'},
+        useMaster: false,
+    });
+
+    if (!prismIcp) {
+        throw new HttpError.NotFound('PrismHR ICP not found');
+    }
+
+    // 6. Resolve jobTitle from jobCode
+    let jobTitle: string | undefined;
+    if (peoContract.jobCode) {
+        try {
+            const resolved = await this._validateAndGetJobTitleCode(
+                peoContract.jobCode,
+                contract.clientLegalEntityId
+            );
+            jobTitle = resolved.jobTitle;
+        } catch (error) {
+            this.log.warn({
+                message: '[createMissingEmploymentForContract] Failed to resolve jobTitle from jobCode, using jobCode as fallback',
+                contractOid,
+                jobCode: peoContract.jobCode,
+                error,
+            });
+        }
+        // Fallback: use jobCode as jobTitle if resolution failed
+        if (!jobTitle) {
+            jobTitle = peoContract.jobCode;
+        }
+    }
+
+    if (!jobTitle) {
+        throw new HttpError.BadRequest(`jobTitle could not be resolved - contract has no jobCode: ${contractOid}`);
+    }
+
+    // 7. Create employment (payrollSettingsId auto-lookups in Employment service)
+    const employmentData = {
+        contractOid,
+        country: contract.country || 'US',
+        state: peoContract.stateCode,
+        clientTeamId: contract.teamId,
+        rate: String(peoContract.payRate),
+        scale: peoContract.payMethod === PEOPayMethodEnum.HOURLY ? 'HOUR' : 'YEAR',
+        email: contract.invitedClientEmail || hrisProfile.email,
+        startDate,
+        employeeKey: employee.id,
+        employeeId: profile.id,
+        jobTitle,
+        payrollLegalEntityId: contract.clientLegalEntityId,
+        ICPId: prismIcp.id,
+        gpContractId: contract.id,
+    };
+
+    this.log.info({
+        message: '[createMissingEmploymentForContract] Creating missing employment for contract',
+        contractOid,
+        jobTitle,
+        startDate,
+        payrollLegalEntityId: contract.clientLegalEntityId,
+    });
+
+    const employment = await employmentService.createPEOEmployment(employmentData);
+
+    if (!employment) {
+        throw new HttpError.InternalServerError('Failed to create employment - service returned null');
+    }
+
+    this.log.info({
+        message: '[createMissingEmploymentForContract] Employment created successfully',
+        contractOid,
+        employmentId: employment.id,
+    });
+
+    return {
+        success: true,
+        message: `Employment created successfully for contract ${contractOid}`,
+        employmentId: employment.id,
+    };
+}
+```
+
+### Step 2: Verify imports exist
+
+Ensure these imports are at the top of the file (they should already exist):
+- `EMSEmploymentsService`
+- `employmentService`
+- `peoContractRepository`
+- `HttpError`
+- `PEOPayMethodEnum`
+
+## Post-Implementation
+
+After completing, run a **code review agent** to check for issues.
+
+## Acceptance Criteria
+
+- [ ] Method exists in `peoContractService`
+- [ ] Method takes `contractOid` and `startDate` as required parameters
+- [ ] Method checks if employment already exists (idempotent)
+- [ ] Method resolves jobTitle from jobCode using `_validateAndGetJobTitleCode`
+- [ ] Method falls back to jobCode as jobTitle if resolution fails
+- [ ] Method throws appropriate errors for missing data
+- [ ] Method logs creation attempts and results
+
+## Testing
+
+1. TypeScript compilation passes: `npm run build`
+2. Method signature is correct
+3. Will be tested via endpoint in work item 02
+
+## Notes
+
+- The method is idempotent - safe to call multiple times
+- If jobTitle cannot be resolved, it uses jobCode as fallback
+- All data comes from the NEW contract - no need to reference old contract
+- `payrollSettingsId` is auto-looked up by Employment service

@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/in_progress/ENGESC-23600/todo/02-techops-endpoint.md",
+  "taskId": "ENGESC-23600",
+  "baseline": {
+    "capturedAt": "2026-01-09T19:53:37.300Z",
+    "hash": "e3a714f8f933909d",
+    "size": 7429
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-09T19:53:42.220Z",
+    "hash": "5909e35f343d39a8",
+    "size": 6730,
+    "editCount": 6
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-09T19:53:42.220Z",
+    "actualFileHash": "5909e35f343d39a8",
+    "status": "synced"
+  }
+}

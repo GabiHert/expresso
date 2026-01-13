@@ -1,0 +1,8 @@
+{
+  "taskId": "EEXPR-12",
+  "title": "[BE] Endpoint to retrieve transfer details, status, and signature progress",
+  "branch": "deel",
+  "frameworkPath": ".ai/tasks/in_progress/EEXPR-12",
+  "startedAt": "2026-01-08T16:00:00Z",
+  "sessionId": "eexpr12-start"
+}

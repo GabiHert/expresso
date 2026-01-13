@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-12-3/todo/05-add-route-registration.md",
+  "taskId": "EEXPR-12",
+  "baseline": {
+    "capturedAt": "2026-01-08T19:00:14.272Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T19:00:14.272Z",
+    "hash": "f913c8b65cd78221",
+    "size": 2155,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T19:00:14.272Z",
+    "actualFileHash": "f913c8b65cd78221",
+    "status": "synced"
+  }
+}

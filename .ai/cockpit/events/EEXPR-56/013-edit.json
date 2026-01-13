@@ -1,0 +1,40 @@
+{
+  "id": "evt-1767833353034-x6h5cebfl",
+  "taskId": "EEXPR-56",
+  "taskIdSource": "env-var",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/in_progress/EEXPR-56/feedback/diff-review.md",
+    "old_string": "### /Users/gabriel.herter/Documents/Projects/deel/backend/services/peo/entity_transfer/steps/cross_hire_sanity_check_step.ts:94\n<!-- id: 4xn281 | status: open | created: 2026-01-08T00:42:00.720Z -->\nadd the github function url",
+    "new_string": "### ~~/Users/gabriel.herter/Documents/Projects/deel/backend/services/peo/entity_transfer/steps/cross_hire_sanity_check_step.ts:94~~\n<!-- id: 4xn281 | status: resolved | created: 2026-01-08T00:42:00.720Z -->\nadd the github function url",
+    "replace_all": false
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/in_progress/EEXPR-56/feedback/diff-review.md",
+    "oldString": "### /Users/gabriel.herter/Documents/Projects/deel/backend/services/peo/entity_transfer/steps/cross_hire_sanity_check_step.ts:94\n<!-- id: 4xn281 | status: open | created: 2026-01-08T00:42:00.720Z -->\nadd the github function url",
+    "newString": "### ~~/Users/gabriel.herter/Documents/Projects/deel/backend/services/peo/entity_transfer/steps/cross_hire_sanity_check_step.ts:94~~\n<!-- id: 4xn281 | status: resolved | created: 2026-01-08T00:42:00.720Z -->\nadd the github function url",
+    "originalFile": "# Diff Feedback\n\nUse this file to add review comments on code changes. The `/address-feedback` command will read this file and present your feedback to the agent.\n\n## Metadata\n<!-- AUTO-GENERATED - DO NOT EDIT -->\nversion: 2\nlast_synced: 2026-01-08T00:42:00.720Z\nfile_hashes:\n<!-- END METADATA -->\n\n---\n\n### ~~path/to/file.ts:42~~\n<!-- id: ekdt6f | status: resolved | created: 2026-01-08T00:40:09.611Z -->\nYour comment here\n\n### /Users/gabriel.herter/Documents/Projects/deel/backend/services/peo/entity_transfer/steps/cross_hire_sanity_check_step.ts:94\n<!-- id: 4xn281 | status: open | created: 2026-01-08T00:42:00.720Z -->\nadd the github function url\n",
+    "structuredPatch": [
+      {
+        "oldStart": 15,
+        "oldLines": 6,
+        "newStart": 15,
+        "newLines": 6,
+        "lines": [
+          " <!-- id: ekdt6f | status: resolved | created: 2026-01-08T00:40:09.611Z -->",
+          " Your comment here",
+          " ",
+          "-### /Users/gabriel.herter/Documents/Projects/deel/backend/services/peo/entity_transfer/steps/cross_hire_sanity_check_step.ts:94",
+          "-<!-- id: 4xn281 | status: open | created: 2026-01-08T00:42:00.720Z -->",
+          "+### ~~/Users/gabriel.herter/Documents/Projects/deel/backend/services/peo/entity_transfer/steps/cross_hire_sanity_check_step.ts:94~~",
+          "+<!-- id: 4xn281 | status: resolved | created: 2026-01-08T00:42:00.720Z -->",
+          " add the github function url"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "b4ec939c-bf52-4079-a8e2-8ca460cd8723",
+  "timestamp": "2026-01-08T00:49:13.034Z"
+}

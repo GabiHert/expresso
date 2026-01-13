@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-56/todo/01-update-i9-validation.md",
+  "taskId": "_unassigned",
+  "baseline": {
+    "capturedAt": "2026-01-08T00:14:53.555Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T00:14:53.555Z",
+    "hash": "2e7cbc9e2ca5c8d5",
+    "size": 6043,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T00:14:53.555Z",
+    "actualFileHash": "2e7cbc9e2ca5c8d5",
+    "status": "synced"
+  }
+}

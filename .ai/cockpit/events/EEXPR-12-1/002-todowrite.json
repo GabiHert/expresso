@@ -1,0 +1,57 @@
+{
+  "id": "evt-1767908320093-mrcc85u08",
+  "taskId": "EEXPR-12-1",
+  "taskIdSource": "env-var",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Fetch dev branch from remote",
+        "status": "in_progress",
+        "activeForm": "Fetching dev branch from remote"
+      },
+      {
+        "content": "Create worktree for EEXPR-12-1",
+        "status": "pending",
+        "activeForm": "Creating worktree for EEXPR-12-1"
+      },
+      {
+        "content": "Set up symlinks for .ai and .claude",
+        "status": "pending",
+        "activeForm": "Setting up symlinks"
+      },
+      {
+        "content": "Activate cockpit tracking",
+        "status": "pending",
+        "activeForm": "Activating cockpit tracking"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [],
+    "newTodos": [
+      {
+        "content": "Fetch dev branch from remote",
+        "status": "in_progress",
+        "activeForm": "Fetching dev branch from remote"
+      },
+      {
+        "content": "Create worktree for EEXPR-12-1",
+        "status": "pending",
+        "activeForm": "Creating worktree for EEXPR-12-1"
+      },
+      {
+        "content": "Set up symlinks for .ai and .claude",
+        "status": "pending",
+        "activeForm": "Setting up symlinks"
+      },
+      {
+        "content": "Activate cockpit tracking",
+        "status": "pending",
+        "activeForm": "Activating cockpit tracking"
+      }
+    ]
+  },
+  "sessionId": "94528b48-30b5-4fdb-9cfc-3f7b3ded4353",
+  "timestamp": "2026-01-08T21:38:40.093Z"
+}

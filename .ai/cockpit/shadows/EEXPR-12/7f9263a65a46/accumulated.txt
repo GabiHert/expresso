@@ -1,0 +1,21 @@
+# Task Status Index
+task: "EEXPR-12-1"
+title: "[PEO] Migration - Fix signature profile_public_id type"
+parent: "EEXPR-12"
+repo: peo
+branch: "EEXPR-12-1-fix-signature-profile-id-type"
+created: "2026-01-08"
+updated: "2026-01-08"
+
+summary:
+  total: 1
+  todo: 1
+  in_progress: 0
+  done: 0
+
+work_items:
+  - id: "01"
+    name: "Create migration file"
+    repo: peo
+    status: todo
+    file: "todo/01-create-migration.md"

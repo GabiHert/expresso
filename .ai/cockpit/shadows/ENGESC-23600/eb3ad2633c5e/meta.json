@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/in_progress/ENGESC-23600/status.yaml",
+  "taskId": "ENGESC-23600",
+  "baseline": {
+    "capturedAt": "2026-01-09T20:07:43.011Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-09T20:10:31.331Z",
+    "hash": "570b8ce030984df4",
+    "size": 681,
+    "editCount": 2
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-09T20:10:31.331Z",
+    "actualFileHash": "570b8ce030984df4",
+    "status": "synced"
+  }
+}

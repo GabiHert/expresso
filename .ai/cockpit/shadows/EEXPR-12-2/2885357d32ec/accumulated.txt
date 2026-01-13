@@ -1,0 +1,78 @@
+import { TransferItemStatus, TransferStatus } from '@models/entityTransfer';
+import { z } from 'zod';
+
+export const CreateTransferItemSchema = z.object({
+    baseContractOid: z.string().min(1).max(20),
+    newBenefitPrismGroupId: z.string().min(1).max(10),
+    newEmploymentPayrollSettingId: z.string().min(1),
+    newPtoPolicyId: z.string().uuid(),
+    newWorkLocationId: z.string().uuid(),
+    newPositionPublicId: z.string().uuid(),
+    newTeamId: z.number().int().positive().optional(),
+});
+
+export const CreateTransferSchema = z.object({
+    organizationId: z.number().int().positive(),
+    requesterProfilePublicId: z.string().uuid(),
+    sourceLegalEntityPublicId: z.string().uuid(),
+    destinationLegalEntityPublicId: z.string().uuid(),
+    effectiveDate: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format, expected YYYY-MM-DD')
+        .refine(
+            (dateStr: string) => {
+                const [year, month, day] = dateStr.split('-').map(Number);
+                const date = new Date(Date.UTC(year, month - 1, day));
+                return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+            },
+            {
+                message: 'Invalid date value',
+            },
+        ),
+    agreementId: z.string().uuid().optional(),
+    items: z.array(CreateTransferItemSchema).min(1),
+});
+
+export const UpdateTransferStatusSchema = z.object({
+    status: z.nativeEnum(TransferStatus),
+});
+
+export const UpdateTransferItemSchema = z.object({
+    status: z.nativeEnum(TransferItemStatus).optional(),
+    newContractOid: z.string().max(20).optional(),
+    resumeFromStep: z.string().max(100).optional(),
+});
+
+export const GetReadyTransfersSchema = z.object({
+    effectiveDate: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format, expected YYYY-MM-DD')
+        .refine(
+            dateStr => {
+                const [year, month, day] = dateStr.split('-').map(Number);
+                const date = new Date(Date.UTC(year, month - 1, day));
+                return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+            },
+            {
+                message: 'Invalid date value',
+            },
+        ),
+    limit: z.coerce.number().int().positive().max(100).default(100),
+});
+
+export const GetTransfersBySourceEntityParamsSchema = z.object({
+    sourceEntityPublicId: z.string().uuid('Invalid source entity public ID'),
+});
+
+export const GetTransfersBySourceEntityQuerySchema = z.object({
+    cursor: z.string().uuid().optional(),
+    limit: z.coerce.number().int().positive().max(100).default(100),
+});
+
+export type CreateTransferDto = z.infer<typeof CreateTransferSchema>;
+export type CreateTransferItemDto = z.infer<typeof CreateTransferItemSchema>;
+export type UpdateTransferStatusDto = z.infer<typeof UpdateTransferStatusSchema>;
+export type UpdateTransferItemDto = z.infer<typeof UpdateTransferItemSchema>;
+export type GetReadyTransfersDto = z.infer<typeof GetReadyTransfersSchema>;
+export type GetTransfersBySourceEntityParamsDto = z.infer<typeof GetTransfersBySourceEntityParamsSchema>;
+export type GetTransfersBySourceEntityQueryDto = z.infer<typeof GetTransfersBySourceEntityQuerySchema>;

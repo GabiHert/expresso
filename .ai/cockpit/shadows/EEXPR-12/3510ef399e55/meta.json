@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-12-3/todo/06-add-integration-tests.md",
+  "taskId": "EEXPR-12",
+  "baseline": {
+    "capturedAt": "2026-01-08T19:00:15.020Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T19:00:15.021Z",
+    "hash": "0a3a36818a237e1d",
+    "size": 9846,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T19:00:15.021Z",
+    "actualFileHash": "0a3a36818a237e1d",
+    "status": "synced"
+  }
+}

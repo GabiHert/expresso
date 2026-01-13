@@ -1,0 +1,118 @@
+import BasePeoModel from '@models/base/BasePeoModel';
+import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, NonAttribute, Sequelize } from 'sequelize';
+
+import type { PeoEmployeeTransfer } from './PeoEmployeeTransfer';
+import { AgreementType, SignatureRole } from './types';
+
+export class PeoEmployeeTransferSignature extends BasePeoModel<
+    InferAttributes<PeoEmployeeTransferSignature>,
+    InferCreationAttributes<PeoEmployeeTransferSignature>
+> {
+    declare id: CreationOptional<string>;
+    declare createdAt: CreationOptional<Date>;
+    declare updatedAt: CreationOptional<Date>;
+
+    declare organizationId: number;
+    declare transferId: string;
+    declare profilePublicId: string;
+    declare role: SignatureRole;
+    declare agreementType: AgreementType;
+    declare agreementId: CreationOptional<string | null>;
+    declare signedAt: CreationOptional<Date | null>;
+
+    // Associations
+    declare transfer?: NonAttribute<PeoEmployeeTransfer>;
+
+    declare static associations: {};
+}
+
+export const initPeoEmployeeTransferSignatureModel = (sequelize: Sequelize) => {
+    PeoEmployeeTransferSignature.init(
+        {
+            id: {
+                type: DataTypes.UUID,
+                defaultValue: DataTypes.UUIDV4,
+                primaryKey: true,
+                allowNull: false,
+                comment: 'Primary key - unique signature record identifier',
+            },
+            createdAt: {
+                field: 'created_at',
+                type: DataTypes.DATE,
+                allowNull: false,
+                comment: 'Record creation timestamp',
+            },
+            updatedAt: {
+                field: 'updated_at',
+                type: DataTypes.DATE,
+                allowNull: false,
+                comment: 'Record last update timestamp',
+            },
+            organizationId: {
+                field: 'organization_id',
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                comment: 'FK to organizations.id - Client organization (denormalized from parent transfer)',
+            },
+            transferId: {
+                field: 'transfer_id',
+                type: DataTypes.UUID,
+                allowNull: false,
+                comment: 'FK to peo_employee_transfers.id - Parent transfer',
+            },
+            profilePublicId: {
+                field: 'profile_public_id',
+                type: DataTypes.UUID,
+                allowNull: false,
+                comment: 'FK to profiles.public_id - Person required to sign (UUID)',
+            },
+            role: {
+                field: 'role',
+                type: DataTypes.ENUM(...Object.values(SignatureRole)),
+                allowNull: false,
+                comment: 'Signer role: ADMIN or EMPLOYEE',
+            },
+            agreementType: {
+                field: 'agreement_type',
+                type: DataTypes.ENUM(...Object.values(AgreementType)),
+                allowNull: false,
+                comment: 'Type of agreement being signed',
+            },
+            agreementId: {
+                field: 'agreement_id',
+                type: DataTypes.UUID,
+                allowNull: true,
+                comment: 'FK to document being signed (NULL for ENTITY_ASSIGNMENT_AGREEMENT)',
+            },
+            signedAt: {
+                field: 'signed_at',
+                type: DataTypes.DATE,
+                allowNull: true,
+                comment: 'Timestamp when signature was collected',
+            },
+        },
+        {
+            tableName: 'peo_employee_transfer_signatures',
+            underscored: true,
+            comment: 'Signature tracking for admin and employee agreements during entity transfers',
+            indexes: [
+                {
+                    unique: true,
+                    fields: ['transfer_id', 'profile_public_id', 'agreement_type'],
+                    name: 'idx_peo_employee_transfer_signatures_unique',
+                },
+            ],
+            sequelize,
+        },
+    );
+};
+
+export const initPeoEmployeeTransferSignatureAssociation = () => {
+    // Lazy import to avoid circular dependencies
+    const { PeoEmployeeTransfer } = require('./PeoEmployeeTransfer');
+
+    PeoEmployeeTransferSignature.belongsTo(PeoEmployeeTransfer, {
+        foreignKey: 'transferId',
+        as: 'transfer',
+    });
+};

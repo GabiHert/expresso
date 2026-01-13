@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/backend/services/peo/peo_contract_service.ts",
+  "taskId": "EEXPR-59",
+  "baseline": {
+    "capturedAt": "2026-01-10T05:35:22.730Z",
+    "hash": "7c2e47fef7c79915",
+    "size": 219981
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-10T05:43:14.437Z",
+    "hash": "49c582bc0872e489",
+    "size": 221787,
+    "editCount": 7
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-10T05:43:14.438Z",
+    "actualFileHash": "49c582bc0872e489",
+    "status": "synced"
+  }
+}

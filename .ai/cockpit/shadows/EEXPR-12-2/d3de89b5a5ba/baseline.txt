@@ -1,0 +1,128 @@
+import EntityTransferService from '@services/entityTransfer/entityTransferService';
+import { StatusCodes } from 'http-status-codes';
+import { Body, Get, HttpError, JsonController, Param, Patch, Post, QueryParams } from 'routing-controllers';
+import { Container } from 'typedi';
+
+import { CreateTransferSchema, GetReadyTransfersSchema, UpdateTransferItemSchema, UpdateTransferStatusSchema } from './entityTransferDto';
+
+@JsonController('/peo/entity-transfer')
+class EntityTransferController {
+    private entityTransferService: EntityTransferService;
+
+    constructor() {
+        this.entityTransferService = Container.get(EntityTransferService);
+    }
+
+    @Post('/transfers')
+    async createTransfer(@Body() body: unknown) {
+        const validation = CreateTransferSchema.safeParse(body);
+        if (!validation.success) {
+            throw new HttpError(StatusCodes.BAD_REQUEST, `Validation error: ${validation.error.message}`);
+        }
+
+        const input = validation.data;
+        log.info({ message: 'Creating entity transfer', organizationId: input.organizationId });
+
+        const transfer = await this.entityTransferService.createTransfer({
+            organizationId: input.organizationId,
+            requesterProfilePublicId: input.requesterProfilePublicId,
+            sourceLegalEntityPublicId: input.sourceLegalEntityPublicId,
+            destinationLegalEntityPublicId: input.destinationLegalEntityPublicId,
+            effectiveDate: new Date(input.effectiveDate),
+            agreementId: input.agreementId,
+            items: input.items,
+        });
+
+        return {
+            success: true,
+            data: transfer,
+        };
+    }
+
+    @Get('/transfers/ready')
+    async getReadyTransfers(@QueryParams() query: unknown) {
+        const validation = GetReadyTransfersSchema.safeParse(query);
+        if (!validation.success) {
+            throw new HttpError(StatusCodes.BAD_REQUEST, `Validation error: ${validation.error.message}`);
+        }
+
+        const { effectiveDate, limit } = validation.data;
+        log.info({ message: 'Getting ready transfers', effectiveDate, limit });
+
+        const transfers = await this.entityTransferService.getReadyTransfers(new Date(effectiveDate), limit);
+
+        return {
+            success: true,
+            data: transfers,
+            count: transfers.length,
+        };
+    }
+
+    @Get('/items/:id')
+    async getTransferItemById(@Param('id') id: string) {
+        log.info({ message: 'Getting transfer item', itemId: id });
+
+        const item = await this.entityTransferService.getTransferItemByIdWithTransfer(id);
+
+        if (!item) {
+            throw new HttpError(StatusCodes.NOT_FOUND, `Transfer item not found: ${id}`);
+        }
+
+        return {
+            success: true,
+            data: item,
+        };
+    }
+
+    @Get('/transfers/:id')
+    async getTransferById(@Param('id') id: string) {
+        log.info({ message: 'Getting transfer', transferId: id });
+
+        const transfer = await this.entityTransferService.getTransferById(id, true);
+
+        if (!transfer) {
+            throw new HttpError(StatusCodes.NOT_FOUND, `Transfer not found: ${id}`);
+        }
+
+        return {
+            success: true,
+            data: transfer,
+        };
+    }
+
+    @Patch('/transfers/:id/status')
+    async updateTransferStatus(@Param('id') id: string, @Body() body: unknown) {
+        const validation = UpdateTransferStatusSchema.safeParse(body);
+        if (!validation.success) {
+            throw new HttpError(StatusCodes.BAD_REQUEST, `Validation error: ${validation.error.message}`);
+        }
+
+        log.info({ message: 'Updating transfer status', transferId: id, status: validation.data.status });
+
+        await this.entityTransferService.updateTransferStatus(id, validation.data.status);
+
+        return {
+            success: true,
+            message: 'Transfer status updated',
+        };
+    }
+
+    @Patch('/items/:id')
+    async updateTransferItem(@Param('id') id: string, @Body() body: unknown) {
+        const validation = UpdateTransferItemSchema.safeParse(body);
+        if (!validation.success) {
+            throw new HttpError(StatusCodes.BAD_REQUEST, `Validation error: ${validation.error.message}`);
+        }
+
+        log.info({ message: 'Updating transfer item', itemId: id, updates: validation.data });
+
+        await this.entityTransferService.updateTransferItem(id, validation.data);
+
+        return {
+            success: true,
+            message: 'Transfer item updated',
+        };
+    }
+}
+
+export default EntityTransferController;

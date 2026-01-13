@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/cockpit/active-task.json",
+  "taskId": "ENGESC-23600",
+  "baseline": {
+    "capturedAt": "2026-01-09T19:50:27.210Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-09T19:50:27.210Z",
+    "hash": "e7622683b0a506e5",
+    "size": 701,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-09T19:50:27.210Z",
+    "actualFileHash": "e7622683b0a506e5",
+    "status": "synced"
+  }
+}

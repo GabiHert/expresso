@@ -1,0 +1,78 @@
+{
+  "id": "evt-1767927077547-fcyvkz9kf",
+  "taskId": "EEXPR-12-1",
+  "taskIdSource": "env-var",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Read entity transfer test data cleanup documentation",
+        "status": "completed",
+        "activeForm": "Reading entity transfer documentation"
+      },
+      {
+        "content": "Query database for Z04 employees with valid data",
+        "status": "completed",
+        "activeForm": "Querying database for Z04 employees"
+      },
+      {
+        "content": "Identify suitable test candidate with active contract",
+        "status": "completed",
+        "activeForm": "Identifying suitable test candidate"
+      },
+      {
+        "content": "Document test data for EEXPR-57 fix validation",
+        "status": "in_progress",
+        "activeForm": "Documenting test data for validation"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [
+      {
+        "content": "Read entity transfer test data cleanup documentation",
+        "status": "completed",
+        "activeForm": "Reading entity transfer documentation"
+      },
+      {
+        "content": "Query database for Z04 employees with valid data",
+        "status": "completed",
+        "activeForm": "Querying database for Z04 employees"
+      },
+      {
+        "content": "Identify suitable test candidate with active contract",
+        "status": "in_progress",
+        "activeForm": "Identifying suitable test candidate"
+      },
+      {
+        "content": "Document test data for EEXPR-57 fix validation",
+        "status": "pending",
+        "activeForm": "Documenting test data for validation"
+      }
+    ],
+    "newTodos": [
+      {
+        "content": "Read entity transfer test data cleanup documentation",
+        "status": "completed",
+        "activeForm": "Reading entity transfer documentation"
+      },
+      {
+        "content": "Query database for Z04 employees with valid data",
+        "status": "completed",
+        "activeForm": "Querying database for Z04 employees"
+      },
+      {
+        "content": "Identify suitable test candidate with active contract",
+        "status": "completed",
+        "activeForm": "Identifying suitable test candidate"
+      },
+      {
+        "content": "Document test data for EEXPR-57 fix validation",
+        "status": "in_progress",
+        "activeForm": "Documenting test data for validation"
+      }
+    ]
+  },
+  "sessionId": "609cdfb5-d0f6-4eec-9cc5-1b82129b0c07",
+  "timestamp": "2026-01-09T02:51:17.547Z"
+}

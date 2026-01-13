@@ -1,0 +1,40 @@
+# Task Status Index
+task: "EEXPR-12-2"
+title: "[PEO] GET transfers by source entity endpoint"
+parent: "EEXPR-12"
+repo: peo
+branch: "EEXPR-12-2-get-transfers-by-source-entity"
+depends_on: ["EEXPR-12-1"]
+created: "2026-01-08"
+updated: "2026-01-08"
+
+summary:
+  total: 4
+  todo: 4
+  in_progress: 0
+  done: 0
+
+work_items:
+  - id: "01"
+    name: "Add service method"
+    repo: peo
+    status: todo
+    file: "todo/01-add-service-method.md"
+
+  - id: "02"
+    name: "Add validation schema"
+    repo: peo
+    status: todo
+    file: "todo/02-add-validation-schema.md"
+
+  - id: "03"
+    name: "Add controller endpoint"
+    repo: peo
+    status: todo
+    file: "todo/03-add-controller-endpoint.md"
+
+  - id: "04"
+    name: "Add unit tests"
+    repo: peo
+    status: todo
+    file: "todo/04-add-unit-tests.md"

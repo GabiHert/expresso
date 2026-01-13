@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/entity_transfers_data.json",
+  "taskId": "_unassigned",
+  "baseline": {
+    "capturedAt": "2026-01-07T18:56:10.501Z",
+    "hash": "1374a0889d7a2f5d",
+    "size": 8631
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-07T18:56:10.501Z",
+    "hash": "140df5bd162f28c9",
+    "size": 8758,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-07T18:56:10.501Z",
+    "actualFileHash": "140df5bd162f28c9",
+    "status": "synced"
+  }
+}

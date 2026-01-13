@@ -1,0 +1,677 @@
+// Set environment variable before any imports to prevent axios "Invalid URL" errors
+process.env.PEO_INTEGRATION_URL = 'http://localhost:3000';
+
+jest.mock('../../base_peo_service', () => ({
+    BasePEOService: class MockBasePEOService {
+        constructor() {
+            this.client = {
+                get: jest.fn(),
+                post: jest.fn().mockResolvedValue({
+                    data: {
+                        success: true,
+                        data: {},
+                    },
+                    status: 200,
+                }),
+                patch: jest.fn().mockResolvedValue({
+                    data: {
+                        success: true,
+                        data: undefined,
+                    },
+                }),
+                delete: jest.fn(),
+            };
+            this.log = {
+                info: jest.fn(),
+                error: jest.fn(),
+                warn: jest.fn(),
+            };
+        }
+        get db() {
+            return {};
+        }
+    },
+    PEOEndpoints: {
+        updateTransferItem: (itemId) => `/peo/entity-transfer/item/${itemId}`,
+        syncContractWithPrism: () => '/peo/peo-contract/integrate',
+    },
+}));
+
+jest.mock('@/services/peo/client_master_service', () => ({
+    peoClientMasterService: {
+        getPEOJobCodesByEntityId: jest.fn().mockResolvedValue([
+            {id: 'JOB-001', jobTitle: 'Software Engineer'},
+            {id: 'JOB-002', jobTitle: 'Product Manager'},
+        ]),
+    },
+}));
+
+const {CONTRACT_STATUSES} = require('../../../../schemas/enums/contract/contract_statuses');
+const timeOffService = require('../../../time_off');
+const {peoContractService} = require('../../peo_contract_service');
+const {peoPositionService} = require('../../peo_position_service');
+const {peoScopeOfWorkService} = require('../../peo_scope_of_work_service');
+const {peoWorkLocationService} = require('../../work_location_service');
+
+const {AssignPtoPolicyStep} = require('./assign_pto_policy_step');
+const {CreateContractStep} = require('./create_contract_step');
+const {CrossHireStep} = require('./cross_hire_step');
+const {ShareComplianceDocumentsStep} = require('./share_compliance_documents_step');
+const {TerminateContractStep} = require('./terminate_contract_step');
+const {UpdateTimeOffEmploymentStep} = require('./update_time_off_employment_step');
+
+describe('Entity Transfer Steps', () => {
+    let mockLogger;
+    let mockClient;
+    let mockDb;
+    let mockContext;
+
+    beforeEach(() => {
+        // Create mock logger
+        mockLogger = {
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+        };
+
+        // Create mock axios client
+        mockClient = {
+            post: jest.fn(),
+        };
+
+        // Create mock database
+        mockDb = {
+            sequelize: {
+                query: jest.fn(),
+            },
+            Contract: {
+                update: jest.fn(),
+            },
+            LegalEntity: {
+                findByPk: jest.fn(),
+            },
+        };
+
+        // Create mock context matching TransferContext interface
+        mockContext = {
+            request: {
+                transfer: {
+                    id: 'transfer-1',
+                    effectiveDate: new Date('2024-01-01'),
+                    organizationId: 100,
+                    destinationLegalEntityId: 200,
+                },
+                item: {
+                    id: 'item-2',
+                    peoContractId: 300,
+                    newBenefitGroupId: '400',
+                    newPayrollSettingsId: 'mock-payroll-settings-500',
+                    newPtoPolicyId: '600',
+                    newWorkLocationId: 'WL001',
+                    newPositionPublicId: '66666666-6666-4666-a666-666666666666',
+                },
+            },
+            contracts: {
+                old: {
+                    id: 300,
+                    oid: 'old-contract-oid',
+                    HrisProfileId: 700,
+                    invitedClientEmail: 'test@example.com',
+                    teamId: 800,
+                    peoContract: {
+                        prismEmployeeId: 'PRISM123',
+                        firstName: 'John',
+                        lastName: 'Doe',
+                        stateCode: 'CA',
+                        employeeTypeCode: 'F',
+                        jobCode: 'Software Engineer',
+                        payRate: '100000',
+                        payMethod: 'salary',
+                        workHoursPerWeek: 40,
+                        addressLine1: '123 Main St',
+                        city: 'San Francisco',
+                        zipCode: '94102',
+                        workLocationCode: 'WL001',
+                        ssn: '123-45-6789',
+                        birthDate: '1990-01-01',
+                        gender: 'M',
+                        maritalStatus: 'S',
+                        citizenStatus: 'US',
+                    },
+                },
+                new: null,
+            },
+            legalEntities: {
+                source: {id: 100, publicId: 'source-uuid'},
+                destination: {id: 200, publicId: 'dest-uuid'},
+            },
+            initiator: {
+                creator: {id: 900, name: 'Admin User'},
+                organization: {id: 100, name: 'Test Org'},
+                teamId: 800,
+            },
+            underwriting: {},
+            stepState: {
+                completedSteps: [],
+            },
+            stepResults: {},
+        };
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    describe('CreateContractStep', () => {
+        let step;
+
+        beforeEach(() => {
+            step = new CreateContractStep(mockLogger, mockDb);
+        });
+
+        it('should have correct properties', () => {
+            expect(step.name).toBe('CreateContract');
+            expect(step.type).toBe('DATABASE');
+        });
+
+        it('should validate required fields', () => {
+            const invalidContext = {
+                ...mockContext,
+                contracts: {
+                    ...mockContext.contracts,
+                    old: null,
+                },
+            };
+
+            expect(() => step.validate(invalidContext)).toThrow();
+        });
+
+        it('should successfully create a contract', async () => {
+            const mockNewContract = {id: 999, oid: 'new-contract-oid', HrisProfileId: 700};
+
+            jest.spyOn(peoScopeOfWorkService, 'getPeoScopeOfWorkByPeoContract').mockResolvedValue({
+                holidays: 10,
+                timeOffType: 'PTO',
+                scopeId: 1,
+                jobScope: 'Engineering',
+                seniorityId: 2,
+            });
+
+            mockDb.LegalEntity.findByPk.mockResolvedValue({
+                publicId: 'legal-entity-uuid-123',
+            });
+
+            mockDb.HrisProfile = {
+                findByPk: jest.fn().mockResolvedValue({
+                    id: 700,
+                    userId: 'user-123',
+                    email: 'test@example.com',
+                    workerId: null,
+                    externalId: null,
+                }),
+            };
+
+            jest.spyOn(peoWorkLocationService, 'getPEOWorkLocationByDeelEntity').mockResolvedValue([{id: 'WL001', name: 'Main Office'}]);
+
+            jest.spyOn(peoPositionService, 'getByFilters').mockResolvedValue([
+                {publicId: '66666666-6666-4666-a666-666666666666', code: 'JOB-001', title: 'Software Engineer'},
+            ]);
+
+            jest.spyOn(peoContractService, 'createContract').mockResolvedValue(mockNewContract);
+
+            const result = await step.execute(mockContext);
+
+            expect(result.context.contracts.new).toEqual(mockNewContract);
+            expect(result.context.stepState.completedSteps).toContain('CreateContract');
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: '[CreateContractStep] Contract created successfully',
+                })
+            );
+            expect(peoContractService.createContract).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    contractDetails: expect.objectContaining({
+                        employeeFirstName: 'John',
+                        employeeLastName: 'Doe',
+                        employeeEmail: 'test@example.com',
+                        clientLegalEntityId: 200,
+                    }),
+                    creator: mockContext.initiator.creator,
+                    organization: mockContext.initiator.organization,
+                }),
+                true
+            );
+        });
+
+        it('should handle errors during contract creation', async () => {
+            const mockError = new Error('Contract creation failed');
+
+            mockDb.HrisProfile = {
+                findByPk: jest.fn().mockResolvedValue({
+                    id: 700,
+                    userId: 'user-123',
+                    email: 'test@example.com',
+                    workerId: null,
+                    externalId: null,
+                }),
+            };
+
+            jest.spyOn(peoScopeOfWorkService, 'getPeoScopeOfWorkByPeoContract').mockResolvedValue(null);
+            jest.spyOn(peoWorkLocationService, 'getPEOWorkLocationByDeelEntity').mockResolvedValue([]);
+            jest.spyOn(peoPositionService, 'getByFilters').mockResolvedValue([
+                {publicId: '66666666-6666-4666-a666-666666666666', code: 'JOB-001', title: 'Software Engineer'},
+            ]);
+            jest.spyOn(peoContractService, 'createContract').mockRejectedValue(mockError);
+
+            await expect(step.execute(mockContext)).rejects.toThrow('Contract creation failed');
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: '[CreateContractStep] Contract creation failed',
+                    err: mockError,
+                })
+            );
+        });
+
+        it('should map employee type codes correctly', () => {
+            const testCases = [
+                {code: 'F', expected: 'Full-time'},
+                {code: 'P', expected: 'Part-time'},
+                {code: 'S', expected: 'Seasonal'},
+                {code: 'X', expected: 'Full-time'}, // Unknown code defaults to Full-time
+            ];
+
+            testCases.forEach(({code, expected}) => {
+                // Access private method through instance
+                const result = step.mapEmployeeTypeCode(code);
+                expect(result).toBe(expected);
+            });
+        });
+    });
+
+    describe('CrossHireStep', () => {
+        let step;
+
+        beforeEach(() => {
+            step = new CrossHireStep(mockLogger, mockClient);
+            mockContext.contracts.new = {id: 999, oid: 'new-contract-oid', HrisProfileId: 700};
+        });
+
+        it('should have correct properties', () => {
+            expect(step.name).toBe('CrossHire');
+            expect(step.type).toBe('EXTERNAL');
+        });
+
+        it('should validate required fields', () => {
+            const invalidContext = {
+                ...mockContext,
+                contracts: {
+                    ...mockContext.contracts,
+                    new: null,
+                },
+            };
+
+            expect(() => step.validate(invalidContext)).toThrow();
+        });
+
+        it('should successfully execute cross-hire', async () => {
+            const mockResponse = {
+                data: {
+                    skipped: false,
+                    message: 'Success',
+                },
+                status: 200,
+            };
+
+            mockClient.post.mockResolvedValue(mockResponse);
+
+            const result = await step.execute(mockContext);
+
+            expect(result.context.stepState.completedSteps).toContain('CrossHire');
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: '[CrossHireStep] Cross-hire completed - Point of no return',
+                })
+            );
+        });
+
+        it('should handle skipped cross-hire response', async () => {
+            const mockResponse = {
+                data: {
+                    skipped: true,
+                    message: 'Already exists',
+                },
+                status: 200,
+            };
+
+            mockClient.post.mockResolvedValue(mockResponse);
+
+            await expect(step.execute(mockContext)).rejects.toThrow('Cross-hire was skipped: Already exists');
+        });
+
+        it('should handle API errors', async () => {
+            const mockError = new Error('API connection failed');
+            mockClient.post.mockRejectedValue(mockError);
+
+            await expect(step.execute(mockContext)).rejects.toThrow('API connection failed');
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: '[CrossHireStep] Cross-hire failed',
+                })
+            );
+        });
+
+        it('should log rollback request', async () => {
+            await step.rollback(mockContext);
+
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: '[CrossHireStep] Rollback requested - manual Prism cleanup required',
+                })
+            );
+        });
+    });
+
+    describe('ShareComplianceDocumentsStep', () => {
+        let step;
+
+        beforeEach(() => {
+            step = new ShareComplianceDocumentsStep(mockLogger, mockDb);
+            mockContext.contracts.new = {id: 999, oid: 'new-contract-oid', HrisProfileId: 700};
+        });
+
+        it('should have correct properties', () => {
+            expect(step.name).toBe('ShareComplianceDocuments');
+            expect(step.type).toBe('EXTERNAL');
+        });
+
+        it('should validate required fields', () => {
+            const invalidContext = {
+                ...mockContext,
+                contracts: {
+                    ...mockContext.contracts,
+                    new: null,
+                },
+            };
+
+            expect(() => step.validate(invalidContext)).toThrow();
+        });
+
+        it('should successfully share compliance documents', async () => {
+            jest.spyOn(peoContractService, 'shareComplianceDocuments').mockResolvedValue({
+                sharedCount: 1,
+                skippedCount: 0,
+                archivedCount: 0,
+                totalSourceSubmissions: 1,
+                sharedSubmissions: [],
+                skippedSubmissions: [],
+                archivedSubmissions: [],
+            });
+
+            const result = await step.execute(mockContext);
+
+            expect(result.context.stepState.completedSteps).toContain('ShareComplianceDocuments');
+            expect(peoContractService.shareComplianceDocuments).toHaveBeenCalledWith({
+                fromContractOid: 'old-contract-oid',
+                toContractOid: 'new-contract-oid',
+                excludeAgreementTypes: ['ARBITRATION_AGREEMENT', 'WSE_NOTICE_OF_PEO_RELATIONSHIP'],
+            });
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: '[ShareComplianceDocumentsStep] Compliance documents shared successfully',
+                })
+            );
+        });
+
+        it('should handle errors during compliance document sharing', async () => {
+            const mockError = new Error('Compliance document sharing failed');
+            jest.spyOn(peoContractService, 'shareComplianceDocuments').mockRejectedValue(mockError);
+
+            await expect(step.execute(mockContext)).rejects.toThrow('Compliance document sharing failed');
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: '[ShareComplianceDocumentsStep] Compliance document sharing failed',
+                })
+            );
+        });
+    });
+
+    describe('UpdateTimeOffEmploymentStep', () => {
+        let step;
+        let mockTimeOffService;
+
+        beforeEach(() => {
+            // Create mock for TimeOffService
+            mockTimeOffService = {
+                transferAdjustments: jest.fn().mockResolvedValue(undefined),
+            };
+            step = new UpdateTimeOffEmploymentStep(mockLogger, mockTimeOffService);
+            mockContext.contracts.new = {id: 999, oid: 'new-contract-oid', HrisProfileId: 700};
+        });
+
+        it('should have correct properties', () => {
+            expect(step.name).toBe('UpdateTimeOffEmployment');
+            expect(step.type).toBe('EXTERNAL');
+        });
+
+        it('should validate required fields', () => {
+            const invalidContext = {
+                ...mockContext,
+                contracts: {
+                    ...mockContext.contracts,
+                    new: null,
+                },
+            };
+
+            expect(() => step.validate(invalidContext)).toThrow();
+        });
+
+        it('should successfully update time off employment', async () => {
+            const result = await step.execute(mockContext);
+
+            expect(result.context.stepState.completedSteps).toContain('UpdateTimeOffEmployment');
+            expect(mockTimeOffService.transferAdjustments).toHaveBeenCalledWith({
+                oldContractOid: 'old-contract-oid',
+                newContractOid: 'new-contract-oid',
+            });
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: '[UpdateTimeOffEmploymentStep] Time-off adjustments transferred',
+                })
+            );
+        });
+
+        it('should handle service errors', async () => {
+            const mockError = new Error('Service error');
+            mockTimeOffService.transferAdjustments.mockRejectedValue(mockError);
+
+            await expect(step.execute(mockContext)).rejects.toThrow('Service error');
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: '[UpdateTimeOffEmploymentStep] Transfer adjustments failed',
+                })
+            );
+        });
+    });
+
+    describe('AssignPtoPolicyStep', () => {
+        let step;
+
+        beforeEach(() => {
+            step = new AssignPtoPolicyStep(mockLogger);
+            mockContext.contracts.new = {id: 999, oid: 'new-contract-oid', HrisProfileId: 700};
+        });
+
+        it('should have correct properties', () => {
+            expect(step.name).toBe('AssignPtoPolicy');
+            expect(step.type).toBe('EXTERNAL');
+        });
+
+        it('should validate required fields', () => {
+            const invalidContext = {
+                ...mockContext,
+                request: {
+                    ...mockContext.request,
+                    item: {
+                        ...mockContext.request.item,
+                        newPtoPolicyId: null,
+                    },
+                },
+            };
+
+            expect(() => step.validate(invalidContext)).toThrow();
+        });
+
+        it('should successfully assign PTO policy', async () => {
+            const mockTimeOffProfile = {id: 123, hrisProfileId: 700};
+
+            jest.spyOn(timeOffService, 'getOrCreateProfile').mockResolvedValue(mockTimeOffProfile);
+            jest.spyOn(timeOffService, 'setPolicyToProfile').mockResolvedValue(null);
+
+            const result = await step.execute(mockContext);
+
+            expect(result.context.stepResults.timeOffProfile).toEqual(mockTimeOffProfile);
+            expect(result.context.stepState.completedSteps).toContain('AssignPtoPolicy');
+            expect(timeOffService.getOrCreateProfile).toHaveBeenCalledWith(700, undefined);
+            expect(timeOffService.setPolicyToProfile).toHaveBeenCalledWith('600', 123, true);
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: '[AssignPtoPolicyStep] PTO policy assigned',
+                })
+            );
+        });
+
+        it('should handle errors during PTO policy assignment', async () => {
+            const mockError = new Error('PTO assignment failed');
+            jest.spyOn(timeOffService, 'getOrCreateProfile').mockRejectedValue(mockError);
+
+            await expect(step.execute(mockContext)).rejects.toThrow('PTO assignment failed');
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: '[AssignPtoPolicyStep] PTO policy assignment failed',
+                })
+            );
+        });
+    });
+
+    describe('TerminateContractStep', () => {
+        let step;
+
+        beforeEach(() => {
+            step = new TerminateContractStep(mockLogger, mockDb);
+            // Mark cross-hire as completed
+            mockContext.stepState.completedSteps = ['CrossHire'];
+        });
+
+        it('should have correct properties', () => {
+            expect(step.name).toBe('TerminateContract');
+            expect(step.type).toBe('EXTERNAL');
+        });
+
+        it('should validate cross-hire completion', () => {
+            const invalidContext = {
+                ...mockContext,
+                stepState: {
+                    ...mockContext.stepState,
+                    completedSteps: [],
+                },
+            };
+
+            expect(() => step.validate(invalidContext)).toThrow();
+        });
+
+        it('should successfully terminate contract', async () => {
+            jest.spyOn(peoContractService, 'terminatePEOContract').mockResolvedValue(null);
+            jest.spyOn(peoContractService, 'cancelEmploymentOnContractDeactivation').mockResolvedValue(null);
+            mockDb.Contract.update.mockResolvedValue([1]);
+
+            const result = await step.execute(mockContext);
+
+            expect(result.context.stepState.completedSteps).toContain('TerminateContract');
+            expect(peoContractService.terminatePEOContract).toHaveBeenCalledWith('old-contract-oid');
+            expect(peoContractService.cancelEmploymentOnContractDeactivation).toHaveBeenCalledWith(
+                'old-contract-oid',
+                mockContext.request.transfer.effectiveDate,
+                mockContext.request.transfer.effectiveDate
+            );
+            expect(mockDb.Contract.update).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    status: CONTRACT_STATUSES.USER_CANCELLED,
+                }),
+                expect.objectContaining({
+                    where: {oid: 'old-contract-oid'},
+                })
+            );
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: '[TerminateContractStep] Contract terminated successfully',
+                })
+            );
+        });
+
+        it('should handle termination errors', async () => {
+            const mockError = new Error('Termination failed');
+            jest.spyOn(peoContractService, 'terminatePEOContract').mockRejectedValue(mockError);
+
+            await expect(step.execute(mockContext)).rejects.toThrow('Termination failed');
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: '[TerminateContractStep] Contract termination failed',
+                })
+            );
+        });
+    });
+
+    describe('Step Integration', () => {
+        it('should have correct step types', () => {
+            const createContractStep = new CreateContractStep(mockLogger, mockDb);
+            const crossHireStep = new CrossHireStep(mockLogger, mockClient);
+            const shareComplianceDocumentsStep = new ShareComplianceDocumentsStep(mockLogger, mockDb);
+            const mockTimeOffService = {transferAdjustments: jest.fn()};
+            const updateTimeOffStep = new UpdateTimeOffEmploymentStep(mockLogger, mockTimeOffService);
+            const terminateContractStep = new TerminateContractStep(mockLogger, mockDb);
+
+            // Verify step types
+            expect(createContractStep.type).toBe('DATABASE');
+            expect(crossHireStep.type).toBe('EXTERNAL');
+            expect(shareComplianceDocumentsStep.type).toBe('EXTERNAL');
+            expect(updateTimeOffStep.type).toBe('EXTERNAL');
+            expect(terminateContractStep.type).toBe('EXTERNAL');
+        });
+
+        it('should properly accumulate completed steps', async () => {
+            const createContractStep = new CreateContractStep(mockLogger, mockDb);
+            const mockNewContract = {id: 999, oid: 'new-contract-oid', HrisProfileId: 700};
+
+            mockDb.HrisProfile = {
+                findByPk: jest.fn().mockResolvedValue({
+                    id: 700,
+                    userId: 'user-123',
+                    email: 'test@example.com',
+                    workerId: null,
+                    externalId: null,
+                }),
+            };
+
+            jest.spyOn(peoScopeOfWorkService, 'getPeoScopeOfWorkByPeoContract').mockResolvedValue(null);
+            mockDb.LegalEntity.findByPk.mockResolvedValue({publicId: 'legal-entity-uuid-123'});
+            jest.spyOn(peoWorkLocationService, 'getPEOWorkLocationByDeelEntity').mockResolvedValue([]);
+            jest.spyOn(peoPositionService, 'getByFilters').mockResolvedValue([
+                {publicId: '66666666-6666-4666-a666-666666666666', code: 'JOB-001', title: 'Software Engineer'},
+            ]);
+            jest.spyOn(peoContractService, 'createContract').mockResolvedValue(mockNewContract);
+
+            const result1 = await createContractStep.execute(mockContext);
+            expect(result1.context.stepState.completedSteps).toEqual(['CreateContract']);
+
+            // Simulate next step by adding to completed steps
+            const context2 = {
+                ...result1.context,
+                stepState: {
+                    ...result1.context.stepState,
+                    completedSteps: [...result1.context.stepState.completedSteps, 'CrossHire'],
+                },
+            };
+            expect(context2.stepState.completedSteps).toEqual(['CreateContract', 'CrossHire']);
+        });
+    });
+});

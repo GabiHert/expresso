@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-59/backend/services/peo/entity_transfer/steps/entity_transfer_steps.spec.js",
+  "taskId": "EEXPR-59",
+  "baseline": {
+    "capturedAt": "2026-01-10T05:51:35.659Z",
+    "hash": "70faeecae6cce001",
+    "size": 25858
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-10T05:55:26.190Z",
+    "hash": "41ce22d367157929",
+    "size": 26154,
+    "editCount": 2
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-10T05:55:26.190Z",
+    "actualFileHash": "41ce22d367157929",
+    "status": "synced"
+  }
+}

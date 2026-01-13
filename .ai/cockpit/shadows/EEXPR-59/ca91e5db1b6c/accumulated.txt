@@ -1,0 +1,166 @@
+<!--
+╔══════════════════════════════════════════════════════════════════╗
+║ LAYER: TASK                                                      ║
+║ LOCATION: .ai/tasks/in_progress/EEXPR-59/                       ║
+╠══════════════════════════════════════════════════════════════════╣
+║ BEFORE WORKING ON THIS TASK:                                     ║
+║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)          ║
+║ 2. Read this entire README first                                 ║
+║ 3. Check which work items are in todo/ vs done/                 ║
+║ 4. Work on ONE item at a time from todo/                        ║
+╚══════════════════════════════════════════════════════════════════╝
+-->
+
+# EEXPR-59: Fix Entity Transfer Missing Employment Creation
+
+## Problem Statement
+
+Entity transfers are creating contracts but **failing to create employment records** in the Employment microservice. This causes:
+
+1. Payroll cannot be processed for transferred employees
+2. Various PEO features dependent on employments don't work
+3. Manual intervention required to fix affected employees
+
+### Root Cause
+
+The `CreateContractStep` in entity transfer calls `peoContractService.createContract()` which has an `afterCommit` callback that creates employments. However, the employment creation fails silently because:
+
+1. **`jobTitle` is required** by the Employment microservice schema
+2. Entity transfer only passes `jobCode` (not `jobTitle`) in `peopleFirstPayload.validatedData`
+3. The `afterCommit` callback errors become unhandled promise rejections (no global handler)
+4. The callback partially succeeds (creates `peo_contracts`) then fails at `createPEOEmployment()`
+
+### Evidence
+
+- Production data shows 19/20 entity transfer contracts missing employments
+- `peo_contracts` records exist (callback runs partially)
+- `employments` and `employment_terms` records are missing
+
+## Acceptance Criteria
+
+- [ ] Entity transfers create employments correctly
+- [ ] `jobTitle` is resolved from `jobCode` using destination entity's job master
+- [ ] Proper logging added for debugging job code resolution
+- [ ] Graceful fallback if job lookup fails (use jobCode as jobTitle)
+- [ ] Existing entity transfer tests pass
+- [ ] New unit test for jobTitle resolution
+
+## Work Items
+
+See `status.yaml` for full index.
+
+| ID | Name | Repo | Status |
+|----|------|------|--------|
+| 01 | Add jobTitle lookup in CreateContractStep | backend | done |
+
+## Worktree
+
+This task uses a worktree at:
+```
+/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-59/
+```
+
+## Branches
+
+| Repo | Branch | Base |
+|------|--------|------|
+| backend | `EEXPR-59` | `dev` |
+
+## Technical Context
+
+### Key Files
+
+| File | Purpose | Lines |
+|------|---------|-------|
+| `backend/services/peo/entity_transfer/steps/create_contract_step.ts` | Creates contract during entity transfer | 226-244 |
+| `backend/services/peo/peo_contract_service.ts` | Contract service with afterCommit callback | 1003-1216 |
+| `backend/services/peo/peo_contract_service.ts` | jobTitle/jobCode validation | 135-155 |
+| `employment/src/controllers/employment/dtos/Employment.dto.ts` | Employment schema (jobTitle required) | 22 |
+
+### Current Flow (Broken)
+
+```
+CreateContractStep.execute()
+    │
+    ├── buildContractDetails()  ← Returns jobCode, NO jobTitle
+    │
+    └── peoContractService.createContract({
+            peopleFirstPayload: {
+                validatedData: {
+                    jobCode: item.newJobCode  ← Only jobCode!
+                }
+            }
+        })
+        │
+        └── afterCommit callback
+            │
+            ├── createPEOContract() ✅ Succeeds
+            │
+            └── createPEOEmployment({
+                    jobTitle: undefined  ← MISSING!
+                }) ❌ Validation fails silently
+```
+
+### Expected Flow (Fixed)
+
+```
+CreateContractStep.execute()
+    │
+    ├── peoClientMasterService.getPEOJobCodesByEntityId()  ← NEW: Lookup jobTitle
+    │
+    ├── buildContractDetails()
+    │
+    └── peoContractService.createContract({
+            peopleFirstPayload: {
+                validatedData: {
+                    jobCode: item.newJobCode,
+                    jobTitle: resolvedJobTitle  ← NOW PROVIDED!
+                }
+            }
+        })
+        │
+        └── afterCommit callback
+            │
+            ├── createPEOContract() ✅ Succeeds
+            │
+            └── createPEOEmployment({
+                    jobTitle: "Software Engineer"  ← Has value!
+                }) ✅ Succeeds
+```
+
+## Implementation Approach
+
+Add `jobTitle` resolution in `CreateContractStep` before calling `createContract()`:
+
+1. Import `peoClientMasterService`
+2. Lookup job codes for destination legal entity
+3. Find matching job by `jobCode` (item.newJobCode)
+4. Extract `jobTitle` from matched job
+5. Pass `jobTitle` in `peopleFirstPayload.validatedData`
+
+This mirrors how `workers_service.ts` handles regular contract creation.
+
+## Risks & Considerations
+
+- **Risk**: Job code lookup may fail if destination entity has no job master configured
+  - **Mitigation**: Add try/catch, fallback to using jobCode as jobTitle, log warning
+
+- **Risk**: Performance impact from additional DB/API call
+  - **Mitigation**: Job lookup is cached in peoClientMasterService, minimal impact
+
+## Testing Strategy
+
+1. **Unit Test**: Mock `peoClientMasterService.getPEOJobCodesByEntityId()` and verify jobTitle is passed
+2. **Integration Test**: Verify employment is created after entity transfer
+3. **Manual Test**: Execute entity transfer via tech_ops endpoint, verify employment exists
+
+## Related Escalations
+
+- ENGESC-23650: Entity transfers for Amae Health missing employments
+- ENGESC-23600: Same issue, additional affected employees
+
+## References
+
+- [Entity Transfer Service](../../../backend/services/peo/entity_transfer/)
+- [PEO Contract Service](../../../backend/services/peo/peo_contract_service.ts)
+- [Employment DTO Schema](../../../employment/src/controllers/employment/dtos/Employment.dto.ts)

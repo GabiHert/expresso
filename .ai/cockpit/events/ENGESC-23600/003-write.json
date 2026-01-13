@@ -1,0 +1,19 @@
+{
+  "id": "evt-1767988231844-7jktszt5c",
+  "taskId": "ENGESC-23600",
+  "taskIdSource": "env-var",
+  "tool": "Write",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Projects/deel/.ai/cockpit/task-switch-signal.json",
+    "content": "{\n  \"timestamp\": \"2026-01-09T22:10:00Z\",\n  \"previousTaskId\": \"EEXPR-12-1\",\n  \"newTaskId\": \"ENGESC-23600\",\n  \"type\": \"task-switch\"\n}\n"
+  },
+  "response": {
+    "type": "create",
+    "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/cockpit/task-switch-signal.json",
+    "content": "{\n  \"timestamp\": \"2026-01-09T22:10:00Z\",\n  \"previousTaskId\": \"EEXPR-12-1\",\n  \"newTaskId\": \"ENGESC-23600\",\n  \"type\": \"task-switch\"\n}\n",
+    "structuredPatch": [],
+    "originalFile": null
+  },
+  "sessionId": "559fc479-ac52-4dcc-b066-387c9d72a177",
+  "timestamp": "2026-01-09T19:50:31.844Z"
+}

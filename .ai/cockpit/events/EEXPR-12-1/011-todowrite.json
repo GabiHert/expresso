@@ -1,0 +1,108 @@
+{
+  "id": "evt-1767908757069-l0a3mei7t",
+  "taskId": "EEXPR-12-1",
+  "taskIdSource": "env-var",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Move work item 01 to in_progress",
+        "status": "completed",
+        "activeForm": "Moving work item 01 to in_progress"
+      },
+      {
+        "content": "Run code-explorer for context",
+        "status": "completed",
+        "activeForm": "Running code-explorer for context"
+      },
+      {
+        "content": "Create migration file",
+        "status": "in_progress",
+        "activeForm": "Creating migration file"
+      },
+      {
+        "content": "Update model type",
+        "status": "pending",
+        "activeForm": "Updating model type"
+      },
+      {
+        "content": "Run code-reviewer",
+        "status": "pending",
+        "activeForm": "Running code-reviewer"
+      },
+      {
+        "content": "Move work item 01 to done",
+        "status": "pending",
+        "activeForm": "Moving work item 01 to done"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [
+      {
+        "content": "Move work item 01 to in_progress",
+        "status": "completed",
+        "activeForm": "Moving work item 01 to in_progress"
+      },
+      {
+        "content": "Run code-explorer for context",
+        "status": "in_progress",
+        "activeForm": "Running code-explorer for context"
+      },
+      {
+        "content": "Create migration file",
+        "status": "pending",
+        "activeForm": "Creating migration file"
+      },
+      {
+        "content": "Update model type",
+        "status": "pending",
+        "activeForm": "Updating model type"
+      },
+      {
+        "content": "Run code-reviewer",
+        "status": "pending",
+        "activeForm": "Running code-reviewer"
+      },
+      {
+        "content": "Move work item 01 to done",
+        "status": "pending",
+        "activeForm": "Moving work item 01 to done"
+      }
+    ],
+    "newTodos": [
+      {
+        "content": "Move work item 01 to in_progress",
+        "status": "completed",
+        "activeForm": "Moving work item 01 to in_progress"
+      },
+      {
+        "content": "Run code-explorer for context",
+        "status": "completed",
+        "activeForm": "Running code-explorer for context"
+      },
+      {
+        "content": "Create migration file",
+        "status": "in_progress",
+        "activeForm": "Creating migration file"
+      },
+      {
+        "content": "Update model type",
+        "status": "pending",
+        "activeForm": "Updating model type"
+      },
+      {
+        "content": "Run code-reviewer",
+        "status": "pending",
+        "activeForm": "Running code-reviewer"
+      },
+      {
+        "content": "Move work item 01 to done",
+        "status": "pending",
+        "activeForm": "Moving work item 01 to done"
+      }
+    ]
+  },
+  "sessionId": "94528b48-30b5-4fdb-9cfc-3f7b3ded4353",
+  "timestamp": "2026-01-08T21:45:57.069Z"
+}

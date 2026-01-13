@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/in_progress/ENGESC-23600/README.md",
+  "taskId": "ENGESC-23600",
+  "baseline": {
+    "capturedAt": "2026-01-09T19:41:04.822Z",
+    "hash": "68748d9088fc58c0",
+    "size": 7643
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-09T19:53:54.009Z",
+    "hash": "1ad0a368f3257180",
+    "size": 7673,
+    "editCount": 6
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-09T19:53:54.009Z",
+    "actualFileHash": "1ad0a368f3257180",
+    "status": "synced"
+  }
+}

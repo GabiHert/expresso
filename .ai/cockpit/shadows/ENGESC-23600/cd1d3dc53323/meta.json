@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-59/status.yaml",
+  "taskId": "ENGESC-23600",
+  "baseline": {
+    "capturedAt": "2026-01-09T21:03:16.269Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-09T21:03:16.269Z",
+    "hash": "3e67ed1ceb86c92b",
+    "size": 356,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-09T21:03:16.269Z",
+    "actualFileHash": "3e67ed1ceb86c92b",
+    "status": "synced"
+  }
+}

@@ -1,0 +1,131 @@
+const fs = require('fs');
+const https = require('https');
+
+const CONFIG = {
+  baseUrl: 'https://api-admin.demo.deel.com',
+  integrationId: '82385071-1350-4d6b-a1a2-584eaa517db2',
+  authToken: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0aW1lc3RhbXAiOjE3NjgyMjU1OTUyMTIsInByb2ZpbGUiOjI3ODI2OTI1LCJocmlzT3JnYW5pemF0aW9uSWQiOm51bGwsInRlYW0iOm51bGwsImFjdG9yIjp7InR5cGUiOiJhZG1pbiJ9LCJkZWVsIjoiZ2FicmllbC5oZXJ0ZXJAZGVlbC5jb20iLCJvcmdhbml6YXRpb25JZCI6MTgyMzA4LCJyZWFkT25seSI6dHJ1ZSwiaWQiOjI3NjA3ODM4LCJpYXQiOjE3NjgyMjU1OTUsImV4cCI6MTc2ODI0MzU5NSwiYXVkIjoiZGVtbyIsImlzcyI6ImFwaS5kZW1vLmRlZWwuY29tIiwic3ViIjoiYXBpIn0.QiO2zBk31IGh7y16qK74gCtfHdfZTDgnjSmNdiSVteonctPCP6wLFNBgQxh3RmPQ8Rg7ivtKYGC_6y3C7x9AEM_JyTDHbFXWUPqZScm-u1geBvuSc3a1p4C_d3f8pFfYswHFdtND4hNkz2BUnlnkZ4pdyjprav-pDoEeLwMOb8oHRvcGPQbzsyUiVo2xJDrWVpGe1z7KT_r3j7mDvpaKWYibXVak0qllnG8LBxPghLjABEmL5qLpZhdAKe0STylHViDLvBkjjehDROhv2ZbwjuiDgUR-fFN4vwhDf_C8EqMi3CMeyzs-qbRn2AX9lzal0jUSouIZy9FF_Aj8Hg26Ag',
+  outputFile: 'employees-data.json',
+  requestIdsFile: 'request-ids.json'
+};
+
+function generateRequestId() {
+  return `fetch-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+
+function makeRequest(cursor, requestId) {
+  return new Promise((resolve, reject) => {
+    let path = `/peo_integration/hris_integration/${CONFIG.integrationId}/employees`;
+    if (cursor) {
+      path += `?cursor=${encodeURIComponent(cursor)}`;
+    }
+
+    const options = {
+      hostname: 'api-admin.demo.deel.com',
+      path: path,
+      method: 'GET',
+      headers: {
+        'accept': 'application/json',
+        'x-api-version': '2',
+        'x-auth-token': CONFIG.authToken,
+        'x-request-id': requestId
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          resolve({ data: json, statusCode: res.statusCode, headers: res.headers });
+        } catch (e) {
+          reject(new Error(`Failed to parse JSON: ${e.message}`));
+        }
+      });
+    });
+
+    req.on('error', reject);
+    req.end();
+  });
+}
+
+async function fetchAllEmployees() {
+  const allEmployees = [];
+  const requestIds = [];
+  const responses = [];
+  let cursor = null;
+  let page = 1;
+
+  console.log('Starting to fetch employees...\n');
+
+  while (true) {
+    const requestId = generateRequestId();
+    requestIds.push(requestId);
+
+    console.log(`Page ${page}: Request ID = ${requestId}`);
+
+    try {
+      const result = await makeRequest(cursor, requestId);
+      const { data, statusCode } = result;
+
+      if (statusCode !== 200) {
+        console.error(`Error: HTTP ${statusCode}`);
+        console.error(JSON.stringify(data, null, 2));
+        break;
+      }
+
+      const employees = data.employees || [];
+      console.log(`  -> Fetched ${employees.length} employees`);
+
+      responses.push({
+        page,
+        requestId,
+        cursor: cursor || 'initial',
+        employeesCount: employees.length,
+        data: data
+      });
+
+      allEmployees.push(...employees);
+
+      cursor = data.cursor;
+      if (!cursor || employees.length === 0) {
+        console.log('\nNo more pages to fetch.');
+        break;
+      }
+
+      page++;
+    } catch (error) {
+      console.error(`Error on page ${page}:`, error.message);
+      break;
+    }
+  }
+
+  console.log(`\nTotal employees fetched: ${allEmployees.length}`);
+  console.log(`Total requests made: ${requestIds.length}`);
+
+  // Save results
+  const output = {
+    fetchedAt: new Date().toISOString(),
+    totalEmployees: allEmployees.length,
+    totalRequests: requestIds.length,
+    integrationId: CONFIG.integrationId,
+    requestIds: requestIds,
+    employees: allEmployees,
+    rawResponses: responses
+  };
+
+  fs.writeFileSync(CONFIG.outputFile, JSON.stringify(output, null, 2));
+  console.log(`\nData saved to: ${CONFIG.outputFile}`);
+
+  // Save request IDs separately for easy access
+  fs.writeFileSync(CONFIG.requestIdsFile, JSON.stringify({
+    fetchedAt: new Date().toISOString(),
+    requestIds: requestIds
+  }, null, 2));
+  console.log(`Request IDs saved to: ${CONFIG.requestIdsFile}`);
+
+  return { allEmployees, requestIds };
+}
+
+fetchAllEmployees().catch(console.error);

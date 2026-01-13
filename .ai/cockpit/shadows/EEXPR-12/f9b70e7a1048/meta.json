@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-12-2/todo/03-add-controller-endpoint.md",
+  "taskId": "EEXPR-12",
+  "baseline": {
+    "capturedAt": "2026-01-08T18:54:56.729Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T18:54:56.730Z",
+    "hash": "05af27c9166e1fb5",
+    "size": 5541,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T18:54:56.730Z",
+    "actualFileHash": "05af27c9166e1fb5",
+    "status": "synced"
+  }
+}

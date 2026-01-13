@@ -1,0 +1,40 @@
+{
+  "id": "evt-1767908805986-d3885at1s",
+  "taskId": "EEXPR-12-1",
+  "taskIdSource": "env-var",
+  "tool": "Edit",
+  "input": {
+    "file_path": "/Users/gabriel.herter/Documents/Projects/worktrees/EEXPR-12-1/peo/src/models/entityTransfer/PeoEmployeeTransferSignature.ts",
+    "old_string": "    declare profilePublicId: number;",
+    "new_string": "    declare profilePublicId: string;",
+    "replace_all": false
+  },
+  "response": {
+    "filePath": "/Users/gabriel.herter/Documents/Projects/worktrees/EEXPR-12-1/peo/src/models/entityTransfer/PeoEmployeeTransferSignature.ts",
+    "oldString": "    declare profilePublicId: number;",
+    "newString": "    declare profilePublicId: string;",
+    "originalFile": "import BasePeoModel from '@models/base/BasePeoModel';\nimport { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, NonAttribute, Sequelize } from 'sequelize';\n\nimport type { PeoEmployeeTransfer } from './PeoEmployeeTransfer';\nimport { AgreementType, SignatureRole } from './types';\n\nexport class PeoEmployeeTransferSignature extends BasePeoModel<\n    InferAttributes<PeoEmployeeTransferSignature>,\n    InferCreationAttributes<PeoEmployeeTransferSignature>\n> {\n    declare id: CreationOptional<string>;\n    declare createdAt: CreationOptional<Date>;\n    declare updatedAt: CreationOptional<Date>;\n\n    declare organizationId: number;\n    declare transferId: string;\n    declare profilePublicId: number;\n    declare role: SignatureRole;\n    declare agreementType: AgreementType;\n    declare agreementId: CreationOptional<string | null>;\n    declare signedAt: CreationOptional<Date | null>;\n\n    // Associations\n    declare transfer?: NonAttribute<PeoEmployeeTransfer>;\n\n    declare static associations: {};\n}\n\nexport const initPeoEmployeeTransferSignatureModel = (sequelize: Sequelize) => {\n    PeoEmployeeTransferSignature.init(\n        {\n            id: {\n                type: DataTypes.UUID,\n                defaultValue: DataTypes.UUIDV4,\n                primaryKey: true,\n                allowNull: false,\n                comment: 'Primary key - unique signature record identifier',\n            },\n            createdAt: {\n                field: 'created_at',\n                type: DataTypes.DATE,\n                allowNull: false,\n                comment: 'Record creation timestamp',\n            },\n            updatedAt: {\n                field: 'updated_at',\n                type: DataTypes.DATE,\n                allowNull: false,\n                comment: 'Record last update timestamp',\n            },\n            organizationId: {\n                field: 'organization_id',\n                type: DataTypes.INTEGER,\n                allowNull: false,\n                comment: 'FK to organizations.id - Client organization (denormalized from parent transfer)',\n            },\n            transferId: {\n                field: 'transfer_id',\n                type: DataTypes.UUID,\n                allowNull: false,\n                comment: 'FK to peo_employee_transfers.id - Parent transfer',\n            },\n            profilePublicId: {\n                field: 'profile_public_id',\n                type: DataTypes.INTEGER,\n                allowNull: false,\n                comment: 'FK to profiles.public_id - Person required to sign',\n            },\n            role: {\n                field: 'role',\n                type: DataTypes.ENUM(...Object.values(SignatureRole)),\n                allowNull: false,\n                comment: 'Signer role: ADMIN or EMPLOYEE',\n            },\n            agreementType: {\n                field: 'agreement_type',\n                type: DataTypes.ENUM(...Object.values(AgreementType)),\n                allowNull: false,\n                comment: 'Type of agreement being signed',\n            },\n            agreementId: {\n                field: 'agreement_id',\n                type: DataTypes.UUID,\n                allowNull: true,\n                comment: 'FK to document being signed (NULL for ENTITY_ASSIGNMENT_AGREEMENT)',\n            },\n            signedAt: {\n                field: 'signed_at',\n                type: DataTypes.DATE,\n                allowNull: true,\n                comment: 'Timestamp when signature was collected',\n            },\n        },\n        {\n            tableName: 'peo_employee_transfer_signatures',\n            underscored: true,\n            comment: 'Signature tracking for admin and employee agreements during entity transfers',\n            indexes: [\n                {\n                    unique: true,\n                    fields: ['transfer_id', 'profile_public_id', 'agreement_type'],\n                    name: 'idx_peo_employee_transfer_signatures_unique',\n                },\n            ],\n            sequelize,\n        },\n    );\n};\n\nexport const initPeoEmployeeTransferSignatureAssociation = () => {\n    // Lazy import to avoid circular dependencies\n    const { PeoEmployeeTransfer } = require('./PeoEmployeeTransfer');\n\n    PeoEmployeeTransferSignature.belongsTo(PeoEmployeeTransfer, {\n        foreignKey: 'transferId',\n        as: 'transfer',\n    });\n};\n",
+    "structuredPatch": [
+      {
+        "oldStart": 14,
+        "oldLines": 7,
+        "newStart": 14,
+        "newLines": 7,
+        "lines": [
+          " ",
+          "     declare organizationId: number;",
+          "     declare transferId: string;",
+          "-    declare profilePublicId: number;",
+          "+    declare profilePublicId: string;",
+          "     declare role: SignatureRole;",
+          "     declare agreementType: AgreementType;",
+          "     declare agreementId: CreationOptional<string | null>;"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "sessionId": "94528b48-30b5-4fdb-9cfc-3f7b3ded4353",
+  "timestamp": "2026-01-08T21:46:45.986Z"
+}

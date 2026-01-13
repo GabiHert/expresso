@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-12-1/todo/01-create-migration.md",
+  "taskId": "EEXPR-12",
+  "baseline": {
+    "capturedAt": "2026-01-08T18:47:58.868Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T18:47:58.868Z",
+    "hash": "0f2914de85785a9c",
+    "size": 6480,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T18:47:58.868Z",
+    "actualFileHash": "0f2914de85785a9c",
+    "status": "synced"
+  }
+}

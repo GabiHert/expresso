@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/fetch-employees.js",
+  "taskId": "EEXPR-59",
+  "baseline": {
+    "capturedAt": "2026-01-12T14:11:04.896Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-12T14:11:04.896Z",
+    "hash": "c197a0dc2bdaab25",
+    "size": 4238,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-12T14:11:04.896Z",
+    "actualFileHash": "c197a0dc2bdaab25",
+    "status": "synced"
+  }
+}

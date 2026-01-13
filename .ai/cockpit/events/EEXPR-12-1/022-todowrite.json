@@ -1,0 +1,123 @@
+{
+  "id": "evt-1767923371905-mf61x79va",
+  "taskId": "EEXPR-12-1",
+  "taskIdSource": "env-var",
+  "tool": "TodoWrite",
+  "input": {
+    "todos": [
+      {
+        "content": "Find Z04 (Alien Authorized) employees in the database",
+        "status": "completed",
+        "activeForm": "Finding Z04 employees"
+      },
+      {
+        "content": "Validate the employee has valid I-9 data",
+        "status": "completed",
+        "activeForm": "Validating I-9 data"
+      },
+      {
+        "content": "Find organizations with multiple PEO entities for transfer testing",
+        "status": "completed",
+        "activeForm": "Finding multi-entity organizations"
+      },
+      {
+        "content": "Explore organization 191800 entities and contracts",
+        "status": "completed",
+        "activeForm": "Exploring organization 191800"
+      },
+      {
+        "content": "Gather destination entity resources (positions, PTO, payroll)",
+        "status": "completed",
+        "activeForm": "Gathering destination entity resources"
+      },
+      {
+        "content": "Select a contract and update with Z04 status and valid I-9 data",
+        "status": "in_progress",
+        "activeForm": "Selecting and updating contract"
+      },
+      {
+        "content": "Generate valid transfer payload",
+        "status": "pending",
+        "activeForm": "Generating transfer payload"
+      }
+    ]
+  },
+  "response": {
+    "oldTodos": [
+      {
+        "content": "Find Z04 (Alien Authorized) employees in the database",
+        "status": "completed",
+        "activeForm": "Finding Z04 employees"
+      },
+      {
+        "content": "Validate the employee has valid I-9 data",
+        "status": "completed",
+        "activeForm": "Validating I-9 data"
+      },
+      {
+        "content": "Find organizations with multiple PEO entities for transfer testing",
+        "status": "completed",
+        "activeForm": "Finding multi-entity organizations"
+      },
+      {
+        "content": "Explore organization 191800 entities and contracts",
+        "status": "completed",
+        "activeForm": "Exploring organization 191800"
+      },
+      {
+        "content": "Gather destination entity resources (positions, PTO, payroll)",
+        "status": "in_progress",
+        "activeForm": "Gathering destination entity resources"
+      },
+      {
+        "content": "Select a contract and update with Z04 status and valid I-9 data",
+        "status": "pending",
+        "activeForm": "Selecting and updating contract"
+      },
+      {
+        "content": "Generate valid transfer payload",
+        "status": "pending",
+        "activeForm": "Generating transfer payload"
+      }
+    ],
+    "newTodos": [
+      {
+        "content": "Find Z04 (Alien Authorized) employees in the database",
+        "status": "completed",
+        "activeForm": "Finding Z04 employees"
+      },
+      {
+        "content": "Validate the employee has valid I-9 data",
+        "status": "completed",
+        "activeForm": "Validating I-9 data"
+      },
+      {
+        "content": "Find organizations with multiple PEO entities for transfer testing",
+        "status": "completed",
+        "activeForm": "Finding multi-entity organizations"
+      },
+      {
+        "content": "Explore organization 191800 entities and contracts",
+        "status": "completed",
+        "activeForm": "Exploring organization 191800"
+      },
+      {
+        "content": "Gather destination entity resources (positions, PTO, payroll)",
+        "status": "completed",
+        "activeForm": "Gathering destination entity resources"
+      },
+      {
+        "content": "Select a contract and update with Z04 status and valid I-9 data",
+        "status": "in_progress",
+        "activeForm": "Selecting and updating contract"
+      },
+      {
+        "content": "Generate valid transfer payload",
+        "status": "pending",
+        "activeForm": "Generating transfer payload"
+      }
+    ]
+  },
+  "sessionId": "609cdfb5-d0f6-4eec-9cc5-1b82129b0c07",
+  "timestamp": "2026-01-09T01:49:31.905Z"
+}

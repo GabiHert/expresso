@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/in_progress/EEXPR-12-1/README.md",
+  "taskId": "EEXPR-12-1",
+  "baseline": {
+    "capturedAt": "2026-01-08T21:37:24.221Z",
+    "hash": "b784fb1659600bb9",
+    "size": 5443
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T21:37:24.221Z",
+    "hash": "b1998746422cecd4",
+    "size": 5443,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T21:37:24.221Z",
+    "actualFileHash": "b1998746422cecd4",
+    "status": "synced"
+  }
+}

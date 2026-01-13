@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-12-4/todo/01-add-service-method.md",
+  "taskId": "EEXPR-12",
+  "baseline": {
+    "capturedAt": "2026-01-08T19:02:11.918Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T19:02:11.918Z",
+    "hash": "b1ab3be088f7721f",
+    "size": 3169,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T19:02:11.918Z",
+    "actualFileHash": "b1ab3be088f7721f",
+    "status": "synced"
+  }
+}

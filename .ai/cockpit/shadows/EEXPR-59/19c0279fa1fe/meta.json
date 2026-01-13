@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/backend/controllers/admin/peo/tech_ops.ts",
+  "taskId": "EEXPR-59",
+  "baseline": {
+    "capturedAt": "2026-01-12T18:16:43.350Z",
+    "hash": "486f2cd550d190d6",
+    "size": 21599
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-12T18:17:44.967Z",
+    "hash": "716bc724de7b0f1c",
+    "size": 21476,
+    "editCount": 2
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-12T18:17:44.968Z",
+    "actualFileHash": "716bc724de7b0f1c",
+    "status": "synced"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "filePath": "/Users/gabriel.herter/Documents/Projects/deel/.ai/tasks/todo/EEXPR-12-3/todo/02-add-client-service-method.md",
+  "taskId": "EEXPR-12",
+  "baseline": {
+    "capturedAt": "2026-01-08T18:59:15.638Z",
+    "hash": "e3b0c44298fc1c14",
+    "size": 0
+  },
+  "accumulated": {
+    "lastUpdatedAt": "2026-01-08T18:59:15.638Z",
+    "hash": "da00594e2e3e9bc2",
+    "size": 3213,
+    "editCount": 1
+  },
+  "sync": {
+    "lastCheckedAt": "2026-01-08T18:59:15.638Z",
+    "actualFileHash": "da00594e2e3e9bc2",
+    "status": "synced"
+  }
+}

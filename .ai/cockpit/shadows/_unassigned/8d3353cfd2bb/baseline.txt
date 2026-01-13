@@ -1,0 +1,153 @@
+<!--
+╔══════════════════════════════════════════════════════════════════╗
+║ LAYER: TASK                                                      ║
+║ LOCATION: .ai/tasks/todo/EEXPR-56/                               ║
+╠══════════════════════════════════════════════════════════════════╣
+║ BEFORE WORKING ON THIS TASK:                                     ║
+║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)           ║
+║ 2. Read this entire README first                                 ║
+║ 3. Check which work items are in todo/ vs done/                  ║
+║ 4. Work on ONE item at a time from todo/                         ║
+╚══════════════════════════════════════════════════════════════════╝
+-->
+
+# EEXPR-56: Align CrossHireSanityCheck I-9 validation with PEO
+
+## Problem Statement
+
+The backend's `CrossHireSanityCheckStep` has overly strict I-9 validation for Z04 (Alien Authorized) citizenship status. It requires ALL 5 I-9 fields unconditionally, but PEO's `validateForIntegrate()` uses conditional logic:
+
+- `alienRegNumber` + `expiration`: paired (if one exists, other required)
+- `passportNumber` + `passportCountry`: paired (only if either present)
+- `i94AdmissionNumber`: NOT validated at all
+
+This mismatch causes valid employees to fail entity transfers at the backend sanity check even though they would pass PEO validation downstream.
+
+## Acceptance Criteria
+
+- [ ] Z04 employees with only alienRegNumber + expiration pass validation
+- [ ] Z04 employees without passport fields pass (if neither present)
+- [ ] i94AdmissionNumber is no longer required
+- [ ] Existing Z03 validation unchanged (alienRegNumber still required)
+
+## Work Items
+
+See `status.yaml` for full index.
+
+| ID | Name | Repo | Status |
+|----|------|------|--------|
+| 01 | Update I-9 validation logic | backend | todo |
+
+## Branches
+
+| Repo | Branch |
+|------|--------|
+| backend | `EEXPR-56-align-i9-validation` |
+
+## Technical Context
+
+### Current Backend Validation (TOO STRICT)
+
+**File**: `backend/services/peo/entity_transfer/steps/cross_hire_sanity_check_step.ts:99-119`
+
+```typescript
+// Z04: Alien Authorized - requires ALL 5 fields
+if (data.citizenStatus === 'Z04') {
+    const i9Fields = [
+        {field: 'i9AlienRegistrationNumber', name: 'I-9 Alien Registration Number'},
+        {field: 'i9AlienRegistrationExpiration', name: 'I-9 Alien Registration Expiration'},
+        {field: 'i94AdmissionNumber', name: 'I-94 Admission Number'},
+        {field: 'i9ForeignPassportNumber', name: 'I-9 Foreign Passport Number'},
+        {field: 'i9PassportIssuingCountry', name: 'I-9 Passport Issuing Country'},
+    ] as const;
+
+    for (const {field, name} of i9Fields) {
+        const value = data[field];
+        if (!value || value.trim() === '') {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `${name} is required for Alien Authorized status`,
+                path: [field],
+            });
+        }
+    }
+}
+```
+
+### PEO Validation (SOURCE OF TRUTH)
+
+**File**: `peo/src/models/peoContract/peoContract.ts:211-239`
+
+```typescript
+if (this.citizenStatus === CitizenStatusPrimsEnum.AlienAuthorized) {
+    // Default to '000000000' if missing
+    if (!this.i9AlienRegistrationNumber) {
+        this.i9AlienRegistrationNumber = '000000000';
+    }
+
+    // If alien reg number exists, expiration is required
+    if (this.i9AlienRegistrationNumber && this.i9AlienRegistrationNumber.trim() !== '') {
+        if (!this.i9AlienRegistrationExpiration) {
+            errors.push('i9AlienRegistrationExpiration is required');
+        }
+    }
+
+    // If expiration exists, alien reg number is required
+    if (this.i9AlienRegistrationExpiration) {
+        if (!this.i9AlienRegistrationNumber || this.i9AlienRegistrationNumber.trim() === '') {
+            errors.push('i9AlienRegistrationNumber is required');
+        }
+    }
+
+    // Passport fields: only required if ONE of them is present
+    if (this.i9PassportIssuingCountry && this.i9PassportIssuingCountry.trim() !== '') {
+        if (!this.i9ForeignPassportNumber || this.i9ForeignPassportNumber.trim() === '') {
+            errors.push('i9ForeignPassportNumber is required');
+        }
+    }
+
+    if (this.i9ForeignPassportNumber && this.i9ForeignPassportNumber.trim() !== '') {
+        if (!this.i9PassportIssuingCountry || this.i9PassportIssuingCountry.trim() === '') {
+            errors.push('i9PassportIssuingCountry is required');
+        }
+    }
+}
+```
+
+### Key Differences
+
+| Field | Backend | PEO |
+|-------|---------|-----|
+| alienRegNumber | REQUIRED | Defaults to '000000000' |
+| alienRegExpiration | REQUIRED | Only if alienRegNumber present |
+| i94AdmissionNumber | REQUIRED | NOT CHECKED |
+| passportNumber | REQUIRED | Only if passportCountry present |
+| passportCountry | REQUIRED | Only if passportNumber present |
+
+## Implementation Approach
+
+Replace the backend's unconditional ALL-fields-required logic with PEO's conditional paired-fields logic. The backend sanity check should mirror PEO's `validateForIntegrate()` to ensure the fail-fast check doesn't reject valid employees.
+
+## Risks & Considerations
+
+- **Low Risk**: This change makes backend MORE lenient, matching existing PEO behavior
+- **No PrismHR impact**: PEO already handles this logic; we're just avoiding premature rejection
+- **Backward compatible**: Employees who passed before will still pass
+
+## Testing Strategy
+
+1. Unit test: Z04 employee with only alienRegNumber + expiration passes
+2. Unit test: Z04 employee with no passport fields passes
+3. Unit test: Z04 employee with passportNumber but no country fails
+4. Unit test: Z04 employee with passportCountry but no number fails
+5. Unit test: Z03 employee still requires alienRegNumber (unchanged)
+
+## Feedback
+
+Review comments can be added to `feedback/diff-review.md`.
+Use `/address-feedback` to discuss feedback with the agent.
+
+## References
+
+- PEO validation source: `peo/src/models/peoContract/peoContract.ts:113-242`
+- Backend step: `backend/services/peo/entity_transfer/steps/cross_hire_sanity_check_step.ts`
