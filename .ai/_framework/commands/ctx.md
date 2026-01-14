@@ -122,6 +122,7 @@ Affected repos:
 
 CRITICAL RULES
 ══════════════════════════════════════════════════════════════════
+🛑 NEVER COMMIT OR PUSH WITHOUT USER APPROVAL
 ⚠ GIT OPERATIONS: Always run in correct repo directory
 ⚠ PROTECTED REPOS: Never modify repos marked protected: true
 ⚠ SUBMODULES: File edits work from parent, git commands don't
@@ -145,6 +146,12 @@ QUICK COMMANDS
 ╔══════════════════════════════════════════════════════════════════╗
 ║ GIT SAFETY - MULTI-REPO HANDLING                                 ║
 ╚══════════════════════════════════════════════════════════════════╝
+
+🛑 NEVER COMMIT OR PUSH WITHOUT EXPLICIT USER APPROVAL
+
+  Before committing: "Ready to commit? [show diff summary]"
+  Before pushing:    "Ready to push to {remote}?"
+  WAIT for user confirmation before executing.
 
 ⚠ CRITICAL: Git operations MUST run in the correct directory!
 
@@ -173,6 +180,15 @@ Before ANY git operation:
   3. □ Verify: git rev-parse --show-toplevel
   4. □ Verify: git remote -v (correct remote?)
   5. □ Check: Is repo protected? If yes, STOP.
+  6. □ ASK USER before commit/push - NEVER auto-execute
+
+FORBIDDEN WITHOUT APPROVAL
+══════════════════════════════════════════════════════════════════
+  🛑 git commit      - Always ask first
+  🛑 git push        - Always ask first
+  🛑 git push --force - NEVER (extremely dangerous)
+  🛑 git reset --hard - NEVER without explicit request
+  🛑 git rebase      - Always ask on shared branches
 
 {if active-task exists}
 CURRENT TASK REPOS
@@ -301,6 +317,7 @@ Always end with:
 ```
 REMEMBER
 ══════════════════════════════════════════════════════════════════
+  🛑 NEVER commit or push without user approval
   ⚠ Git commands: Run in correct repo directory
   ⚠ Protected repos: Don't modify (check manifest.yaml)
   ⚠ Extensions: Check for .extend.md files
