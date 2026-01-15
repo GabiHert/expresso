@@ -123,6 +123,7 @@ Affected repos:
 CRITICAL RULES
 ══════════════════════════════════════════════════════════════════
 🛑 NEVER COMMIT OR PUSH WITHOUT USER APPROVAL
+🛑 EXTENSIONS: Reading is NOT applying - verify compliance at each step
 ⚠ GIT OPERATIONS: Always run in correct repo directory
 ⚠ PROTECTED REPOS: Never modify repos marked protected: true
 ⚠ SUBMODULES: File edits work from parent, git commands don't
@@ -136,6 +137,7 @@ Config: .ai/_project/manifest.yaml
 QUICK COMMANDS
 ══════════════════════════════════════════════════════════════════
 /ctx git      - Git safety rules
+/ctx ext      - Extension compliance guide
 /ctx nav      - Navigation guide
 /ctx commands - Available commands
 ```
@@ -212,6 +214,63 @@ PROTECTED REPOSITORIES
      DO NOT: create branches, commit, push
      Locked to branch: {repo.locked_branch}
 {/for}
+```
+
+#### Extension Focus (`/ctx ext`)
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║ EXTENSION COMPLIANCE - READING ≠ APPLYING                        ║
+╚══════════════════════════════════════════════════════════════════╝
+
+🛑 THE PROBLEM: "Acknowledge but Don't Apply"
+
+  WRONG:
+    ✓ Project Extension Active
+    [proceeds to ignore extension and use default habits]
+
+  RIGHT:
+    ✓ Project Extension Active
+    Extension mandates: {list specific requirements}
+    Adjusting my approach to comply...
+
+WHEN YOU FIND AN EXTENSION
+══════════════════════════════════════════════════════════════════
+
+  1. EXTRACT requirements explicitly:
+     "Extension requires:
+       • BDD-first: tests BEFORE implementation
+       • Coverage threshold: 80%"
+
+  2. VERIFY each step against requirements:
+     "Does this comply with the extension?"
+     "Am I defaulting to habits instead?"
+
+  3. CHECK at decision points:
+     "EXTENSION COMPLIANCE CHECK
+      Requirement: BDD-first
+      My proposal: [test → implement → verify]
+      Compliant: ✓"
+
+WHY THIS MATTERS
+══════════════════════════════════════════════════════════════════
+
+Extensions exist to OVERRIDE default behavior.
+Acknowledging without applying defeats their purpose.
+
+Common failure: Reading extension → Announcing it's active →
+                Immediately falling back to default patterns
+
+If your plan contradicts the extension, STOP and re-read.
+
+EXTENSION LOCATIONS
+══════════════════════════════════════════════════════════════════
+  .ai/_project/commands/{command}.extend.md
+
+  Examples:
+    task-create.extend.md   - Custom task creation workflow
+    task-work.extend.md     - Custom implementation patterns
+    document.extend.md      - Custom documentation style
 ```
 
 #### Navigation Focus (`/ctx nav`)
@@ -318,9 +377,9 @@ Always end with:
 REMEMBER
 ══════════════════════════════════════════════════════════════════
   🛑 NEVER commit or push without user approval
+  🛑 EXTENSIONS: Reading ≠ Applying - verify compliance at EACH step
   ⚠ Git commands: Run in correct repo directory
   ⚠ Protected repos: Don't modify (check manifest.yaml)
-  ⚠ Extensions: Check for .extend.md files
   ⚠ Docs first: Check documentation before exploring code
 ```
 

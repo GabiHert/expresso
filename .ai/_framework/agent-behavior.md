@@ -152,6 +152,75 @@ When the user invokes framework commands (`/task-*`, `/document`, etc.):
 2. Follow the command's workflow exactly
 3. Use existing documentation as context
 
+## Extension Compliance (CRITICAL)
+
+**Reading an extension is NOT the same as applying it.**
+
+When you find a `.extend.md` file:
+
+### 1. Extract and List Requirements
+
+Don't just announce "✓ Project Extension Active". Extract the actual requirements:
+
+```
+✓ Project Extension Active
+
+Extension requires:
+  • BDD-first: Write tests BEFORE implementation
+  • Test file naming: {feature}.test.ts
+  • Coverage threshold: 80%
+```
+
+### 2. Verify EACH Step Against Extension
+
+Before executing any step, ask yourself:
+- "Does this step comply with the extension requirements?"
+- "Am I defaulting to habits instead of following the extension?"
+
+### 3. Stop-and-Check at Key Decision Points
+
+When creating work items, plans, or proposals:
+
+```
+EXTENSION COMPLIANCE CHECK
+══════════════════════════════════════════════════════════════════
+Extension requirement: BDD-first (tests before implementation)
+
+My proposed order:
+  1. Write tests for feature X        ✓ Compliant
+  2. Implement feature X              ✓ Compliant (after tests)
+  3. Write integration tests          ✓ Compliant
+
+Proceeding with extension-compliant plan.
+```
+
+### Common Failure: "Acknowledge but Don't Apply"
+
+**WRONG:**
+```
+✓ Project Extension Active
+[proceeds to ignore extension and use default habits]
+```
+
+**RIGHT:**
+```
+✓ Project Extension Active
+
+Extension mandates: {specific requirements}
+
+Adjusting my approach to comply:
+  • Instead of: design → implement → test
+  • I will do:  test → implement → verify
+```
+
+### Why This Matters
+
+Extensions exist to override default behavior for project-specific needs.
+Acknowledging without applying defeats their entire purpose.
+
+**If you find yourself proposing something that contradicts the extension,
+STOP and re-read the extension requirements.**
+
 ## Summary
 
 ```
