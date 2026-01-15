@@ -199,6 +199,16 @@
             "svelte"
           ],
           "description": "File extensions to scan for @expresso tags"
+        },
+        "aiCockpit.expresso.highlightKeyword": {
+          "type": "boolean",
+          "default": true,
+          "description": "Highlight the @expresso keyword with distinct styling (bold, colored text)"
+        },
+        "aiCockpit.expresso.highlightCommands": {
+          "type": "boolean",
+          "default": true,
+          "description": "Highlight valid Claude commands (/task-start, /task-work, etc.) in comments"
         }
       }
     },

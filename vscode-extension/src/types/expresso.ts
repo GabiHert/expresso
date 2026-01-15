@@ -4,6 +4,20 @@
  */
 
 /**
+ * Represents a discovered Claude command from markdown files
+ */
+export interface CommandInfo {
+  /** Command name with leading slash (e.g., "/task-start") */
+  name: string;
+  /** Human-readable description extracted from markdown H1 */
+  description: string;
+  /** Absolute path to the markdown file */
+  filePath: string;
+  /** Where the command was discovered from */
+  source: 'framework' | 'project';
+}
+
+/**
  * Expresso tag variant types
  * - normal: Standard @expresso tag (brown highlight)
  * - urgent: @expresso! for high priority (orange-red highlight)
@@ -94,6 +108,12 @@ export interface ExpressoConfig {
 
   /** Whether to show CodeLens ("Brew this" buttons) */
   showCodeLens: boolean;
+
+  /** Whether to highlight @expresso keyword distinctly */
+  highlightKeyword: boolean;
+
+  /** Whether to highlight Claude commands in comments */
+  highlightCommands: boolean;
 }
 
 /**
@@ -130,6 +150,8 @@ export const DEFAULT_EXPRESSO_CONFIG: ExpressoConfig = {
   scanOnSave: true,
   showDecorations: true,
   showCodeLens: true,
+  highlightKeyword: true,
+  highlightCommands: true,
 };
 
 /**
@@ -146,6 +168,10 @@ export interface ExpressoVariantStyle {
   codeLensText: string;
   /** Emoji for toast notification */
   emoji: string;
+  /** Text color for @expresso keyword (hex format, e.g., #D97706) */
+  keywordColor: string;
+  /** Font weight for keyword ('bold' | 'normal') */
+  keywordFontWeight: string;
 }
 
 /**
@@ -158,6 +184,8 @@ export const EXPRESSO_VARIANT_STYLES: Record<ExpressoVariant, ExpressoVariantSty
     gutterIcon: 'expresso-sparkle.gif',
     codeLensText: '☕ Brew this',
     emoji: '☕',
+    keywordColor: '#16A34A',  // Green for better contrast against brown background
+    keywordFontWeight: 'bold',
   },
   urgent: {
     backgroundColor: 'rgba(255, 87, 34, 0.15)',
@@ -165,6 +193,8 @@ export const EXPRESSO_VARIANT_STYLES: Record<ExpressoVariant, ExpressoVariantSty
     gutterIcon: 'expresso-sparkle-urgent.gif',
     codeLensText: '🔥 Brew this NOW',
     emoji: '🔥',
+    keywordColor: '#EF4444',
+    keywordFontWeight: 'bold',
   },
   question: {
     backgroundColor: 'rgba(33, 150, 243, 0.15)',
@@ -172,5 +202,73 @@ export const EXPRESSO_VARIANT_STYLES: Record<ExpressoVariant, ExpressoVariantSty
     gutterIcon: 'expresso-sparkle-question.gif',
     codeLensText: '❓ Brew this',
     emoji: '❓',
+    keywordColor: '#3B82F6',
+    keywordFontWeight: 'bold',
   },
 };
+
+/**
+ * Valid Claude slash commands that should be highlighted in comments
+ * These correspond to commands in .ai/_framework/commands/
+ *
+ * @deprecated Use CommandRegistry.getCommandNames() instead.
+ * This static list is no longer used at runtime and will be removed.
+ */
+export const VALID_CLAUDE_COMMANDS = [
+  '/task-start',
+  '/task-work',
+  '/task-done',
+  '/task-explore',
+  '/task-status',
+  '/task-review',
+  '/task-resume',
+  '/task-create',
+  '/init',
+  '/help',
+  '/ask',
+  '/enhance',
+  '/document',
+  '/ai-sync',
+  '/address-feedback',
+  '/command-create',
+  '/command-extend',
+  '/expresso',
+] as const;
+
+/**
+ * Type for valid Claude command names
+ *
+ * @deprecated Use string type or CommandInfo.name instead.
+ */
+export type ClaudeCommand = (typeof VALID_CLAUDE_COMMANDS)[number];
+
+/**
+ * Decoration style for Claude command highlighting
+ * Uses purple to distinguish from @expresso variants
+ */
+export const COMMAND_DECORATION_STYLE = {
+  /** Text color for commands (bright cyan for visibility) */
+  color: '#00FFFF',
+  /** Font weight */
+  fontWeight: 'bold',
+  /** Light background to make commands pop */
+  backgroundColor: 'rgba(0, 255, 255, 0.15)',
+  /** Rounded corners */
+  borderRadius: '2px',
+};
+
+/**
+ * Represents a matched Claude command in code
+ */
+export interface CommandMatch {
+  /** The command text (e.g., '/task-start') */
+  command: string;
+  /** Line number (1-based) */
+  line: number;
+  /** Column where command starts */
+  columnStart: number;
+  /** Column where command ends */
+  columnEnd: number;
+  /** File path */
+  filePath: string;
+}

@@ -1,14 +1,23 @@
 import * as vscode from 'vscode';
 import { ExpressoScanner } from './ExpressoScanner';
-import { ExpressoTag, ExpressoVariant, EXPRESSO_VARIANT_STYLES } from '../types/expresso';
+import {
+  ExpressoTag,
+  ExpressoVariant,
+  EXPRESSO_VARIANT_STYLES,
+  CommandMatch,
+} from '../types/expresso';
 
 /**
  * Manages text decorations (highlighting, gutter icons) for @expresso tags
  */
 export class ExpressoDecorator implements vscode.Disposable {
+  // Comment background decorations (pre-created, reused)
   private normalDecoration: vscode.TextEditorDecorationType;
   private urgentDecoration: vscode.TextEditorDecorationType;
   private questionDecoration: vscode.TextEditorDecorationType;
+
+  // Inline-created decorations for keywords and commands (created per-render for reliability)
+  private inlineDecorations: vscode.TextEditorDecorationType[] = [];
 
   private disposables: vscode.Disposable[] = [];
 
@@ -16,7 +25,7 @@ export class ExpressoDecorator implements vscode.Disposable {
     private scanner: ExpressoScanner,
     private extensionUri: vscode.Uri
   ) {
-    // Create decoration types for each variant
+    // Create decoration types for each variant (comment background)
     this.normalDecoration = this.createDecorationType('normal');
     this.urgentDecoration = this.createDecorationType('urgent');
     this.questionDecoration = this.createDecorationType('question');
@@ -45,7 +54,7 @@ export class ExpressoDecorator implements vscode.Disposable {
   }
 
   /**
-   * Create decoration type for a variant
+   * Create decoration type for a variant (comment background)
    */
   private createDecorationType(variant: ExpressoVariant): vscode.TextEditorDecorationType {
     const style = EXPRESSO_VARIANT_STYLES[variant];
@@ -93,38 +102,139 @@ export class ExpressoDecorator implements vscode.Disposable {
     }
 
     const filePath = editor.document.uri.fsPath;
+
+    // Ensure document is scanned (populates both tag and command caches)
+    void this.scanner.scanDocument(editor.document);
+
+    // Clear previous inline decorations before creating new ones
+    for (const decoration of this.inlineDecorations) {
+      decoration.dispose();
+    }
+    this.inlineDecorations = [];
+
     const tags = this.scanner.getTagsForFile(filePath);
 
-    // Group tags by variant
+    // Group tags by variant (for comment background)
     const normalRanges: vscode.DecorationOptions[] = [];
     const urgentRanges: vscode.DecorationOptions[] = [];
     const questionRanges: vscode.DecorationOptions[] = [];
 
+    // Keyword-only ranges (for distinct @expresso styling)
+    const normalKeywordRanges: vscode.DecorationOptions[] = [];
+    const urgentKeywordRanges: vscode.DecorationOptions[] = [];
+    const questionKeywordRanges: vscode.DecorationOptions[] = [];
+
     for (const tag of tags) {
       // Calculate the full range of the comment block
       const range = this.getCommentRange(editor, tag);
+
+      // Calculate the keyword-only range
+      const keywordRange = this.getKeywordRange(editor, tag);
 
       const decoration: vscode.DecorationOptions = {
         range,
         hoverMessage: this.createHoverMessage(tag),
       };
 
+      const keywordDecoration: vscode.DecorationOptions = {
+        range: keywordRange,
+        // No hover for keyword - the comment hover is sufficient
+      };
+
       switch (tag.variant) {
         case 'urgent':
           urgentRanges.push(decoration);
+          urgentKeywordRanges.push(keywordDecoration);
           break;
         case 'question':
           questionRanges.push(decoration);
+          questionKeywordRanges.push(keywordDecoration);
           break;
         default:
           normalRanges.push(decoration);
+          normalKeywordRanges.push(keywordDecoration);
       }
     }
 
-    // Apply decorations
+    // Apply comment background decorations
     editor.setDecorations(this.normalDecoration, normalRanges);
     editor.setDecorations(this.urgentDecoration, urgentRanges);
     editor.setDecorations(this.questionDecoration, questionRanges);
+
+    // Apply keyword decorations using underlines (doesn't conflict with command backgrounds)
+    if (config.highlightKeyword) {
+      if (normalKeywordRanges.length > 0) {
+        const normalType = vscode.window.createTextEditorDecorationType({
+          textDecoration: 'underline wavy #16A34A',  // Green wavy underline
+        });
+        this.inlineDecorations.push(normalType);
+        editor.setDecorations(normalType, normalKeywordRanges);
+      }
+      if (urgentKeywordRanges.length > 0) {
+        const urgentType = vscode.window.createTextEditorDecorationType({
+          textDecoration: 'underline wavy #EF4444',  // Red wavy underline
+        });
+        this.inlineDecorations.push(urgentType);
+        editor.setDecorations(urgentType, urgentKeywordRanges);
+      }
+      if (questionKeywordRanges.length > 0) {
+        const questionType = vscode.window.createTextEditorDecorationType({
+          textDecoration: 'underline wavy #3B82F6',  // Blue wavy underline
+        });
+        this.inlineDecorations.push(questionType);
+        editor.setDecorations(questionType, questionKeywordRanges);
+      }
+    }
+
+    // Apply command decorations (purple background)
+    if (config.highlightCommands) {
+      const commands = this.scanner.scanDocumentForCommands(editor.document);
+
+      const commandDecorationType = vscode.window.createTextEditorDecorationType({
+        backgroundColor: 'rgba(156, 39, 176, 0.35)',  // Purple background
+        borderRadius: '3px',
+      });
+      this.inlineDecorations.push(commandDecorationType);
+
+      const commandRanges: vscode.DecorationOptions[] = commands.map(cmd => ({
+        range: new vscode.Range(
+          cmd.line - 1,
+          cmd.columnStart,
+          cmd.line - 1,
+          cmd.columnEnd
+        ),
+      }));
+
+      if (commandRanges.length > 0) {
+        editor.setDecorations(commandDecorationType, commandRanges);
+      }
+    }
+  }
+
+  /**
+   * Get the range for just the @expresso keyword (including variant suffix)
+   */
+  private getKeywordRange(editor: vscode.TextEditor, tag: ExpressoTag): vscode.Range {
+    const lineIndex = tag.line - 1;
+    const line = editor.document.lineAt(lineIndex).text;
+
+    // Find @expresso in the line
+    const keywordMatch = line.indexOf('@expresso');
+    if (keywordMatch === -1) {
+      // Fallback to tag's column position
+      return new vscode.Range(lineIndex, tag.columnStart, lineIndex, tag.columnStart + 9);
+    }
+
+    // Determine keyword length based on variant
+    // @expresso = 9 chars, @expresso! or @expresso? = 10 chars
+    const keywordLength = tag.variant === 'normal' ? 9 : 10;
+
+    return new vscode.Range(
+      lineIndex,
+      keywordMatch,
+      lineIndex,
+      keywordMatch + keywordLength
+    );
   }
 
   /**
@@ -223,12 +333,30 @@ export class ExpressoDecorator implements vscode.Disposable {
   }
 
   /**
+   * Create hover message for a command
+   */
+  private createCommandHoverMessage(cmd: CommandMatch): vscode.MarkdownString {
+    const md = new vscode.MarkdownString();
+    md.appendMarkdown(`**Claude Command**: \`${cmd.command}\`\n\n`);
+    md.appendMarkdown(`Run this command in a Claude Code session to execute it.\n\n`);
+    md.appendMarkdown(`---\n`);
+    md.appendMarkdown(`*Recognized Expresso framework command*`);
+    md.isTrusted = true;
+    return md;
+  }
+
+  /**
    * Clear decorations from an editor
    */
   public clearEditor(editor: vscode.TextEditor): void {
     editor.setDecorations(this.normalDecoration, []);
     editor.setDecorations(this.urgentDecoration, []);
     editor.setDecorations(this.questionDecoration, []);
+    // Dispose inline decorations
+    for (const decoration of this.inlineDecorations) {
+      decoration.dispose();
+    }
+    this.inlineDecorations = [];
   }
 
   /**
@@ -256,6 +384,12 @@ export class ExpressoDecorator implements vscode.Disposable {
     this.normalDecoration.dispose();
     this.urgentDecoration.dispose();
     this.questionDecoration.dispose();
+
+    // Dispose inline decorations
+    for (const decoration of this.inlineDecorations) {
+      decoration.dispose();
+    }
+    this.inlineDecorations = [];
 
     for (const disposable of this.disposables) {
       disposable.dispose();

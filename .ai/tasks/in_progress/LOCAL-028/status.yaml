@@ -1,0 +1,76 @@
+# Task Status Index
+task: "LOCAL-028"
+title: "Enhanced @expresso Highlighting"
+created: "2026-01-13"
+updated: "2026-01-13"
+
+summary:
+  total: 8
+  todo: 0
+  in_progress: 0
+  done: 8
+
+work_items:
+  - id: "01"
+    name: "Add keyword styles to types"
+    repo: "vscode-extension"
+    repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
+    repo_protected: true
+    status: done
+    file: "done/01-add-keyword-styles.md"
+
+  - id: "02"
+    name: "Create keyword decoration types"
+    repo: "vscode-extension"
+    repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
+    repo_protected: true
+    status: done
+    file: "done/02-create-keyword-decorations.md"
+
+  - id: "03"
+    name: "Apply keyword decorations"
+    repo: "vscode-extension"
+    repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
+    repo_protected: true
+    status: done
+    file: "done/03-apply-keyword-decorations.md"
+
+  - id: "04"
+    name: "Define valid commands list"
+    repo: "vscode-extension"
+    repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
+    repo_protected: true
+    status: done
+    file: "done/04-define-commands-list.md"
+
+  - id: "05"
+    name: "Add command scanning"
+    repo: "vscode-extension"
+    repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
+    repo_protected: true
+    status: done
+    file: "done/05-add-command-scanning.md"
+
+  - id: "06"
+    name: "Add command decoration"
+    repo: "vscode-extension"
+    repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
+    repo_protected: true
+    status: done
+    file: "done/06-add-command-decoration.md"
+
+  - id: "07"
+    name: "Add configuration options"
+    repo: "vscode-extension"
+    repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
+    repo_protected: true
+    status: done
+    file: "done/07-add-config-options.md"
+
+  - id: "08"
+    name: "Unit tests"
+    repo: "vscode-extension"
+    repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
+    repo_protected: true
+    status: done
+    file: "done/08-unit-tests.md"
