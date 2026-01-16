@@ -112,7 +112,22 @@
             "kt",
             "scala",
             "vue",
-            "svelte"
+            "svelte",
+            "sql",
+            "sh",
+            "bash",
+            "yaml",
+            "yml",
+            "html",
+            "css",
+            "scss",
+            "sass",
+            "less",
+            "lua",
+            "r",
+            "ex",
+            "exs",
+            "md"
           ],
           "description": "File extensions to scan for @expresso tags"
         },
