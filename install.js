@@ -18,6 +18,7 @@
  *   - .claude/agents/          Lightweight subagents (Haiku model)
  *   - .claude/hooks/           Event capture for VSCode extension
  *   - .claude/settings.json    Hook configuration
+ *   - .cursor/commands/        Cursor IDE slash commands (same format as Claude)
  *   - AI Cockpit VSCode extension (optional)
  */
 
@@ -36,6 +37,8 @@ const FRAMEWORK_DIRS = [".ai/_framework"];
 
 const CLAUDE_DIRS = [".claude/commands", ".claude/agents", ".claude/hooks"];
 
+const CURSOR_DIRS = [".cursor/commands"];
+
 const CLAUDE_FILES = [".claude/settings.json"];
 
 const DIRS_TO_CREATE = [
@@ -43,7 +46,6 @@ const DIRS_TO_CREATE = [
   ".ai/tasks/in_progress",
   ".ai/tasks/done",
   ".ai/cockpit/events",
-  ".ai/cockpit/shadows",
   ".ai/docs",
 ];
 
@@ -262,6 +264,7 @@ ${colors.cyan}WHAT GETS INSTALLED:${colors.reset}
   .claude/agents/          Lightweight subagents (Haiku model)
   .claude/hooks/           Event capture for VSCode extension
   .claude/settings.json    Hook configuration
+  .cursor/commands/        Cursor IDE slash commands (same as Claude)
   AI Cockpit extension     VSCode extension (optional)
 
 ${colors.cyan}AFTER INSTALLATION:${colors.reset}
@@ -312,7 +315,7 @@ ${colors.bright}╔════════════════════�
   // --------------------------------------------------------
   // Step 1: Validate target directory
   // --------------------------------------------------------
-  logStep("1/6", "Validating target directory");
+  logStep("1/7", "Validating target directory");
 
   if (!fs.existsSync(targetDir)) {
     if (nonInteractive) {
@@ -335,15 +338,17 @@ ${colors.bright}╔════════════════════�
   // --------------------------------------------------------
   // Step 2: Check for existing installation
   // --------------------------------------------------------
-  logStep("2/6", "Checking for existing installation");
+  logStep("2/7", "Checking for existing installation");
 
   const aiExists = fs.existsSync(path.join(targetDir, ".ai"));
   const claudeExists = fs.existsSync(path.join(targetDir, ".claude"));
+  const cursorExists = fs.existsSync(path.join(targetDir, ".cursor"));
 
-  if ((aiExists || claudeExists) && !updateMode) {
+  if ((aiExists || claudeExists || cursorExists) && !updateMode) {
     logWarning("Existing installation detected:");
     if (aiExists) logInfo("  - .ai/ directory found");
     if (claudeExists) logInfo("  - .claude/ directory found");
+    if (cursorExists) logInfo("  - .cursor/ directory found");
 
     if (!nonInteractive) {
       const proceed = await confirm("Create backup and continue?");
@@ -362,6 +367,10 @@ ${colors.bright}╔════════════════════�
       const backup = createBackup(path.join(targetDir, ".claude"));
       if (backup) logSuccess(`Backed up .claude/ to ${path.basename(backup)}`);
     }
+    if (cursorExists) {
+      const backup = createBackup(path.join(targetDir, ".cursor"));
+      if (backup) logSuccess(`Backed up .cursor/ to ${path.basename(backup)}`);
+    }
   } else if (updateMode) {
     logInfo("Update mode: will overwrite framework files only");
   } else {
@@ -371,7 +380,7 @@ ${colors.bright}╔════════════════════�
   // --------------------------------------------------------
   // Step 3: Copy framework files
   // --------------------------------------------------------
-  logStep("3/6", "Installing framework files");
+  logStep("3/7", "Installing framework files");
 
   for (const dir of FRAMEWORK_DIRS) {
     const src = path.join(SCRIPT_DIR, dir);
@@ -389,7 +398,7 @@ ${colors.bright}╔════════════════════�
   // --------------------------------------------------------
   // Step 4: Copy Claude integration files
   // --------------------------------------------------------
-  logStep("4/6", "Installing Claude Code integration");
+  logStep("4/7", "Installing Claude Code integration");
 
   for (const dir of CLAUDE_DIRS) {
     const src = path.join(SCRIPT_DIR, dir);
@@ -422,9 +431,28 @@ ${colors.bright}╔════════════════════�
   }
 
   // --------------------------------------------------------
-  // Step 5: Create directory structure
+  // Step 5: Install Cursor integration
   // --------------------------------------------------------
-  logStep("5/6", "Creating directory structure");
+  logStep("5/7", "Installing Cursor IDE integration");
+
+  for (const dir of CURSOR_DIRS) {
+    // Cursor commands use same format as Claude - copy from .claude/commands
+    const src = path.join(SCRIPT_DIR, ".claude/commands");
+    const dest = path.join(targetDir, dir);
+
+    try {
+      copyDirectory(src, dest);
+      logSuccess(`Copied ${dir}/`);
+    } catch (e) {
+      logError(`Failed to copy ${dir}: ${e.message}`);
+      process.exit(1);
+    }
+  }
+
+  // --------------------------------------------------------
+  // Step 6: Create directory structure
+  // --------------------------------------------------------
+  logStep("6/7", "Creating directory structure");
 
   for (const dir of DIRS_TO_CREATE) {
     const fullPath = path.join(targetDir, dir);
@@ -452,7 +480,6 @@ ${colors.bright}╔════════════════════�
     ".ai/tasks/in_progress",
     ".ai/tasks/done",
     ".ai/cockpit/events",
-    ".ai/cockpit/shadows",
   ];
 
   for (const dir of gitkeepDirs) {
@@ -463,9 +490,9 @@ ${colors.bright}╔════════════════════�
   }
 
   // --------------------------------------------------------
-  // Step 6: Install VSCode extension
+  // Step 7: Install VSCode extension
   // --------------------------------------------------------
-  logStep("6/6", "VSCode extension");
+  logStep("7/7", "VSCode extension");
 
   if (skipExtension) {
     logInfo("Skipped (--no-extension flag)");

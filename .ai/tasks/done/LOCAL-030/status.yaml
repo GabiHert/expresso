@@ -1,0 +1,76 @@
+# Task Status Index
+task: "LOCAL-030"
+title: "Remove Session and Shadow File Tracking Feature"
+created: "2025-01-15"
+updated: "2025-01-16"
+
+summary:
+  total: 8
+  todo: 0
+  in_progress: 0
+  done: 8
+
+work_items:
+  - id: "01"
+    name: "Remove Shadow Services"
+    repo: "vscode-extension"
+    repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
+    repo_protected: false
+    status: done
+    file: "done/01-remove-shadow-services.md"
+
+  - id: "02"
+    name: "Remove Session Services"
+    repo: "vscode-extension"
+    repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
+    repo_protected: false
+    status: done
+    file: "done/02-remove-session-services.md"
+
+  - id: "03"
+    name: "Remove Cleanup Service"
+    repo: "vscode-extension"
+    repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
+    repo_protected: false
+    status: done
+    file: "done/03-remove-cleanup-service.md"
+
+  - id: "04"
+    name: "Simplify TaskTreeProvider"
+    repo: "vscode-extension"
+    repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
+    repo_protected: false
+    status: done
+    file: "done/04-simplify-tree-provider.md"
+
+  - id: "05"
+    name: "Clean Extension Entry Point"
+    repo: "vscode-extension"
+    repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
+    repo_protected: false
+    status: done
+    file: "done/05-clean-extension.md"
+
+  - id: "06"
+    name: "Update Package.json"
+    repo: "vscode-extension"
+    repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
+    repo_protected: false
+    status: done
+    file: "done/06-update-package-json.md"
+
+  - id: "07"
+    name: "Remove Test Files"
+    repo: "vscode-extension"
+    repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
+    repo_protected: false
+    status: done
+    file: "done/07-remove-tests.md"
+
+  - id: "08"
+    name: "Clean Dependencies"
+    repo: "vscode-extension"
+    repo_path: "/Users/gabriel.herter/Documents/Personal/ai-framework/vscode-extension"
+    repo_protected: false
+    status: done
+    file: "done/08-clean-dependencies.md"
