@@ -267,3 +267,126 @@
 - PEO's validateForIntegrate() auto-defaults alienRegNumber to '000000000' if missing
 - Backend sanity checks should mirror PEO validation to avoid premature rejection
 - Post-deployment discovered separate bug: syncI9InfoToPEoContract updates wrong contract (tracked as EEXPR-57)
+
+---
+
+## 2026-01-09: EEXPR-57 - Fix syncI9InfoToPEoContract updating wrong contract
+
+**Repos affected**: backend
+**Task**: [EEXPR-57](.ai/tasks/done/EEXPR-57/)
+
+**Summary**: Fixed bug where syncI9InfoToPEoContract was updating the wrong contract during entity transfers. Added contractOid parameter to ensure I-9 data syncs to the correct target contract.
+
+**Key changes**:
+- Added `contractOid` parameter to `updateDefaultPEOContractWithI9()`
+- Updated `syncI9InfoToPEoContract()` to pass `contractOid`
+- Refactored from `contractId` (number) to `contractOid` (string) for consistency
+- Added unit tests for targeted contract update
+
+**Files modified**:
+- `backend/services/peo/peo_contract_service.ts`
+- `backend/services/peo/__tests__/peo_contract_service.spec.ts`
+
+---
+
+## 2026-01-09: ENGESC-23600 - Tech Ops Endpoint for Missing PEO Employments
+
+**Repos affected**: backend
+**Task**: [ENGESC-23600](.ai/tasks/done/ENGESC-23600/)
+
+**Summary**: Created tech ops endpoint to manually create missing PEO employments for contracts that failed employment creation during entity transfers.
+
+**Key changes**:
+- Added `createMissingEmployment()` service method
+- Added `/admin/peo/tech_ops/create_missing_employment` endpoint
+- Endpoint validates contract exists and has no employment before creating
+
+**Files modified**:
+- `backend/services/peo/peo_contract_service.ts`
+- `backend/controllers/admin/peo/tech_ops/index.ts`
+
+---
+
+## 2026-01-14: EEXPR-59 - Fix Entity Transfer Missing Employment Creation
+
+**Repos affected**: backend
+**Task**: [EEXPR-59](.ai/tasks/done/EEXPR-59/)
+
+**Summary**: Fixed root cause of entity transfers creating contracts without employment records. The Employment microservice requires `jobTitle`, but `CreateContractStep` only passed `jobCode`.
+
+**Key changes**:
+- Added `getJobTitle()` method to resolve jobTitle from jobCode using destination entity's job master
+- Pass `jobTitle` in `peopleFirstPayload.validatedData`
+- Throw error if jobTitle not found (must exist after UW force complete)
+- Added unit tests for jobTitle resolution
+
+**PRs**:
+- dev: PR merged
+- release-dev: [PR #121476](https://github.com/letsdeel/backend/pull/121476)
+- master: [PR #121507](https://github.com/letsdeel/backend/pull/121507) (clean fix without cherry-pick conflicts)
+
+**Related escalations**: ENGESC-23650, ENGESC-23600
+
+**Learnings**:
+- Employment microservice requires both `jobCode` AND `jobTitle`
+- `afterCommit` callback errors in `peoContractService.createContract()` are unhandled promise rejections
+- Job codes can be looked up via `peoClientMasterService.getPEOJobCodesByEntityId()`
+
+---
+
+## 2026-01-19: EEXPR-12-2 - [PEO] GET transfers by source entity endpoint
+
+**Repos affected**: peo
+**Epic**: [EEXPR-12](.ai/tasks/in_progress/EEXPR-12/)
+
+**Summary**: Created PEO endpoint to list entity transfers by source legal entity public ID with cursor-based pagination and multi-status filtering.
+
+**Key changes**:
+- Added `GET /peo/entity-transfer/transfers/source/:sourceEntityPublicId` endpoint
+- Implemented cursor-based pagination (limit max 100)
+- Added multi-status filtering via comma-separated `status` query param
+- Service method `getTransfersBySourceEntity()` in entityTransferService
+- Returns raw transfer data with items and signatures
+
+**Endpoint details**:
+- Path: `/peo/entity-transfer/transfers/source/:sourceEntityPublicId`
+- Query params: `cursor` (UUID), `limit` (default 100), `status` (comma-separated)
+- Response: `{ transfers: [...], cursor: string | null, hasMore: boolean }`
+
+**Files created/modified**:
+- `peo/src/controllers/entityTransfer/entityTransferController.ts:68-89`
+- `peo/src/services/entityTransfer/entityTransferService.ts:292-342`
+- `peo/src/controllers/entityTransfer/entityTransferDto.ts:67-84`
+
+---
+
+## 2026-01-19: EEXPR-12-3 - [BE] Tech ops endpoint with enrichment
+
+**Repos affected**: backend
+**Epic**: [EEXPR-12](.ai/tasks/in_progress/EEXPR-12/)
+
+**Summary**: Created backend tech ops endpoint that calls PEO's transfer listing endpoint and enriches the response with legal entity names, profile information, and employee emails from backend database.
+
+**Key changes**:
+- Added tech ops endpoint for listing entity transfers with enrichment
+- Calls PEO service `GET /peo/entity-transfer/transfers/source/:id`
+- Enriches response with:
+  - Legal entity names and country codes from `LegalEntities` table
+  - Profile names and emails from `Profile` table
+  - Employee emails via Contract → Profile join
+- Uses batch queries with `Op.in` pattern to avoid N+1 queries
+- Map-based O(1) lookup during enrichment
+
+**Enrichment pattern**:
+```javascript
+// Batch fetch all related data
+const [profiles, legalEntities, contractEmails] = await Promise.all([
+  Profile.findAll({ where: { publicId: { [Op.in]: profileIds } } }),
+  LegalEntity.findAll({ where: { publicId: { [Op.in]: entityIds } } }),
+  Contract.findAll({ where: { id: { [Op.in]: contractIds } }, include: ['Contractor'] })
+]);
+
+// Build maps for O(1) lookup
+const profileMap = new Map(profiles.map(p => [p.publicId, p]));
+const entityMap = new Map(entities.map(e => [e.publicId, e]));
+```

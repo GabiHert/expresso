@@ -1,0 +1,17 @@
+task_id: EEXPR-12-4
+title: "[BE] Public API endpoint for transfers"
+status: in_progress
+repo: backend
+branch: EEXPR-12-4-public-api-transfers
+
+summary:
+  total: 1
+  done: 1
+  in_progress: 0
+  todo: 0
+
+work_items:
+  - id: "01"
+    name: "add-public-api-endpoint"
+    status: done
+    file: "done/01-add-public-api-endpoint.md"

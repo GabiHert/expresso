@@ -1,0 +1,30 @@
+# Task Status Index
+task: "EEXPR-64-seniority-date"
+title: "Fix Seniority Dates Not Copied During Entity Transfer"
+created: "2026-01-14"
+updated: "2026-01-15"
+
+summary:
+  total: 3
+  todo: 0
+  in_progress: 0
+  done: 3
+
+work_items:
+  - id: "01"
+    name: "Pass seniority dates in CreateContractStep"
+    repo: "backend"
+    status: done
+    file: "done/01-pass-seniority-dates-create-contract-step.md"
+
+  - id: "02"
+    name: "Accept seniority dates in peo_contract_service"
+    repo: "backend"
+    status: done
+    file: "done/02-accept-seniority-dates-peo-contract-service.md"
+
+  - id: "03"
+    name: "Add unit tests for seniority date copying"
+    repo: "backend"
+    status: done
+    file: "done/03-add-unit-tests.md"

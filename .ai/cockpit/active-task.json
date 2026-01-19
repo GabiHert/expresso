@@ -1,8 +1,20 @@
 {
-  "taskId": "EEXPR-12-2",
-  "title": "[PEO] GET transfers by source entity endpoint",
-  "branch": "EEXPR-12-2-get-transfers-by-source-entity",
-  "frameworkPath": ".ai/tasks/in_progress/EEXPR-12-2",
-  "startedAt": "2026-01-13T12:56:52Z",
-  "sessionId": "8ab5fed41c03"
+  "taskId": "EEXPR-12-7",
+  "title": "[BE] Unified Entity Transfers Gateway Endpoint (EOR + PEO)",
+  "branch": "deel",
+  "frameworkPath": ".ai/tasks/in_progress/EEXPR-12-7",
+  "startedAt": "2026-01-19T12:00:00Z",
+  "sessionId": "eexpr127unified",
+  "affectedRepos": [
+    {
+      "name": "backend",
+      "absolutePath": "/Users/gabriel.herter/Documents/Projects/deel/backend",
+      "gitRoot": "/Users/gabriel.herter/Documents/Projects/deel/backend",
+      "branch": "deel",
+      "remote": "origin",
+      "remoteUrl": "git@github.com:letsdeel/backend.git",
+      "protected": false
+    }
+  ],
+  "currentWorkRepo": "backend"
 }

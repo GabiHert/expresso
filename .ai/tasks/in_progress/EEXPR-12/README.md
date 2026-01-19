@@ -10,6 +10,7 @@
 ║   EEXPR-12-2: [PEO] GET transfers by source entity endpoint      ║
 ║   EEXPR-12-3: [BE] Tech ops endpoint with enrichment             ║
 ║   EEXPR-12-4: [BE] Public API endpoint for transfers             ║
+║   EEXPR-12-5: [PEO+BE] Multi-status filter for transfers         ║
 ║                                                                  ║
 ║ WORK ITEMS IN THIS EPIC:                                         ║
 ║   01-create-subtask-eexpr-12-1.md                                ║
@@ -135,9 +136,11 @@ We need an endpoint to retrieve entity transfer details by source legal entity p
 | ID | Name | Repo | Status | Description |
 |----|------|------|--------|-------------|
 | EEXPR-12-1 | Migration - Fix signature profile_public_id | peo | todo | Fix INTEGER → UUID type mismatch |
-| EEXPR-12-2 | GET transfers by source entity endpoint | peo | todo | New PEO endpoint returning raw data |
-| EEXPR-12-3 | Tech ops endpoint with enrichment | backend | todo | Backend enrichment + tech ops exposure |
+| EEXPR-12-2 | GET transfers by source entity endpoint | peo | **done** | New PEO endpoint returning raw data |
+| EEXPR-12-3 | Tech ops endpoint with enrichment | backend | **done** | Backend enrichment + tech ops exposure |
 | EEXPR-12-4 | Public API endpoint for transfers | backend | todo | Client-facing endpoint like transfer_resources |
+| EEXPR-12-5 | Multi-status filter for transfers | peo, backend | todo | Add status filter array to query |
+| EEXPR-12-7 | Unified Entity Transfers Gateway (EOR + PEO) | backend | todo | Aggregate EOR and PEO transfers |
 
 ## Work Items (Epic Level)
 

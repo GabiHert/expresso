@@ -1,6 +1,5 @@
-import { PeoEmployeeTransfer, PeoEmployeeTransferItem, PeoEmployeeTransferSignature, TransferItemStatus, TransferStatus } from '@models/entityTransfer';
-import { PeoContract } from '@models/peoContract/peoContract';
-import { Op, Transaction, WhereOptions } from 'sequelize';
+import { PeoEmployeeTransfer, PeoEmployeeTransferItem, TransferItemStatus, TransferStatus } from '@models/entityTransfer';
+import { Includeable, Op, Transaction } from 'sequelize';
 import { Service } from 'typedi';
 
 export interface CreateTransferInput {
@@ -27,56 +26,6 @@ export interface UpdateTransferItemInput {
     status?: TransferItemStatus;
     newContractOid?: string;
     resumeFromStep?: string;
-}
-
-export interface TransferItemResponse {
-    id: string;
-    status: string;
-    baseContractOid: string;
-    deelContractId: number | null;
-    employeeName: string;
-    newBenefitPrismGroupId: string;
-    newEmploymentPayrollSettingId: string;
-    newPtoPolicyId: string;
-    newWorkLocationId: string;
-    newPositionPublicId: string;
-    newTeamId: number | null;
-    newContractOid: string | null;
-    resumeFromStep: string | null;
-}
-
-export interface TransferSignatureResponse {
-    id: string;
-    profilePublicId: string;
-    role: string;
-    agreementType: string;
-    signedAt: Date | null;
-}
-
-export interface TransferRecordResponse {
-    id: string;
-    status: string;
-    organizationId: number;
-    requesterProfilePublicId: string;
-    sourceLegalEntityPublicId: string;
-    destinationLegalEntityPublicId: string;
-    effectiveDate: string;
-    agreementId: string | null;
-    items: TransferItemResponse[];
-    signatures: TransferSignatureResponse[];
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface GetTransfersBySourceEntityResponse {
-    transfers: TransferRecordResponse[];
-    cursor: string | null;
-    hasMore: boolean;
-}
-
-export interface GetTransfersBySourceEntityOptions {
-    cursor?: string;
-    limit?: number;
 }
 
 @Service()
@@ -132,10 +81,26 @@ export default class EntityTransferService {
     }
 
     async getTransferById(id: string, includeItems = true, transaction?: Transaction): Promise<PeoEmployeeTransfer | null> {
-        const include: any[] = [];
+        const include: Includeable[] = [];
 
         if (includeItems) {
-            include.push({ model: PeoEmployeeTransferItem, as: 'items' });
+            include.push({
+                model: PeoEmployeeTransferItem,
+                as: 'items',
+                attributes: [
+                    'id',
+                    'status',
+                    'baseContractOid',
+                    'newBenefitPrismGroupId',
+                    'newEmploymentPayrollSettingId',
+                    'newPtoPolicyId',
+                    'newWorkLocationId',
+                    'newPositionPublicId',
+                    'newTeamId',
+                    'newContractOid',
+                    'resumeFromStep',
+                ],
+            });
         }
 
         return PeoEmployeeTransfer.findByPk(id, {
@@ -158,7 +123,35 @@ export default class EntityTransferService {
                 {
                     model: PeoEmployeeTransfer,
                     as: 'transfer',
-                    include: [{ model: PeoEmployeeTransferItem, as: 'items' }],
+                    attributes: [
+                        'id',
+                        'organizationId',
+                        'status',
+                        'requesterProfilePublicId',
+                        'sourceLegalEntityPublicId',
+                        'destinationLegalEntityPublicId',
+                        'effectiveDate',
+                        'agreementId',
+                    ],
+                    include: [
+                        {
+                            model: PeoEmployeeTransferItem,
+                            as: 'items',
+                            attributes: [
+                                'id',
+                                'status',
+                                'baseContractOid',
+                                'newBenefitPrismGroupId',
+                                'newEmploymentPayrollSettingId',
+                                'newPtoPolicyId',
+                                'newWorkLocationId',
+                                'newPositionPublicId',
+                                'newTeamId',
+                                'newContractOid',
+                                'resumeFromStep',
+                            ],
+                        },
+                    ],
                 },
             ],
             transaction,
@@ -174,7 +167,25 @@ export default class EntityTransferService {
                     [Op.lte]: effectiveDate,
                 },
             },
-            include: [{ model: PeoEmployeeTransferItem, as: 'items' }],
+            include: [
+                {
+                    model: PeoEmployeeTransferItem,
+                    as: 'items',
+                    attributes: [
+                        'id',
+                        'status',
+                        'baseContractOid',
+                        'newBenefitPrismGroupId',
+                        'newEmploymentPayrollSettingId',
+                        'newPtoPolicyId',
+                        'newWorkLocationId',
+                        'newPositionPublicId',
+                        'newTeamId',
+                        'newContractOid',
+                        'resumeFromStep',
+                    ],
+                },
+            ],
             limit,
             order: [['effectiveDate', 'ASC']],
             useMaster: false, // Always use replica for batch queries
@@ -218,132 +229,5 @@ export default class EntityTransferService {
 
     async updateTransferItemStatus(id: string, status: TransferItemStatus, transaction?: Transaction): Promise<void> {
         await this.updateTransferItem(id, { status }, transaction);
-    }
-
-    async getTransfersBySourceEntity(
-        sourceEntityPublicId: string,
-        options: GetTransfersBySourceEntityOptions = {},
-    ): Promise<GetTransfersBySourceEntityResponse> {
-        const { cursor, limit = 100 } = options;
-        const queryLimit = Math.min(limit, 100);
-
-        const whereClause: WhereOptions<PeoEmployeeTransfer> = {
-            sourceLegalEntityPublicId: sourceEntityPublicId,
-        };
-
-        if (cursor) {
-            whereClause.id = { [Op.gt]: cursor };
-        }
-
-        const transfers = await PeoEmployeeTransfer.findAll({
-            where: whereClause,
-            limit: queryLimit + 1,
-            order: [['id', 'ASC']],
-            include: [
-                {
-                    model: PeoEmployeeTransferItem,
-                    as: 'items',
-                },
-                {
-                    model: PeoEmployeeTransferSignature,
-                    as: 'signatures',
-                },
-            ],
-            useMaster: false,
-        });
-
-        const hasMore = transfers.length > queryLimit;
-        const results = hasMore ? transfers.slice(0, queryLimit) : transfers;
-        const nextCursor = hasMore && results.length > 0 ? results[results.length - 1].id : null;
-
-        const baseContractOids = results.flatMap(t => t.items?.map(i => i.baseContractOid) || []);
-        const contractsMap = await this.getContractsByOids(baseContractOids);
-
-        const transformedTransfers = results.map(transfer => this.transformTransfer(transfer, contractsMap));
-
-        return {
-            transfers: transformedTransfers,
-            cursor: nextCursor,
-            hasMore,
-        };
-    }
-
-    private async getContractsByOids(oids: string[]): Promise<Map<string, PeoContract>> {
-        if (oids.length === 0) {
-            return new Map();
-        }
-
-        const uniqueOids = [...new Set(oids)];
-        const contracts = await PeoContract.findAll({
-            where: {
-                deelContractOid: { [Op.in]: uniqueOids },
-            },
-            attributes: ['deelContractOid', 'deelContractId', 'firstName', 'lastName'],
-            useMaster: false,
-        });
-
-        const map = new Map<string, PeoContract>();
-        for (const contract of contracts) {
-            map.set(contract.deelContractOid, contract);
-        }
-        return map;
-    }
-
-    private transformTransfer(
-        transfer: PeoEmployeeTransfer,
-        contractsMap: Map<string, PeoContract>,
-    ): TransferRecordResponse {
-        return {
-            id: transfer.id,
-            status: transfer.status,
-            organizationId: transfer.organizationId,
-            requesterProfilePublicId: transfer.requesterProfilePublicId,
-            sourceLegalEntityPublicId: transfer.sourceLegalEntityPublicId,
-            destinationLegalEntityPublicId: transfer.destinationLegalEntityPublicId,
-            effectiveDate: transfer.effectiveDate instanceof Date
-                ? transfer.effectiveDate.toISOString().split('T')[0]
-                : String(transfer.effectiveDate),
-            agreementId: transfer.agreementId || null,
-            items: transfer.items?.map(item => this.transformItem(item, contractsMap)) || [],
-            signatures: transfer.signatures?.map(sig => this.transformSignature(sig)) || [],
-            createdAt: transfer.createdAt,
-            updatedAt: transfer.updatedAt,
-        };
-    }
-
-    private transformItem(
-        item: PeoEmployeeTransferItem,
-        contractsMap: Map<string, PeoContract>,
-    ): TransferItemResponse {
-        const peoContract = contractsMap.get(item.baseContractOid);
-        const employeeName = peoContract
-            ? `${peoContract.firstName || ''} ${peoContract.lastName || ''}`.trim()
-            : '';
-
-        return {
-            id: item.id,
-            status: item.status,
-            baseContractOid: item.baseContractOid,
-            deelContractId: peoContract?.deelContractId || null,
-            employeeName,
-            newBenefitPrismGroupId: item.newBenefitPrismGroupId,
-            newEmploymentPayrollSettingId: item.newEmploymentPayrollSettingId,
-            newPtoPolicyId: item.newPtoPolicyId,
-            newWorkLocationId: item.newWorkLocationId,
-            newPositionPublicId: item.newPositionPublicId,
-            newTeamId: item.newTeamId || null,
-            newContractOid: item.newContractOid || null,
-            resumeFromStep: item.resumeFromStep || null,
-        };
-    }
-
-    private transformSignature(sig: PeoEmployeeTransferSignature): TransferSignatureResponse {
-        return {
-            id: sig.id,
-            profilePublicId: sig.profilePublicId,
-            role: sig.role,
-            agreementType: sig.agreementType,
-            signedAt: sig.signedAt || null,
-        };
     }
 }

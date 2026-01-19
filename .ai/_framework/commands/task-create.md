@@ -324,11 +324,28 @@ See `status.yaml` for full index.
 
 ## Branches
 
-| Repo | Branch |
-|------|--------|
+{if ALL affected repos are protected}
+**Note:** All affected repos are protected. No task branches will be created.
+Work will be done on existing branches in the protected repos.
+
+**Protected Repos:**
 {for each affected repo}
-| {repo} | `{ticket-id}-{short-description}` |
+- ⛔ {repo} - stays on `{locked_branch}`
 {/for}
+{else}
+| Repo | Path | Branch |
+|------|------|--------|
+{for each affected repo WHERE protected != true}
+| {repo} | `{absolute_path}` | `{ticket-id}-{short-description}` |
+{/for}
+
+{if any protected repos in affected list}
+**Protected Repos (no branches created):**
+{for each affected repo WHERE protected == true}
+- ⛔ {repo} - stays on `{locked_branch}`
+{/for}
+{/if}
+{/if}
 
 ## Technical Context
 
@@ -394,10 +411,17 @@ work_items:
   - id: "{id}"
     name: "{name}"
     repo: "{repo}"
+    repo_path: "{absolute_path}"
+    repo_protected: {true|false}
     status: todo
     file: "todo/{id}-{slug}.md"
 {/for}
 ```
+
+**Path Validation:** Ensure `repo_path` is an absolute path before writing:
+- If manifest `path` is relative (starts with `./`): resolve against `project.root`
+- Verify the resolved path exists and contains a `.git` directory
+- Store the fully resolved absolute path, never a relative path
 
 **Note:** The `color` field is optional. Valid values are: `charts.red`, `charts.orange`, `charts.yellow`, `charts.green`, `charts.blue`, `charts.purple`. Only include the color field if the user selected one in Step 6b.
 
@@ -419,7 +443,17 @@ For each work item, create `{id}-{slug}.md`:
 -->
 
 ---
+# Repository Context (LOCAL-026)
 repo: {repo}
+repo_path: {absolute_path}
+branch: {branch_name}
+protected: {true|false}
+
+# Git Safety Reminder
+# Before any git operation:
+#   1. cd {repo_path}
+#   2. Verify: git rev-parse --show-toplevel
+#   3. Verify: git branch --show-current
 ---
 
 # {Work Item Title}
@@ -495,7 +529,16 @@ Work Items:
   {list each work item with id and name}
 
 Branches to Create:
-  {repo}: git checkout -b {branch-name}
+{for each non-protected repo}
+  {repo}: cd {absolute_path} && git checkout -b {branch-name}
+{/for}
+
+{if protected repos exist}
+Protected (no branches):
+{for each protected repo}
+  ⛔ {repo}: stays on {locked_branch}
+{/for}
+{/if}
 
 Next Steps:
   1. Review the task README: .ai/tasks/todo/{ticket-id}/README.md

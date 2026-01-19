@@ -6,10 +6,10 @@ created: "2025-01-08"
 updated: "2025-01-08"
 
 summary:
-  total: 4
-  todo: 0
+  total: 6
+  todo: 2
   in_progress: 0
-  done: 4
+  done: 6
 
 subtasks:
   - id: "EEXPR-12-1"
@@ -20,20 +20,35 @@ subtasks:
   - id: "EEXPR-12-2"
     name: "[PEO] GET transfers by source entity endpoint"
     repo: peo
-    status: todo
+    status: done
     depends_on: ["EEXPR-12-1"]
+    completed_at: "2026-01-19"
 
   - id: "EEXPR-12-3"
     name: "[BE] Tech ops endpoint with enrichment"
     repo: backend
-    status: todo
+    status: done
     depends_on: ["EEXPR-12-1", "EEXPR-12-2"]
+    completed_at: "2026-01-19"
 
   - id: "EEXPR-12-4"
     name: "[BE] Public API endpoint for transfers"
     repo: backend
     status: todo
     depends_on: ["EEXPR-12-3"]
+
+  - id: "EEXPR-12-5"
+    name: "[PEO+BE] Multi-status filter for transfers endpoint"
+    repos: [peo, backend]
+    status: todo
+    depends_on: ["EEXPR-12-2", "EEXPR-12-4"]
+
+  - id: "EEXPR-12-7"
+    name: "[BE] Unified Entity Transfers Gateway Endpoint (EOR + PEO)"
+    repo: backend
+    status: todo
+    depends_on: ["EEXPR-12-2", "EEXPR-12-3"]
+    task_folder: ".ai/tasks/todo/EEXPR-12-7/"
 
 work_items:
   - id: "01"

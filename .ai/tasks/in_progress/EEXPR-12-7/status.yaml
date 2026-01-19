@@ -1,0 +1,54 @@
+# Task Status Index
+task: "EEXPR-12-7"
+title: "[BE] Unified Entity Transfers Gateway Endpoint (EOR + PEO)"
+parent_epic: "EEXPR-12"
+created: "2026-01-19"
+updated: "2026-01-19"
+
+summary:
+  total: 4
+  todo: 0
+  in_progress: 0
+  done: 4
+
+dependencies:
+  - id: "EEXPR-12-2"
+    name: "[PEO] GET transfers by source entity endpoint"
+    status: done
+
+  - id: "EEXPR-12-3"
+    name: "[BE] Tech ops endpoint with enrichment"
+    status: done
+
+work_items:
+  - id: "01"
+    name: "Create unified entity transfers service"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/01-create-unified-service.md"
+
+  - id: "02"
+    name: "Create unified entity transfers controller"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/02-create-unified-controller.md"
+
+  - id: "03"
+    name: "Add gateway definition"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/03-add-gateway-definition.md"
+
+  - id: "04"
+    name: "Add unit tests"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/04-add-unit-tests.md"

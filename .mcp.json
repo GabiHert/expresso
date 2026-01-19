@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "sql-query": {
+      "command": "node",
+      "args": [
+        "/Users/gabriel.herter/Documents/Projects/mcp/sql-mcp-server/index.js"
+      ],
+      "env": {
+        "DB_HOST": "localhost",
+        "DB_PORT": "6666",
+        "DB_NAME": "deel",
+        "DB_USER": "deel",
+        "DB_PASSWORD": "admin",
+        "MAX_ROWS": "1000",
+        "QUERY_TIMEOUT": "30000"
+      }
+    }
+  }
+}

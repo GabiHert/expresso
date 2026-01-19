@@ -1,0 +1,38 @@
+task_id: EEXPR-12-5
+title: "[PEO+BE] Multi-status filter for transfers endpoint"
+status: done
+repos:
+  - peo
+  - backend
+branch: EEXPR-12-5-status-filter
+
+summary:
+  total: 4
+  done: 4
+  in_progress: 0
+  todo: 0
+
+work_items:
+  - id: "01"
+    name: "add-status-filter-peo"
+    repo: peo
+    status: done
+    file: "done/01-add-status-filter-peo.md"
+
+  - id: "02"
+    name: "add-status-filter-backend"
+    repo: backend
+    status: done
+    file: "done/02-add-status-filter-backend.md"
+
+  - id: "03"
+    name: "move-client-service"
+    repo: backend
+    status: done
+    file: "done/03-move-client-service.md"
+
+  - id: "04"
+    name: "create-query-service"
+    repo: backend
+    status: done
+    file: "done/04-create-query-service.md"

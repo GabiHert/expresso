@@ -95,6 +95,56 @@ When answering questions or exploring context, follow this order:
 - Start exploring code without task context
 - Ignore existing research in the task folder
 
+## Git Safety Rules
+
+**CRITICAL: Never commit or push without explicit user approval.**
+
+### Before ANY Git Operation
+
+1. **ASK PERMISSION** before:
+   - `git commit` - Always ask "Ready to commit these changes?"
+   - `git push` - Always ask "Ready to push to remote?"
+   - `git checkout -b` - Ask if creating branches in shared repos
+   - `git merge` / `git rebase` - Always confirm first
+
+2. **VERIFY CORRECT DIRECTORY** (multi-repo/submodule projects):
+   - File edits work from parent directory
+   - Git commands MUST run in the specific repo/submodule directory
+   - Always `cd` to the correct repo before git operations
+   - Verify with `git rev-parse --show-toplevel`
+
+3. **CHECK PROTECTED STATUS**:
+   - Read `manifest.yaml` for `protected: true` repos
+   - NEVER run git operations on protected repos
+   - Protected repos are read-only for the agent
+
+### Safe Workflow Example
+
+```
+User: "Commit the changes"
+
+Agent: I'll prepare the commit. Let me show you what will be committed:
+
+[runs git status, git diff --staged]
+
+Ready to commit with message:
+"feat: add user authentication"
+
+Proceed with commit? (waiting for approval)
+
+User: "yes"
+
+Agent: [now runs git commit]
+```
+
+### Forbidden Without Approval
+
+- `git commit` - NEVER auto-commit
+- `git push` - NEVER auto-push
+- `git push --force` - NEVER (extremely dangerous)
+- `git reset --hard` - NEVER without explicit request
+- `git rebase` on shared branches - NEVER without approval
+
 ## For Framework Commands
 
 When the user invokes framework commands (`/task-*`, `/document`, etc.):

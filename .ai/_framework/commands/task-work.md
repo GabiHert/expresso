@@ -79,10 +79,28 @@ Work on a specific work item from the current task. This command guides you thro
 
 ## Implementation
 
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ GIT SAFETY CHECKLIST (LOCAL-026)                                │
+│                                                                 │
+│ Before ANY git operation (add, commit, push, checkout):         │
+│                                                                 │
+│ 1. Read active-task.json for repo paths                         │
+│ 2. cd to {absolutePath} from affectedRepos                      │
+│ 3. Verify: git rev-parse --show-toplevel                        │
+│ 4. Verify: git remote -v (correct remote?)                      │
+│ 5. Check: Is repo protected? If yes, STOP.                      │
+│                                                                 │
+│ NEVER run git commands from the project root when working       │
+│ on nested repos - you'll commit to the wrong repo!              │
+└─────────────────────────────────────────────────────────────────┘
+```
+
 ### Step 0: Orientation
 
 1. Read `.ai/_project/manifest.yaml` to understand:
    - Available repositories
+   - **Protected repos (`protected: true`) - NEVER commit to these**
    - Commit conventions
    - Available MCPs
 
@@ -295,11 +313,107 @@ Run /task-done to finish the task.
 {/if}
 ```
 
+### Step 8.5: Pre-Git Verification (MANDATORY)
+
+Before any git operation, you MUST verify you're in the correct repository:
+
+**1. Read active-task.json:**
+```bash
+cat .ai/cockpit/active-task.json
+```
+
+**2. Identify target repo from current work item:**
+- Get `repo` from work item YAML frontmatter
+- Find matching entry in `affectedRepos` array
+- Get `absolutePath` and `gitRoot`
+
+**If repo not found in affectedRepos:**
+```
+⛔ REPO NOT FOUND IN TASK CONTEXT
+
+Repo '{repo}' is not in active-task.json affectedRepos.
+
+Possible causes:
+  • This repo is protected (no git operations allowed)
+  • This repo was not included when task was started
+  • active-task.json is outdated
+
+Resolution:
+  • For protected repos: commit manually after careful review
+  • Otherwise: re-run /task-start to refresh context
+```
+STOP and do not proceed with git operations.
+
+**3. Navigate and verify:**
+```bash
+# Navigate to the ABSOLUTE path
+cd {absolutePath}
+
+# Verify git root matches (resolve symlinks with pwd -P)
+ACTUAL_ROOT=$(cd "$(git rev-parse --show-toplevel)" && pwd -P)
+EXPECTED_ROOT=$(cd "{gitRoot}" && pwd -P)
+
+if [ "$ACTUAL_ROOT" != "$EXPECTED_ROOT" ]; then
+  echo "⛔ GIT ROOT MISMATCH"
+  echo "Expected: $EXPECTED_ROOT"
+  echo "Actual: $ACTUAL_ROOT"
+  echo ""
+  echo "You may be in a nested repo. Aborting git operation."
+  exit 1
+fi
+
+# Verify correct branch
+CURRENT_BRANCH=$(git branch --show-current)
+EXPECTED_BRANCH="{branch from affectedRepos}"
+
+if [ "$CURRENT_BRANCH" != "$EXPECTED_BRANCH" ]; then
+  echo "⚠️ BRANCH MISMATCH"
+  echo "Expected: $EXPECTED_BRANCH"
+  echo "Actual: $CURRENT_BRANCH"
+  echo ""
+  echo "Switch to correct branch before proceeding."
+fi
+
+# Verify remote
+git remote -v | grep origin
+```
+
+**4. Show verification result:**
+```
+GIT CONTEXT VERIFIED ✓
+
+Repository: {repo}
+Path: {absolutePath}
+Git Root: ✓ Matches expected
+Branch: {branch}
+Remote: origin → {remoteUrl}
+
+Ready for git operations.
+```
+
+**5. If verification fails:**
+```
+⛔ GIT CONTEXT VERIFICATION FAILED
+
+Cannot proceed with git operations. Issues found:
+  • {list issues}
+
+Please manually verify your working directory and try again.
+```
+
+STOP and do not proceed with git operations if verification fails.
+
 ### Step 9: Offer Commit
+
+**IMPORTANT**: All git commands must be run from the verified repo path.
 
 If changes were made:
 ```
 COMMIT
+
+Repository: {repo}
+Path: {absolutePath}
+Branch: {branch}
 
 Would you like to commit these changes?
 
@@ -312,7 +426,29 @@ Suggested message: {type}({scope}): {description}
 Commit now? (y/n)
 ```
 
-If yes, create the commit following manifest conventions.
+**If yes**, run git commands using absolute path:
+```bash
+cd {absolutePath}
+
+# Verify one more time
+pwd
+git rev-parse --show-toplevel
+
+# Stage and commit
+git add {files}
+git commit -m "{message}"
+```
+
+**If the repo is protected** (check `affectedRepos[].protected` or manifest):
+```
+⛔ COMMIT BLOCKED - PROTECTED REPO
+
+{repo} is marked as protected in manifest.yaml.
+Changes cannot be committed to this repo via task workflow.
+
+If you need to make changes here, commit manually after
+careful review.
+```
 
 ### Step 10: Auto-Sync (if enabled)
 

@@ -7,14 +7,14 @@
     "size": 6442
   },
   "accumulated": {
-    "lastUpdatedAt": "2026-01-13T13:18:44.228Z",
-    "hash": "e6b9a733923055b5",
-    "size": 12580,
-    "editCount": 3
+    "lastUpdatedAt": "2026-01-14T16:45:28.968Z",
+    "hash": "c6688aa644a41eb3",
+    "size": 8760,
+    "editCount": 11
   },
   "sync": {
-    "lastCheckedAt": "2026-01-13T13:18:44.228Z",
-    "actualFileHash": "e6b9a733923055b5",
+    "lastCheckedAt": "2026-01-14T16:45:28.968Z",
+    "actualFileHash": "c6688aa644a41eb3",
     "status": "synced"
   }
 }

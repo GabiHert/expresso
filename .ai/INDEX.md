@@ -99,6 +99,8 @@
 | peo | [docs/peo/](./docs/peo/) | PEO service |
 | peo/entity_transfers | [docs/peo/entity_transfers/](./docs/peo/entity_transfers/) | Entity transfer handlers |
 | peo/hris_integration | [docs/peo/hris_integration/](./docs/peo/hris_integration/) | HRIS integration (BambooHR, Hibob, Workday) |
+| eor-experience | [docs/eor-experience/](./docs/eor-experience/) | EOR experience service |
+| eor-experience/contracts-legal-entity-movement | [docs/eor-experience/contracts-legal-entity-movement/](./docs/eor-experience/contracts-legal-entity-movement/) | Legal entity movement API for EOR contracts |
 | employment | [docs/employment/](./docs/employment/) | Employment service - payroll, employments, payouts |
 | payroll-processing-api | [docs/payroll-processing-api/](./docs/payroll-processing-api/) | Payroll processing |
 | benefits | [docs/benefits/](./docs/benefits/) | Benefits service |
