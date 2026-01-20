@@ -145,6 +145,51 @@ Agent: [now runs git commit]
 - `git reset --hard` - NEVER without explicit request
 - `git rebase` on shared branches - NEVER without approval
 
+## Worktree Rules
+
+**MANDATORY: Always use the `create-worktree.sh` script when creating git worktrees.**
+
+### Why This Matters
+
+Manual worktree creation leads to:
+- Inconsistent directory structures
+- Forgotten `.gitignore` entries
+- Branch naming inconsistencies
+- Cleanup difficulties
+
+### Required Script Usage
+
+```bash
+# Script location
+scripts/create-worktree.sh <repo-path> <task-id> [base-branch]
+
+# Examples
+scripts/create-worktree.sh ~/Projects/backend JIRA-123
+scripts/create-worktree.sh ~/Projects/backend JIRA-123 develop
+scripts/create-worktree.sh /path/to/repo feature/new-api main
+```
+
+### What the Script Does
+
+1. Creates worktree at `.worktrees/{task-id}/` inside the target repo
+2. Creates branch `task/{task-id}` from the specified base branch
+3. Automatically adds `.worktrees/` to `.gitignore`
+4. Fetches latest from remote before branching
+5. Validates repo path and handles errors gracefully
+
+### Forbidden Without the Script
+
+- `git worktree add` - NEVER run manually
+- Creating worktrees in arbitrary locations
+- Creating worktrees without proper `.gitignore` setup
+
+### Cleanup
+
+When done with a worktree:
+```bash
+git worktree remove .worktrees/{task-id}
+```
+
 ## For Framework Commands
 
 When the user invokes framework commands (`/task-*`, `/document`, etc.):

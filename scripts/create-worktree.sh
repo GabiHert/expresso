@@ -105,7 +105,7 @@ mkdir -p "$WORKTREE_DIR"
 
 # Add .worktrees to .gitignore if not already there
 if [ -f .gitignore ]; then
-    if ! grep -q "^\.worktrees/?$" .gitignore 2>/dev/null; then
+    if ! grep -qE "^\.worktrees/?$" .gitignore 2>/dev/null; then
         warn "Adding .worktrees/ to .gitignore"
         echo ".worktrees/" >> .gitignore
     fi

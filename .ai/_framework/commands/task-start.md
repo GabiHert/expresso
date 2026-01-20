@@ -20,6 +20,28 @@ Start a task by moving it from todo to in_progress, reading the task context, an
 /task-start JIRA-123
 /task-start LOCAL-001
 /task-start                       # Lists available tasks to choose from
+/task-start JIRA-123 --worktree <repo-path> [base-branch]
+```
+
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `--worktree <repo-path>` | Create a git worktree for task isolation. Requires repo path. |
+| `[base-branch]` | Base branch for worktree (default: main). Only used with `--worktree`. |
+
+### Examples with --worktree
+
+```bash
+# Create worktree from main branch
+/task-start JIRA-123 --worktree ~/Projects/backend
+
+# Create worktree from develop branch
+/task-start JIRA-123 --worktree ~/Projects/backend develop
+
+# Multiple repos (run separately)
+/task-start JIRA-123 --worktree ~/Projects/backend main
+/task-start JIRA-123 --worktree ~/Projects/frontend main
 ```
 
 ## Workflow
@@ -28,6 +50,11 @@ Start a task by moving it from todo to in_progress, reading the task context, an
 1. FIND TASK
    • Search in .ai/tasks/todo/
    • Validate task exists
+
+1.5. CREATE WORKTREE (if --worktree provided)
+   • Run scripts/create-worktree.sh (MANDATORY)
+   • Create isolated workspace at .worktrees/{task-id}/
+   • Never run git worktree add manually
 
 2. MOVE TO IN_PROGRESS
    • Move folder from todo/ to in_progress/
@@ -49,6 +76,7 @@ Start a task by moving it from todo to in_progress, reading the task context, an
 5. ACTIVATE TRACKING
    • Update cockpit active-task.json
    • Enable edit tracking
+   • Include worktree info if created
 ```
 
 ## Implementation
@@ -107,6 +135,64 @@ Available tasks in todo:
 
 Which task would you like to start? (Enter number or task ID)
 ```
+
+### Step 1.5: Create Worktree (if --worktree provided)
+
+**MANDATORY: Use the `create-worktree.sh` script. Never run `git worktree add` manually.**
+
+If `--worktree` flag is provided:
+
+1. **Validate the script exists:**
+   ```bash
+   if [ ! -f "scripts/create-worktree.sh" ]; then
+     error "Worktree script not found at scripts/create-worktree.sh"
+   fi
+   ```
+
+2. **Execute the worktree script:**
+   ```bash
+   scripts/create-worktree.sh <repo-path> <task-id> [base-branch]
+   ```
+
+   Example:
+   ```bash
+   scripts/create-worktree.sh ~/Projects/backend JIRA-123 main
+   ```
+
+3. **Announce worktree creation:**
+   ```
+   ╔══════════════════════════════════════════════════════════════════╗
+   ║ WORKTREE CREATED                                                 ║
+   ╠══════════════════════════════════════════════════════════════════╣
+
+   Repository: {repo-path}
+   Worktree:   {repo-path}/.worktrees/{task-id}/
+   Branch:     task/{task-id}
+   Base:       {base-branch}
+
+   To enter worktree:
+     cd {repo-path}/.worktrees/{task-id}
+
+   To open in VS Code:
+     code {repo-path}/.worktrees/{task-id}
+   ╚══════════════════════════════════════════════════════════════════╝
+   ```
+
+4. **If script fails**, stop and report the error. Do not proceed with task-start.
+
+5. **Update active-task.json** to include worktree info:
+   ```json
+   {
+     "taskId": "{task-id}",
+     "worktrees": [
+       {
+         "repo": "{repo-path}",
+         "path": "{repo-path}/.worktrees/{task-id}",
+         "branch": "task/{task-id}"
+       }
+     ]
+   }
+   ```
 
 ### Step 2: Move Task to In Progress
 
@@ -275,6 +361,11 @@ Activate cockpit tracking for the task:
 Task: {task-id} - {title}
 Location: .ai/tasks/in_progress/{task-id}/
 
+{if worktree was created}
+Worktree: {repo-path}/.worktrees/{task-id}/
+Branch:   task/{task-id}
+{/if}
+
 Work Items: {total} total, {todo} remaining
 
 Start With:
@@ -284,6 +375,10 @@ Quick Commands:
   • /task-work 01              Work on item 01
   • /task-status               View all tasks
   • /task-review               Run code review
+{if worktree was created}
+  • cd {worktree-path}         Enter worktree
+  • code {worktree-path}       Open in VS Code
+{/if}
 ```
 
 ### Step 8: Auto-Sync (if enabled)
