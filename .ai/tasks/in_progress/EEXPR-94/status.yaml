@@ -1,0 +1,36 @@
+# Task Status Index
+task: "EEXPR-94"
+title: "Fix Entity Transfer Replication Lag Bug"
+created: "2026-01-21"
+updated: "2026-01-23"
+
+summary:
+  total: 3
+  todo: 2
+  in_progress: 0
+  done: 1
+
+work_items:
+  - id: "01"
+    name: "Fix createTransfer to use master read"
+    repo: "peo"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/peo"
+    repo_protected: false
+    status: done
+    file: "done/01-fix-create-transfer-master-read.md"
+
+  - id: "02"
+    name: "Fix file submissions rollback to use direct SQL deletion"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: in_progress
+    file: "in_progress/02-fix-file-submissions-rollback-direct-sql.md"
+
+  - id: "03"
+    name: "Update file submission repository tests"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: todo
+    file: "todo/03-update-file-submission-repository-tests.md"

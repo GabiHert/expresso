@@ -3,13 +3,13 @@ task: "EEXPR-12"
 title: "[BE] Endpoint to retrieve transfer details, status, and signature progress"
 type: epic
 created: "2025-01-08"
-updated: "2025-01-08"
+updated: "2026-01-20"
 
 summary:
-  total: 6
-  todo: 2
+  total: 8
+  todo: 4
   in_progress: 0
-  done: 6
+  done: 4
 
 subtasks:
   - id: "EEXPR-12-1"
@@ -46,9 +46,23 @@ subtasks:
   - id: "EEXPR-12-7"
     name: "[BE] Unified Entity Transfers Gateway Endpoint (EOR + PEO)"
     repo: backend
-    status: todo
+    status: done
     depends_on: ["EEXPR-12-2", "EEXPR-12-3"]
-    task_folder: ".ai/tasks/todo/EEXPR-12-7/"
+    completed_at: "2026-01-20"
+
+  - id: "EEXPR-12-8"
+    name: "[BE] /pending route with hardcoded status defaults"
+    repo: backend
+    status: todo
+    depends_on: ["EEXPR-12-7"]
+    task_folder: "subtasks/EEXPR-12-8/"
+
+  - id: "EEXPR-12-9"
+    name: "[BE] contractOid filter for unified transfers"
+    repo: backend
+    status: todo
+    depends_on: ["EEXPR-12-7", "EEXPR-12-8"]
+    task_folder: "subtasks/EEXPR-12-9/"
 
 work_items:
   - id: "01"

@@ -62,28 +62,29 @@ The entity transfer endpoint requires the following fields:
 | Field | Description | Database Source |
 |-------|-------------|-----------------|
 | `newPayrollSettingsId` | Payroll settings (pay frequency) in the new entity | `employment.employment_payroll_settings.id` |
-| `newBenefitGroupId` | Benefit group ID in the destination entity | `peo.peo_benefit_groups.id` |
-| `newPtoPolicyId` | PTO/time-off policy in the destination entity | `peo.prism_hr_pto_policies.id` |
-| `newWorkLocationId` | Work location in the destination entity | `peo.work_locations.id` |
-| `newJobCode` | Position/job code in the destination entity | `peo.peo_positions.code` |
+| `newBenefitGroupId` | Benefit group ID in the destination entity | `peo.peo_benefit_groups.prism_group_id` |
+| `newPtoPolicyId` | PTO/time-off policy in the destination entity (UUID) | `time_off.policies.uid` |
+| `newWorkLocationId` | Work location in the destination entity (UUID) | `entity_work_locations.public_id` |
+| `newPositionPublicId` | Position public ID in the destination entity (UUID) | `peo.peo_positions.public_id` |
 | `newTeamId` | Team assignment in the new entity (optional) | `public.teams.id` |
+
+> **Note**: The field `newJobCode` is deprecated. Use `newPositionPublicId` instead.
 
 ### Example Payload
 
 ```json
 {
-  "organizationId": 106252,
-  "requesterProfilePublicId": "bfad0491-eca1-4857-ac9a-7e30002a44d4",
-  "basePeoContractOid": "EMP12345",
-  "sourceLegalEntityPublicId": "13c44a93-cf52-4dd3-a1ba-cf8e8404cd10",
-  "destinationLegalEntityPublicId": "6569739c-33d5-4897-82f5-5284d2b17e71",
-  "effectiveDate": "2025-12-17",
-  "agreementId": "AGR-TEST-0E31823D",
-  "newPayrollSettingsId": "cmj1mkiml01to01cngrnz3z1h",
+  "organizationId": 248967,
+  "requesterProfilePublicId": "8a123893-ecfc-4a96-ac93-348e131c3e2c",
+  "basePeoContractOid": "mdqzz6j",
+  "sourceLegalEntityPublicId": "973397ff-e02d-4602-800c-a640c5cfd6e9",
+  "destinationLegalEntityPublicId": "626c5332-7f5c-4afd-a5db-2de2d7787e75",
+  "effectiveDate": "2026-01-27",
+  "newPayrollSettingsId": "cmhky5pbc000301eogtj1fsdl",
   "newBenefitGroupId": "1",
-  "newPtoPolicyId": "7422d56a-a372-46c5-adbd-9463d16d58cb",
-  "newWorkLocationId": "1eb08af5-4ce9-4fb1-8ddd-ab8ae5bb23c6",
-  "newJobCode": "SRCONSULARC",
-  "newTeamId": 205923
+  "newPtoPolicyId": "8e54b4e5-3106-44ec-88fb-f25a2ced2819",
+  "newWorkLocationId": "80389a62-a2de-4106-b2c2-205a7e7667e1",
+  "newPositionPublicId": "c896145a-beb1-42ab-882b-496152d31693",
+  "newTeamId": 378936
 }
 ```

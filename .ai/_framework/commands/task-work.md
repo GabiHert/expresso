@@ -81,14 +81,14 @@ Work on a specific work item from the current task. This command guides you thro
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│ GIT SAFETY CHECKLIST (LOCAL-026)                                │
+│ GIT SAFETY CHECKLIST                                            │
 │                                                                 │
 │ Before ANY git operation (add, commit, push, checkout):         │
 │                                                                 │
-│ 1. Read active-task.json for repo paths                         │
-│ 2. cd to {absolutePath} from affectedRepos                      │
-│ 3. Verify: git rev-parse --show-toplevel                        │
-│ 4. Verify: git remote -v (correct remote?)                      │
+│ 1. Read work item to get target repo                            │
+│ 2. Read manifest.yaml for repo path                             │
+│ 3. cd to the repo path                                          │
+│ 4. Verify: git rev-parse --show-toplevel                        │
 │ 5. Check: Is repo protected? If yes, STOP.                      │
 │                                                                 │
 │ NEVER run git commands from the project root when working       │
@@ -207,68 +207,110 @@ Choice? (1/2)
 
 If user chooses 1, launch an Explore agent targeting the relevant files and patterns.
 
-### Step 5: Implement
+### Step 5: Invoke Implementer Agent
 
-Follow each implementation step from the work item:
-
-```
-IMPLEMENTING STEP 1: {step name}
-══════════════════════════════════════════════════════════════════
-
-File: {file path}
-
-{Follow the instructions from the work item}
-```
-
-After each step:
-- Show what was changed
-- Ask if ready to proceed to next step
+**Spawn the Implementer agent** to execute this work item with clean context:
 
 ```
-Step 1 complete.
+Task(
+  subagent_type: "implementer",
+  model: "sonnet",
+  prompt: "
+    ## Task Context
+    {task README content}
 
-Changes made:
-  • {file}: {brief description of change}
+    ## Your Work Item
+    {work item file content}
 
-Continue to Step 2? (y/n)
+    ## Previous Feedback (if re-running)
+    {feedback file content, if exists}
+
+    ## Implementation Guidelines
+    - Implement ONLY what the work item specifies
+    - No git operations (orchestrator handles git)
+    - Must satisfy all acceptance criteria
+    - Follow existing code patterns
+
+    Return an implementation summary when complete.
+  "
+)
 ```
 
-### Step 6: Post-Implementation
+The Implementer agent will:
+- Execute with fresh, isolated context
+- Make code changes as specified
+- Run tests if specified
+- Return a summary of changes and acceptance criteria status
 
-After all steps complete:
-```
-IMPLEMENTATION COMPLETE
+Capture the implementation summary for the Reviewer.
 
-Running code review...
-```
+### Step 6: Invoke Reviewer Agent (Automatic)
 
-Launch a code review agent on the changed files:
-```
-Review the following changes for:
-- Bugs or logic errors
-- Security vulnerabilities
-- Code quality issues
-- Missing tests
+**After Implementer completes, automatically spawn the Reviewer agent:**
 
-Changed files: {list of files modified}
+```bash
+# Get the git diff for review
+git diff HEAD > /tmp/changes.diff
 ```
 
-If issues found:
 ```
-REVIEW FINDINGS
+Task(
+  subagent_type: "reviewer",
+  model: "sonnet",
+  prompt: "
+    ## Implementer Summary
+    {summary from implementer}
 
-The review found {count} issues:
+    ## Git Diff
+    {contents of git diff}
 
-  1. {issue description}
-     Suggestion: {fix}
+    ## Work Item Acceptance Criteria
+    {criteria from work item}
 
-  2. {issue description}
-     Suggestion: {fix}
+    ## Task Context
+    {task README content}
 
-Would you like me to address these? (y/n)
+    ## Your Mission
+    Review this implementation:
+    1. Check all acceptance criteria are met
+    2. Check for bugs, security issues, code quality
+    3. Return verdict: APPROVED or NEEDS CHANGES
+
+    Save feedback to: {task-path}/feedback/{work-item-id}-review.md
+  "
+)
 ```
 
-Address issues if requested.
+**If verdict is NEEDS CHANGES:**
+```
+╔══════════════════════════════════════════════════════════════════╗
+║ REVIEW: NEEDS CHANGES                                            ║
+╠══════════════════════════════════════════════════════════════════╣
+
+{display reviewer feedback summary}
+
+Required Actions:
+  1. {action 1}
+  2. {action 2}
+
+╠══════════════════════════════════════════════════════════════════╣
+║ Options:                                                         ║
+║   [F]ix - Re-run implementer with feedback                       ║
+║   [O]verride - Mark complete anyway                              ║
+║   [S]top - Stop and review manually                              ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+
+- If **Fix**: Re-run Step 5 with previous feedback included
+- If **Override**: Continue to Step 7
+- If **Stop**: Exit task-work
+
+**If verdict is APPROVED:**
+```
+✓ Review passed - proceeding to completion
+```
+
+Continue to Step 7.
 
 ### Step 7: Complete Work Item
 
@@ -317,62 +359,44 @@ Run /task-done to finish the task.
 
 Before any git operation, you MUST verify you're in the correct repository:
 
-**1. Read active-task.json:**
+**1. Identify target repo from current work item:**
+- Get `repo` from work item YAML frontmatter or content
+
+**2. Read manifest.yaml for repo details:**
 ```bash
-cat .ai/cockpit/active-task.json
+cat .ai/_project/manifest.yaml | grep -A5 "name: {repo}"
 ```
+- Get `path` for the repo
+- Check if `protected: true`
 
-**2. Identify target repo from current work item:**
-- Get `repo` from work item YAML frontmatter
-- Find matching entry in `affectedRepos` array
-- Get `absolutePath` and `gitRoot`
-
-**If repo not found in affectedRepos:**
+**If repo is protected:**
 ```
-⛔ REPO NOT FOUND IN TASK CONTEXT
+⛔ PROTECTED REPO - NO GIT OPERATIONS
 
-Repo '{repo}' is not in active-task.json affectedRepos.
+Repo '{repo}' is marked as protected in manifest.yaml.
+Commit manually after careful review.
+```
+STOP and do not proceed with git operations.
 
-Possible causes:
-  • This repo is protected (no git operations allowed)
-  • This repo was not included when task was started
-  • active-task.json is outdated
+**If repo not found in manifest:**
+```
+⛔ REPO NOT FOUND
 
-Resolution:
-  • For protected repos: commit manually after careful review
-  • Otherwise: re-run /task-start to refresh context
+Repo '{repo}' is not in manifest.yaml.
+Add it to the manifest or check the repo name.
 ```
 STOP and do not proceed with git operations.
 
 **3. Navigate and verify:**
 ```bash
-# Navigate to the ABSOLUTE path
-cd {absolutePath}
+# Navigate to the repo path from manifest
+cd {repo_path}
 
-# Verify git root matches (resolve symlinks with pwd -P)
-ACTUAL_ROOT=$(cd "$(git rev-parse --show-toplevel)" && pwd -P)
-EXPECTED_ROOT=$(cd "{gitRoot}" && pwd -P)
+# Verify we're in a git repo
+git rev-parse --show-toplevel
 
-if [ "$ACTUAL_ROOT" != "$EXPECTED_ROOT" ]; then
-  echo "⛔ GIT ROOT MISMATCH"
-  echo "Expected: $EXPECTED_ROOT"
-  echo "Actual: $ACTUAL_ROOT"
-  echo ""
-  echo "You may be in a nested repo. Aborting git operation."
-  exit 1
-fi
-
-# Verify correct branch
-CURRENT_BRANCH=$(git branch --show-current)
-EXPECTED_BRANCH="{branch from affectedRepos}"
-
-if [ "$CURRENT_BRANCH" != "$EXPECTED_BRANCH" ]; then
-  echo "⚠️ BRANCH MISMATCH"
-  echo "Expected: $EXPECTED_BRANCH"
-  echo "Actual: $CURRENT_BRANCH"
-  echo ""
-  echo "Switch to correct branch before proceeding."
-fi
+# Show current branch
+git branch --show-current
 
 # Verify remote
 git remote -v | grep origin
@@ -383,10 +407,8 @@ git remote -v | grep origin
 GIT CONTEXT VERIFIED ✓
 
 Repository: {repo}
-Path: {absolutePath}
-Git Root: ✓ Matches expected
-Branch: {branch}
-Remote: origin → {remoteUrl}
+Path: {repo_path}
+Branch: {current_branch}
 
 Ready for git operations.
 ```

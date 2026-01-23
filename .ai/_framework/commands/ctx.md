@@ -49,9 +49,9 @@ Quickly refresh your understanding of the Expresso framework. Use this command w
    - Protected repo flags
    - Conventions
 
-2. Check for active task:
-   - Read `.ai/cockpit/active-task.json` if exists
-   - Note current working repo and affected repos
+2. Check for tasks in progress:
+   - List tasks in `.ai/tasks/in_progress/`
+   - Note which repos are affected by current tasks
 
 3. **EXTENSION CHECK (MANDATORY)**:
    ```
@@ -106,23 +106,19 @@ REPOSITORIES
     {if repo.is_framework}📦 Framework repo{/if}
 {/for}
 
-{if active-task exists}
-ACTIVE TASK
+{if tasks in in_progress/}
+TASKS IN PROGRESS
 ══════════════════════════════════════════════════════════════════
-Task: {taskId} - {title}
-Working in: {currentWorkRepo}
-
-Affected repos:
-{for each repo in affectedRepos}
-  • {repo.name}: {repo.absolutePath}
-    Branch: {repo.branch}
-    {if repo.protected}⛔ PROTECTED{/if}
+{for each task in .ai/tasks/in_progress/}
+  • {task-id}: {title}
+    Work items: {done}/{total} complete
 {/for}
 {/if}
 
 CRITICAL RULES
 ══════════════════════════════════════════════════════════════════
 🛑 NEVER COMMIT OR PUSH WITHOUT USER APPROVAL
+🛑 EXTENSIONS: Reading is NOT applying - verify compliance at each step
 ⚠ GIT OPERATIONS: Always run in correct repo directory
 ⚠ PROTECTED REPOS: Never modify repos marked protected: true
 ⚠ SUBMODULES: File edits work from parent, git commands don't
@@ -136,6 +132,7 @@ Config: .ai/_project/manifest.yaml
 QUICK COMMANDS
 ══════════════════════════════════════════════════════════════════
 /ctx git      - Git safety rules
+/ctx ext      - Extension compliance guide
 /ctx nav      - Navigation guide
 /ctx commands - Available commands
 ```
@@ -190,21 +187,6 @@ FORBIDDEN WITHOUT APPROVAL
   🛑 git reset --hard - NEVER without explicit request
   🛑 git rebase      - Always ask on shared branches
 
-{if active-task exists}
-CURRENT TASK REPOS
-══════════════════════════════════════════════════════════════════
-{for each repo in affectedRepos}
-  {repo.name}:
-    Path: {repo.absolutePath}
-    Git root: {repo.gitRoot}
-    Remote: {repo.remoteUrl}
-    Protected: {repo.protected}
-{/for}
-
-To work in {currentWorkRepo}:
-  cd {currentWorkRepo.absolutePath}
-{/if}
-
 PROTECTED REPOSITORIES
 ══════════════════════════════════════════════════════════════════
 {for each repo where protected: true}
@@ -212,6 +194,63 @@ PROTECTED REPOSITORIES
      DO NOT: create branches, commit, push
      Locked to branch: {repo.locked_branch}
 {/for}
+```
+
+#### Extension Focus (`/ctx ext`)
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║ EXTENSION COMPLIANCE - READING ≠ APPLYING                        ║
+╚══════════════════════════════════════════════════════════════════╝
+
+🛑 THE PROBLEM: "Acknowledge but Don't Apply"
+
+  WRONG:
+    ✓ Project Extension Active
+    [proceeds to ignore extension and use default habits]
+
+  RIGHT:
+    ✓ Project Extension Active
+    Extension mandates: {list specific requirements}
+    Adjusting my approach to comply...
+
+WHEN YOU FIND AN EXTENSION
+══════════════════════════════════════════════════════════════════
+
+  1. EXTRACT requirements explicitly:
+     "Extension requires:
+       • BDD-first: tests BEFORE implementation
+       • Coverage threshold: 80%"
+
+  2. VERIFY each step against requirements:
+     "Does this comply with the extension?"
+     "Am I defaulting to habits instead?"
+
+  3. CHECK at decision points:
+     "EXTENSION COMPLIANCE CHECK
+      Requirement: BDD-first
+      My proposal: [test → implement → verify]
+      Compliant: ✓"
+
+WHY THIS MATTERS
+══════════════════════════════════════════════════════════════════
+
+Extensions exist to OVERRIDE default behavior.
+Acknowledging without applying defeats their purpose.
+
+Common failure: Reading extension → Announcing it's active →
+                Immediately falling back to default patterns
+
+If your plan contradicts the extension, STOP and re-read.
+
+EXTENSION LOCATIONS
+══════════════════════════════════════════════════════════════════
+  .ai/_project/commands/{command}.extend.md
+
+  Examples:
+    task-create.extend.md   - Custom task creation workflow
+    task-work.extend.md     - Custom implementation patterns
+    document.extend.md      - Custom documentation style
 ```
 
 #### Navigation Focus (`/ctx nav`)
@@ -318,9 +357,9 @@ Always end with:
 REMEMBER
 ══════════════════════════════════════════════════════════════════
   🛑 NEVER commit or push without user approval
+  🛑 EXTENSIONS: Reading ≠ Applying - verify compliance at EACH step
   ⚠ Git commands: Run in correct repo directory
   ⚠ Protected repos: Don't modify (check manifest.yaml)
-  ⚠ Extensions: Check for .extend.md files
   ⚠ Docs first: Check documentation before exploring code
 ```
 
@@ -329,11 +368,6 @@ REMEMBER
 If manifest.yaml doesn't exist:
 ```
 ⚠ No manifest found. Run /init to set up the framework.
-```
-
-If active-task.json is malformed:
-```
-⚠ Active task file corrupted. Re-run /task-start to fix.
 ```
 
 ## Notes

@@ -1,0 +1,37 @@
+# Task Status Index
+task: "EEXPR-95"
+title: "Fix tech ops entity transfer status update"
+color: "charts.orange"
+created: "2026-01-22"
+updated: "2026-01-22"
+
+summary:
+  total: 3
+  todo: 3
+  in_progress: 0
+  done: 0
+
+work_items:
+  - id: "EEXPR-95-1"
+    name: "Add determineTransferStatus helper method"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: todo
+    file: "todo/EEXPR-95-1-add-determine-transfer-status-helper.md"
+
+  - id: "EEXPR-95-2"
+    name: "Update executeEntityTransfer to update transfer status"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: todo
+    file: "todo/EEXPR-95-2-update-execute-entity-transfer.md"
+
+  - id: "EEXPR-95-3"
+    name: "Add unit tests for status determination"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: todo
+    file: "todo/EEXPR-95-3-add-unit-tests.md"

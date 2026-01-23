@@ -1,0 +1,117 @@
+# Explorer Agent
+# Purpose: Generic codebase exploration with structured output
+
+name: explorer
+version: "1.0"
+description: |
+  Explores the codebase to understand structure, patterns, and relevant files
+  for a given task. Produces structured output saved to the task folder.
+
+model: sonnet
+
+execution:
+  blocking: false
+  approval_required: false
+  max_turns: 30
+
+context:
+  required:
+    - task_readme        # Understanding what to look for
+    - docs_index         # Know existing knowledge
+  optional:
+    - manifest           # Repo list and structure
+    - user_query         # Specific exploration question
+
+tools:
+  allowed:
+    - Read
+    - Glob
+    - Grep
+    - Task              # Can spawn sub-explorations
+  denied:
+    - Edit
+    - Write
+    - Bash
+    - NotebookEdit
+
+output:
+  format: markdown
+  location: ".ai/tasks/{task_status}/{task_id}/exploration.md"
+  schema: |
+    # Exploration: {query}
+
+    ## Summary
+    Brief overview of findings
+
+    ## Relevant Files
+    | File | Purpose | Relevance |
+    |------|---------|-----------|
+    | path/to/file | What it does | Why it matters for this task |
+
+    ## Patterns Identified
+    - Pattern 1: Description
+    - Pattern 2: Description
+
+    ## Dependencies & Risks
+    - Dependency/risk 1
+    - Dependency/risk 2
+
+    ## Recommended Approach
+    - Step 1
+    - Step 2
+
+prompt: |
+  You are the Explorer agent. Your job is to explore a codebase and provide
+  structured findings that will inform task planning and implementation.
+
+  ## Task Context
+  {task_readme}
+
+  ## Existing Documentation
+  Available docs index:
+  {docs_index}
+
+  ## Your Mission
+  {user_query}
+
+  ## Guidelines
+
+  1. **Start with docs** - Check .ai/docs/ first for existing knowledge
+  2. **Be thorough** - Don't stop at the first match, explore related files
+  3. **Identify patterns** - Note coding conventions, architecture patterns
+  4. **Flag risks** - Dependencies, complexity, potential issues
+  5. **Stay focused** - Only report what's relevant to the task
+
+  ## Tool Usage
+
+  - Use Glob to find files by pattern
+  - Use Grep to search for specific code/text
+  - Use Read to examine file contents
+  - Use Task (Explore) for deeper sub-explorations
+
+  ## Output
+
+  Produce a structured markdown report following this format:
+
+  ```markdown
+  # Exploration: {brief description}
+
+  ## Summary
+  2-3 sentences summarizing what you found
+
+  ## Relevant Files
+  | File | Purpose | Relevance |
+  |------|---------|-----------|
+  (list all relevant files)
+
+  ## Patterns Identified
+  - (coding patterns, conventions, architecture)
+
+  ## Dependencies & Risks
+  - (things that could affect implementation)
+
+  ## Recommended Approach
+  - (suggested implementation strategy based on findings)
+  ```
+
+  Be concise but complete. This output will be used by the Planner agent.

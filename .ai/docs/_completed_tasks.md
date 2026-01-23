@@ -337,7 +337,7 @@
 ## 2026-01-19: EEXPR-12-2 - [PEO] GET transfers by source entity endpoint
 
 **Repos affected**: peo
-**Epic**: [EEXPR-12](.ai/tasks/in_progress/EEXPR-12/)
+**Epic**: [EEXPR-12](.ai/tasks/done/EEXPR-12/)
 
 **Summary**: Created PEO endpoint to list entity transfers by source legal entity public ID with cursor-based pagination and multi-status filtering.
 
@@ -363,7 +363,7 @@
 ## 2026-01-19: EEXPR-12-3 - [BE] Tech ops endpoint with enrichment
 
 **Repos affected**: backend
-**Epic**: [EEXPR-12](.ai/tasks/in_progress/EEXPR-12/)
+**Epic**: [EEXPR-12](.ai/tasks/done/EEXPR-12/)
 
 **Summary**: Created backend tech ops endpoint that calls PEO's transfer listing endpoint and enriches the response with legal entity names, profile information, and employee emails from backend database.
 
@@ -390,3 +390,35 @@ const [profiles, legalEntities, contractEmails] = await Promise.all([
 const profileMap = new Map(profiles.map(p => [p.publicId, p]));
 const entityMap = new Map(entities.map(e => [e.publicId, e]));
 ```
+
+---
+
+## 2026-01-22: EEXPR-12 - Unified Entity Transfers Gateway
+
+**Repos affected**: backend, peo
+**Epic**: [EEXPR-12](.ai/tasks/done/EEXPR-12/)
+
+**Summary**: Implemented unified entity transfers gateway endpoint that aggregates EOR and PEO transfer data in parallel. Updated EOR integration to use internal endpoint. Added strict validation requiring `organizationId` for EOR and `sourceLegalEntityPublicId` for PEO based on requested types.
+
+**Key changes**:
+- Created `/entity_transfers/unified` endpoint aggregating EOR + PEO transfers
+- Created `/entity_transfers/unified/pending` with hardcoded status filters
+- Updated EOR to use internal endpoint `/internal/contracts-legal-entity-movement/organization/:organizationId`
+- Added `contractOid` filter for unified transfers
+- Strict validation: `organizationId` required for EOR, `sourceLegalEntityPublicId` for PEO
+
+**Endpoints**:
+- `GET /entity_transfers/unified?types=eor,peo&organizationId=X&sourceLegalEntityPublicId=Y`
+- `GET /entity_transfers/unified/pending?organizationId=X&sourceLegalEntityPublicId=Y`
+
+**Files modified**:
+- `backend/controllers/entity_transfers/index.ts` - New unified controller
+- `backend/services/peo/entity_transfer/services/unified_entity_transfer_service.ts` - Service aggregating EOR+PEO
+- `backend/services/employee/eor_experience.js` - Updated to use internal EOR endpoint
+
+**Remaining subtasks** (can be completed independently):
+- EEXPR-12-1: PEO migration for signature profile_public_id (not blocking - table empty)
+- EEXPR-12-4: Public API endpoint for transfers
+- EEXPR-12-5: Multi-status filter for transfers endpoint
+
+---

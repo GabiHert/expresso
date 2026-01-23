@@ -1,20 +1,20 @@
 {
-  "taskId": "EEXPR-12-7",
-  "title": "[BE] Unified Entity Transfers Gateway Endpoint (EOR + PEO)",
-  "branch": "deel",
-  "frameworkPath": ".ai/tasks/in_progress/EEXPR-12-7",
-  "startedAt": "2026-01-19T12:00:00Z",
-  "sessionId": "eexpr127unified",
+  "taskId": "EEXPR-94",
+  "title": "Fix Entity Transfer Replication Lag Bug",
+  "branch": "EEXPR-94-fix-replication-lag",
+  "frameworkPath": ".ai/tasks/in_progress/EEXPR-94",
+  "startedAt": "2026-01-21T12:00:00Z",
+  "sessionId": "eexpr94-fix-replication-lag",
   "affectedRepos": [
     {
-      "name": "backend",
-      "absolutePath": "/Users/gabriel.herter/Documents/Projects/deel/backend",
-      "gitRoot": "/Users/gabriel.herter/Documents/Projects/deel/backend",
-      "branch": "deel",
+      "name": "peo",
+      "absolutePath": "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-94/peo",
+      "gitRoot": "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-94/peo",
+      "branch": "EEXPR-94-fix-replication-lag",
       "remote": "origin",
-      "remoteUrl": "git@github.com:letsdeel/backend.git",
+      "remoteUrl": "git@github.com:letsdeel/peo.git",
       "protected": false
     }
   ],
-  "currentWorkRepo": "backend"
+  "currentWorkRepo": "peo"
 }

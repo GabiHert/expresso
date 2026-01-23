@@ -1,0 +1,29 @@
+task: "EEXPR-12-9"
+title: "[BE] contractOid filter for unified transfers"
+type: subtask
+parent: "EEXPR-12"
+repo: backend
+status: in_progress
+created: "2026-01-20"
+depends_on: ["EEXPR-12-7", "EEXPR-12-8"]
+
+work_items:
+  - id: "01"
+    name: "Add contractOid to UnifiedTransferOptions interface"
+    status: todo
+    file: "todo/01-add-interface-field.md"
+
+  - id: "02"
+    name: "Add contractOid to controller Joi schemas"
+    status: todo
+    file: "todo/02-add-joi-schema.md"
+
+  - id: "03"
+    name: "Implement EOR filtering by contract"
+    status: todo
+    file: "todo/03-eor-filtering.md"
+
+  - id: "04"
+    name: "Implement PEO filtering via baseContractOid"
+    status: todo
+    file: "todo/04-peo-filtering.md"

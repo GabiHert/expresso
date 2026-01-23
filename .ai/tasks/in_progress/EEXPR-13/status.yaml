@@ -1,0 +1,69 @@
+# Task Status Index
+task: "EEXPR-13"
+title: "Entity Transfers POST Endpoint"
+color: "charts.purple"
+created: "2026-01-20"
+updated: "2026-01-20"
+
+summary:
+  total: 7
+  todo: 0
+  in_progress: 0
+  done: 7
+
+work_items:
+  - id: "EEXPR-13-1"
+    name: "Effective date calculation service"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-13-1-effective-date-service.md"
+
+  - id: "EEXPR-13-2"
+    name: "Execute sanity checks only method"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-13-2-sanity-checks-only.md"
+
+  - id: "EEXPR-13-3"
+    name: "Underwriting request service"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-13-3-underwriting-request-service.md"
+
+  - id: "EEXPR-13-4"
+    name: "Signatures creation endpoint"
+    repo: "peo"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/peo"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-13-4-signatures-endpoint.md"
+
+  - id: "EEXPR-13-5"
+    name: "PEO client methods for transfer creation"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-13-5-peo-client-methods.md"
+
+  - id: "EEXPR-13-6"
+    name: "Tech ops POST endpoint"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-13-6-tech-ops-endpoint.md"
+
+  - id: "EEXPR-13-7"
+    name: "Public API POST endpoint"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-13-7-public-api-endpoint.md"

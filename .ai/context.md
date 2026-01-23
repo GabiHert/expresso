@@ -39,9 +39,9 @@
 
 | Status | Count | Details |
 |--------|-------|---------|
-| **In Progress** | 1 | PEOCM-660: Entity Transfer Tables (needs testing) |
-| **Todo** | 0 | - |
-| **Recently Done** | 2 | PEOCM-823: Use position public_id, PEOCM-792-3: Fix Transfer Resources Endpoint Bugs |
+| **In Progress** | 2 | PEOCM-660: Entity Transfer Tables (needs testing), EEXPR-13: Entity Transfers POST Endpoint |
+| **Todo** | 2 | EEXPR-90: Fix CreateContractStep rollback null vs undefined, EEXPR-95: Fix tech ops entity transfer status update |
+| **Recently Done** | 3 | EEXPR-12: Unified Entity Transfers Gateway, PEOCM-823: Use position public_id, PEOCM-792-3: Fix Transfer Resources Endpoint Bugs |
 
 ## Quick Reference
 

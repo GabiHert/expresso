@@ -1,0 +1,15 @@
+task: "EEXPR-12-8"
+title: "[BE] /pending route with hardcoded status defaults"
+type: subtask
+parent: "EEXPR-12"
+repo: backend
+status: done
+created: "2026-01-20"
+completed_at: "2026-01-20"
+depends_on: ["EEXPR-12-7"]
+
+work_items:
+  - id: "01"
+    name: "Add /pending endpoint to controller"
+    status: done
+    file: "done/01-add-pending-endpoint.md"
