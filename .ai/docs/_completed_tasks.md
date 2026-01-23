@@ -422,3 +422,63 @@ const entityMap = new Map(entities.map(e => [e.publicId, e]));
 - EEXPR-12-5: Multi-status filter for transfers endpoint
 
 ---
+
+## 2026-01-23: EEXPR-64 - Fix Seniority Dates Not Copied During Entity Transfer
+
+**Repos affected**: backend
+**Task**: [EEXPR-64](.ai/tasks/done/EEXPR-64-seniority-date/)
+
+**Summary**: Fixed entity transfers not copying employee seniority dates (origHireDate, lastHireDate, seniorityDate) from source contract. Previously, these were overwritten with the transfer effective date, causing employees to lose tenure history.
+
+**Key changes**:
+- Modified `CreateContractStep.buildContractDetails()` to extract and pass seniority dates from the old contract
+- Modified `peoContractService.createContract()` to accept and use passed seniority dates instead of hardcoding `contractStartDate`
+- Added unit tests verifying seniority dates are correctly copied
+
+**Work Items**: 3 completed
+
+---
+
+## 2026-01-23: EEXPR-67 - Fix Entity Transfer Resources Endpoint
+
+**Repos affected**: backend
+**Task**: [EEXPR-67](.ai/tasks/done/EEXPR-67/)
+
+**Summary**: Fixed three issues in the entity transfer resources endpoint: PTO policies now include universal policies (no worker types defined), work locations filter accepts UNDERWRITING status, and payroll settings mapping removes inconsistent fallback logic.
+
+**Key changes**:
+- Replaced raw SQL with `timeOffService.getPoliciesByOrganizationId()` and post-filter for PEO + universal policies
+- Updated work locations filter to include both ACTIVE and UNDERWRITING statuses
+- Removed `||` fallback chains in payroll settings mapping
+
+**Work Items**: 3 completed
+
+---
+
+## 2026-01-23: EEXPR-12-1 - [PEO] Migration - Fix signature profile_public_id type
+
+**Repos affected**: peo
+**Epic**: [EEXPR-12](.ai/tasks/done/EEXPR-12/)
+
+**Summary**: Created migration to convert `peo_employee_transfer_signatures.profile_public_id` from INTEGER to UUID type using column replacement strategy.
+
+**Work Items**: 1 completed
+
+---
+
+## 2026-01-23: EEXPR-12-7 - [BE] Unified Entity Transfers Gateway Endpoint (EOR + PEO)
+
+**Repos affected**: backend
+**Epic**: [EEXPR-12](.ai/tasks/done/EEXPR-12/)
+
+**Summary**: Created unified gateway endpoint that aggregates entity transfer listings from both EOR and PEO services in parallel, with separate status filtering for each service type and graceful partial failure handling.
+
+**Key changes**:
+- Created `unified_entity_transfer_service.js` using `Promise.allSettled()` for parallel EOR+PEO calls
+- Created `unified_entity_transfers_controller.js` with query param validation
+- Added gateway definition for the new endpoint
+- Unit tests covering success, partial failure, and full failure scenarios
+
+**Work Items**: 4 completed
+
+---

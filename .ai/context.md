@@ -41,7 +41,7 @@
 |--------|-------|---------|
 | **In Progress** | 2 | PEOCM-660: Entity Transfer Tables (needs testing), EEXPR-13: Entity Transfers POST Endpoint |
 | **Todo** | 2 | EEXPR-90: Fix CreateContractStep rollback null vs undefined, EEXPR-95: Fix tech ops entity transfer status update |
-| **Recently Done** | 3 | EEXPR-12: Unified Entity Transfers Gateway, PEOCM-823: Use position public_id, PEOCM-792-3: Fix Transfer Resources Endpoint Bugs |
+| **Recently Done** | 7 | EEXPR-64: Fix Seniority Dates, EEXPR-67: Fix Transfer Resources, EEXPR-12-1: Signature migration, EEXPR-12-7: Unified Gateway, EEXPR-12: Epic complete, EEXPR-94: Fix master read |
 
 ## Quick Reference
 

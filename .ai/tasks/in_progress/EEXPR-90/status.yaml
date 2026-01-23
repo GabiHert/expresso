@@ -2,13 +2,13 @@
 task: "EEXPR-90"
 title: "Fix CreateContractStep rollback failure due to null vs undefined type mismatch"
 created: "2025-01-20"
-updated: "2025-01-20"
+updated: "2026-01-23"
 
 summary:
-  total: 2
+  total: 4
   todo: 0
   in_progress: 0
-  done: 2
+  done: 4
 
 work_items:
   - id: "01"
@@ -26,3 +26,19 @@ work_items:
     repo_protected: false
     status: done
     file: "done/02-add-rollback-test.md"
+
+  - id: "03"
+    name: "Fix file submissions rollback to use direct SQL deletion"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/03-fix-file-submissions-rollback-direct-sql.md"
+
+  - id: "04"
+    name: "Update file submission repository tests"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/04-update-file-submission-repository-tests.md"

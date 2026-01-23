@@ -105,6 +105,7 @@
 | payroll-processing-api | [docs/payroll-processing-api/](./docs/payroll-processing-api/) | Payroll processing |
 | benefits | [docs/benefits/](./docs/benefits/) | Benefits service |
 | playwright-automation | [docs/playwright-automation/](./docs/playwright-automation/) | E2E testing framework |
+| giger | [docs/giger/](./docs/giger/) | Internal service platform (sandboxes, secrets, flags, NATS, K8s) |
 
 ### History
 | Document | Location | Description |
