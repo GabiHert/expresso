@@ -2,6 +2,10 @@
 CLAUDE.md
 README.md
 
+# Dependencies
+node_modules/
+**/node_modules/
+
 # Git worktrees for isolated task work
 worktrees/
 
