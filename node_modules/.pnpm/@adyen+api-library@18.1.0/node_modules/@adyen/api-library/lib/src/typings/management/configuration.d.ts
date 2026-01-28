@@ -1,0 +1,30 @@
+import { Currency } from './currency';
+export declare class Configuration {
+    /**
+    * Payment method, like **eftpos_australia** or **mc**. See the [possible values](https://docs.adyen.com/development-resources/paymentmethodvariant#management-api).
+    */
+    'brand': string;
+    /**
+    * Countries, to filter different surcharge amounts for domestic or international cards.
+    */
+    'country'?: Array<string>;
+    /**
+    * Currency, and surcharge percentage or amount.
+    */
+    'currencies': Array<Currency>;
+    /**
+    * Funding source. Possible values: * **Credit** * **Debit**
+    */
+    'sources'?: Array<string>;
+    static discriminator: string | undefined;
+    static attributeTypeMap: Array<{
+        name: string;
+        baseName: string;
+        type: string;
+    }>;
+    static getAttributeTypeMap(): {
+        name: string;
+        baseName: string;
+        type: string;
+    }[];
+}

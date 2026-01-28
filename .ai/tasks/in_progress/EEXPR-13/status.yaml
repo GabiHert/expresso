@@ -3,13 +3,13 @@ task: "EEXPR-13"
 title: "Entity Transfers POST Endpoint"
 color: "charts.purple"
 created: "2026-01-20"
-updated: "2026-01-20"
+updated: "2026-01-28"
 
 summary:
-  total: 7
+  total: 10
   todo: 0
   in_progress: 0
-  done: 7
+  done: 10
 
 work_items:
   - id: "EEXPR-13-1"
@@ -67,3 +67,27 @@ work_items:
     repo_protected: false
     status: done
     file: "done/EEXPR-13-7-public-api-endpoint.md"
+
+  - id: "EEXPR-13-8"
+    name: "Work Location UW method"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-13-8-work-location-uw-method.md"
+
+  - id: "EEXPR-13-9"
+    name: "Position UW method"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-13-9-position-uw-method.md"
+
+  - id: "EEXPR-13-10"
+    name: "Update POST endpoint for UW methods"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-13-10-update-post-endpoint.md"

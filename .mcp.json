@@ -14,6 +14,26 @@
         "MAX_ROWS": "1000",
         "QUERY_TIMEOUT": "30000"
       }
+    },
+    "giger": {
+      "command": "node",
+      "args": [
+        "/Users/gabriel.herter/Documents/Projects/deel/giger-mcp/dist/index.js"
+      ],
+      "env": {
+        "GIGER_SESSION_COOKIE": "s%3ABdOVZOkW80w8Ih59z7kAJvx2DiK9jLuG.nM8LqPLs1FIFl2L6iWRBpW82%2B30w37U86X9xNbFhXA0"
+      }
+    },
+    "deel-api": {
+      "command": "node",
+      "args": [
+        "/Users/gabriel.herter/Documents/Projects/deel/deel-api-mcp/dist/index.js"
+      ],
+      "env": {
+        "DEEL_API_COLLECTIONS_PATH": "/Users/gabriel.herter/Documents/Projects/deel/deel-api-mcp/collections",
+        "DEEL_API_ENV_NAME": "DEV",
+        "DEEL_API_FORBIDDEN_ENVS": "PRODUCTION,PROD,STAGING"
+      }
     }
   }
 }
