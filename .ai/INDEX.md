@@ -94,6 +94,7 @@
 | backend | [docs/backend/](./docs/backend/) | Backend monorepo docs |
 | backend/modules | [docs/backend/modules.md](./docs/backend/modules.md) | ~200 modules guide |
 | backend/entity_transfers | [docs/backend/entity_transfers/](./docs/backend/entity_transfers/) | Entity transfer feature |
+| backend/entity_transfers/e2e-testing | [docs/backend/entity_transfers/e2e-testing-guide.md](./docs/backend/entity_transfers/e2e-testing-guide.md) | E2E testing guide for Giger environments |
 | frontend | [docs/frontend/](./docs/frontend/) | Frontend React app |
 | admin | [docs/admin/](./docs/admin/) | Admin dashboard |
 | peo | [docs/peo/](./docs/peo/) | PEO service |

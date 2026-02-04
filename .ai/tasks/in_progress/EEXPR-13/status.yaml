@@ -3,13 +3,13 @@ task: "EEXPR-13"
 title: "Entity Transfers POST Endpoint"
 color: "charts.purple"
 created: "2026-01-20"
-updated: "2026-01-28"
+updated: "2026-02-03"
 
 summary:
-  total: 10
-  todo: 0
+  total: 15
+  todo: 1
   in_progress: 0
-  done: 10
+  done: 14
 
 work_items:
   - id: "EEXPR-13-1"
@@ -91,3 +91,45 @@ work_items:
     repo_protected: false
     status: done
     file: "done/EEXPR-13-10-update-post-endpoint.md"
+
+  - id: "EEXPR-13-11"
+    name: "Use Prism codes for UW request descriptions"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-13/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-13-11-use-prism-codes-for-uw-descriptions.md"
+
+  - id: "EEXPR-13-12"
+    name: "Remove UUID fallback from CheckUnderwritingRequestStatus"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-13/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-13-12-remove-uuid-fallback.md"
+    depends_on: ["EEXPR-13-11"]
+
+  - id: "EEXPR-13-13"
+    name: "E2E test on Giger (EEXPR-12)"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-13/backend"
+    repo_protected: false
+    status: todo
+    file: "todo/EEXPR-13-13-e2e-test-giger.md"
+    depends_on: ["EEXPR-13-11", "EEXPR-13-12"]
+
+  - id: "EEXPR-13-14"
+    name: "Remove effectiveDate calculation - accept from request body"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-13/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-13-14-remove-effective-date-calculation.md"
+
+  - id: "EEXPR-13-15"
+    name: "Migrate entity transfer feature flag from frontend to backend"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-13/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-13-15-migrate-entity-transfer-feature-flag.md"

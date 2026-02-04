@@ -1,0 +1,107 @@
+# Task Status Index
+task: "EEXPR-129"
+title: "Review and Update Entity Transfer TDD"
+color: "charts.red"
+created: "2026-02-03"
+updated: "2026-02-04"
+
+summary:
+  total: 15
+  todo: 8
+  in_progress: 0
+  done: 7
+
+work_items:
+  # === Review Phases (Complete) ===
+  - id: "EEXPR-129-1"
+    name: "Phase 1: State Machines & Lifecycle"
+    repo: "backend, peo"
+    status: done
+    file: "done/EEXPR-129-1-state-machines-lifecycle.md"
+
+  - id: "EEXPR-129-2"
+    name: "Phase 2: Step-Based Execution Pipeline"
+    repo: "backend"
+    status: done
+    file: "done/EEXPR-129-2-execution-pipeline.md"
+
+  - id: "EEXPR-129-3"
+    name: "Phase 3: Data Model"
+    repo: "backend, peo"
+    status: done
+    file: "done/EEXPR-129-3-data-model.md"
+
+  - id: "EEXPR-129-4"
+    name: "Phase 4: API Endpoints & Contracts"
+    repo: "backend"
+    status: done
+    file: "done/EEXPR-129-4-api-endpoints.md"
+
+  - id: "EEXPR-129-5"
+    name: "Phase 5: Signatures & Documents Flow"
+    repo: "backend, peo"
+    status: done
+    file: "done/EEXPR-129-5-signatures-documents.md"
+
+  - id: "EEXPR-129-6"
+    name: "Phase 6: Business Logic & Edge Cases"
+    repo: "backend, peo"
+    status: done
+    file: "done/EEXPR-129-6-business-logic.md"
+
+  - id: "EEXPR-129-7"
+    name: "Phase 7: Open Questions, Risks & Operational"
+    repo: "docs"
+    status: done
+    file: "done/EEXPR-129-7-open-questions-risks.md"
+
+  # === Fix Proposals (Pending User Approval) ===
+  - id: "EEXPR-129-8"
+    name: "Phase 1 Fixes: State Machines & Lifecycle"
+    repo: "docs"
+    status: todo
+    file: "todo/EEXPR-129-8-phase1-fixes.md"
+
+  - id: "EEXPR-129-9"
+    name: "Phase 2 Fixes: Execution Pipeline"
+    repo: "docs"
+    status: todo
+    file: "todo/EEXPR-129-9-phase2-fixes.md"
+
+  - id: "EEXPR-129-10"
+    name: "Phase 3 Fixes: Data Model"
+    repo: "docs"
+    status: todo
+    file: "todo/EEXPR-129-10-phase3-fixes.md"
+
+  - id: "EEXPR-129-11"
+    name: "Phase 4 Fixes: API Endpoints & Contracts"
+    repo: "docs"
+    status: todo
+    file: "todo/EEXPR-129-11-phase4-fixes.md"
+
+  - id: "EEXPR-129-12"
+    name: "Phase 5 Fixes: Signatures & Documents Flow"
+    repo: "docs"
+    status: todo
+    file: "todo/EEXPR-129-12-phase5-fixes.md"
+
+  - id: "EEXPR-129-13"
+    name: "Phase 6 Fixes: Business Logic & Edge Cases"
+    repo: "docs"
+    status: todo
+    file: "todo/EEXPR-129-13-phase6-fixes.md"
+
+  - id: "EEXPR-129-14"
+    name: "Phase 7 Fixes: Open Questions, Risks & Operational"
+    repo: "docs"
+    status: todo
+    file: "todo/EEXPR-129-14-phase7-fixes.md"
+
+  # === Final Merge ===
+  - id: "EEXPR-129-15"
+    name: "Merge All Approved Fixes into TDD Document"
+    repo: "docs"
+    status: todo
+    blocked_by: ["EEXPR-129-8", "EEXPR-129-9", "EEXPR-129-10", "EEXPR-129-11", "EEXPR-129-12", "EEXPR-129-13", "EEXPR-129-14"]
+    file: "todo/EEXPR-129-15-merge-tdd-fixes.md"

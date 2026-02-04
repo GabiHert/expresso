@@ -16,7 +16,7 @@
 |-------|-------|
 | **Project** | Deel Platform |
 | **Description** | Global HR and payroll platform with PEO, EOR, and contractor management services |
-| **Root** | /Users/gabriel.herter/Documents/Projects/new_deel |
+| **Root** | /Users/gabriel.herter/Documents/Projects/deel |
 
 ## Repositories
 
@@ -39,8 +39,8 @@
 
 | Status | Count | Details |
 |--------|-------|---------|
-| **In Progress** | 2 | PEOCM-660: Entity Transfer Tables (needs testing), EEXPR-13: Entity Transfers POST Endpoint |
-| **Todo** | 2 | EEXPR-90: Fix CreateContractStep rollback null vs undefined, EEXPR-95: Fix tech ops entity transfer status update |
+| **In Progress** | 3 | PEOCM-660: Entity Transfer Tables (needs testing), EEXPR-13: Entity Transfers POST Endpoint, EEXPR-129: Review and Update Entity Transfer TDD (7 phases) |
+| **Todo** | 4 | EEXPR-44-1: PEO signature service layer, EEXPR-44-2: Backend signature client (depends on 44-1), EEXPR-90: Fix CreateContractStep rollback null vs undefined, EEXPR-95: Fix tech ops entity transfer status update |
 | **Recently Done** | 7 | EEXPR-64: Fix Seniority Dates, EEXPR-67: Fix Transfer Resources, EEXPR-12-1: Signature migration, EEXPR-12-7: Unified Gateway, EEXPR-12: Epic complete, EEXPR-94: Fix master read |
 
 ## Quick Reference

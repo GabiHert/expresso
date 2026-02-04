@@ -14,7 +14,7 @@
 project:
   name: "Deel Platform"
   description: "Global HR and payroll platform with PEO, EOR, and contractor management services"
-  root: "/Users/gabriel.herter/Documents/Projects/new_deel"
+  root: "/Users/gabriel.herter/Documents/Projects/deel"
 
 # ============================================================
 # REPOSITORIES

@@ -1,0 +1,44 @@
+# Task Status Index
+task: "EEXPR-44-2"
+title: "Replace Backend Mock Signatures with PEO Service Calls"
+created: "2026-01-28"
+updated: "2026-01-28"
+
+summary:
+  total: 4
+  todo: 4
+  in_progress: 0
+  done: 0
+
+work_items:
+  - id: "01"
+    name: "Add PEO signature endpoint definitions"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: todo
+    file: "todo/01-signature-endpoint-definitions.md"
+
+  - id: "02"
+    name: "Add signature client service methods"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: todo
+    file: "todo/02-signature-client-service.md"
+
+  - id: "03"
+    name: "Update types and replace repository mocks"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: todo
+    file: "todo/03-update-types-replace-mocks.md"
+
+  - id: "04"
+    name: "Update callers to use transferId"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/backend"
+    repo_protected: false
+    status: todo
+    file: "todo/04-update-callers-transfer-id.md"

@@ -12,6 +12,7 @@ Entity transfers are managed within the PEO module in the backend, not as a sepa
 |----------|---------|
 | [deployments.md](deployments.md) | Production deployment history, cherry-pick PRs, rollback procedures |
 | [test-data-cleanup.md](test-data-cleanup.md) | Guide for preparing anonymized test data for PrismHR validation |
+| [e2e-testing-guide.md](e2e-testing-guide.md) | Step-by-step E2E testing on Giger environments |
 
 ## Key Files
 

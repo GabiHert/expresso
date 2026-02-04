@@ -1,0 +1,36 @@
+# Task Status Index
+task: "EEXPR-44-1"
+title: "Add PEO Signature Service Layer for Entity Transfers"
+created: "2026-01-28"
+updated: "2026-01-29"
+
+summary:
+  total: 3
+  todo: 0
+  in_progress: 0
+  done: 3
+
+work_items:
+  - id: "01"
+    name: "Add signature service methods"
+    repo: "peo"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/peo"
+    repo_protected: false
+    status: done
+    file: "done/01-signature-service-methods.md"
+
+  - id: "02"
+    name: "Add signature controller endpoints"
+    repo: "peo"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/peo"
+    repo_protected: false
+    status: done
+    file: "done/02-signature-controller-endpoints.md"
+
+  - id: "03"
+    name: "Add signature DTOs"
+    repo: "peo"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/peo"
+    repo_protected: false
+    status: done
+    file: "done/03-signature-dtos.md"

@@ -1,0 +1,101 @@
+# Task Status Index
+task: "EEXPR-44"
+title: "Replace Mock Repository with PEO Service Calls"
+color: "charts.orange"
+created: "2026-01-29"
+updated: "2026-02-03"
+
+summary:
+  total: 11
+  todo: 0
+  in_progress: 0
+  done: 11
+
+work_items:
+  - id: "EEXPR-44-1"
+    name: "PEO: Database, Models, Service & Endpoints"
+    repo: "peo"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-44/peo"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-44-1-peo-signatures.md"
+
+  - id: "EEXPR-44-2"
+    name: "Backend: Client Integration & Mock Replacement"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-44/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-44-2-backend-client.md"
+
+  - id: "EEXPR-44-3"
+    name: "Backend: JetStream Event Processor"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-44/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-44-3-event-processor.md"
+
+  - id: "EEXPR-44-4"
+    name: "PEO: Make effectiveDate Nullable"
+    repo: "peo"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-44/peo"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-44-4-peo-nullable-effective-date.md"
+
+  - id: "EEXPR-44-5"
+    name: "Backend: Remove effectiveDate from Transfer Creation"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-44/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-44-5-backend-remove-effective-date.md"
+
+  - id: "EEXPR-44-6"
+    name: "Backend: Wire Document Setup into Transfer Creation"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-44/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-44-6-backend-wire-setup.md"
+
+  - id: "EEXPR-44-7"
+    name: "Backend: Fix Create Transfer Response"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-44/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-44-7-backend-fix-create-response.md"
+
+  - id: "EEXPR-44-8"
+    name: "Backend: Clean Up Create Doc Requirements Endpoint"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-44/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-44-8-backend-clean-create-doc-requirements.md"
+
+  - id: "EEXPR-44-9"
+    name: "Backend: Remove Debug Logging from AttachSignedDocumentsStep"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-44/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-44-9-backend-remove-debug-logging.md"
+
+  - id: "EEXPR-44-10"
+    name: "Backend: Make skipDocumentSteps Optional on Execute Endpoint"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-44/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-44-10-backend-optional-skip-document-steps.md"
+
+  - id: "EEXPR-44-11"
+    name: "Backend: Clean Up Copy Signed Documents Endpoint"
+    repo: "backend"
+    repo_path: "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-44/backend"
+    repo_protected: false
+    status: done
+    file: "done/EEXPR-44-11-backend-clean-copy-signed-documents.md"

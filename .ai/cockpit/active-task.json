@@ -1,20 +1,8 @@
 {
-  "taskId": "EEXPR-94",
-  "title": "Fix Entity Transfer Replication Lag Bug",
-  "branch": "EEXPR-94-fix-replication-lag",
-  "frameworkPath": ".ai/tasks/in_progress/EEXPR-94",
-  "startedAt": "2026-01-21T12:00:00Z",
-  "sessionId": "eexpr94-fix-replication-lag",
-  "affectedRepos": [
-    {
-      "name": "peo",
-      "absolutePath": "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-94/peo",
-      "gitRoot": "/Users/gabriel.herter/Documents/Projects/deel/worktrees/EEXPR-94/peo",
-      "branch": "EEXPR-94-fix-replication-lag",
-      "remote": "origin",
-      "remoteUrl": "git@github.com:letsdeel/peo.git",
-      "protected": false
-    }
-  ],
-  "currentWorkRepo": "peo"
+  "taskId": "EEXPR-129",
+  "title": "Review and Update Entity Transfer TDD",
+  "branch": "deel",
+  "frameworkPath": ".ai/tasks/in_progress/EEXPR-129",
+  "startedAt": "2026-02-03T12:00:00Z",
+  "sessionId": "eexpr129-tdd-review"
 }
