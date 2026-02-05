@@ -87,27 +87,9 @@ Start a task by moving it from todo to in_progress, reading the task context, an
    - Available repositories
    - Commit conventions
 
-2. **EXTENSION CHECK (MANDATORY)**:
-   ```
-   ┌─────────────────────────────────────────────────────────────────┐
-   │ CHECK FOR PROJECT EXTENSION                                     │
-   │                                                                 │
-   │ Look for: .ai/_project/commands/task-start.extend.md           │
-   │                                                                 │
-   │ If file EXISTS:                                                 │
-   │   1. Read the extension file completely                         │
-   │   2. Parse and extract these sections:                          │
-   │      • Context     → Add to orientation announcements           │
-   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
-   │      • Step Overrides → Replace matching steps                  │
-   │      • Agents      → Use specified agents for phases            │
-   │      • Post-Hooks  → Execute AFTER final step                   │
-   │   3. Announce: "✓ Project Extension Active"                     │
-   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
-   │                                                                 │
-   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
-   └─────────────────────────────────────────────────────────────────┘
-   ```
+2. **Extension Support**: This command supports compiled extensions
+   via `/command-extend task-start --variant NAME`. If a compiled extension
+   exists, the stub already points to it — no runtime discovery needed.
 
 3. Announce:
 ```
@@ -231,6 +213,90 @@ APPROACH
 {summarize implementation approach}
 ```
 
+### Step 3.5: Run Explorer Agent (Automatic)
+
+**Invoke the Explorer agent** to gather codebase context for this task:
+
+```
+Task(
+  subagent_type: "explorer",
+  model: "sonnet",
+  prompt: "
+    ## Task Context
+    {task README content}
+
+    ## Existing Documentation
+    {list of .ai/docs/ files}
+
+    ## Your Mission
+    Explore the codebase to understand what needs to change for this task.
+    Focus on: affected files, existing patterns, dependencies, and risks.
+
+    Save your findings to: .ai/tasks/in_progress/{task-id}/exploration.md
+  "
+)
+```
+
+The Explorer agent will:
+- Search for relevant files and patterns
+- Identify dependencies and risks
+- Document findings in `exploration.md`
+
+Announce when complete:
+```
+✓ Exploration complete: .ai/tasks/in_progress/{task-id}/exploration.md
+```
+
+### Step 3.6: Run Planner Agent (If No Work Items)
+
+**If status.yaml shows 0 work items**, invoke the Planner agent:
+
+```
+Task(
+  subagent_type: "planner",
+  model: "sonnet",
+  prompt: "
+    ## Task Context
+    {task README content}
+
+    ## Exploration Findings
+    {exploration.md content}
+
+    ## Project Repos
+    {repos from manifest.yaml}
+
+    ## Your Mission
+    Break this task into concrete work items.
+    CRITICAL: Each work item must affect only ONE repository.
+
+    Return proposed work items for user approval.
+  "
+)
+```
+
+Present proposals to user:
+```
+╔══════════════════════════════════════════════════════════════════╗
+║ PROPOSED WORK ITEMS                                              ║
+╠══════════════════════════════════════════════════════════════════╣
+
+  1. [{repo}] {item name}
+     {description}
+
+  2. [{repo}] {item name}
+     {description}
+
+  ...
+
+╠══════════════════════════════════════════════════════════════════╣
+║ [A]pprove All  [E]dit  [R]e-plan                                ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+
+On approval:
+- Create work item files in `todo/` folder
+- Update status.yaml with new items
+
 ### Step 4: Check Work Items
 
 Read status.yaml and list work items by status:
@@ -264,94 +330,7 @@ This is the first item and has no dependencies.
 Update `.ai/context.md`:
 - Move task from "Todo" to "In Progress" in Current State section
 
-### Step 6: Activate Cockpit Tracking
-
-Activate cockpit tracking for the task:
-
-1. Ensure `.ai/cockpit/` directory exists:
-   ```bash
-   mkdir -p .ai/cockpit/events
-   ```
-
-2. Check if another task is already active:
-   ```bash
-   cat .ai/cockpit/active-task.json 2>/dev/null | jq -r '.taskId'
-   ```
-
-   **If another task is active**, warn:
-   ```
-   Warning: Task {existing-task-id} is already active.
-   Options:
-     1. Switch to {new-task-id} (replaces active)
-     2. Cancel
-
-   Choice? (1/2)
-   ```
-
-   If user chooses 1, continue. If 2, abort task-start.
-
-3. Get current git branch:
-   ```bash
-   git branch --show-current 2>/dev/null || echo "unknown"
-   ```
-
-4. Generate sessionId (timestamp-based):
-   ```bash
-   date +%s%N | md5sum | head -c 12
-   ```
-
-5. Capture previous task ID for signal file:
-   ```bash
-   previous_task_id=""
-   if [ -f .ai/cockpit/active-task.json ]; then
-     previous_task_id=$(jq -r '.taskId // empty' .ai/cockpit/active-task.json 2>/dev/null)
-   fi
-   ```
-
-6. Write `active-task.json` atomically:
-   ```bash
-   cat > .ai/cockpit/active-task.json.tmp << 'EOF'
-   {
-     "taskId": "{task-id}",
-     "title": "{task-title}",
-     "branch": "{current-git-branch}",
-     "frameworkPath": ".ai/tasks/in_progress/{task-id}",
-     "startedAt": "{ISO-timestamp}",
-     "sessionId": "{generated-session-id}"
-   }
-   EOF
-
-   mv .ai/cockpit/active-task.json.tmp .ai/cockpit/active-task.json
-   ```
-
-7. Write task-switch-signal to trigger VSCode sync:
-   ```bash
-   if [ -n "$previous_task_id" ] && [ "$previous_task_id" != "$task_id" ]; then
-     cat > .ai/cockpit/task-switch-signal.json.tmp << EOF
-   {
-     "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-     "previousTaskId": "$previous_task_id",
-     "newTaskId": "$task_id",
-     "type": "task-switch"
-   }
-   EOF
-
-     mv .ai/cockpit/task-switch-signal.json.tmp .ai/cockpit/task-switch-signal.json
-   fi
-   ```
-
-8. Announce activation:
-   ```
-   Cockpit: Task {task-id} is now active
-   All edits will be tracked under this task.
-
-   {if previous_task_id exists and differs from task_id}
-   ✓ Active task switched: {previous_task_id} → {task_id}
-     VSCode extension will be notified automatically
-   {/if}
-   ```
-
-### Step 7: Output Summary
+### Step 6: Output Summary
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
@@ -381,15 +360,37 @@ Quick Commands:
 {/if}
 ```
 
-### Step 8: Auto-Sync (if enabled)
+### Step 7: Invoke Sync Agent (if enabled)
 
 Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 
 **If auto_sync is enabled:**
 
-Use the ai-sync agent (lightweight/Haiku) to commit and push changes:
+```bash
+# Get .ai/ folder status
+git status .ai/ --porcelain
 ```
-Use the ai-sync agent to sync the .ai folder changes
+
+```
+Task(
+  subagent_type: "sync",
+  model: "haiku",
+  prompt: "
+    ## .ai/ Folder Status
+    {git status output}
+
+    ## Task Context
+    Task ID: {task-id}
+    Trigger: task-start
+
+    ## Your Mission
+    Commit changes to .ai/ folder using batched commits:
+    - tasks: Task moved to in_progress
+    - docs: Exploration notes (if created)
+
+    Execute git operations and report results.
+  "
+)
 ```
 
 This ensures task status changes are tracked in version control automatically.

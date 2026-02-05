@@ -4,118 +4,172 @@
 ║ COMMAND: /command-extend                                         ║
 ║ STATUS: Complete                                                 ║
 ╠══════════════════════════════════════════════════════════════════╣
-║ PURPOSE: Create project-level extensions for framework commands  ║
+║ PURPOSE: Create compiled project-level extensions for commands   ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
 
-# /command-extend - Extend Framework Commands
+# /command-extend - Compiled Command Extensions
 
 ## Description
 
-Create project-level extensions for existing framework commands. Extensions auto-merge when running the base command, allowing you to inject project-specific agents, workflow steps, and context without modifying framework files.
+Create project-level compiled extensions for existing framework commands. Extensions are compiled into self-contained documents that the stub points to directly — no runtime discovery or merging needed.
 
 This enables a layered customization approach:
 - **Framework layer**: Generic commands (reusable across projects)
-- **Project layer**: Extensions with project-specific workflows (TDD, BDD, custom agents)
+- **Project layer**: Compiled variants with project-specific workflows (TDD, BDD, custom agents)
 
 ## Usage
 
 ```
-/command-extend task-create         # Extend /task-create for this project
-/command-extend task-work           # Extend /task-work with custom workflow
-/command-extend --list              # List all project extensions
+/command-extend task-create                       # Create default variant
+/command-extend task-create --variant tdd         # Create named variant
+/command-extend task-create --activate tdd        # Switch active variant
+/command-extend task-create --recompile           # Recompile all variants from source
+/command-extend task-create --recompile tdd       # Recompile specific variant
+/command-extend --list                            # Show all variants with [active] indicator
+/command-extend --migrate                         # Convert legacy .extend.md to compiled format
 ```
 
-## How Auto-Merge Works
+## File Structure
 
-When you run a framework command like `/task-create`:
+```
+.ai/_framework/commands/task-create.md                → base (never modified by project)
+.ai/_project/commands/task-create.active.md           → compiled, authoritative (what AI reads)
+.ai/_project/commands/task-create.variant.tdd.md      → stored compiled variant
+.ai/_project/commands/task-create.source.tdd.yaml     → source overrides (for recompilation)
+.claude/commands/task-create.md                       → stub → points to active.md
+.claude/commands/task-create:tdd.md                   → stub → points to variant.tdd.md
+```
 
-1. Framework loads `.ai/_framework/commands/task-create.md`
-2. Checks for `.ai/_project/commands/task-create.extend.md`
-3. If extension exists, merges in this order:
-   - Injects **Context** into orientation phase
-   - Prepends **Pre-Hooks** before Step 0
-   - Replaces steps marked with **Step Overrides**
-   - Adds **Agents** to exploration/review phases
-   - Appends **Post-Hooks** after final step
+## How It Works
 
-## Extension File Structure
+When you run `/command-extend task-create --variant tdd`:
 
-Extensions are Markdown files stored in `.ai/_project/commands/`:
+1. Gathers customization details (context, agents, hooks, step overrides)
+2. Saves source as `.ai/_project/commands/task-create.source.tdd.yaml`
+3. Reads the full base command from `.ai/_framework/commands/task-create.md`
+4. Compiles a fully self-contained document with all steps inlined
+5. Writes compiled output to `.ai/_project/commands/task-create.variant.tdd.md`
+6. Activates: copies to `.ai/_project/commands/task-create.active.md`
+7. Updates stubs in `.claude/commands/` (and `.cursor/commands/` if exists)
+
+When the user runs `/task-create`, the stub points directly to the compiled `active.md` — no runtime extension discovery needed.
+
+## Source YAML Format
+
+```yaml
+variant: tdd
+extends: task-create
+created: 2026-01-23
+context: |
+  This project uses TDD with BDD-style specs.
+pre_hooks:
+  - name: "Check for specs"
+    content: |
+      1. Search for .feature files
+      2. Include in task context if found
+step_overrides:
+  3:
+    name: "Explore (TDD)"
+    content: |
+      1. Find existing test files
+      2. Identify test patterns
+  7:
+    name: "Create Task Structure (TDD)"
+    content: |
+      For each work item: Red → Green → Refactor
+post_hooks:
+  - name: "Generate test skeletons"
+    content: |
+      1. Create test file placeholders
+agents:
+  exploration: "feature-dev:code-explorer"
+  review: "feature-dev:code-reviewer"
+step_injections:
+  4:
+    position: start
+    content: |
+      ⚠️ MANDATORY: Each work item MUST begin with BDD scenario creation.
+      Do NOT design work items that start with "implement" without
+      defining expected behavior FIRST.
+  6:
+    position: start
+    content: |
+      Before confirming, verify constraint compliance.
+validation_checklist:
+  step: 6
+  items:
+    - "Each work item begins with scenario/spec creation"
+    - "Implementation steps follow (not precede) behavior definition"
+```
+
+## Compiled Output Format
 
 ```markdown
 <!--
 ╔══════════════════════════════════════════════════════════════════╗
-║ LAYER: PROJECT                                                   ║
-║ EXTENDS: /task-create                                            ║
-╠══════════════════════════════════════════════════════════════════╣
-║ PURPOSE: {project-specific description}                          ║
+║ COMPILED COMMAND (DO NOT EDIT DIRECTLY)                          ║
+║ Base: .ai/_framework/commands/{cmd}.md                           ║
+║ Variant: {variant}                                               ║
+║ Compiled: {YYYY-MM-DD}                                           ║
+║ Source: .ai/_project/commands/{cmd}.source.{variant}.yaml        ║
+║                                                                   ║
+║ To modify: Edit source YAML then run                             ║
+║   /command-extend {cmd} --recompile                              ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
 
-# task-create Extension
+# /{cmd} — {description}
 
-## Context
+## AUTHORITY NOTICE
+This is a COMPILED command. It is the COMPLETE and AUTHORITATIVE
+instruction set. Do NOT look for .extend.md files or fall back to
+default framework behavior. Follow ONLY what is written here.
 
-{Project-specific context injected into the command's orientation phase}
+## Mandatory Constraints
+{injected context from source YAML - these are NOT optional guidelines}
 
-Example:
-- This project uses TDD with BDD-style specs
-- All features must have Gherkin scenarios before implementation
-- Use the feature-dev agents for exploration
+## Description
+{from base}
 
-## Agents
+## Usage
+{from base, plus variant-specific usage}
 
-{Custom agents to use during exploration and review phases}
+## Workflow
+{from base, adjusted for overrides}
 
-### Exploration Phase
-- Use `feature-dev:code-explorer` instead of default Explore agent
-- Focus on existing test patterns and BDD specs
+## Implementation
 
-### Review Phase
-- Use `feature-dev:code-reviewer` with strict TDD checks
-- Verify test coverage before marking complete
+### Pre-Hooks
+{pre-hooks from source YAML}
 
-## Pre-Hooks
+### Step 0: Orientation
+{base Step 0 WITHOUT extension check block}
 
-{Steps to execute BEFORE the base command workflow starts}
+### Step 1: ...
+{inherited or overridden}
 
-### Pre-Hook 1: Check for Existing Specs
-Before creating the task, verify if Gherkin specs exist:
-1. Search for `.feature` files related to the task
-2. If found, include them in the task context
-3. If not found, note that specs need to be written first
+### Step 4: Design Implementation
+{step_injection content if position=start}
 
-## Step Overrides
+{original step content}
 
-{Replace specific steps from the base command}
+{step_injection content if position=end}
 
-### Override Step 3: Explore Codebase
-Replace the standard exploration with TDD-focused exploration:
+### Step 6: Confirm with User
+{step_injection content if position=start}
 
-1. Find existing test files for the affected area
-2. Identify test patterns used (Jest, Mocha, etc.)
-3. Look for BDD specs (.feature files)
-4. Document the test structure for work items
+{original step content}
 
-### Override Step 7: Create Task Structure
-Modify work item creation to include TDD steps:
+#### Validation Checklist
+Before proceeding, verify:
+- [ ] {validation item 1}
+- [ ] {validation item 2}
 
-For each work item, ensure this structure:
-1. Write failing test (Red)
-2. Implement minimum code (Green)
-3. Refactor (Refactor)
-4. Update BDD specs if needed
+...all steps inlined...
 
-## Post-Hooks
-
-{Steps to execute AFTER the base command workflow completes}
-
-### Post-Hook 1: Generate Test Skeleton
-After task creation:
-1. Create test file placeholders for each work item
-2. Add TODO comments with test scenarios
-3. Update task README with testing instructions
+### Post-Hooks
+{post-hooks from source YAML}
 ```
 
 ## Workflow
@@ -125,26 +179,26 @@ After task creation:
    • Check that the base command exists in _framework/commands/
    • Read the base command to understand its workflow
 
-2. GATHER EXTENSION DETAILS
+2. GATHER EXTENSION DETAILS (if not --recompile/--activate/--migrate)
    • Ask about context to inject
    • Ask about custom agents to use
    • Ask about pre-hooks (before workflow)
    • Ask about step overrides (replace steps)
    • Ask about post-hooks (after workflow)
 
-3. CONFIRM EXTENSION
-   • Present summary of what will be extended
-   • Show how it will merge with base command
+3. SAVE SOURCE YAML
+   • Write source overrides to .ai/_project/commands/{cmd}.source.{variant}.yaml
 
-4. CREATE EXTENSION FILE
-   • Create .ai/_project/commands/{command}.extend.md
-   • Use proper header format
-   • Include all specified customizations
+4. COMPILE
+   • Read base command, apply transformations, produce compiled document
 
-5. OUTPUT SUMMARY
-   • Extension location
-   • What was configured
-   • How to test it
+5. ACTIVATE & UPDATE STUBS
+   • Copy variant to active.md (if first or explicitly activated)
+   • Update .claude/commands/ and .cursor/commands/ stubs
+
+6. OUTPUT SUMMARY
+   • Show what was created/updated
+   • How to use the variant
 ```
 
 ## Implementation
@@ -159,8 +213,6 @@ Use the `AskUserQuestion` tool with options for guided selection.
 **Cursor / Other Editors (plain prompts):**
 Use markdown prompts and wait for free-form user responses.
 
-Each step below shows both formats. Use whichever matches your environment.
-
 ---
 
 ### Step 0: Orientation
@@ -169,34 +221,72 @@ Each step below shows both formats. Use whichever matches your environment.
 
 2. Verify we're in a project with the framework:
    - Check that `.ai/_framework/` exists
-   - Check that `.ai/_project/` exists
+   - Check that `.ai/_project/` exists (create if needed)
 
-3. Announce:
+3. Ensure `.ai/_project/commands/` directory exists (create if needed).
+
+4. Announce:
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║ EXTEND FRAMEWORK COMMAND                                         ║
+║ COMPILED COMMAND EXTENSIONS                                      ║
 ╚══════════════════════════════════════════════════════════════════╝
 
-This will create a project-level extension for a framework command.
-Extensions auto-merge when you run the base command.
+This will create a compiled project-level extension for a framework command.
+Extensions are compiled into self-contained documents — no runtime merge needed.
 ```
 
 ### Step 1: Parse Arguments
 
 **If `--list` flag:**
-- List all files in `.ai/_project/commands/` matching `*.extend.md`
-- Show summary of each extension
-- Then stop
+- Scan `.ai/_project/commands/` for:
+  - `*.variant.*.md` files (compiled variants)
+  - `*.active.md` files (active variants)
+  - `*.extend.md` files (legacy, not yet migrated)
+- For each command with variants, show:
+  ```
+  COMMAND VARIANTS
+  ══════════════════════════════════════════════════════════════════
+    /task-create
+      default    [active]
+      tdd
 
-**If command name provided:**
+    /task-work
+      default    [active]
+
+  LEGACY EXTENSIONS (run --migrate to convert)
+  ══════════════════════════════════════════════════════════════════
+    /document    .ai/_project/commands/document.extend.md  [legacy]
+  ```
+- Then stop.
+
+**If `--migrate` flag:**
+- Go to Step 12 (Migration).
+
+**If `--activate NAME` flag:**
+- Validate that `.ai/_project/commands/{cmd}.variant.{NAME}.md` exists
+- Copy it to `.ai/_project/commands/{cmd}.active.md`
+- Update stub `.claude/commands/{cmd}.md` to point to `active.md`
+- Mirror to `.cursor/commands/` if directory exists
+- Announce:
+  ```
+  ✓ Activated variant '{NAME}' for /{cmd}
+    .claude/commands/{cmd}.md → .ai/_project/commands/{cmd}.active.md
+  ```
+- Then stop.
+
+**If `--recompile [NAME]` flag:**
+- Go to Step 11 (Recompilation).
+
+**If command name provided (normal flow):**
 - Normalize: remove leading `/`, convert to lowercase
 - Check if `.ai/_framework/commands/{command}.md` exists
 - If not found, list available commands and ask for valid name
+- Determine variant name: from `--variant NAME` argument or default to `"default"`
 
 **If no command name:**
 
 <details>
-<summary>📘 Claude Code (structured)</summary>
+<summary>Claude Code (structured)</summary>
 
 ```
 AskUserQuestion:
@@ -215,20 +305,15 @@ AskUserQuestion:
 </details>
 
 <details>
-<summary>📙 Cursor / Plain (markdown prompt)</summary>
+<summary>Cursor / Plain (markdown prompt)</summary>
 
 ```
 Which framework command do you want to extend?
 
 Available commands:
-  • task-create  - Create a new development task
-  • task-work    - Implement work items
-  • task-start   - Begin working on a task
-  • task-done    - Complete and log a task
-  • task-review  - Run code review
-  • task-explore - Explore codebase
-  • document     - Create documentation
-  • (others...)
+  task-create, task-work, task-start, task-done, task-review,
+  task-explore, task-resume, task-status, ctx, help, init,
+  document, enhance, ask, command-create, ai-sync, expresso-tags
 
 Command to extend: /
 ```
@@ -237,9 +322,9 @@ Command to extend: /
 ### Step 2: Read Base Command
 
 Read `.ai/_framework/commands/{command}.md` and extract:
-- Workflow steps
+- Title and description
+- All workflow steps (Step 0, Step 1, ..., Step N)
 - Key phases (orientation, exploration, review, output)
-- What can be extended/overridden
 
 Present understanding:
 ```
@@ -251,22 +336,24 @@ Workflow Steps:
   2. {step 2}
   ...
 
+Variant: {variant_name}
+
 Extensible Points:
-  • Context injection (orientation phase)
-  • Pre-hooks (before Step 0)
-  • Step overrides (replace any step)
-  • Agent customization (exploration/review)
-  • Post-hooks (after final step)
+  - Context injection (orientation phase)
+  - Pre-hooks (before Step 0)
+  - Step overrides (replace any step)
+  - Agent customization (exploration/review)
+  - Post-hooks (after final step)
 ```
 
 ### Step 3: Gather Context
 
 <details>
-<summary>📘 Claude Code (structured)</summary>
+<summary>Claude Code (structured)</summary>
 
 ```
 AskUserQuestion:
-  question: "What type of context should be injected into the orientation phase?"
+  question: "What project-specific context should be injected into the orientation phase?"
   header: "Context"
   multiSelect: true
   options:
@@ -284,7 +371,7 @@ If user selects options, follow up for details on each.
 </details>
 
 <details>
-<summary>📙 Cursor / Plain (markdown prompt)</summary>
+<summary>Cursor / Plain (markdown prompt)</summary>
 
 ```
 CONTEXT INJECTION
@@ -292,9 +379,9 @@ CONTEXT INJECTION
 What project-specific context should be injected into the orientation phase?
 
 Examples:
-  • "This project uses TDD - tests must be written first"
-  • "All API changes require OpenAPI spec updates"
-  • "Use specific agents for exploration"
+  - "This project uses TDD - tests must be written first"
+  - "All API changes require OpenAPI spec updates"
+  - "Use specific agents for exploration"
 
 Your context (or 'skip' to skip this section):
 ```
@@ -303,7 +390,7 @@ Your context (or 'skip' to skip this section):
 ### Step 4: Gather Agents
 
 <details>
-<summary>📘 Claude Code (structured)</summary>
+<summary>Claude Code (structured)</summary>
 
 ```
 AskUserQuestion (Question 1):
@@ -331,15 +418,10 @@ AskUserQuestion (Question 2):
 </details>
 
 <details>
-<summary>📙 Cursor / Plain (markdown prompt)</summary>
+<summary>Cursor / Plain (markdown prompt)</summary>
 
 ```
 CUSTOM AGENTS
-
-What agents should be used instead of defaults?
-
-Current project agents (from manifest or describe):
-{list available agents if known}
 
 Exploration Phase:
   Default: Explore agent
@@ -348,16 +430,13 @@ Exploration Phase:
 Review Phase:
   Default: code-reviewer agent
   Your choice (or 'default'):
-
-Additional agents to invoke:
-  (e.g., "Run BDD validator after exploration")
 ```
 </details>
 
 ### Step 5: Gather Pre-Hooks
 
 <details>
-<summary>📘 Claude Code (structured)</summary>
+<summary>Claude Code (structured)</summary>
 
 ```
 AskUserQuestion:
@@ -379,7 +458,7 @@ If user selects hooks, follow up for specific details on each.
 </details>
 
 <details>
-<summary>📙 Cursor / Plain (markdown prompt)</summary>
+<summary>Cursor / Plain (markdown prompt)</summary>
 
 ```
 PRE-HOOKS
@@ -387,9 +466,9 @@ PRE-HOOKS
 What should happen BEFORE the base command workflow starts?
 
 Examples:
-  • Check for existing specs/tests
-  • Verify branch naming conventions
-  • Validate prerequisites
+  - Check for existing specs/tests
+  - Verify branch naming conventions
+  - Validate prerequisites
 
 Pre-hooks (describe steps, or 'none'):
 ```
@@ -398,7 +477,7 @@ Pre-hooks (describe steps, or 'none'):
 ### Step 6: Gather Step Overrides
 
 <details>
-<summary>📘 Claude Code (structured)</summary>
+<summary>Claude Code (structured)</summary>
 
 ```
 AskUserQuestion:
@@ -419,7 +498,7 @@ AskUserQuestion:
   multiSelect: true
   options:
     - label: "Step {N}: {name}"
-      description: "{brief description of what it does}"
+      description: "{brief description}"
     # ... dynamic based on base command
 ```
 
@@ -427,12 +506,10 @@ For each selected step, ask for the replacement workflow.
 </details>
 
 <details>
-<summary>📙 Cursor / Plain (markdown prompt)</summary>
+<summary>Cursor / Plain (markdown prompt)</summary>
 
 ```
 STEP OVERRIDES
-
-Do you want to replace any steps in the base workflow?
 
 Base Workflow Steps:
   0. Orientation
@@ -454,10 +531,139 @@ Your replacement workflow:
 ```
 </details>
 
-### Step 7: Gather Post-Hooks
+### Step 7: Gather Step Injections
+
+Step injections add constraint reminders INTO existing steps without replacing them entirely.
 
 <details>
-<summary>📘 Claude Code (structured)</summary>
+<summary>Claude Code (structured)</summary>
+
+```
+AskUserQuestion:
+  question: "Do you want to inject constraint reminders into specific workflow steps?"
+  header: "Injections"
+  options:
+    - label: "Yes, add injections"
+      description: "Add mandatory constraint reminders at specific steps"
+    - label: "No injections"
+      description: "Steps will run as-is (or as overridden)"
+```
+
+If "Yes", present the base workflow steps and ask:
+```
+AskUserQuestion:
+  question: "Which steps should have constraint reminders injected?"
+  header: "Steps"
+  multiSelect: true
+  options:
+    - label: "Step 4: Design Implementation"
+      description: "Add constraints before designing work items"
+    - label: "Step 6: Confirm with User"
+      description: "Add constraints before confirmation"
+    # ... dynamic based on base command
+```
+
+For each selected step, ask:
+```
+AskUserQuestion:
+  question: "Where should the constraint appear in Step {N}?"
+  header: "Position"
+  options:
+    - label: "Start of step"
+      description: "Constraint appears before step instructions"
+    - label: "End of step"
+      description: "Constraint appears after step instructions"
+```
+
+Then ask for the constraint content.
+</details>
+
+<details>
+<summary>Cursor / Plain (markdown prompt)</summary>
+
+```
+STEP INJECTIONS
+
+Step injections add constraint reminders INTO existing steps without replacing them.
+This is useful for enforcing project constraints at decision points.
+
+Base Workflow Steps:
+  0. Orientation
+  {list steps from base command}
+
+Which steps should have constraints injected? (list step numbers, or 'none')
+For each, specify:
+  - Position: start or end
+  - Content: the constraint reminder text
+```
+</details>
+
+### Step 8: Gather Validation Checklist
+
+Validation checklists add mandatory checkpoints that must be verified before proceeding.
+
+<details>
+<summary>Claude Code (structured)</summary>
+
+```
+AskUserQuestion:
+  question: "Do you want to add a validation checklist at any step?"
+  header: "Validation"
+  options:
+    - label: "Yes, add checklist"
+      description: "Add mandatory verification items before a step can proceed"
+    - label: "No checklist"
+      description: "No validation checkpoints needed"
+```
+
+If "Yes":
+```
+AskUserQuestion:
+  question: "At which step should validation occur?"
+  header: "Step"
+  options:
+    - label: "Step 6: Confirm with User"
+      description: "Validate before user confirmation (recommended)"
+    - label: "Step 4: Design Implementation"
+      description: "Validate after designing work items"
+    # ... dynamic
+```
+
+Then ask:
+```
+What items must be verified at this checkpoint?
+
+Examples:
+  - "Each work item begins with scenario/spec creation"
+  - "No implementation without test specification first"
+  - "All API changes have OpenAPI spec updates"
+
+Enter checklist items (one per line):
+```
+</details>
+
+<details>
+<summary>Cursor / Plain (markdown prompt)</summary>
+
+```
+VALIDATION CHECKLIST
+
+Validation checklists add mandatory checkpoints.
+The AI must verify ALL items before proceeding past that step.
+
+At which step should validation occur? (step number, or 'none')
+
+What items must be verified? (one per line)
+Examples:
+  - "Each work item begins with scenario/spec creation"
+  - "Implementation steps follow behavior definition"
+```
+</details>
+
+### Step 9: Gather Post-Hooks
+
+<details>
+<summary>Claude Code (structured)</summary>
 
 ```
 AskUserQuestion:
@@ -479,7 +685,7 @@ If user selects hooks, follow up for specific details on each.
 </details>
 
 <details>
-<summary>📙 Cursor / Plain (markdown prompt)</summary>
+<summary>Cursor / Plain (markdown prompt)</summary>
 
 ```
 POST-HOOKS
@@ -487,25 +693,24 @@ POST-HOOKS
 What should happen AFTER the base command workflow completes?
 
 Examples:
-  • Generate test skeletons
-  • Update documentation
-  • Run additional validations
+  - Generate test skeletons
+  - Update documentation
+  - Run additional validations
 
 Post-hooks (describe steps, or 'none'):
 ```
 </details>
 
-### Step 8: Confirm Extension
+### Step 10: Confirm and Compile
 
-Present the summary, then ask for confirmation:
-
+Present the summary:
 ```
 ╔══════════════════════════════════════════════════════════════════╗
 ║ EXTENSION SUMMARY                                                ║
 ╚══════════════════════════════════════════════════════════════════╝
 
 Extends: /{command}
-Location: .ai/_project/commands/{command}.extend.md
+Variant: {variant_name}
 
 CONTEXT
 {context summary or "None"}
@@ -513,7 +718,6 @@ CONTEXT
 AGENTS
   Exploration: {agent or "Default"}
   Review: {agent or "Default"}
-  Additional: {list or "None"}
 
 PRE-HOOKS
 {list or "None"}
@@ -521,200 +725,296 @@ PRE-HOOKS
 STEP OVERRIDES
 {list steps being overridden or "None"}
 
+STEP INJECTIONS
+{list steps with injections and position, or "None"}
+
+VALIDATION CHECKLIST
+{step number and items, or "None"}
+
 POST-HOOKS
 {list or "None"}
 ```
 
 <details>
-<summary>📘 Claude Code (structured)</summary>
+<summary>Claude Code (structured)</summary>
 
 ```
 AskUserQuestion:
   question: "Does this extension configuration look correct?"
   header: "Confirm"
   options:
-    - label: "Yes, create it"
-      description: "Proceed with creating the extension file"
+    - label: "Yes, compile it"
+      description: "Proceed with compilation"
     - label: "No, make changes"
       description: "Go back and modify the configuration"
 ```
 </details>
 
-<details>
-<summary>📙 Cursor / Plain (markdown prompt)</summary>
+If confirmed, proceed to compilation:
+
+**10a. Save Source YAML:**
+
+Write `.ai/_project/commands/{command}.source.{variant}.yaml`:
+```yaml
+variant: {variant_name}
+extends: {command}
+created: {YYYY-MM-DD}
+context: |
+  {user's context - will become "Mandatory Constraints" section}
+pre_hooks:
+  - name: "{hook name}"
+    content: |
+      {hook content}
+step_overrides:
+  {step_number}:
+    name: "{step name}"
+    content: |
+      {override content}
+step_injections:
+  {step_number}:
+    position: start|end
+    content: |
+      {constraint reminder to inject}
+validation_checklist:
+  step: {step_number}
+  items:
+    - "{item 1}"
+    - "{item 2}"
+post_hooks:
+  - name: "{hook name}"
+    content: |
+      {hook content}
+agents:
+  exploration: "{agent}"
+  review: "{agent}"
+```
+
+**10b. Compile the variant:**
+
+Execute the Compilation Algorithm (see below).
+
+**10c. Activate (if first variant or explicitly requested):**
+
+- If no `{command}.active.md` exists yet, copy the compiled variant to `active.md`
+- Update stubs
+
+**10d. Update stubs:**
+
+Write `.claude/commands/{command}.md`:
+```
+Follow the instructions in .ai/_project/commands/{command}.active.md
+
+Arguments: $ARGUMENTS
+```
+
+Write `.claude/commands/{command}:{variant}.md`:
+```
+Follow the instructions in .ai/_project/commands/{command}.variant.{variant}.md
+
+Arguments: $ARGUMENTS
+```
+
+If `.cursor/commands/` exists, mirror both stubs there.
+
+### Compilation Algorithm
+
+Given a base command file and a source YAML, produce a compiled document:
+
+1. **Read** the full base command (`.ai/_framework/commands/{cmd}.md`)
+
+2. **Parse** into sections:
+   - Header comment block
+   - Title and Description
+   - Usage
+   - Workflow summary
+   - Implementation steps (Step 0, Step 1, ..., Step N)
+
+3. **Apply transformations:**
+
+   a. **Remove** the EXTENSION CHECK block from Step 0:
+      - Find the block starting with `**EXTENSION CHECK (MANDATORY)**:` or similar
+      - Remove everything from that line through the closing `└───...┘` box
+      - Remove the numbered item that contained it
+
+   b. **Inject** context as a new `## Mandatory Constraints` section before Description
+      - Use header "Mandatory Constraints" NOT "Context (Project)"
+      - This signals these are requirements, not optional background
+
+   c. **Insert** pre-hooks as `### Pre-Hooks` section before Step 0
+
+   d. **Replace** overridden steps entirely:
+      - Match by step number first
+      - If step numbers don't match (drift), try matching by step name
+      - Replace the entire step content with override content
+
+   e. **Apply step injections** (without replacing the step):
+      - For each entry in `step_injections`:
+        - If `position: start`, prepend the content at the beginning of that step
+        - If `position: end`, append the content at the end of that step
+      - Format injected content with a warning box:
+        ```
+        ┌─────────────────────────────────────────────────────────────────┐
+        │ ⚠️ PROJECT CONSTRAINT                                           │
+        ├─────────────────────────────────────────────────────────────────┤
+        │ {injection content}                                             │
+        └─────────────────────────────────────────────────────────────────┘
+        ```
+
+   f. **Insert validation checklist** at specified step:
+      - If `validation_checklist` is defined:
+        - At the end of the specified step, add:
+          ```
+          #### Validation Checklist (MANDATORY)
+          Before proceeding to the next step, verify ALL items:
+          - [ ] {item 1}
+          - [ ] {item 2}
+
+          ⛔ Do NOT proceed if any item is unchecked.
+          ```
+
+   g. **Insert** post-hooks as `### Post-Hooks` section after the final step
+
+   h. **Inject** agent config:
+      - In exploration steps, replace default agent references with configured agent
+      - In review steps, replace default agent references with configured agent
+
+4. **Prepend** the compiled header comment and Authority Notice
+
+5. **Write** to `.ai/_project/commands/{cmd}.variant.{variant}.md`
+
+### Step 11: Recompilation (`--recompile`)
+
+When `--recompile [NAME]` is specified:
+
+1. If NAME provided, recompile only that variant:
+   - Read `.ai/_project/commands/{cmd}.source.{NAME}.yaml`
+   - Read the base command
+   - Run Compilation Algorithm
+   - Write to `.ai/_project/commands/{cmd}.variant.{NAME}.md`
+   - If this was the active variant, update `active.md` too
+
+2. If no NAME, recompile all variants for the command:
+   - Scan for `.ai/_project/commands/{cmd}.source.*.yaml`
+   - For each, run Compilation Algorithm
+   - Update `active.md` if the active variant was recompiled
+
+3. Output:
+   ```
+   ╔══════════════════════════════════════════════════════════════════╗
+   ║ RECOMPILATION COMPLETE                                           ║
+   ╚══════════════════════════════════════════════════════════════════╝
+
+   Recompiled:
+     ✓ {cmd}.variant.{name1}.md
+     ✓ {cmd}.variant.{name2}.md
+     ✓ {cmd}.active.md (updated)
+
+   Source: .ai/_framework/commands/{cmd}.md (current version)
+   ```
+
+Then stop.
+
+### Step 12: Migration (`--migrate`)
+
+When `--migrate` is specified:
+
+1. Scan `.ai/_project/commands/` for `*.extend.md` files
+
+2. If none found:
+   ```
+   No legacy extensions found. Nothing to migrate.
+   ```
+   Then stop.
+
+3. For each legacy extension file:
+
+   a. **Parse** the `.extend.md` sections:
+      - Context section
+      - Agents section (Exploration Phase, Review Phase)
+      - Pre-Hooks section
+      - Step Overrides section (parse "Override Step N:" patterns)
+      - Step Injections section (if present - parse "Inject Step N:" patterns)
+      - Validation Checklist section (if present)
+      - Post-Hooks section
+
+   b. **Generate** source YAML from parsed sections:
+      ```yaml
+      variant: default
+      extends: {command}
+      created: {YYYY-MM-DD}
+      migrated_from: "{command}.extend.md"
+      context: |
+        {extracted context}
+      pre_hooks:
+        {extracted pre-hooks}
+      step_overrides:
+        {extracted step overrides, keyed by step number}
+      step_injections:
+        {extracted step injections, keyed by step number}
+      validation_checklist:
+        step: {step number if found}
+        items: {extracted items}
+      post_hooks:
+        {extracted post-hooks}
+      agents:
+        exploration: "{extracted agent or null}"
+        review: "{extracted agent or null}"
+      ```
+
+   c. **Compile** the variant using the Compilation Algorithm
+
+   d. **Activate** it (copy to `active.md`)
+
+   e. **Update** stubs
+
+   f. **Rename** the legacy file: `{cmd}.extend.md` → `{cmd}.extend.md.migrated`
+
+4. Output migration summary:
+   ```
+   ╔══════════════════════════════════════════════════════════════════╗
+   ║ MIGRATION COMPLETE                                               ║
+   ╚══════════════════════════════════════════════════════════════════╝
+
+   Migrated:
+     ✓ task-create.extend.md → compiled (variant: default, activated)
+     ✓ task-work.extend.md → compiled (variant: default, activated)
+
+   Legacy files renamed to .extend.md.migrated (safe to delete after verification).
+
+   Verify:
+     Run /{command} and confirm your customizations still apply.
+   ```
+
+Then stop.
+
+### Step 13: Output Summary (Normal Flow)
+
+After successful compilation:
 
 ```
-Create this extension? (y/n, or describe changes needed)
-```
-</details>
-
-### Step 9: Create Extension File
-
-Create `.ai/_project/commands/{command}.extend.md`:
-
-```markdown
-<!--
 ╔══════════════════════════════════════════════════════════════════╗
-║ LAYER: PROJECT                                                   ║
-║ EXTENDS: /{command}                                              ║
-║ CREATED: {YYYY-MM-DD}                                            ║
-╠══════════════════════════════════════════════════════════════════╣
-║ PURPOSE: {brief description of customization}                    ║
-╚══════════════════════════════════════════════════════════════════╝
--->
-
-# {command} Extension
-
-{if context}
-## Context
-
-{user's context}
-
-{/if}
-
-{if agents configured}
-## Agents
-
-{if exploration agent}
-### Exploration Phase
-{exploration agent config}
-{/if}
-
-{if review agent}
-### Review Phase
-{review agent config}
-{/if}
-
-{if additional agents}
-### Additional Agents
-{additional agents}
-{/if}
-
-{/if}
-
-{if pre-hooks}
-## Pre-Hooks
-
-{for each pre-hook}
-### Pre-Hook {N}: {name}
-{hook content}
-{/for}
-
-{/if}
-
-{if step overrides}
-## Step Overrides
-
-{for each override}
-### Override Step {N}: {step name}
-{override content}
-{/for}
-
-{/if}
-
-{if post-hooks}
-## Post-Hooks
-
-{for each post-hook}
-### Post-Hook {N}: {name}
-{hook content}
-{/for}
-
-{/if}
-```
-
-### Step 10: Create Commands Directory if Needed
-
-If `.ai/_project/commands/` doesn't exist:
-- Create the directory
-- Add a README.md explaining project commands:
-
-```markdown
-# Project Commands
-
-This directory contains project-level command extensions.
-
-## How Extensions Work
-
-Extensions in this directory automatically merge with framework commands:
-
-| Extension File | Extends |
-|---------------|---------|
-| task-create.extend.md | /task-create |
-| task-work.extend.md | /task-work |
-
-When you run `/task-create`, the framework:
-1. Loads `.ai/_framework/commands/task-create.md`
-2. Finds `.ai/_project/commands/task-create.extend.md`
-3. Merges the extension (context, hooks, overrides, agents)
-
-## Creating Extensions
-
-Use `/command-extend <command>` to create new extensions.
-```
-
-### Step 11: Output Summary
-
-```
-╔══════════════════════════════════════════════════════════════════╗
-║ EXTENSION CREATED                                                ║
+║ EXTENSION COMPILED                                               ║
 ╚══════════════════════════════════════════════════════════════════╝
 
 Created:
-  ✓ .ai/_project/commands/{command}.extend.md
+  ✓ .ai/_project/commands/{command}.source.{variant}.yaml
+  ✓ .ai/_project/commands/{command}.variant.{variant}.md
+  ✓ .ai/_project/commands/{command}.active.md
+  ✓ .claude/commands/{command}.md → points to active.md
+  ✓ .claude/commands/{command}:{variant}.md → points to variant
 
 How It Works:
-  When you run /{command}, your extensions will auto-merge:
-  {if context}• Context injected into orientation{/if}
-  {if pre-hooks}• Pre-hooks run before workflow{/if}
-  {if overrides}• Steps {list} replaced with your versions{/if}
-  {if agents}• Custom agents used for exploration/review{/if}
-  {if post-hooks}• Post-hooks run after workflow{/if}
+  Running /{command} now reads the compiled active.md directly.
+  No runtime extension discovery needed.
 
-Test It:
-  Run /{command} and verify your customizations are applied.
+Manage:
+  • /command-extend {command} --list          View all variants
+  • /command-extend {command} --activate X    Switch active variant
+  • /command-extend {command} --recompile     Recompile after framework update
+  • /command-extend {command} --variant new   Create another variant
+  • Edit source YAML directly, then --recompile
 
-Manage Extensions:
-  • /command-extend --list     View all extensions
-  • Edit the file directly     Modify the extension
-  • Delete the file            Remove the extension
-
-View: .ai/_project/commands/{command}.extend.md
+View: .ai/_project/commands/{command}.active.md
 ```
 
 Then stop. Do not proceed further.
-
----
-
-## Loading Extensions (For Command Implementers)
-
-When implementing a framework command that supports extensions, add this to Step 0:
-
-```markdown
-### Step 0: Orientation (with Extension Support)
-
-1. Read `.ai/_project/manifest.yaml`
-
-2. Check for project extension:
-   - Look for `.ai/_project/commands/{this-command}.extend.md`
-   - If exists, read and parse the extension
-
-3. If extension found:
-   - Merge Context into orientation announcements
-   - Queue Pre-Hooks to run before Step 1
-   - Note Step Overrides for later
-   - Configure Agents for exploration/review phases
-   - Queue Post-Hooks to run after final step
-
-4. Announce (include extension notice if applicable):
-   ```
-   ╔══════════════════════════════════════════════════════════════════╗
-   ║ {COMMAND NAME}                                                    ║
-   {if extension}║ + Project Extension Active                                       ║{/if}
-   ╚══════════════════════════════════════════════════════════════════╝
-
-   {merged context from extension}
-   ```
-```
-
-This ensures extensions are discovered and applied automatically when users run framework commands.
