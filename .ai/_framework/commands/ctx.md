@@ -380,6 +380,7 @@ REMEMBER
   🛑 EXTENSIONS: Reading ≠ Applying - verify compliance at EACH step
   ⚠ Git commands: Run in correct repo directory
   ⚠ Protected repos: Don't modify (check manifest.yaml)
+  ⚠ Extensions: Check for .extend.md files
   ⚠ Docs first: Check documentation before exploring code
 ```
 
