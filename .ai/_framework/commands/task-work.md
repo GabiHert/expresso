@@ -196,6 +196,17 @@ If user chooses 1, launch an Explore agent targeting the relevant files and patt
 
 ### Step 5: Invoke Implementer Agent
 
+┌─────────────────────────────────────────────────────────────────┐
+│ ⚠️  MANDATORY: INVOKE IMPLEMENTER AGENT                         │
+│                                                                 │
+│ You MUST invoke the implementer agent to execute work items.    │
+│ Do NOT skip this step or implement the changes yourself.        │
+│ The implementer agent works with clean, isolated context.       │
+│                                                                 │
+│ If you find yourself editing application code directly without  │
+│ invoking the implementer agent, STOP — you are off track.       │
+└─────────────────────────────────────────────────────────────────┘
+
 **Invoke the implementer agent** to execute this work item with clean context.
 
 Provide the following context to the agent:
@@ -228,6 +239,17 @@ The Implementer agent will:
 Capture the implementation summary for the Reviewer.
 
 ### Step 6: Invoke Reviewer Agent (Automatic)
+
+┌─────────────────────────────────────────────────────────────────┐
+│ ⚠️  MANDATORY: INVOKE REVIEWER AGENT                            │
+│                                                                 │
+│ You MUST invoke the reviewer agent after implementation.        │
+│ Do NOT skip this step or review the code yourself.              │
+│ The reviewer agent ensures consistent quality checks.           │
+│                                                                 │
+│ If you find yourself skipping review or approving your own      │
+│ changes without invoking the reviewer agent, STOP.              │
+└─────────────────────────────────────────────────────────────────┘
 
 **After Implementer completes, automatically spawn the Reviewer agent:**
 

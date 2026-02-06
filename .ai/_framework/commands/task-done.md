@@ -175,6 +175,17 @@ Update `.ai/context.md`:
 
 ### Step 7: Invoke Documenter Agent (Automatic)
 
+┌─────────────────────────────────────────────────────────────────┐
+│ ⚠️  MANDATORY: INVOKE DOCUMENTER AGENT                          │
+│                                                                 │
+│ You MUST invoke the documenter agent to capture learnings.      │
+│ Do NOT skip this step or write documentation yourself.          │
+│ The documenter agent ensures consistent knowledge capture.      │
+│                                                                 │
+│ If you find yourself skipping documentation or completing the   │
+│ task without invoking the documenter agent, STOP.               │
+└─────────────────────────────────────────────────────────────────┘
+
 **Invoke the documenter agent** to capture learnings from this task.
 
 First, gather the diff:

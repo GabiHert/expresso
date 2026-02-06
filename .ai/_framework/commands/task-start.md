@@ -230,7 +230,16 @@ APPROACH
 
 ### Step 3.5: Run Explorer Agent (Automatic)
 
-**Invoke the Explorer agent** to gather codebase context for this task:
+┌─────────────────────────────────────────────────────────────────┐
+│ ⚠️  MANDATORY: INVOKE EXPLORER AGENT                            │
+│                                                                 │
+│ You MUST invoke the explorer agent to gather context.           │
+│ Do NOT skip this step or explore the codebase yourself.         │
+│ The explorer agent ensures thorough, structured exploration.    │
+│                                                                 │
+│ If you find yourself using Glob/Grep/Read directly instead of   │
+│ invoking the explorer agent, STOP — you are off track.          │
+└─────────────────────────────────────────────────────────────────┘
 
 **Invoke the explorer agent** with the following context:
 
@@ -260,7 +269,18 @@ Announce when complete:
 
 ### Step 3.6: Run Planner Agent (If No Work Items)
 
-**If status.yaml shows 0 work items**, invoke the Planner agent:
+**If status.yaml shows 0 work items:**
+
+┌─────────────────────────────────────────────────────────────────┐
+│ ⚠️  MANDATORY: INVOKE PLANNER AGENT                             │
+│                                                                 │
+│ You MUST invoke the planner agent to create work items.         │
+│ Do NOT skip this step or create work items yourself.            │
+│ The planner agent ensures consistent work item structure.       │
+│                                                                 │
+│ If you find yourself writing work item files without invoking   │
+│ the planner agent, STOP — you are off track.                    │
+└─────────────────────────────────────────────────────────────────┘
 
 **Invoke the planner agent** with the following context:
 
