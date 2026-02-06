@@ -1,13 +1,11 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { ActiveTask, CockpitEvent, CockpitSession, UNASSIGNED_TASK_ID, TaskColor, isValidTaskColor } from '../types';
+import { ActiveTask, TaskColor, isValidTaskColor } from '../types';
 import { CockpitFileWatcher } from '../watchers/FileWatcher';
-import { Shadow, ShadowManager } from '../services/ShadowManager';
-import { SessionManager } from '../services/SessionManager';
 import { CommentManager } from '../services/CommentManager';
 
-type TreeItemType = SectionItem | TaskItem | EventItem | WorkItemNode | FilesChangedSection | ShadowFileItem | SessionsSection | SessionItem | UnassignedSessionsSection | WorkItemsSection;
+type TreeItemType = SectionItem | TaskItem | WorkItemNode | WorkItemsSection;
 
 interface FrameworkTask {
   taskId: string;
@@ -30,15 +28,12 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
   private activeTask: ActiveTask | null = null;
-  private events: Map<string, CockpitEvent[]> = new Map();
   private workspaceRoot: string;
   private disposables: vscode.Disposable[] = [];
   private taskColors: Map<string, TaskColor> = new Map();
 
   constructor(
     private fileWatcher: CockpitFileWatcher,
-    private shadowManager: ShadowManager,
-    private sessionManager?: SessionManager,
     private commentManager?: CommentManager
   ) {
     this.workspaceRoot = fileWatcher.getWorkspaceRoot();
@@ -46,15 +41,6 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
     this.disposables.push(
       fileWatcher.onActiveTaskChanged(task => {
         this.activeTask = task;
-        this.refresh();
-      })
-    );
-
-    this.disposables.push(
-      fileWatcher.onEventAdded(event => {
-        const existing = this.events.get(event.taskId) || [];
-        existing.push(event);
-        this.events.set(event.taskId, existing);
         this.refresh();
       })
     );
@@ -68,12 +54,12 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
       );
     }
 
-    // Pre-load task colors to avoid race condition with session color inheritance
+    // Pre-load task colors
     this.loadAllTaskColors();
   }
 
   /**
-   * Pre-load all task colors to ensure they're available before sessions request them
+   * Pre-load all task colors to ensure they're available
    */
   private async loadAllTaskColors(): Promise<void> {
     for (const status of ['in_progress', 'todo', 'done']) {
@@ -125,18 +111,6 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
       return this.getTaskChildren(element);
     }
 
-    if (element instanceof SessionsSection) {
-      return this.getSessionsForTask(element.taskId);
-    }
-
-    if (element instanceof UnassignedSessionsSection) {
-      return this.getUnassignedSessions();
-    }
-
-    if (element instanceof FilesChangedSection) {
-      return this.getFilesForTask(element.taskId, element.taskStatus);
-    }
-
     if (element instanceof WorkItemsSection) {
       return this.getWorkItemsForSection(element);
     }
@@ -144,8 +118,8 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
     return [];
   }
 
-  private async getSections(): Promise<(SectionItem | UnassignedSessionsSection)[]> {
-    const sections: (SectionItem | UnassignedSessionsSection)[] = [];
+  private async getSections(): Promise<SectionItem[]> {
+    const sections: SectionItem[] = [];
 
     const inProgressCount = await this.countTasksInDir('in_progress');
     const todoCount = await this.countTasksInDir('todo');
@@ -159,14 +133,6 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
     }
     if (doneCount > 0) {
       sections.push(new SectionItem('done', doneCount));
-    }
-
-    // Add unassigned sessions section at root level
-    if (this.sessionManager) {
-      const unassignedSessions = await this.sessionManager.getUnassignedSessions();
-      if (unassignedSessions.length > 0) {
-        sections.push(new UnassignedSessionsSection(unassignedSessions.length));
-      }
     }
 
     return sections;
@@ -197,7 +163,7 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
 
         if (task) {
           const isActive = this.activeTask?.taskId === taskId;
-          // Store task color for session inheritance
+          // Store task color
           if (task.color) {
             this.taskColors.set(taskId, task.color);
           }
@@ -296,100 +262,10 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
   private async getTaskChildren(task: TaskItem): Promise<TreeItemType[]> {
     const items: TreeItemType[] = [];
 
-    // Add Sessions section if sessions exist
-    if (this.sessionManager) {
-      const sessions = await this.sessionManager.getSessionsForTask(task.taskId);
-      if (sessions.length > 0) {
-        items.push(new SessionsSection(task.taskId, sessions.length));
-      }
-    }
-
     // Add work items section if available
     if (task.task.workItems && task.task.workItems.length > 0) {
       items.push(new WorkItemsSection(task.task.taskId, task.task.status, task.task.workItems, task.task.workItems.length));
     }
-
-    // Add Files Changed section if shadows exist
-    const shadows = await this.shadowManager.getShadowsForTask(task.taskId);
-    if (shadows.length > 0) {
-      items.push(new FilesChangedSection(task.taskId, task.task.status, shadows.length));
-    }
-
-    return items;
-  }
-
-  private async getSessionsForTask(taskId: string): Promise<SessionItem[]> {
-    if (!this.sessionManager) return [];
-
-    const sessions = await this.sessionManager.getSessionsForTask(taskId);
-    const taskColor = this.getTaskColor(taskId);
-
-    // Sort: active sessions first, then by lastActive descending
-    return sessions
-      .sort((a, b) => {
-        if (a.status !== b.status) {
-          return a.status === 'active' ? -1 : 1;
-        }
-        return new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime();
-      })
-      .map(s => new SessionItem(s, false, taskColor));
-  }
-
-  private async getUnassignedSessions(): Promise<SessionItem[]> {
-    if (!this.sessionManager) return [];
-
-    const sessions = await this.sessionManager.getUnassignedSessions();
-
-    // Sort: active sessions first, then by lastActive descending
-    return sessions
-      .sort((a, b) => {
-        if (a.status !== b.status) {
-          return a.status === 'active' ? -1 : 1;
-        }
-        return new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime();
-      })
-      .map(s => new SessionItem(s, true));
-  }
-
-  private async getFilesForTask(taskId: string, taskStatus: string): Promise<ShadowFileItem[]> {
-    const shadows = await this.shadowManager.getShadowsForTask(taskId);
-    const items: ShadowFileItem[] = [];
-
-    // Load feedback to get comment counts
-    let commentsByFile: Map<string, number> = new Map();
-    if (this.commentManager) {
-      try {
-        const feedback = await this.commentManager.loadFeedback(taskId);
-        // Count only open comments per file
-        for (const comment of feedback.comments) {
-          if (comment.status === 'open') {
-            const count = commentsByFile.get(comment.filePath) || 0;
-            commentsByFile.set(comment.filePath, count + 1);
-          }
-        }
-      } catch {
-        // Ignore errors loading feedback
-      }
-    }
-
-    for (const shadow of shadows) {
-      const syncStatus = await this.shadowManager.checkSyncStatus(shadow);
-      const commentCount = commentsByFile.get(shadow.meta.filePath) || 0;
-      items.push(new ShadowFileItem(shadow, syncStatus, taskId, taskStatus, commentCount));
-    }
-
-    // Sort: modified first, then files with comments, then by filename
-    items.sort((a, b) => {
-      if (a.syncStatus !== b.syncStatus) {
-        if (a.syncStatus === 'user-modified') return -1;
-        if (b.syncStatus === 'user-modified') return 1;
-      }
-      // Files with comments come before files without
-      if (a.commentCount !== b.commentCount) {
-        return b.commentCount - a.commentCount;
-      }
-      return a.shadow.meta.filePath.localeCompare(b.shadow.meta.filePath);
-    });
 
     return items;
   }
@@ -525,130 +401,6 @@ class WorkItemNode extends vscode.TreeItem {
   }
 }
 
-class EventItem extends vscode.TreeItem {
-  constructor(
-    public readonly eventId: string,
-    public readonly tool: string,
-    public readonly filePath: string,
-    public readonly timestamp: string,
-    public readonly event: CockpitEvent
-  ) {
-    super(path.basename(filePath), vscode.TreeItemCollapsibleState.None);
-
-    this.id = eventId;
-    this.description = this.formatTime(timestamp);
-    this.tooltip = `${tool}: ${filePath}\n${timestamp}`;
-
-    switch (tool) {
-      case 'Edit':
-        this.iconPath = new vscode.ThemeIcon('edit');
-        break;
-      case 'Write':
-        this.iconPath = new vscode.ThemeIcon('new-file');
-        break;
-      case 'TodoWrite':
-        this.iconPath = new vscode.ThemeIcon('checklist');
-        break;
-      default:
-        this.iconPath = new vscode.ThemeIcon('file');
-    }
-
-    this.command = {
-      command: 'aiCockpit.viewEventDiff',
-      title: 'View Diff',
-      arguments: [this.event]
-    };
-
-    this.contextValue = 'event';
-  }
-
-  private formatTime(timestamp: string): string {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-}
-
-class FilesChangedSection extends vscode.TreeItem {
-  constructor(
-    public readonly taskId: string,
-    public readonly taskStatus: string,
-    fileCount: number
-  ) {
-    super('Files Changed', vscode.TreeItemCollapsibleState.Collapsed);
-
-    this.description = `${fileCount}`;
-    this.iconPath = new vscode.ThemeIcon('files');
-    this.contextValue = 'files-changed-section';
-  }
-}
-
-class ShadowFileItem extends vscode.TreeItem {
-  constructor(
-    public readonly shadow: Shadow,
-    public readonly syncStatus: 'synced' | 'user-modified' | 'file-deleted',
-    public readonly taskId: string,
-    _taskStatus: string, // Kept for backwards compatibility
-    public readonly commentCount: number = 0
-  ) {
-    super(
-      path.basename(shadow.meta.filePath),
-      vscode.TreeItemCollapsibleState.None
-    );
-
-    let descParts: string[] = [];
-    descParts.push(`${shadow.meta.accumulated.editCount} edit${shadow.meta.accumulated.editCount !== 1 ? 's' : ''}`);
-
-    this.tooltip = `${shadow.meta.filePath}\n${shadow.meta.accumulated.editCount} Claude edits\nStatus: ${syncStatus}`;
-
-    // Icon based on sync status
-    switch (syncStatus) {
-      case 'synced':
-        this.iconPath = new vscode.ThemeIcon('check', new vscode.ThemeColor('charts.green'));
-        break;
-      case 'user-modified':
-        this.iconPath = new vscode.ThemeIcon('warning', new vscode.ThemeColor('charts.yellow'));
-        descParts.push('(modified)');
-        break;
-      case 'file-deleted':
-        this.iconPath = new vscode.ThemeIcon('trash', new vscode.ThemeColor('charts.red'));
-        descParts.push('(deleted)');
-        break;
-    }
-
-    // Show comment count badge
-    if (commentCount > 0) {
-      descParts.push(`💬 ${commentCount}`);
-      this.tooltip += `\n${commentCount} open comment${commentCount !== 1 ? 's' : ''}`;
-    }
-
-    this.description = descParts.join(' ');
-
-    // Click action: always use native VSCode diff
-    this.command = {
-      command: 'aiCockpit.showPlainDiff',
-      title: 'Show Diff',
-      arguments: [shadow]
-    };
-
-    this.contextValue = `shadow-file-${syncStatus}`;
-  }
-}
-
-class SessionsSection extends vscode.TreeItem {
-  constructor(
-    public readonly taskId: string,
-    sessionCount: number
-  ) {
-    super('Sessions', vscode.TreeItemCollapsibleState.Collapsed);
-
-    // Set id to taskId so it's preserved when VSCode serializes the TreeItem
-    this.id = `sessions-${taskId}`;
-    this.description = `${sessionCount}`;
-    this.iconPath = new vscode.ThemeIcon('terminal');
-    this.contextValue = 'sessions-section';
-  }
-}
-
 class WorkItemsSection extends vscode.TreeItem {
   constructor(
     public readonly taskId: string,
@@ -662,72 +414,5 @@ class WorkItemsSection extends vscode.TreeItem {
     this.description = `${workItemCount}`;
     this.iconPath = new vscode.ThemeIcon('checklist');
     this.contextValue = 'workitems-section';
-  }
-}
-
-class UnassignedSessionsSection extends vscode.TreeItem {
-  constructor(sessionCount: number) {
-    super('Sessions', vscode.TreeItemCollapsibleState.Collapsed);
-
-    this.id = 'sessions-unassigned';
-    this.description = `${sessionCount}`;
-    this.iconPath = new vscode.ThemeIcon('terminal');
-    this.contextValue = 'unassigned-sessions-section';
-  }
-}
-
-class SessionItem extends vscode.TreeItem {
-  constructor(
-    public readonly session: CockpitSession,
-    public readonly isUnassigned: boolean = false,
-    taskColor?: TaskColor
-  ) {
-    super(session.label, vscode.TreeItemCollapsibleState.None);
-
-    this.description = session.status;
-
-    // Determine color: use task color if available, otherwise default green for active
-    const getColor = (): vscode.ThemeColor | undefined => {
-      if (taskColor) {
-        return new vscode.ThemeColor(taskColor);
-      }
-      if (session.status === 'active') {
-        return new vscode.ThemeColor('charts.green');
-      }
-      return undefined;
-    };
-
-    const iconColor = getColor();
-
-    // Icon: filled for active, outline for closed
-    if (session.status === 'active') {
-      this.iconPath = new vscode.ThemeIcon('circle-filled', iconColor);
-    } else {
-      this.iconPath = new vscode.ThemeIcon('circle-outline', iconColor);
-    }
-
-    // Click behavior depends on session status
-    if (session.status === 'active') {
-      this.command = {
-        command: 'aiCockpit.focusSession',
-        title: 'Focus Session',
-        arguments: [session]
-      };
-    } else {
-      this.command = {
-        command: 'aiCockpit.resumeSession',
-        title: 'Resume Session',
-        arguments: [session]
-      };
-    }
-
-    // Add 'unassigned' suffix for unassigned sessions to enable "Link to Task" menu
-    const baseCv = `session-${session.status}`;
-    this.contextValue = isUnassigned ? `${baseCv}-unassigned` : baseCv;
-
-    // Format timestamps for tooltip
-    const created = new Date(session.createdAt).toLocaleString();
-    const lastActive = new Date(session.lastActive).toLocaleString();
-    this.tooltip = `Session ID: ${session.id}\nCreated: ${created}\nLast active: ${lastActive}`;
   }
 }

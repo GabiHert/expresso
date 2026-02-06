@@ -14,6 +14,20 @@
 
 Grow the project setup with new knowledge. Add repos, update conventions, add MCPs, or modify project configuration.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ DO NOT EDIT APPLICATION CODE                                 │
+│                                                                 │
+│ ALLOWED:  Read any file. Write ONLY inside .ai/ directory.      │
+│ FORBIDDEN: Create, edit, or delete files outside .ai/           │
+│ TEMP FILES: Scratch/temporary output goes in .ai/tmp/           │
+│                                                                 │
+│ This command updates project configuration and documentation.    │
+│ It must NEVER modify application source code, tests, or config. │
+│ If you find yourself editing code files, STOP — you are off     │
+│ track.                                                          │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```
@@ -61,27 +75,9 @@ Grow the project setup with new knowledge. Add repos, update conventions, add MC
 1. Read `.ai/_project/manifest.yaml` to understand current configuration.
 2. Read `.ai/INDEX.md` to know existing documentation.
 
-3. **EXTENSION CHECK (MANDATORY)**:
-   ```
-   ┌─────────────────────────────────────────────────────────────────┐
-   │ CHECK FOR PROJECT EXTENSION                                     │
-   │                                                                 │
-   │ Look for: .ai/_project/commands/enhance.extend.md              │
-   │                                                                 │
-   │ If file EXISTS:                                                 │
-   │   1. Read the extension file completely                         │
-   │   2. Parse and extract these sections:                          │
-   │      • Context     → Add to orientation announcements           │
-   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
-   │      • Step Overrides → Replace matching steps                  │
-   │      • Agents      → Use specified agents for phases            │
-   │      • Post-Hooks  → Execute AFTER final step                   │
-   │   3. Announce: "✓ Project Extension Active"                     │
-   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
-   │                                                                 │
-   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
-   └─────────────────────────────────────────────────────────────────┘
-   ```
+3. **Extension Support**: This command supports compiled extensions
+   via `/command-extend enhance --variant NAME`. If a compiled extension
+   exists, the stub already points to it — no runtime discovery needed.
 
 4. Announce:
 ```

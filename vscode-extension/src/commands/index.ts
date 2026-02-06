@@ -21,10 +21,6 @@ export function registerCommands(
             detail: 'Currently active task'
           },
           {
-            label: '$(eye) View Diff History',
-            description: 'See all changes for this task'
-          },
-          {
             label: '$(check) Complete Task',
             description: 'Run /task-done in terminal'
           },
@@ -55,9 +51,7 @@ export function registerCommands(
 
       if (!selected) return;
 
-      if (selected.label.includes('View Diff History')) {
-        vscode.commands.executeCommand('aiCockpit.showDiffHistory');
-      } else if (selected.label.includes('Complete Task')) {
+      if (selected.label.includes('Complete Task')) {
         const terminal = vscode.window.createTerminal('AI Cockpit');
         terminal.show();
         terminal.sendText('/task-done');

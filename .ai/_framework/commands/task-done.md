@@ -14,6 +14,21 @@
 
 Mark a task as done, log it to history, and move it to the done folder. This preserves the task for future reference.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ DO NOT EDIT APPLICATION CODE                                 │
+│                                                                 │
+│ ALLOWED:  Read any file. Write ONLY inside .ai/ directory.      │
+│ FORBIDDEN: Create, edit, or delete files outside .ai/           │
+│ TEMP FILES: Scratch/temporary output goes in .ai/tmp/           │
+│                                                                 │
+│ This command archives tasks and updates documentation.           │
+│ It must NEVER modify application source code, tests, or config. │
+│ If you find yourself editing code files, STOP — you are off     │
+│ track. Only .ai/tasks/, .ai/docs/, and .ai/context.md may be   │
+│ written to.                                                     │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```
@@ -56,27 +71,9 @@ Mark a task as done, log it to history, and move it to the done folder. This pre
    - Notification settings
    - Available MCPs (for notifications)
 
-2. **EXTENSION CHECK (MANDATORY)**:
-   ```
-   ┌─────────────────────────────────────────────────────────────────┐
-   │ CHECK FOR PROJECT EXTENSION                                     │
-   │                                                                 │
-   │ Look for: .ai/_project/commands/task-done.extend.md            │
-   │                                                                 │
-   │ If file EXISTS:                                                 │
-   │   1. Read the extension file completely                         │
-   │   2. Parse and extract these sections:                          │
-   │      • Context     → Add to orientation announcements           │
-   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
-   │      • Step Overrides → Replace matching steps                  │
-   │      • Agents      → Use specified agents for phases            │
-   │      • Post-Hooks  → Execute AFTER final step                   │
-   │   3. Announce: "✓ Project Extension Active"                     │
-   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
-   │                                                                 │
-   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
-   └─────────────────────────────────────────────────────────────────┘
-   ```
+2. **Extension Support**: This command supports compiled extensions
+   via `/command-extend task-done --variant NAME`. If a compiled extension
+   exists, the stub already points to it — no runtime discovery needed.
 
 3. Announce:
 ```
@@ -170,71 +167,86 @@ If the file has the placeholder row `| _No tasks completed yet_ | | |`, remove i
 ║ LOCATION: .ai/tasks/done/{task-id}/                             ║
 ```
 
-### Step 6: Deactivate Cockpit Tracking
-
-Deactivate cockpit tracking for the completed task:
-
-1. Check if `.ai/cockpit/active-task.json` exists:
-   ```bash
-   test -f .ai/cockpit/active-task.json
-   ```
-
-2. **If file exists**, read the taskId:
-   ```bash
-   cat .ai/cockpit/active-task.json | jq -r '.taskId'
-   ```
-
-3. **If taskId matches current task**:
-   - Delete the file:
-     ```bash
-     rm .ai/cockpit/active-task.json
-     ```
-   - Announce:
-     ```
-     Cockpit: Task {task-id} tracking stopped
-     ```
-
-4. **If taskId does NOT match current task**:
-   - Warn:
-     ```
-     Warning: Active task is {other-task-id}, not {current-task-id}.
-     The active task file will not be modified.
-     ```
-   - Continue without deleting (different task is active)
-
-5. **If file doesn't exist**:
-   - Continue silently (task wasn't being tracked via cockpit)
-
-**Note**: Events in `.ai/cockpit/events/{task-id}/` are preserved for historical reference.
-
-### Step 7: Update Context
+### Step 6: Update Context
 
 Update `.ai/context.md`:
 - Remove task from "In Progress" in Current State section
 - Add to "Recently Done" count
 
-### Step 8: Offer Documentation
+### Step 7: Invoke Documenter Agent (Automatic)
 
-If significant patterns were discovered:
+┌─────────────────────────────────────────────────────────────────┐
+│ ⚠️  MANDATORY: INVOKE DOCUMENTER AGENT                          │
+│                                                                 │
+│ You MUST invoke the documenter agent to capture learnings.      │
+│ Do NOT skip this step or write documentation yourself.          │
+│ The documenter agent ensures consistent knowledge capture.      │
+│                                                                 │
+│ If you find yourself skipping documentation or completing the   │
+│ task without invoking the documenter agent, STOP.               │
+└─────────────────────────────────────────────────────────────────┘
+
+**Invoke the documenter agent** to capture learnings from this task.
+
+First, gather the diff:
+```bash
+# Get full task diff (if tracking start commit)
+git diff {task_start_commit}..HEAD > /tmp/task-changes.diff 2>/dev/null || git diff HEAD~10..HEAD > /tmp/task-changes.diff
 ```
-DOCUMENTATION
 
-Would you like to document any patterns or learnings from this task?
+Provide the following context to the agent:
 
-Common options:
-  1. Add to shared patterns (.ai/docs/_shared/)
-  2. Add to repo-specific docs (.ai/docs/{repo}/)
-  3. Add to architecture docs (.ai/docs/_architecture/)
-  4. Skip documentation
+```
+## Completed Task
+{task README content}
 
-Choice? (1/2/3/4)
+## Work Items Completed
+{all work item files content}
+
+## Feedback Received
+{all feedback files content}
+
+## Changes Made (Full Diff)
+{contents of task-changes.diff}
+
+## Existing Documentation
+{list and content of relevant .ai/docs/ files}
+
+## Your Mission
+Analyze this completed task and propose documentation updates:
+1. Task summary for _completed_tasks.md
+2. New patterns discovered → .ai/docs/
+3. Updates to existing docs if needed
+4. Architecture decisions made
+
+Return proposals for user approval.
 ```
 
-If user chooses to document:
-- Create appropriate documentation file
-- Update INDEX.md with new entry
+**Present proposals to user:**
+```
+╔══════════════════════════════════════════════════════════════════╗
+║ DOCUMENTATION PROPOSALS                                          ║
+╠══════════════════════════════════════════════════════════════════╣
 
-### Step 9: Send Notification
+  1. [NEW] .ai/docs/{path}/new-doc.md
+     {brief description}
+
+  2. [UPDATE] .ai/docs/_architecture/README.md
+     {section and change description}
+
+  3. [APPEND] .ai/docs/_completed_tasks.md
+     {task log entry preview}
+
+╠══════════════════════════════════════════════════════════════════╣
+║ [A]pply All  [R]eview Each  [S]kip                               ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+
+- If **Apply All**: Apply all proposed documentation changes
+- If **Review Each**: Show each proposal and ask for approval
+- If **Skip**: Skip documentation updates
+
+### Step 8: Send Notification
 
 If `notifications.on_task_done` is true in manifest and notification MCP is available:
 
@@ -247,7 +259,7 @@ Send notification with:
 - Summary: {user's summary}
 - Type: success
 
-### Step 10: Output Summary
+### Step 9: Output Summary
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
@@ -274,18 +286,41 @@ Next Steps:
   • /help                Show commands
 ```
 
-### Step 11: Auto-Sync (if enabled)
+### Step 10: Invoke Sync Agent (if enabled)
 
 Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 
 **If auto_sync is enabled:**
 
-Use the ai-sync agent (lightweight/Haiku) to commit and push changes:
-```
-Use the ai-sync agent to sync the .ai folder changes
+```bash
+# Get .ai/ folder status
+git status .ai/ --porcelain
 ```
 
-This ensures task completion is tracked in version control automatically.
+**Invoke the sync agent** with the following context:
+
+```
+## .ai/ Folder Status
+{git status output}
+
+## Task Context
+Task ID: {task-id}
+Trigger: task-done
+
+## Your Mission
+Commit changes to .ai/ folder using batched commits:
+- docs: Documentation changes
+- tasks: Task state changes
+- config: Configuration changes
+
+Execute git operations and report results.
+```
+```
+
+The Sync agent will:
+- Batch changes by type
+- Create appropriate commit messages
+- Report sync results
 
 **If auto_sync is disabled:** Skip this step.
 

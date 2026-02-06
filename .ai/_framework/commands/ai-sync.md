@@ -14,6 +14,20 @@
 
 Sync the `.ai/` folder with its git repository. Commits local changes, pushes to origin, pulls updates, and merges the main branch for framework updates.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ DO NOT EDIT APPLICATION CODE                                 │
+│                                                                 │
+│ ALLOWED:  Git operations on .ai/ folder ONLY                    │
+│ FORBIDDEN: Create, edit, or delete application source code      │
+│ FORBIDDEN: Git operations on files outside .ai/                 │
+│ TEMP FILES: Scratch/temporary output goes in .ai/tmp/           │
+│                                                                 │
+│ This command syncs the .ai/ folder with git only.               │
+│ It must NEVER modify or commit application source code.         │
+│ If you find yourself staging non-.ai/ files, STOP.              │
+└─────────────────────────────────────────────────────────────────┘
+
 This command supports two modes:
 - **Standalone mode**: `.ai-framework/` git repository with `.ai` as symlink
 - **Embedded mode**: `.ai/` as a regular directory within the main project repo
@@ -82,27 +96,9 @@ project/
 
 ### Step 0: Orientation
 
-1. **EXTENSION CHECK (MANDATORY)**:
-   ```
-   ┌─────────────────────────────────────────────────────────────────┐
-   │ CHECK FOR PROJECT EXTENSION                                     │
-   │                                                                 │
-   │ Look for: .ai/_project/commands/ai-sync.extend.md              │
-   │                                                                 │
-   │ If file EXISTS:                                                 │
-   │   1. Read the extension file completely                         │
-   │   2. Parse and extract these sections:                          │
-   │      • Context     → Add to orientation announcements           │
-   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
-   │      • Step Overrides → Replace matching steps                  │
-   │      • Agents      → Use specified agents for phases            │
-   │      • Post-Hooks  → Execute AFTER final step                   │
-   │   3. Announce: "✓ Project Extension Active"                     │
-   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
-   │                                                                 │
-   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
-   └─────────────────────────────────────────────────────────────────┘
-   ```
+1. **Extension Support**: This command supports compiled extensions
+   via `/command-extend ai-sync --variant NAME`. If a compiled extension
+   exists, the stub already points to it — no runtime discovery needed.
 
 2. Announce:
    ```

@@ -14,13 +14,49 @@
 
 Start a task by moving it from todo to in_progress, reading the task context, and preparing to work on the first work item.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ DO NOT EDIT APPLICATION CODE                                 │
+│                                                                 │
+│ ALLOWED:  Read any file. Write ONLY inside .ai/ directory.      │
+│ FORBIDDEN: Create, edit, or delete files outside .ai/           │
+│ TEMP FILES: Scratch/temporary output goes in .ai/tmp/           │
+│                                                                 │
+│ This command manages task state and creates exploration notes.   │
+│ It must NEVER modify application source code, tests, or config. │
+│ If you find yourself editing code files, STOP — you are off     │
+│ track. Only .ai/tasks/, .ai/docs/, and .ai/context.md may be   │
+│ written to.                                                     │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```
 /task-start JIRA-123
 /task-start LOCAL-001
-/task-start JIRA-123 --worktree   # Create git worktrees for isolated work
 /task-start                       # Lists available tasks to choose from
+/task-start JIRA-123 --worktree <repo-path> [base-branch]
+```
+
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `--worktree <repo-path>` | Create a git worktree for task isolation. Requires repo path. |
+| `[base-branch]` | Base branch for worktree (default: main). Only used with `--worktree`. |
+
+### Examples with --worktree
+
+```bash
+# Create worktree from main branch
+/task-start JIRA-123 --worktree ~/Projects/backend
+
+# Create worktree from develop branch
+/task-start JIRA-123 --worktree ~/Projects/backend develop
+
+# Multiple repos (run separately)
+/task-start JIRA-123 --worktree ~/Projects/backend main
+/task-start JIRA-123 --worktree ~/Projects/frontend main
 ```
 
 ## Workflow
@@ -29,7 +65,11 @@ Start a task by moving it from todo to in_progress, reading the task context, an
 1. FIND TASK
    • Search in .ai/tasks/todo/
    • Validate task exists
-   • Parse --worktree flag if present
+
+1.5. CREATE WORKTREE (if --worktree provided)
+   • Run scripts/create-worktree.sh (MANDATORY)
+   • Create isolated workspace at .worktrees/{task-id}/
+   • Never run git worktree add manually
 
 2. MOVE TO IN_PROGRESS
    • Move folder from todo/ to in_progress/
@@ -48,13 +88,10 @@ Start a task by moving it from todo to in_progress, reading the task context, an
    • Identify which are in todo/ vs done/
    • Recommend starting point
 
-5. PREPARE BRANCHES (or WORKTREES)
-   • If --worktree flag AND conventions.worktrees.enabled:
-     - Create worktree directories per affected repo
-     - Create symlinks for shared config (.ai, .claude, etc.)
-   • Otherwise:
-     - Create branch in each affected repo
-     - Follow branch naming convention from manifest
+5. ACTIVATE TRACKING
+   • Update cockpit active-task.json
+   • Enable edit tracking
+   • Include worktree info if created
 ```
 
 ## Implementation
@@ -63,32 +100,11 @@ Start a task by moving it from todo to in_progress, reading the task context, an
 
 1. Read `.ai/_project/manifest.yaml` to understand:
    - Available repositories
-   - **Protected repos (`protected: true`) - NEVER create branches in these**
-   - Branch naming conventions
    - Commit conventions
-   - Worktree conventions (if `--worktree` flag used)
 
-2. **EXTENSION CHECK (MANDATORY)**:
-   ```
-   ┌─────────────────────────────────────────────────────────────────┐
-   │ CHECK FOR PROJECT EXTENSION                                     │
-   │                                                                 │
-   │ Look for: .ai/_project/commands/task-start.extend.md           │
-   │                                                                 │
-   │ If file EXISTS:                                                 │
-   │   1. Read the extension file completely                         │
-   │   2. Parse and extract these sections:                          │
-   │      • Context     → Add to orientation announcements           │
-   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
-   │      • Step Overrides → Replace matching steps                  │
-   │      • Agents      → Use specified agents for phases            │
-   │      • Post-Hooks  → Execute AFTER final step                   │
-   │   3. Announce: "✓ Project Extension Active"                     │
-   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
-   │                                                                 │
-   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
-   └─────────────────────────────────────────────────────────────────┘
-   ```
+2. **Extension Support**: This command supports compiled extensions
+   via `/command-extend task-start --variant NAME`. If a compiled extension
+   exists, the stub already points to it — no runtime discovery needed.
 
 3. Announce:
 ```
@@ -99,24 +115,11 @@ Start a task by moving it from todo to in_progress, reading the task context, an
 
 ### Step 1: Parse Arguments
 
-**Parse flags:**
-- Check for `--worktree` flag in arguments
-- Store worktree mode for later use
-
 **If task ID provided:**
 - Look for task in `.ai/tasks/todo/{task-id}/`
 - If not found in todo, check `.ai/tasks/in_progress/{task-id}/`
   - If found there, say: "Task {task-id} is already in progress. Use /task-resume to continue."
 - If not found anywhere, say: "Task {task-id} not found. Use /task-status to see available tasks."
-
-**If `--worktree` flag used:**
-- Verify `conventions.worktrees.enabled` is `true` in manifest
-- If not enabled, warn:
-  ```
-  Worktree mode requested but not enabled in manifest.
-  Add `conventions.worktrees.enabled: true` to manifest.yaml to use this feature.
-  Proceeding with normal branch mode.
-  ```
 
 **If no task ID provided:**
 - List available tasks in todo/:
@@ -129,6 +132,64 @@ Available tasks in todo:
 
 Which task would you like to start? (Enter number or task ID)
 ```
+
+### Step 1.5: Create Worktree (if --worktree provided)
+
+**MANDATORY: Use the `create-worktree.sh` script. Never run `git worktree add` manually.**
+
+If `--worktree` flag is provided:
+
+1. **Validate the script exists:**
+   ```bash
+   if [ ! -f "scripts/create-worktree.sh" ]; then
+     error "Worktree script not found at scripts/create-worktree.sh"
+   fi
+   ```
+
+2. **Execute the worktree script:**
+   ```bash
+   scripts/create-worktree.sh <repo-path> <task-id> [base-branch]
+   ```
+
+   Example:
+   ```bash
+   scripts/create-worktree.sh ~/Projects/backend JIRA-123 main
+   ```
+
+3. **Announce worktree creation:**
+   ```
+   ╔══════════════════════════════════════════════════════════════════╗
+   ║ WORKTREE CREATED                                                 ║
+   ╠══════════════════════════════════════════════════════════════════╣
+
+   Repository: {repo-path}
+   Worktree:   {repo-path}/.worktrees/{task-id}/
+   Branch:     task/{task-id}
+   Base:       {base-branch}
+
+   To enter worktree:
+     cd {repo-path}/.worktrees/{task-id}
+
+   To open in VS Code:
+     code {repo-path}/.worktrees/{task-id}
+   ╚══════════════════════════════════════════════════════════════════╝
+   ```
+
+4. **If script fails**, stop and report the error. Do not proceed with task-start.
+
+5. **Update active-task.json** to include worktree info:
+   ```json
+   {
+     "taskId": "{task-id}",
+     "worktrees": [
+       {
+         "repo": "{repo-path}",
+         "path": "{repo-path}/.worktrees/{task-id}",
+         "branch": "task/{task-id}"
+       }
+     ]
+   }
+   ```
 
 ### Step 2: Move Task to In Progress
 
@@ -167,6 +228,102 @@ APPROACH
 {summarize implementation approach}
 ```
 
+### Step 3.5: Run Explorer Agent (Automatic)
+
+┌─────────────────────────────────────────────────────────────────┐
+│ ⚠️  MANDATORY: INVOKE EXPLORER AGENT                            │
+│                                                                 │
+│ You MUST invoke the explorer agent to gather context.           │
+│ Do NOT skip this step or explore the codebase yourself.         │
+│ The explorer agent ensures thorough, structured exploration.    │
+│                                                                 │
+│ If you find yourself using Glob/Grep/Read directly instead of   │
+│ invoking the explorer agent, STOP — you are off track.          │
+└─────────────────────────────────────────────────────────────────┘
+
+**Invoke the explorer agent** with the following context:
+
+```
+## Task Context
+{task README content}
+
+## Existing Documentation
+{list of .ai/docs/ files}
+
+## Your Mission
+Explore the codebase to understand what needs to change for this task.
+Focus on: affected files, existing patterns, dependencies, and risks.
+
+Save your findings to: .ai/tasks/in_progress/{task-id}/exploration.md
+```
+
+The Explorer agent will:
+- Search for relevant files and patterns
+- Identify dependencies and risks
+- Document findings in `exploration.md`
+
+Announce when complete:
+```
+✓ Exploration complete: .ai/tasks/in_progress/{task-id}/exploration.md
+```
+
+### Step 3.6: Run Planner Agent (If No Work Items)
+
+**If status.yaml shows 0 work items:**
+
+┌─────────────────────────────────────────────────────────────────┐
+│ ⚠️  MANDATORY: INVOKE PLANNER AGENT                             │
+│                                                                 │
+│ You MUST invoke the planner agent to create work items.         │
+│ Do NOT skip this step or create work items yourself.            │
+│ The planner agent ensures consistent work item structure.       │
+│                                                                 │
+│ If you find yourself writing work item files without invoking   │
+│ the planner agent, STOP — you are off track.                    │
+└─────────────────────────────────────────────────────────────────┘
+
+**Invoke the planner agent** with the following context:
+
+```
+## Task Context
+{task README content}
+
+## Exploration Findings
+{exploration.md content}
+
+## Project Repos
+{repos from manifest.yaml}
+
+## Your Mission
+Break this task into concrete work items.
+CRITICAL: Each work item must affect only ONE repository.
+
+Return proposed work items for user approval.
+```
+
+Present proposals to user:
+```
+╔══════════════════════════════════════════════════════════════════╗
+║ PROPOSED WORK ITEMS                                              ║
+╠══════════════════════════════════════════════════════════════════╣
+
+  1. [{repo}] {item name}
+     {description}
+
+  2. [{repo}] {item name}
+     {description}
+
+  ...
+
+╠══════════════════════════════════════════════════════════════════╣
+║ [A]pprove All  [E]dit  [R]e-plan                                ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+
+On approval:
+- Create work item files in `todo/` folder
+- Update status.yaml with new items
+
 ### Step 4: Check Work Items
 
 Read status.yaml and list work items by status:
@@ -195,300 +352,13 @@ Start with work item 01: {name}
 This is the first item and has no dependencies.
 ```
 
-### Step 5: Prepare Branches or Worktrees
-
-**If `--worktree` mode AND `conventions.worktrees.enabled`:**
-
-Show worktree plan:
-```
-WORKTREES
-
-The following worktrees will be created:
-
-  {base_path}/{TICKET}/{repo}/  (branch: {branch-name})
-  {base_path}/{TICKET}/{repo}/  (branch: {branch-name})
-
-Symlinks to create in each:
-  .ai -> {relative_path_to_project}/.ai
-  .claude -> {relative_path_to_project}/.claude
-
-Create worktrees now? (y/n)
-```
-
-**If yes**, for each affected repo:
-1. Calculate worktree path: `{conventions.worktrees.base_path}/{TICKET}/{repo.name}`
-2. Create parent directories if needed:
-   ```bash
-   mkdir -p {worktree_parent_path}
-   ```
-3. Create the worktree with new branch:
-   ```bash
-   git -C {repo.path} worktree add {worktree_path} -b {branch-name} {conventions.worktrees.base_branch}
-   ```
-4. Create symlinks for each item in `conventions.worktrees.symlinks`:
-   ```bash
-   cd {worktree_path}
-   ln -s {relative_path_to_project_root}/{symlink_target} {symlink_name}
-   ```
-   Example: `ln -s ../../../.ai .ai`
-
-**Otherwise (normal branch mode):**
-
-**First, identify protected repos from manifest:**
-
-Read `manifest.yaml` and separate repos into:
-- **Protected repos**: `protected: true` - NEVER modify git state
-- **Work repos**: `protected: false` or not specified - can create branches
-
-**Show protection status:**
-```
-REPOSITORY PROTECTION STATUS
-
-Protected (git operations blocked):
-{for each repo where protected == true}
-  ⛔ {repo.name} (locked to: {repo.locked_branch})
-{/for}
-
-Available for branch creation:
-{for each repo where protected != true}
-  ✓ {repo.name}
-{/for}
-```
-
-**If ALL affected repos are protected:**
-```
-ALL REPOS PROTECTED
-
-All affected repositories are marked as protected.
-No task branches will be created.
-
-Work will be done on existing branches:
-{for each repo}
-  ⛔ {repo.name}: stays on {locked_branch}
-{/for}
-
-Proceeding without branch creation.
-```
-Skip to Step 6.
-
-**Otherwise, for non-protected repos only**, offer to create the branch:
-```
-BRANCHES
-
-The following branches will be created (protected repos excluded):
-
-{for each repo where protected != true}
-  {repo}: cd {absolute_path} && git checkout -b {branch-name}
-{/for}
-
-⛔ Skipped (protected):
-{for each repo where protected == true}
-  {repo}: stays on {locked_branch}
-{/for}
-
-Would you like me to create these branches now? (y/n)
-```
-
-**If yes**, for each **non-protected** repo:
-1. **Resolve absolute path** from manifest:
-   - If `path` starts with `./`: resolve against `project.root`
-   - If `path` is absolute: use as-is
-   - Store as `absolutePath`
-2. Navigate to the repo using absolute path
-3. **Verify git root** matches expected:
-   ```bash
-   cd {absolutePath}
-   ACTUAL_ROOT=$(git rev-parse --show-toplevel)
-   EXPECTED_ROOT="{repo.git_root or absolutePath}"
-
-   if [ "$ACTUAL_ROOT" != "$EXPECTED_ROOT" ]; then
-     echo "⛔ GIT ROOT MISMATCH"
-     echo "Expected: $EXPECTED_ROOT"
-     echo "Actual: $ACTUAL_ROOT"
-     echo "Aborting - you may be in a nested repo."
-     exit 1
-   fi
-   ```
-4. Ensure on main/master branch and up to date
-5. Create the feature branch:
-   ```bash
-   git checkout main && git pull
-   git checkout -b {conventions.branches.pattern}
-   ```
-6. **Capture branch info** for storing in active-task.json:
-   - Branch name created
-   - Remote URL: `git remote get-url origin`
-   - Absolute path verified
-
-**If user attempts to force branch in protected repo:**
-```
-⛔ PROTECTED REPO - OPERATION BLOCKED
-
-Cannot create branch in '{repo.name}':
-  • This repo is marked as protected: true
-  • It is locked to branch: {locked_branch}
-  • Task branches must be created in work repos only
-
-This protection prevents accidental commits to the framework repo
-when working on nested repositories.
-```
-
-**If no**, proceed without creating branches/worktrees.
-
-### Step 6: Update Context
+### Step 5: Update Context
 
 Update `.ai/context.md`:
 - Move task from "Todo" to "In Progress" in Current State section
 
-### Step 7: Activate Cockpit Tracking
+### Step 6: Output Summary
 
-Activate cockpit tracking for the task:
-
-1. Ensure `.ai/cockpit/` directory exists:
-   ```bash
-   mkdir -p .ai/cockpit/events
-   ```
-
-2. Check if another task is already active:
-   ```bash
-   cat .ai/cockpit/active-task.json 2>/dev/null | jq -r '.taskId'
-   ```
-
-   **If another task is active**, warn:
-   ```
-   Warning: Task {existing-task-id} is already active.
-   Options:
-     1. Switch to {new-task-id} (replaces active)
-     2. Cancel
-
-   Choice? (1/2)
-   ```
-
-   If user chooses 1, continue. If 2, abort task-start.
-
-3. Get current git branch:
-   ```bash
-   git branch --show-current 2>/dev/null || echo "unknown"
-   ```
-
-4. Generate sessionId (timestamp-based):
-   ```bash
-   date +%s%N | md5sum | head -c 12
-   ```
-
-5. Capture previous task ID for signal file:
-   ```bash
-   # Capture previous task ID for signal file
-   previous_task_id=""
-   if [ -f .ai/cockpit/active-task.json ]; then
-     previous_task_id=$(jq -r '.taskId // empty' .ai/cockpit/active-task.json 2>/dev/null)
-   fi
-   ```
-
-6. Write `active-task.json` atomically with enhanced schema:
-   ```bash
-   # Build the affectedRepos array from branch creation step
-   # Include all non-protected repos with their absolute paths
-
-   cat > .ai/cockpit/active-task.json.tmp << 'EOF'
-   {
-     "taskId": "{task-id}",
-     "title": "{task-title}",
-     "branch": "{current-git-branch}",
-     "frameworkPath": ".ai/tasks/in_progress/{task-id}",
-     "startedAt": "{ISO-timestamp}",
-     "sessionId": "{generated-session-id}",
-     "affectedRepos": [
-       {for each non-protected repo where branch was created}
-       {
-         "name": "{repo-name}",
-         "absolutePath": "{resolved-absolute-path}",
-         "gitRoot": "{git-root-path}",
-         "branch": "{created-branch-name}",
-         "remote": "origin",
-         "remoteUrl": "{git-remote-url}",
-         "protected": false
-       }
-       {/for}
-     ],
-     "currentWorkRepo": "{first-non-protected-repo-name}"
-   }
-   EOF
-
-   # Atomic rename
-   mv .ai/cockpit/active-task.json.tmp .ai/cockpit/active-task.json
-   ```
-
-   **Schema Notes:**
-   - `affectedRepos` array contains only non-protected repos with branches created
-   - `absolutePath` is the resolved full path to the repo working directory (where you cd to work)
-   - `gitRoot` is the path from `git rev-parse --show-toplevel` - usually same as absolutePath,
-     but differs in worktree scenarios or git submodules. Use gitRoot for verification.
-   - When comparing paths, always use `pwd -P` to resolve symlinks
-   - `branch` field at root is kept for backward compatibility
-   - `currentWorkRepo` is set to the first work repo (can be updated during work)
-
-7. Write task-switch-signal to trigger VSCode sync:
-   ```bash
-   # Write task-switch-signal to trigger VSCode sync
-   if [ -n "$previous_task_id" ] && [ "$previous_task_id" != "$task_id" ]; then
-     cat > .ai/cockpit/task-switch-signal.json.tmp << EOF
-   {
-     "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-     "previousTaskId": "$previous_task_id",
-     "newTaskId": "$task_id",
-     "type": "task-switch"
-   }
-   EOF
-
-     # Atomic rename to trigger FileWatcher
-     mv .ai/cockpit/task-switch-signal.json.tmp .ai/cockpit/task-switch-signal.json
-   fi
-   ```
-
-8. Announce activation:
-   ```
-   Cockpit: Task {task-id} is now active
-   All edits will be tracked under this task.
-
-   {if previous_task_id exists and differs from task_id}
-   ✓ Active task switched: {previous_task_id} → {task_id}
-     VSCode extension will be notified automatically
-   {/if}
-   ```
-
-### Step 9: Output Summary
-
-**If worktree mode:**
-```
-╔══════════════════════════════════════════════════════════════════╗
-║ READY TO WORK (WORKTREE MODE)                                    ║
-╚══════════════════════════════════════════════════════════════════╝
-
-Task: {task-id} - {title}
-Location: .ai/tasks/in_progress/{task-id}/
-
-Worktrees Created:
-  {base_path}/{TICKET}/{repo}/ → branch: {branch-name}
-  {base_path}/{TICKET}/{repo}/ → branch: {branch-name}
-
-Symlinks: .ai, .claude, .cursor (linked to project root)
-
-Work Items: {total} total, {todo} remaining
-
-Start With:
-  □ 01. {first work item name} ({repo})
-
-To work in worktrees:
-  cd {base_path}/{TICKET}/{repo}/
-
-Quick Commands:
-  • /task-work 01              Work on item 01
-  • /task-status               View all tasks
-  • /task-review               Run code review
-```
-
-**Otherwise (normal mode):**
 ```
 ╔══════════════════════════════════════════════════════════════════╗
 ║ READY TO WORK                                                    ║
@@ -497,6 +367,11 @@ Quick Commands:
 Task: {task-id} - {title}
 Location: .ai/tasks/in_progress/{task-id}/
 
+{if worktree was created}
+Worktree: {repo-path}/.worktrees/{task-id}/
+Branch:   task/{task-id}
+{/if}
+
 Work Items: {total} total, {todo} remaining
 
 Start With:
@@ -506,17 +381,39 @@ Quick Commands:
   • /task-work 01              Work on item 01
   • /task-status               View all tasks
   • /task-review               Run code review
+{if worktree was created}
+  • cd {worktree-path}         Enter worktree
+  • code {worktree-path}       Open in VS Code
+{/if}
 ```
 
-### Step 10: Auto-Sync (if enabled)
+### Step 7: Invoke Sync Agent (if enabled)
 
 Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 
 **If auto_sync is enabled:**
 
-Use the ai-sync agent (lightweight/Haiku) to commit and push changes:
+```bash
+# Get .ai/ folder status
+git status .ai/ --porcelain
 ```
-Use the ai-sync agent to sync the .ai folder changes
+
+**Invoke the sync agent** with the following context:
+
+```
+## .ai/ Folder Status
+{git status output}
+
+## Task Context
+Task ID: {task-id}
+Trigger: task-start
+
+## Your Mission
+Commit changes to .ai/ folder using batched commits:
+- tasks: Task moved to in_progress
+- docs: Exploration notes (if created)
+
+Execute git operations and report results.
 ```
 
 This ensures task status changes are tracked in version control automatically.

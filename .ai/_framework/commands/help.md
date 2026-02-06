@@ -14,6 +14,18 @@
 
 Display available commands grouped by category.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ READ-ONLY COMMAND — DO NOT MODIFY ANY FILES                  │
+│                                                                 │
+│ ALLOWED:  Read any file, display output to user                 │
+│ FORBIDDEN: Edit, Write, create, or delete ANY files             │
+│ TEMP FILES: If you must create scratch files, use .ai/tmp/      │
+│                                                                 │
+│ This command displays information only. If you find yourself    │
+│ about to edit or create a file, STOP — you are off track.       │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```
@@ -62,27 +74,9 @@ Display available commands grouped by category.
 
 ### Step 0: Parse Arguments
 
-1. **EXTENSION CHECK (MANDATORY)**:
-   ```
-   ┌─────────────────────────────────────────────────────────────────┐
-   │ CHECK FOR PROJECT EXTENSION                                     │
-   │                                                                 │
-   │ Look for: .ai/_project/commands/help.extend.md                 │
-   │                                                                 │
-   │ If file EXISTS:                                                 │
-   │   1. Read the extension file completely                         │
-   │   2. Parse and extract these sections:                          │
-   │      • Context     → Add to orientation announcements           │
-   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
-   │      • Step Overrides → Replace matching steps                  │
-   │      • Agents      → Use specified agents for phases            │
-   │      • Post-Hooks  → Execute AFTER final step                   │
-   │   3. Announce: "✓ Project Extension Active"                     │
-   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
-   │                                                                 │
-   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
-   └─────────────────────────────────────────────────────────────────┘
-   ```
+1. **Extension Support**: This command supports compiled extensions
+   via `/command-extend help --variant NAME`. If a compiled extension
+   exists, the stub already points to it — no runtime discovery needed.
 
 2. Determine if the user provided a command name:
    - `/help` → Show all commands (go to Step 1)
@@ -127,6 +121,16 @@ Output the following categorized command reference:
 ╚══════════════════════════════════════════════════════════════════╝
 ```
 
+5. **Scan for variants**: Check `.ai/_project/commands/` for `*.variant.*.md` and `*.active.md` files.
+   - For each command with variants, append after the main table:
+     ```
+     VARIANTS (Project Extensions)
+     ══════════════════════════════════════════════════════════════════
+       /{cmd}:{variant1}    [active]
+       /{cmd}:{variant2}
+     ```
+   - If no variants exist, skip this section.
+
 Then stop. Do not proceed further.
 
 ### Step 2: Show Command Details
@@ -165,5 +169,15 @@ When user provides `/help <command>`:
    WORKFLOW
    {Extract and summarize the Workflow section - key steps only}
    ```
+
+5. **Check for variants**: Scan `.ai/_project/commands/{command}.variant.*.md`
+   - If variants exist, append:
+     ```
+     VARIANTS
+       :{variant1}    [active]
+       :{variant2}
+
+     Switch: /command-extend {command} --activate {variant}
+     ```
 
 Then stop. Do not proceed further.

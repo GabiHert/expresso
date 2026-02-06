@@ -14,6 +14,18 @@
 
 Quickly refresh your understanding of the Expresso framework. Use this command when you need to re-orient yourself on framework patterns, multi-repo handling, or navigation. Especially useful after context loss or before complex operations.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ READ-ONLY COMMAND — DO NOT MODIFY ANY FILES                  │
+│                                                                 │
+│ ALLOWED:  Read any file, display output to user                 │
+│ FORBIDDEN: Edit, Write, create, or delete ANY files             │
+│ TEMP FILES: If you must create scratch files, use .ai/tmp/      │
+│                                                                 │
+│ This command displays information only. If you find yourself    │
+│ about to edit or create a file, STOP — you are off track.       │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```
@@ -49,30 +61,13 @@ Quickly refresh your understanding of the Expresso framework. Use this command w
    - Protected repo flags
    - Conventions
 
-2. Check for active task:
-   - Read `.ai/cockpit/active-task.json` if exists
-   - Note current working repo and affected repos
+2. Check for tasks in progress:
+   - List tasks in `.ai/tasks/in_progress/`
+   - Note which repos are affected by current tasks
 
-3. **EXTENSION CHECK (MANDATORY)**:
-   ```
-   ┌─────────────────────────────────────────────────────────────────┐
-   │ CHECK FOR PROJECT EXTENSION                                     │
-   │                                                                 │
-   │ Look for: .ai/_project/commands/ctx.extend.md                  │
-   │                                                                 │
-   │ If file EXISTS:                                                 │
-   │   1. Read the extension file completely                         │
-   │   2. Parse and extract these sections:                          │
-   │      • Context     → Add to orientation announcements           │
-   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
-   │      • Step Overrides → Replace matching steps                  │
-   │      • Post-Hooks  → Execute AFTER final step                   │
-   │   3. Announce: "✓ Project Extension Active"                     │
-   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS                          │
-   │                                                                 │
-   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
-   └─────────────────────────────────────────────────────────────────┘
-   ```
+3. **Extension Support**: This command supports compiled extensions
+   via `/command-extend ctx --variant NAME`. If a compiled extension
+   exists, the stub already points to it — no runtime discovery needed.
 
 ### Step 1: Display Context
 
@@ -106,23 +101,19 @@ REPOSITORIES
     {if repo.is_framework}📦 Framework repo{/if}
 {/for}
 
-{if active-task exists}
-ACTIVE TASK
+{if tasks in in_progress/}
+TASKS IN PROGRESS
 ══════════════════════════════════════════════════════════════════
-Task: {taskId} - {title}
-Working in: {currentWorkRepo}
-
-Affected repos:
-{for each repo in affectedRepos}
-  • {repo.name}: {repo.absolutePath}
-    Branch: {repo.branch}
-    {if repo.protected}⛔ PROTECTED{/if}
+{for each task in .ai/tasks/in_progress/}
+  • {task-id}: {title}
+    Work items: {done}/{total} complete
 {/for}
 {/if}
 
 CRITICAL RULES
 ══════════════════════════════════════════════════════════════════
 🛑 NEVER COMMIT OR PUSH WITHOUT USER APPROVAL
+🛑 EXTENSIONS: Reading is NOT applying - verify compliance at each step
 ⚠ GIT OPERATIONS: Always run in correct repo directory
 ⚠ PROTECTED REPOS: Never modify repos marked protected: true
 ⚠ SUBMODULES: File edits work from parent, git commands don't
@@ -136,6 +127,7 @@ Config: .ai/_project/manifest.yaml
 QUICK COMMANDS
 ══════════════════════════════════════════════════════════════════
 /ctx git      - Git safety rules
+/ctx ext      - Extension compliance guide
 /ctx nav      - Navigation guide
 /ctx commands - Available commands
 ```
@@ -190,21 +182,6 @@ FORBIDDEN WITHOUT APPROVAL
   🛑 git reset --hard - NEVER without explicit request
   🛑 git rebase      - Always ask on shared branches
 
-{if active-task exists}
-CURRENT TASK REPOS
-══════════════════════════════════════════════════════════════════
-{for each repo in affectedRepos}
-  {repo.name}:
-    Path: {repo.absolutePath}
-    Git root: {repo.gitRoot}
-    Remote: {repo.remoteUrl}
-    Protected: {repo.protected}
-{/for}
-
-To work in {currentWorkRepo}:
-  cd {currentWorkRepo.absolutePath}
-{/if}
-
 PROTECTED REPOSITORIES
 ══════════════════════════════════════════════════════════════════
 {for each repo where protected: true}
@@ -212,6 +189,55 @@ PROTECTED REPOSITORIES
      DO NOT: create branches, commit, push
      Locked to branch: {repo.locked_branch}
 {/for}
+```
+
+#### Extension Focus (`/ctx ext`)
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║ COMPILED EXTENSIONS - HOW THEY WORK                              ║
+╚══════════════════════════════════════════════════════════════════╝
+
+HOW COMPILED EXTENSIONS WORK
+══════════════════════════════════════════════════════════════════
+
+Extensions are COMPILED into self-contained documents.
+The stub points directly to the compiled file — no runtime
+discovery or merging needed.
+
+  1. Source YAML defines overrides (context, hooks, step replacements)
+  2. Compilation merges source + base into single authoritative document
+  3. Stub points to compiled file directly
+  4. AI reads ONLY the compiled file — it IS the command
+
+WHEN A COMPILED EXTENSION IS ACTIVE
+══════════════════════════════════════════════════════════════════
+
+  The compiled .active.md file is the COMPLETE instruction set.
+  It contains:
+    • Authority Notice (confirms it's the authoritative source)
+    • Project Context (injected from source YAML)
+    • All steps inlined (base + overrides merged)
+    • Pre-hooks and post-hooks included
+    • Agent configuration embedded
+
+  There is NO separate extension to "discover" or "merge" at
+  runtime. The compiled file IS the final command.
+
+FILE LOCATIONS
+══════════════════════════════════════════════════════════════════
+  .ai/_project/commands/{cmd}.active.md          <- what AI reads
+  .ai/_project/commands/{cmd}.variant.{name}.md  <- stored variants
+  .ai/_project/commands/{cmd}.source.{name}.yaml <- source overrides
+
+MANAGEMENT COMMANDS
+══════════════════════════════════════════════════════════════════
+  /command-extend {cmd}                    Create extension
+  /command-extend {cmd} --variant {name}   Create named variant
+  /command-extend {cmd} --activate {name}  Switch active variant
+  /command-extend {cmd} --recompile        Recompile after update
+  /command-extend --list                   Show all variants
+  /command-extend --migrate                Convert legacy extensions
 ```
 
 #### Navigation Focus (`/ctx nav`)
@@ -304,10 +330,18 @@ META
 ══════════════════════════════════════════════════════════════════
   /help              - Show available commands
   /command-create    - Create new command
-  /command-extend    - Extend command at project level
+  /command-extend    - Compile command extensions
   /ai-sync           - Sync .ai/ folder with git
-  /address-feedback  - Address code review feedback
-  /expresso          - Execute inline @expresso tasks
+  /expresso-tags     - Execute inline @expresso tasks
+
+{Scan .ai/_project/commands/*.variant.*.md and display if any exist:}
+
+PROJECT VARIANTS
+══════════════════════════════════════════════════════════════════
+  /{cmd}:{variant1}     [active] {description from source YAML}
+  /{cmd}:{variant2}
+
+  Switch: /command-extend {cmd} --activate {variant}
 ```
 
 ### Step 2: Remind Critical Rules
@@ -318,6 +352,7 @@ Always end with:
 REMEMBER
 ══════════════════════════════════════════════════════════════════
   🛑 NEVER commit or push without user approval
+  🛑 COMPILED EXTENSIONS: If stub points to active.md, follow ONLY that
   ⚠ Git commands: Run in correct repo directory
   ⚠ Protected repos: Don't modify (check manifest.yaml)
   ⚠ Extensions: Check for .extend.md files
@@ -331,14 +366,9 @@ If manifest.yaml doesn't exist:
 ⚠ No manifest found. Run /init to set up the framework.
 ```
 
-If active-task.json is malformed:
-```
-⚠ Active task file corrupted. Re-run /task-start to fix.
-```
-
 ## Notes
 
 - This command is read-only (no modifications)
 - Safe to run anytime for orientation
 - Particularly useful after context compaction
-- Can be extended via .ai/_project/commands/ctx.extend.md
+- Can be extended via `/command-extend ctx --variant NAME`

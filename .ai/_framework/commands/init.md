@@ -14,6 +14,20 @@
 
 Set up the three-layer AI task framework for a new project. This command gathers project information, explores the codebase, and creates all necessary configuration files.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ DO NOT EDIT APPLICATION CODE                                 │
+│                                                                 │
+│ ALLOWED:  Read any file. Write to .ai/, .claude/, .cursor/      │
+│ FORBIDDEN: Create, edit, or delete application source code      │
+│ TEMP FILES: Scratch/temporary output goes in .ai/tmp/           │
+│                                                                 │
+│ This command initializes the framework structure only.           │
+│ It must NEVER modify application source code, tests, or config. │
+│ If you find yourself editing code files, STOP — you are off     │
+│ track.                                                          │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```
@@ -50,15 +64,11 @@ Set up the three-layer AI task framework for a new project. This command gathers
    • Generate INDEX.md
    • Create tasks/ folder structure
 
-4. INSTALL COMMANDS
-   • Create .claude/commands/ or .cursor/commands/
+4. INSTALL COMMANDS & AGENTS
+   • Create commands in .claude/commands/ and/or .cursor/commands/
+   • Create agents in .claude/agents/ and/or .cursor/agents/
    • Register all 13 slash commands
-   • Commands become immediately available
-
-4b. CREATE LIGHTWEIGHT AGENTS (Claude Code only)
-   • Create .claude/agents/ for cost-optimized commands
-   • task-status, help, ai-sync use Haiku model
-   • ~70% cost savings for simple operations
+   • Commands and agents become immediately available
 
 5. CREATE PROJECT BRANCH (if tracking enabled)
    • Create branch project/{project-name} in ai-framework
@@ -84,27 +94,9 @@ Set up the three-layer AI task framework for a new project. This command gathers
    repository to your project first, then run /init again.
    ```
 
-2. **EXTENSION CHECK (MANDATORY)**:
-   ```
-   ┌─────────────────────────────────────────────────────────────────┐
-   │ CHECK FOR PROJECT EXTENSION                                     │
-   │                                                                 │
-   │ Look for: .ai/_project/commands/init.extend.md                 │
-   │                                                                 │
-   │ If file EXISTS:                                                 │
-   │   1. Read the extension file completely                         │
-   │   2. Parse and extract these sections:                          │
-   │      • Context     → Add to orientation announcements           │
-   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
-   │      • Step Overrides → Replace matching steps                  │
-   │      • Agents      → Use specified agents for phases            │
-   │      • Post-Hooks  → Execute AFTER final step                   │
-   │   3. Announce: "✓ Project Extension Active"                     │
-   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
-   │                                                                 │
-   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
-   └─────────────────────────────────────────────────────────────────┘
-   ```
+2. **Extension Support**: This command supports compiled extensions
+   via `/command-extend init --variant NAME`. If a compiled extension
+   exists, the stub already points to it — no runtime discovery needed.
 
 3. If framework found, announce:
 ```
@@ -345,7 +337,7 @@ lightweight_commands:
 # Automatically sync .ai/ changes after each command
 auto_sync:
   enabled: true                       # Auto-commit and push after commands
-  use_agent: true                     # Use lightweight ai-sync agent (Haiku)
+  use_agent: true                     # Use ai-sync agent for automatic syncing
 ```
 
 ### Step 4: Create Domain Layer
@@ -412,118 +404,59 @@ Ensure these directories exist:
 - `.ai/tasks/in_progress/`
 - `.ai/tasks/done/`
 
-### Step 6: Install Commands
+### Step 6: Install Commands & Agents
 
-Based on the AI tool selected in Q5, install the framework commands.
+Based on the AI tool selected in Q5, install the framework commands and agents.
 
-**For Claude Code (Option 1):**
+**Determine target directories:**
+- Claude Code (Option 1): `.claude/commands/` and `.claude/agents/`
+- Cursor (Option 2): `.cursor/commands/` and `.cursor/agents/`
+- Both (if user uses both): install to both `.claude/` and `.cursor/`
 
-Create command skill files in `.claude/commands/` directory:
+**6a. Create command stubs:**
 
 ```bash
-mkdir -p .claude/commands
+mkdir -p {target}/commands
 ```
 
-For each framework command, create a skill file that references our command prompt:
+For each framework command, create a stub file that references the command definition:
 
-**`.claude/commands/init.md`:**
+**`{target}/commands/init.md`:**
 ```markdown
 Follow the instructions in .ai/_framework/commands/init.md
 ```
 
-**`.claude/commands/task-create.md`:**
+**`{target}/commands/{command-name}.md`** (for all other commands):
 ```markdown
-Follow the instructions in .ai/_framework/commands/task-create.md
+Follow the instructions in .ai/_framework/commands/{command-name}.md
 
 Arguments: $ARGUMENTS
 ```
 
-**`.claude/commands/task-start.md`:**
-```markdown
-Follow the instructions in .ai/_framework/commands/task-start.md
+Create stubs for all 13 commands: `init`, `task-create`, `task-start`, `task-work`, `task-done`, `task-status`, `task-resume`, `task-review`, `task-explore`, `document`, `enhance`, `help`, `command-create`.
 
-Arguments: $ARGUMENTS
-```
-
-**`.claude/commands/task-work.md`:**
-```markdown
-Follow the instructions in .ai/_framework/commands/task-work.md
-
-Arguments: $ARGUMENTS
-```
-
-**`.claude/commands/task-done.md`:**
-```markdown
-Follow the instructions in .ai/_framework/commands/task-done.md
-
-Arguments: $ARGUMENTS
-```
-
-**`.claude/commands/task-status.md`:**
-```markdown
-Follow the instructions in .ai/_framework/commands/task-status.md
-
-Arguments: $ARGUMENTS
-```
-
-**`.claude/commands/task-resume.md`:**
-```markdown
-Follow the instructions in .ai/_framework/commands/task-resume.md
-
-Arguments: $ARGUMENTS
-```
-
-**`.claude/commands/task-review.md`:**
-```markdown
-Follow the instructions in .ai/_framework/commands/task-review.md
-
-Arguments: $ARGUMENTS
-```
-
-**`.claude/commands/task-explore.md`:**
-```markdown
-Follow the instructions in .ai/_framework/commands/task-explore.md
-
-Arguments: $ARGUMENTS
-```
-
-**`.claude/commands/document.md`:**
-```markdown
-Follow the instructions in .ai/_framework/commands/document.md
-
-Arguments: $ARGUMENTS
-```
-
-**`.claude/commands/enhance.md`:**
-```markdown
-Follow the instructions in .ai/_framework/commands/enhance.md
-
-Arguments: $ARGUMENTS
-```
-
-**`.claude/commands/help.md`:**
-```markdown
-Follow the instructions in .ai/_framework/commands/help.md
-
-Arguments: $ARGUMENTS
-```
-
-**`.claude/commands/command-create.md`:**
-```markdown
-Follow the instructions in .ai/_framework/commands/command-create.md
-
-Arguments: $ARGUMENTS
-```
-
-**For Cursor (Option 2):**
-
-Create command files in `.cursor/commands/` directory:
+**6b. Create agent stubs:**
 
 ```bash
-mkdir -p .cursor/commands
+mkdir -p {target}/agents
 ```
 
-Create the same command files as above, but in `.cursor/commands/` instead.
+**Agent templates are located at:** `.ai/_framework/templates/agents/`
+
+Copy agent stubs from templates:
+```bash
+cp .ai/_framework/templates/agents/explorer.md {target}/agents/
+cp .ai/_framework/templates/agents/planner.md {target}/agents/
+cp .ai/_framework/templates/agents/implementer.md {target}/agents/
+cp .ai/_framework/templates/agents/reviewer.md {target}/agents/
+cp .ai/_framework/templates/agents/documenter.md {target}/agents/
+cp .ai/_framework/templates/agents/sync.md {target}/agents/
+cp .ai/_framework/templates/agents/task-status.md {target}/agents/
+cp .ai/_framework/templates/agents/help.md {target}/agents/
+cp .ai/_framework/templates/agents/ai-sync.md {target}/agents/
+```
+
+Where `{target}` = `.claude` and/or `.cursor` depending on the AI tool selected.
 
 **For Other (Option 3):**
 
@@ -536,40 +469,6 @@ To use them, reference the command file when invoking:
 
 Or configure your AI tool to recognize these as slash commands.
 ```
-
-### Step 6b: Create Lightweight Subagents (Claude Code only)
-
-**Skip this step if:**
-- User selected Cursor or Other in Q5
-- User selected option 3 (No) in Q8
-
-**If lightweight commands are enabled (Q8 option 1 or 2):**
-
-Create the `.claude/agents/` directory:
-```bash
-mkdir -p .claude/agents
-```
-
-For each command in the lightweight_commands list, create a subagent file.
-
-**Agent templates are located at:** `.ai/_framework/templates/agents/`
-
-**Default lightweight agents to create:**
-
-Copy from templates to `.claude/agents/`:
-```bash
-cp .ai/_framework/templates/agents/task-status.md .claude/agents/
-cp .ai/_framework/templates/agents/help.md .claude/agents/
-cp .ai/_framework/templates/agents/ai-sync.md .claude/agents/
-```
-
-**For custom lightweight commands**, use the generic template:
-- Template: `.ai/_framework/templates/agents/lightweight-agent.md`
-- Copy and replace `{command-name}` with the actual command name
-- Adjust `tools` list based on what the command needs
-
-**Note:** The slash commands (e.g., `/task-status`) still work and use the default model.
-To use the lightweight version, invoke the subagent: "Use the task-status agent to show status"
 
 ### Step 7: Generate context.md
 
@@ -653,28 +552,21 @@ Created:
   ✓ .ai/docs/{repo}/              - Per-repo documentation
 {/if}
 
-Commands Installed:
+Commands & Agents Installed:
 {if Claude Code}
   ✓ .claude/commands/             - 13 slash commands registered
+  ✓ .claude/agents/               - 9 agents registered
     Available: /init, /task-create, /task-start, /task-work,
                /task-done, /task-status, /task-resume, /task-review,
                /task-explore, /document, /enhance, /help, /command-create
 {/if}
 {if Cursor}
   ✓ .cursor/commands/             - 13 slash commands registered
+  ✓ .cursor/agents/               - 9 agents registered
 {/if}
 {if Other}
   ℹ Commands available in .ai/_framework/commands/
     Invoke manually: "Follow .ai/_framework/commands/{command}.md"
-{/if}
-
-{if Claude Code AND lightweight_commands enabled}
-Lightweight Agents (Haiku):
-  ✓ .claude/agents/               - Cost-optimized subagents
-    Agents: {list of lightweight commands}
-
-  Usage: "Use the {agent-name} agent to..."
-  Savings: ~70% compared to Opus for simple operations
 {/if}
 
 {if tracking enabled}

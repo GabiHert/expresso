@@ -14,6 +14,20 @@
 
 Create a new command with proper structure, ensuring consistency across the framework. This command gathers context through questions before creating the command skeleton.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ DO NOT EDIT APPLICATION CODE                                 │
+│                                                                 │
+│ ALLOWED:  Read any file. Write to .ai/, .claude/, .cursor/      │
+│ FORBIDDEN: Create, edit, or delete application source code      │
+│ TEMP FILES: Scratch/temporary output goes in .ai/tmp/           │
+│                                                                 │
+│ This command creates framework command definitions only.         │
+│ It must NEVER modify application source code, tests, or config. │
+│ If you find yourself editing code files, STOP — you are off     │
+│ track.                                                          │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```
@@ -104,27 +118,9 @@ Create a new command with proper structure, ensuring consistency across the fram
    - Check that `.ai/_framework/` exists
    - Read existing commands to understand patterns
 
-2. **EXTENSION CHECK (MANDATORY)**:
-   ```
-   ┌─────────────────────────────────────────────────────────────────┐
-   │ CHECK FOR PROJECT EXTENSION                                     │
-   │                                                                 │
-   │ Look for: .ai/_project/commands/command-create.extend.md       │
-   │                                                                 │
-   │ If file EXISTS:                                                 │
-   │   1. Read the extension file completely                         │
-   │   2. Parse and extract these sections:                          │
-   │      • Context     → Add to orientation announcements           │
-   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
-   │      • Step Overrides → Replace matching steps                  │
-   │      • Agents      → Use specified agents for phases            │
-   │      • Post-Hooks  → Execute AFTER final step                   │
-   │   3. Announce: "✓ Project Extension Active"                     │
-   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
-   │                                                                 │
-   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
-   └─────────────────────────────────────────────────────────────────┘
-   ```
+2. **Extension Support**: This command supports compiled extensions
+   via `/command-extend command-create --variant NAME`. If a compiled extension
+   exists, the stub already points to it — no runtime discovery needed.
 
 3. Announce:
 ```
@@ -409,7 +405,7 @@ Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 
 **If auto_sync is enabled:**
 
-Use the ai-sync agent (lightweight/Haiku) to commit and push changes:
+Use the ai-sync agent to commit and push changes:
 ```
 Use the ai-sync agent to sync the .ai folder changes
 ```

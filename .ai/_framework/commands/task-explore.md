@@ -14,6 +14,20 @@
 
 Explore the codebase to understand context for a task or question. Uses exploration agents to thoroughly investigate the code and report findings.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ READ-ONLY COMMAND — DO NOT MODIFY ANY FILES                  │
+│                                                                 │
+│ ALLOWED:  Read any file, display output to user                 │
+│ FORBIDDEN: Edit, Write, create, or delete ANY files             │
+│ TEMP FILES: If you must create scratch files, use .ai/tmp/      │
+│                                                                 │
+│ This command explores and reports findings only. It must NEVER   │
+│ modify application source code, tests, config, or any other     │
+│ files. If you find yourself about to edit a file, STOP — you    │
+│ are off track.                                                  │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```
@@ -81,27 +95,9 @@ Explore the codebase to understand context for a task or question. Uses explorat
    - Available repositories and paths
    - Agent preferences (exploration thoroughness)
 
-2. **EXTENSION CHECK (MANDATORY)**:
-   ```
-   ┌─────────────────────────────────────────────────────────────────┐
-   │ CHECK FOR PROJECT EXTENSION                                     │
-   │                                                                 │
-   │ Look for: .ai/_project/commands/task-explore.extend.md         │
-   │                                                                 │
-   │ If file EXISTS:                                                 │
-   │   1. Read the extension file completely                         │
-   │   2. Parse and extract these sections:                          │
-   │      • Context     → Add to orientation announcements           │
-   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
-   │      • Step Overrides → Replace matching steps                  │
-   │      • Agents      → Use specified agents for phases            │
-   │      • Post-Hooks  → Execute AFTER final step                   │
-   │   3. Announce: "✓ Project Extension Active"                     │
-   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
-   │                                                                 │
-   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
-   └─────────────────────────────────────────────────────────────────┘
-   ```
+2. **Extension Support**: This command supports compiled extensions
+   via `/command-extend task-explore --variant NAME`. If a compiled extension
+   exists, the stub already points to it — no runtime discovery needed.
 
 3. Announce:
 ```

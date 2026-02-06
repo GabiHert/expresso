@@ -1,7 +1,7 @@
 {
   "name": "ai-cockpit",
   "displayName": "AI Cockpit",
-  "description": "Monitor and manage Claude Code tasks with real-time diff tracking",
+  "description": "Monitor and manage Claude Code tasks",
   "version": "0.1.0",
   "publisher": "ai-cockpit",
   "engines": {
@@ -29,48 +29,9 @@
         "title": "AI Cockpit: Show Task Menu"
       },
       {
-        "command": "aiCockpit.viewEventDiff",
-        "title": "AI Cockpit: View Event Diff"
-      },
-      {
-        "command": "aiCockpit.showClaudeChanges",
-        "title": "AI Cockpit: Show Claude Changes"
-      },
-      {
-        "command": "aiCockpit.showYourChanges",
-        "title": "AI Cockpit: Show Your Changes"
-      },
-      {
-        "command": "aiCockpit.showFullDiff",
-        "title": "AI Cockpit: Show Full Diff"
-      },
-      {
         "command": "aiCockpit.openTaskTerminal",
         "title": "AI Cockpit: Open Task Terminal",
         "icon": "$(terminal)"
-      },
-      {
-        "command": "aiCockpit.resumeSession",
-        "title": "AI Cockpit: Resume Session",
-        "icon": "$(play)"
-      },
-      {
-        "command": "aiCockpit.focusSession",
-        "title": "AI Cockpit: Focus Session",
-        "icon": "$(eye)"
-      },
-      {
-        "command": "aiCockpit.newSession",
-        "title": "AI Cockpit: New Session",
-        "icon": "$(add)"
-      },
-      {
-        "command": "aiCockpit.cleanupSessions",
-        "title": "AI Cockpit: Cleanup Old Sessions"
-      },
-      {
-        "command": "aiCockpit.validateClaudePath",
-        "title": "AI Cockpit: Validate Claude Path"
       },
       {
         "command": "aiCockpit.openTask",
@@ -81,34 +42,9 @@
         "title": "AI Cockpit: Open Work Item"
       },
       {
-        "command": "aiCockpit.renameSession",
-        "title": "Rename Session",
-        "icon": "$(edit)"
-      },
-      {
-        "command": "aiCockpit.deleteSession",
-        "title": "Delete Session",
-        "icon": "$(trash)"
-      },
-      {
-        "command": "aiCockpit.startSession",
-        "title": "AI Cockpit: Start Session",
-        "icon": "$(add)"
-      },
-      {
-        "command": "aiCockpit.linkSessionToTask",
-        "title": "Link to Task",
-        "icon": "$(link)"
-      },
-      {
         "command": "aiCockpit.openFeedbackFile",
         "title": "Open Feedback",
         "icon": "$(comment-discussion)"
-      },
-      {
-        "command": "aiCockpit.showPlainDiff",
-        "title": "Show Plain Diff",
-        "icon": "$(diff)"
       },
       {
         "command": "aiCockpit.deleteTask",
@@ -136,26 +72,6 @@
     "configuration": {
       "title": "AI Cockpit",
       "properties": {
-        "aiCockpit.sessions.retentionDays": {
-          "type": "number",
-          "default": 7,
-          "description": "Number of days to keep closed sessions"
-        },
-        "aiCockpit.sessions.autoCleanup": {
-          "type": "boolean",
-          "default": true,
-          "description": "Automatically clean up old sessions on startup"
-        },
-        "aiCockpit.claude.historyPath": {
-          "type": "string",
-          "default": "",
-          "description": "Path to Claude's history.jsonl file. Leave empty to use default (~/.claude/history.jsonl)"
-        },
-        "aiCockpit.claude.autoDetect": {
-          "type": "boolean",
-          "default": true,
-          "description": "Automatically detect Claude history location"
-        },
         "aiCockpit.expresso.enabled": {
           "type": "boolean",
           "default": true,
@@ -196,7 +112,22 @@
             "kt",
             "scala",
             "vue",
-            "svelte"
+            "svelte",
+            "sql",
+            "sh",
+            "bash",
+            "yaml",
+            "yml",
+            "html",
+            "css",
+            "scss",
+            "sass",
+            "less",
+            "lua",
+            "r",
+            "ex",
+            "exs",
+            "md"
           ],
           "description": "File extensions to scan for @expresso tags"
         },
@@ -230,13 +161,6 @@
       ]
     },
     "menus": {
-      "view/title": [
-        {
-          "command": "aiCockpit.startSession",
-          "when": "view == aiCockpit.tasks",
-          "group": "navigation"
-        }
-      ],
       "view/item/context": [
         {
           "command": "aiCockpit.openFeedbackFile",
@@ -267,111 +191,6 @@
           "command": "aiCockpit.openTaskTerminal",
           "when": "view == aiCockpit.tasks && viewItem == task-done",
           "group": "inline"
-        },
-        {
-          "command": "aiCockpit.viewEventDiff",
-          "when": "view == aiCockpit.tasks && viewItem == event",
-          "group": "inline"
-        },
-        {
-          "command": "aiCockpit.showPlainDiff",
-          "when": "view == aiCockpit.tasks && viewItem =~ /shadow-file/",
-          "group": "navigation@1"
-        },
-        {
-          "command": "aiCockpit.showClaudeChanges",
-          "when": "view == aiCockpit.tasks && viewItem =~ /shadow-file/",
-          "group": "diff@1"
-        },
-        {
-          "command": "aiCockpit.showYourChanges",
-          "when": "view == aiCockpit.tasks && viewItem == shadow-file-user-modified",
-          "group": "diff@2"
-        },
-        {
-          "command": "aiCockpit.showFullDiff",
-          "when": "view == aiCockpit.tasks && viewItem =~ /shadow-file/",
-          "group": "diff@3"
-        },
-        {
-          "command": "aiCockpit.focusSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-active",
-          "group": "inline"
-        },
-        {
-          "command": "aiCockpit.resumeSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-closed",
-          "group": "inline"
-        },
-        {
-          "command": "aiCockpit.newSession",
-          "when": "view == aiCockpit.tasks && viewItem == sessions-section",
-          "group": "inline"
-        },
-        {
-          "command": "aiCockpit.renameSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-active",
-          "group": "2_session@1"
-        },
-        {
-          "command": "aiCockpit.renameSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-closed",
-          "group": "2_session@1"
-        },
-        {
-          "command": "aiCockpit.deleteSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-active",
-          "group": "2_session@2"
-        },
-        {
-          "command": "aiCockpit.deleteSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-closed",
-          "group": "2_session@2"
-        },
-        {
-          "command": "aiCockpit.startSession",
-          "when": "view == aiCockpit.tasks && viewItem == unassigned-sessions-section",
-          "group": "inline"
-        },
-        {
-          "command": "aiCockpit.focusSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-active-unassigned",
-          "group": "inline"
-        },
-        {
-          "command": "aiCockpit.resumeSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-closed-unassigned",
-          "group": "inline"
-        },
-        {
-          "command": "aiCockpit.linkSessionToTask",
-          "when": "view == aiCockpit.tasks && viewItem == session-active-unassigned",
-          "group": "1_link@1"
-        },
-        {
-          "command": "aiCockpit.linkSessionToTask",
-          "when": "view == aiCockpit.tasks && viewItem == session-closed-unassigned",
-          "group": "1_link@1"
-        },
-        {
-          "command": "aiCockpit.renameSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-active-unassigned",
-          "group": "2_session@1"
-        },
-        {
-          "command": "aiCockpit.renameSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-closed-unassigned",
-          "group": "2_session@1"
-        },
-        {
-          "command": "aiCockpit.deleteSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-active-unassigned",
-          "group": "2_session@2"
-        },
-        {
-          "command": "aiCockpit.deleteSession",
-          "when": "view == aiCockpit.tasks && viewItem == session-closed-unassigned",
-          "group": "2_session@2"
         },
         {
           "command": "aiCockpit.deleteTask",
@@ -405,7 +224,6 @@
   "devDependencies": {
     "@types/diff": "^5.2.3",
     "@types/node": "^20.0.0",
-    "@types/sql.js": "^1.4.9",
     "@types/vscode": "^1.85.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
@@ -415,7 +233,6 @@
   "dependencies": {
     "@vscode/vsce": "^3.7.1",
     "diff": "^5.2.0",
-    "diff2html": "^3.4.48",
-    "sql.js": "^1.13.0"
+    "diff2html": "^3.4.48"
   }
 }

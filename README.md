@@ -12,7 +12,7 @@
 
 ---
 
-A developer productivity framework for Claude Code that supercharges your AI-assisted development workflow with inline task annotations, structured task management, and real-time session tracking.
+A developer productivity framework for **Claude Code** and **Cursor IDE** that supercharges your AI-assisted development workflow with inline task annotations, structured task management, and real-time session tracking.
 
 ## Why Expresso?
 
@@ -117,16 +117,19 @@ node install.js --help
 ```
 your-project/
 ├── .ai/
-│   ├── _framework/     # Commands and templates (17 slash commands)
+│   ├── _framework/     # Commands, agents, and templates
 │   ├── _project/       # Your project configuration
 │   ├── tasks/          # Task management (todo, in_progress, done)
 │   ├── cockpit/        # Runtime data for VSCode extension
-│   └── docs/           # Documentation storage
+│   ├── docs/           # Documentation storage
+│   └── tmp/            # Temporary files (gitignored)
 ├── .claude/
-│   ├── commands/       # Claude Code slash command wrappers
-│   ├── agents/         # Lightweight subagents (cost-optimized)
-│   ├── hooks/          # Event capture for session tracking
-│   └── settings.json   # Hook configuration
+│   ├── commands/       # Claude Code slash command stubs
+│   ├── agents/         # Subagents (explorer, planner, implementer, etc.)
+│   └── settings.json   # Configuration
+├── .cursor/
+│   ├── commands/       # Cursor IDE slash command stubs
+│   └── agents/         # Cursor IDE agents (same as Claude)
 └── CLAUDE.md           # Project instructions for Claude
 ```
 
@@ -210,15 +213,20 @@ In VSCode, you'll see:
 | `/ask` | Answer questions using project docs |
 | `/help` | Show all available commands |
 
+### Framework
+
+| Command | Description |
+|---------|-------------|
+| `/ctx` | Refresh framework context and orientation |
+| `/ai-sync` | Sync .ai folder with git |
+| `/command-create` | Create new framework command |
+| `/command-extend` | Create compiled command extensions |
+
 ### Utilities
 
 | Command | Description |
 |---------|-------------|
-| `/expresso path:line "task"` | Execute an @expresso tag |
-| `/address-feedback` | Address code review comments |
-| `/ai-sync` | Sync .ai folder with git |
-| `/command-create` | Create new framework command |
-| `/command-extend` | Extend existing commands |
+| `/expresso-tags` | List and address @expresso inline tags |
 
 ## VSCode Extension Features
 
@@ -248,6 +256,21 @@ In VSCode, you'll see:
 - Syntax highlighting for tags
 - CodeLens "Brew this" buttons
 - Multi-line comment support
+
+## Agent System
+
+Expresso uses specialized agents for different phases of development:
+
+| Agent | Purpose | Scope |
+|-------|---------|-------|
+| **Explorer** | Codebase exploration, pattern discovery | Read-only |
+| **Planner** | Break tasks into work items | Read-only |
+| **Implementer** | Execute work items, write code | Can edit code |
+| **Reviewer** | Code review, quality checks | Read-only |
+| **Documenter** | Capture learnings, update docs | Read-only |
+| **Sync** | Git operations for .ai/ folder | .ai/ only |
+
+Agents are invoked automatically by task commands. Each agent has strict scope constraints to prevent unintended modifications.
 
 ## Configuration
 
@@ -291,7 +314,7 @@ In VSCode settings:
 
 - **Node.js** 18+
 - **VSCode** 1.85+ (for the extension)
-- **Claude Code** CLI (for slash commands)
+- **Claude Code** CLI or **Cursor IDE** (for slash commands)
 
 ## Updating
 
@@ -321,23 +344,11 @@ This updates framework files while preserving your project configuration, tasks,
 2. Restart Claude Code CLI
 3. Run `/help` to verify commands are loaded
 
-### Hooks not triggering
+### Cursor IDE Support
 
-Check `.claude/settings.json` contains:
+Expresso works with both Claude Code and Cursor IDE. The installer creates matching stubs in both `.claude/` and `.cursor/` directories. Commands and agents work identically in both environments.
 
-```json
-{
-  "hooks": {
-    "PostToolUse": [{
-      "matcher": "Edit|Write|TodoWrite",
-      "hooks": [{
-        "type": "command",
-        "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/cockpit-capture.js\""
-      }]
-    }]
-  }
-}
-```
+**Note:** Cursor's AI may require stronger guardrails. The framework includes scope constraints that prevent non-execution commands from modifying application code.
 
 ## Contributing
 

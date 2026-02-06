@@ -14,6 +14,20 @@
 
 Create or update documentation in the domain layer. Documentation helps future AI sessions and developers understand patterns, architecture, and conventions.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ DO NOT EDIT APPLICATION CODE                                 │
+│                                                                 │
+│ ALLOWED:  Read any file. Write ONLY inside .ai/ directory.      │
+│ FORBIDDEN: Create, edit, or delete files outside .ai/           │
+│ TEMP FILES: Scratch/temporary output goes in .ai/tmp/           │
+│                                                                 │
+│ This command creates and updates documentation files.            │
+│ It must NEVER modify application source code, tests, or config. │
+│ If you find yourself editing code files, STOP — you are off     │
+│ track. Only .ai/docs/ and .ai/INDEX.md may be written to.      │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```
@@ -84,27 +98,9 @@ When no repository is specified, the command automatically:
 
 2. Read `.ai/INDEX.md` to see existing documentation and avoid duplicates.
 
-3. **EXTENSION CHECK (MANDATORY)**:
-   ```
-   ┌─────────────────────────────────────────────────────────────────┐
-   │ CHECK FOR PROJECT EXTENSION                                     │
-   │                                                                 │
-   │ Look for: .ai/_project/commands/document.extend.md             │
-   │                                                                 │
-   │ If file EXISTS:                                                 │
-   │   1. Read the extension file completely                         │
-   │   2. Parse and extract these sections:                          │
-   │      • Context     → Add to orientation announcements           │
-   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
-   │      • Step Overrides → Replace matching steps                  │
-   │      • Agents      → Use specified agents for phases            │
-   │      • Post-Hooks  → Execute AFTER final step                   │
-   │   3. Announce: "✓ Project Extension Active"                     │
-   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
-   │                                                                 │
-   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
-   └─────────────────────────────────────────────────────────────────┘
-   ```
+3. **Extension Support**: This command supports compiled extensions
+   via `/command-extend document --variant NAME`. If a compiled extension
+   exists, the stub already points to it — no runtime discovery needed.
 
 ### Step 1: Parse Request
 
@@ -398,7 +394,7 @@ Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 
 **If auto_sync is enabled:**
 
-Use the ai-sync agent (lightweight/Haiku) to commit and push changes:
+Use the ai-sync agent to commit and push changes:
 ```
 Use the ai-sync agent to sync the .ai folder changes
 ```

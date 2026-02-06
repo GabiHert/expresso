@@ -14,6 +14,21 @@
 
 Create a new task with work items organized by repository. This command explores the codebase, designs the implementation approach, and creates a structured task folder.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ DO NOT EDIT APPLICATION CODE                                 │
+│                                                                 │
+│ ALLOWED:  Read any file. Write ONLY inside .ai/ directory.      │
+│ FORBIDDEN: Create, edit, or delete files outside .ai/           │
+│ TEMP FILES: Scratch/temporary output goes in .ai/tmp/           │
+│                                                                 │
+│ This command creates task definitions and documentation.         │
+│ It must NEVER modify application source code, tests, or config. │
+│ If you find yourself editing code files, STOP — you are off     │
+│ track. Only .ai/tasks/, .ai/docs/, and .ai/context.md may be   │
+│ written to.                                                     │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```
@@ -67,27 +82,9 @@ Create a new task with work items organized by repository. This command explores
    - Commit message patterns
    - Available MCPs
 
-2. **EXTENSION CHECK (MANDATORY)**:
-   ```
-   ┌─────────────────────────────────────────────────────────────────┐
-   │ CHECK FOR PROJECT EXTENSION                                     │
-   │                                                                 │
-   │ Look for: .ai/_project/commands/task-create.extend.md          │
-   │                                                                 │
-   │ If file EXISTS:                                                 │
-   │   1. Read the extension file completely                         │
-   │   2. Parse and extract these sections:                          │
-   │      • Context     → Add to orientation announcements           │
-   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
-   │      • Step Overrides → Replace matching steps                  │
-   │      • Agents      → Use specified agents for phases            │
-   │      • Post-Hooks  → Execute AFTER final step                   │
-   │   3. Announce: "✓ Project Extension Active"                     │
-   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
-   │                                                                 │
-   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
-   └─────────────────────────────────────────────────────────────────┘
-   ```
+2. **Extension Support**: This command supports compiled extensions
+   via `/command-extend task-create --variant NAME`. If a compiled extension
+   exists, the stub already points to it — no runtime discovery needed.
 
 3. Announce:
 ```
@@ -141,9 +138,20 @@ Based on the answer, determine:
 
 ### Step 3: Explore Codebase
 
-For each relevant repo, launch an Explore agent:
+┌─────────────────────────────────────────────────────────────────┐
+│ ⚠️  MANDATORY: INVOKE EXPLORER AGENT                            │
+│                                                                 │
+│ You MUST invoke the explorer agent for each relevant repo.      │
+│ Do NOT skip this step or explore the codebase yourself.         │
+│ The explorer agent ensures thorough, structured exploration.    │
+│                                                                 │
+│ If you find yourself using Glob/Grep/Read directly instead of   │
+│ invoking the explorer agent, STOP — you are off track.          │
+└─────────────────────────────────────────────────────────────────┘
+
+For each relevant repo, invoke the explorer agent:
 ```
-Explore {repo.name} repository focusing on:
+Invoke the explorer agent to explore {repo.name} repository focusing on:
 - {user's described problem/feature area}
 - Related files and patterns
 - Existing implementations to learn from
@@ -151,7 +159,7 @@ Explore {repo.name} repository focusing on:
 - Configuration requirements
 ```
 
-Compile findings:
+Compile findings from the explorer agent:
 - Key files involved
 - Patterns to follow
 - Potential risks
@@ -159,9 +167,20 @@ Compile findings:
 
 ### Step 4: Design Implementation
 
-Launch a Plan agent to design the implementation:
+┌─────────────────────────────────────────────────────────────────┐
+│ ⚠️  MANDATORY: INVOKE PLANNER AGENT                             │
+│                                                                 │
+│ You MUST invoke the planner agent before proceeding.            │
+│ Do NOT skip this step or design the plan yourself.              │
+│ The planner agent ensures consistent work item structure.       │
+│                                                                 │
+│ If you find yourself creating work items without invoking the   │
+│ planner agent, STOP — you are off track.                        │
+└─────────────────────────────────────────────────────────────────┘
+
+Invoke the planner agent to design the implementation:
 ```
-Design an implementation plan for: {title}
+Invoke the planner agent to design an implementation plan for: {title}
 
 Context:
 - Problem: {user's problem description}
@@ -175,7 +194,7 @@ Create:
 5. Testing approach
 ```
 
-From the plan, extract:
+From the planner agent output, extract:
 - List of work items with: id, name, repo, description
 - Suggested order
 - Acceptance criteria
@@ -227,6 +246,21 @@ flowchart TB
 ```
 
 **Note:** These diagrams use native Mermaid syntax and will be embedded directly in the task README.md. Many editors and viewers render Mermaid automatically.
+
+### Step 5b: Pre-Confirmation Checklist
+
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ CHECKPOINT: VERIFY MANDATORY STEPS COMPLETED                 │
+│                                                                 │
+│ Before proceeding to Step 6, verify ALL are true:               │
+│                                                                 │
+│   □ Explorer agent was invoked for each relevant repo           │
+│   □ Planner agent was invoked to design work items              │
+│   □ Work items have repo assignments and dependencies           │
+│                                                                 │
+│ If ANY checkbox is unchecked, GO BACK and complete that step.   │
+│ Do NOT proceed to Step 6 with missing agent invocations.        │
+└─────────────────────────────────────────────────────────────────┘
 
 ### Step 6: Confirm with User
 
@@ -585,7 +619,7 @@ Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 
 **If auto_sync is enabled:**
 
-Use the ai-sync agent (lightweight/Haiku) to commit and push changes:
+Use the ai-sync agent to commit and push changes:
 ```
 Use the ai-sync agent to sync the .ai folder changes
 ```

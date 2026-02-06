@@ -145,12 +145,126 @@ Agent: [now runs git commit]
 - `git reset --hard` - NEVER without explicit request
 - `git rebase` on shared branches - NEVER without approval
 
+## Worktree Rules
+
+**MANDATORY: Always use the `create-worktree.sh` script when creating git worktrees.**
+
+### Why This Matters
+
+Manual worktree creation leads to:
+- Inconsistent directory structures
+- Forgotten `.gitignore` entries
+- Branch naming inconsistencies
+- Cleanup difficulties
+
+### Required Script Usage
+
+```bash
+# Script location
+scripts/create-worktree.sh <repo-path> <task-id> [base-branch]
+
+# Examples
+scripts/create-worktree.sh ~/Projects/backend JIRA-123
+scripts/create-worktree.sh ~/Projects/backend JIRA-123 develop
+scripts/create-worktree.sh /path/to/repo feature/new-api main
+```
+
+### What the Script Does
+
+1. Creates worktree at `.worktrees/{task-id}/` inside the target repo
+2. Creates branch `task/{task-id}` from the specified base branch
+3. Automatically adds `.worktrees/` to `.gitignore`
+4. Fetches latest from remote before branching
+5. Validates repo path and handles errors gracefully
+
+### Forbidden Without the Script
+
+- `git worktree add` - NEVER run manually
+- Creating worktrees in arbitrary locations
+- Creating worktrees without proper `.gitignore` setup
+
+### Cleanup
+
+When done with a worktree:
+```bash
+git worktree remove .worktrees/{task-id}
+```
+
 ## For Framework Commands
 
 When the user invokes framework commands (`/task-*`, `/document`, etc.):
 1. Read the command definition in `.ai/_framework/commands/`
 2. Follow the command's workflow exactly
 3. Use existing documentation as context
+
+## Extension Compliance (CRITICAL)
+
+**Reading an extension is NOT the same as applying it.**
+
+When you find a `.extend.md` file:
+
+### 1. Extract and List Requirements
+
+Don't just announce "✓ Project Extension Active". Extract the actual requirements:
+
+```
+✓ Project Extension Active
+
+Extension requires:
+  • BDD-first: Write tests BEFORE implementation
+  • Test file naming: {feature}.test.ts
+  • Coverage threshold: 80%
+```
+
+### 2. Verify EACH Step Against Extension
+
+Before executing any step, ask yourself:
+- "Does this step comply with the extension requirements?"
+- "Am I defaulting to habits instead of following the extension?"
+
+### 3. Stop-and-Check at Key Decision Points
+
+When creating work items, plans, or proposals:
+
+```
+EXTENSION COMPLIANCE CHECK
+══════════════════════════════════════════════════════════════════
+Extension requirement: BDD-first (tests before implementation)
+
+My proposed order:
+  1. Write tests for feature X        ✓ Compliant
+  2. Implement feature X              ✓ Compliant (after tests)
+  3. Write integration tests          ✓ Compliant
+
+Proceeding with extension-compliant plan.
+```
+
+### Common Failure: "Acknowledge but Don't Apply"
+
+**WRONG:**
+```
+✓ Project Extension Active
+[proceeds to ignore extension and use default habits]
+```
+
+**RIGHT:**
+```
+✓ Project Extension Active
+
+Extension mandates: {specific requirements}
+
+Adjusting my approach to comply:
+  • Instead of: design → implement → test
+  • I will do:  test → implement → verify
+```
+
+### Why This Matters
+
+Extensions exist to override default behavior for project-specific needs.
+Acknowledging without applying defeats their entire purpose.
+
+**If you find yourself proposing something that contradicts the extension,
+STOP and re-read the extension requirements.**
 
 ## Summary
 
