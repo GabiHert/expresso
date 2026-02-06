@@ -14,14 +14,14 @@ The agent framework provides specialized sub-agents that execute with **clean, i
 
 ## Agent Catalog
 
-| Agent | Purpose | Model | Blocking |
-|-------|---------|-------|----------|
-| [explorer](./explorer.yaml) | Codebase exploration | sonnet | No |
-| [planner](./planner.yaml) | Break tasks into work items | sonnet | Yes (approval) |
-| [implementer](./implementer.yaml) | Execute single work item | sonnet | No |
-| [reviewer](./reviewer.yaml) | Validate implementation | sonnet | Yes (quality gate) |
-| [documenter](./documenter.yaml) | Capture learnings | sonnet | Yes (approval) |
-| [sync](./sync.yaml) | Git operations for .ai/ | haiku | No |
+| Agent | Purpose | Model | Blocking | Scope |
+|-------|---------|-------|----------|-------|
+| [explorer](./explorer.yaml) | Codebase exploration | sonnet | No | read-only |
+| [planner](./planner.yaml) | Break tasks into work items | sonnet | Yes (approval) | read-only |
+| [implementer](./implementer.yaml) | Execute single work item | sonnet | No | **can edit code** |
+| [reviewer](./reviewer.yaml) | Validate implementation | sonnet | Yes (quality gate) | read-only |
+| [documenter](./documenter.yaml) | Capture learnings | sonnet | Yes (approval) | read-only |
+| [sync](./sync.yaml) | Git operations for .ai/ | haiku | No | .ai/ only |
 
 ## Orchestration Flow
 
@@ -144,7 +144,11 @@ Available variables for prompt templates:
 
 ## Invoking Agents
 
-Agents are invoked by the orchestrator (main Claude session) using the Task tool:
+Agents are invoked by the orchestrator (main AI session) according to the current IDE:
+
+### Claude Code
+
+Uses the **Task tool** with sub-agent spawning:
 
 ```
 Task(
@@ -154,11 +158,24 @@ Task(
 )
 ```
 
-The orchestrator:
-1. Loads agent definition
+### Cursor
+
+Uses **agent stubs** in `.cursor/agents/`. To invoke an agent:
+
+1. Reference the agent by name: "Use the explorer agent to..."
+2. Cursor loads the stub from `.cursor/agents/{agent-name}.md`
+3. The stub instructs loading the full YAML definition
+4. Execute the agent's task within the current session context
+
+For user approval steps, use conversational prompts instead of structured questions.
+
+### Common Orchestration Flow
+
+Regardless of IDE, the orchestrator:
+1. Loads agent definition (from YAML)
 2. Builds context from specifications
-3. Renders prompt template
-4. Invokes sub-agent
+3. Renders prompt template with context variables
+4. Invokes the agent (via IDE-appropriate mechanism)
 5. Processes output
 6. Handles approval flow if required
 

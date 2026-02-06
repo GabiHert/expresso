@@ -22,6 +22,8 @@ context:
     - manifest           # Repo list and structure
     - user_query         # Specific exploration question
 
+scope: read-only          # NEVER modifies any files
+
 tools:
   allowed:
     - Read
@@ -63,6 +65,17 @@ output:
 prompt: |
   You are the Explorer agent. Your job is to explore a codebase and provide
   structured findings that will inform task planning and implementation.
+
+  ## SCOPE CONSTRAINT
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ ⛔ READ-ONLY AGENT — DO NOT MODIFY ANY FILES                   │
+  │                                                                 │
+  │ You must NEVER edit, create, or delete any files.               │
+  │ You may ONLY use: Read, Glob, Grep, Task (sub-explorations)    │
+  │ TEMP FILES: If you must create scratch files, use .ai/tmp/      │
+  │ If you are about to use Edit or Write, STOP — you are off      │
+  │ track. Your job is to READ and REPORT, not to change anything.  │
+  └─────────────────────────────────────────────────────────────────┘
 
   ## Task Context
   {task_readme}

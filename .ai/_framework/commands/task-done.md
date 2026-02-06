@@ -14,6 +14,21 @@
 
 Mark a task as done, log it to history, and move it to the done folder. This preserves the task for future reference.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ DO NOT EDIT APPLICATION CODE                                 │
+│                                                                 │
+│ ALLOWED:  Read any file. Write ONLY inside .ai/ directory.      │
+│ FORBIDDEN: Create, edit, or delete files outside .ai/           │
+│ TEMP FILES: Scratch/temporary output goes in .ai/tmp/           │
+│                                                                 │
+│ This command archives tasks and updates documentation.           │
+│ It must NEVER modify application source code, tests, or config. │
+│ If you find yourself editing code files, STOP — you are off     │
+│ track. Only .ai/tasks/, .ai/docs/, and .ai/context.md may be   │
+│ written to.                                                     │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```
@@ -160,43 +175,40 @@ Update `.ai/context.md`:
 
 ### Step 7: Invoke Documenter Agent (Automatic)
 
-**Spawn the Documenter agent** to capture learnings from this task:
+**Invoke the documenter agent** to capture learnings from this task.
 
+First, gather the diff:
 ```bash
 # Get full task diff (if tracking start commit)
 git diff {task_start_commit}..HEAD > /tmp/task-changes.diff 2>/dev/null || git diff HEAD~10..HEAD > /tmp/task-changes.diff
 ```
 
+Provide the following context to the agent:
+
 ```
-Task(
-  subagent_type: "documenter",
-  model: "sonnet",
-  prompt: "
-    ## Completed Task
-    {task README content}
+## Completed Task
+{task README content}
 
-    ## Work Items Completed
-    {all work item files content}
+## Work Items Completed
+{all work item files content}
 
-    ## Feedback Received
-    {all feedback files content}
+## Feedback Received
+{all feedback files content}
 
-    ## Changes Made (Full Diff)
-    {contents of task-changes.diff}
+## Changes Made (Full Diff)
+{contents of task-changes.diff}
 
-    ## Existing Documentation
-    {list and content of relevant .ai/docs/ files}
+## Existing Documentation
+{list and content of relevant .ai/docs/ files}
 
-    ## Your Mission
-    Analyze this completed task and propose documentation updates:
-    1. Task summary for _completed_tasks.md
-    2. New patterns discovered → .ai/docs/
-    3. Updates to existing docs if needed
-    4. Architecture decisions made
+## Your Mission
+Analyze this completed task and propose documentation updates:
+1. Task summary for _completed_tasks.md
+2. New patterns discovered → .ai/docs/
+3. Updates to existing docs if needed
+4. Architecture decisions made
 
-    Return proposals for user approval.
-  "
-)
+Return proposals for user approval.
 ```
 
 **Present proposals to user:**
@@ -274,27 +286,24 @@ Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 git status .ai/ --porcelain
 ```
 
+**Invoke the sync agent** with the following context:
+
 ```
-Task(
-  subagent_type: "sync",
-  model: "haiku",
-  prompt: "
-    ## .ai/ Folder Status
-    {git status output}
+## .ai/ Folder Status
+{git status output}
 
-    ## Task Context
-    Task ID: {task-id}
-    Trigger: task-done
+## Task Context
+Task ID: {task-id}
+Trigger: task-done
 
-    ## Your Mission
-    Commit changes to .ai/ folder using batched commits:
-    - docs: Documentation changes
-    - tasks: Task state changes
-    - config: Configuration changes
+## Your Mission
+Commit changes to .ai/ folder using batched commits:
+- docs: Documentation changes
+- tasks: Task state changes
+- config: Configuration changes
 
-    Execute git operations and report results.
-  "
-)
+Execute git operations and report results.
+```
 ```
 
 The Sync agent will:

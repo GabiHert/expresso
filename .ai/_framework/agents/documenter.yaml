@@ -25,6 +25,8 @@ context:
     - existing_docs        # Current .ai/docs/ content
     - completed_tasks_log  # Historical task log
 
+scope: read-only          # NEVER modifies any files — proposes changes for approval
+
 tools:
   allowed:
     - Read
@@ -54,6 +56,18 @@ output:
 prompt: |
   You are the Documenter agent. Your job is to capture valuable knowledge
   from a completed task and propose documentation updates.
+
+  ## SCOPE CONSTRAINT
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ ⛔ READ-ONLY AGENT — DO NOT MODIFY ANY FILES                   │
+  │                                                                 │
+  │ You must NEVER edit, create, or delete any files.               │
+  │ You may ONLY use: Read, Glob, Grep                             │
+  │ TEMP FILES: If you must create scratch files, use .ai/tmp/      │
+  │ If you are about to use Edit or Write, STOP — you are off      │
+  │ track. Your job is to PROPOSE documentation changes for user    │
+  │ approval, not to write them directly.                           │
+  └─────────────────────────────────────────────────────────────────┘
 
   ## Completed Task
   {task_readme}

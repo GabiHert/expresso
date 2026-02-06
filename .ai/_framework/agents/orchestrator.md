@@ -2,12 +2,36 @@
 
 ## Overview
 
-This document explains how framework commands invoke agents. The orchestrator (main Claude session) loads agent definitions, builds context, and spawns sub-agents using the Task tool.
+This document explains how framework commands invoke agents. The orchestrator (main AI session) loads agent definitions, builds context, and invokes agents using the IDE-appropriate mechanism.
+
+## Multi-IDE Support
+
+The orchestrator adapts to the current IDE environment:
+
+| Step | Claude Code | Cursor |
+|------|-------------|--------|
+| Load definition | Read YAML file | Read YAML file |
+| Build context | Same process | Same process |
+| Invoke agent | `Task(subagent_type, prompt, model)` | Reference `.cursor/agents/{name}.md` |
+| User approval | `AskUserQuestion(options)` | Conversational prompt |
+| Process output | Same process | Same process |
+
+## Agent Scope Enforcement
+
+Every agent has a `scope` field in its YAML definition that constrains what it may do:
+
+| Scope | Meaning | Agents |
+|-------|---------|--------|
+| `read-only` | Must NEVER create, edit, or delete any files | explorer, planner, reviewer, documenter |
+| `can-edit-code` | May modify application source code | implementer |
+| `ai-folder-only` | May only run git operations on `.ai/` | sync |
+
+**The orchestrator must enforce scope.** When invoking an agent, the scope constraint is embedded in the agent's prompt template. If an agent attempts to act outside its scope, the orchestrator should stop execution.
 
 ## Core Pattern
 
 ```
-Command executes → Load agent YAML → Build context → Spawn Task → Process output
+Command executes → Load agent YAML → Check scope → Build context → Invoke agent → Process output
 ```
 
 ### Loading Agent Definition
@@ -35,8 +59,9 @@ The orchestrator must:
 2. Include optional context if available
 3. Render the prompt template with context variables
 
-### Spawning Sub-Agent
+### Invoking the Agent
 
+**Claude Code:**
 ```
 Task(
   subagent_type: "general-purpose",
@@ -45,6 +70,11 @@ Task(
   max_turns: agent_def.execution.max_turns
 )
 ```
+
+**Cursor:**
+Invoke the agent by name within the current session. The agent stub in
+`.cursor/agents/{name}.md` provides the instructions. Pass the rendered
+prompt as context for the agent to execute.
 
 ## Command Integration
 
@@ -62,12 +92,7 @@ Task(
 │    docs_index   = Glob(.ai/docs/**/README.md) + LS              │
 │    user_query   = "Explore codebase for task: {task_title}"     │
 │                                                                 │
-│ 3. Spawn agent:                                                 │
-│    Task(                                                        │
-│      subagent_type: "general-purpose",                          │
-│      model: "sonnet",                                           │
-│      prompt: explorer_prompt_with_context                       │
-│    )                                                            │
+│ 3. Invoke explorer agent with rendered prompt                    │
 │                                                                 │
 │ 4. Save output:                                                 │
 │    Write(.ai/tasks/in_progress/{id}/exploration.md)             │
@@ -86,21 +111,14 @@ Task(
 │    manifest      = Read(.ai/_project/manifest.yaml)             │
 │    manifest_repos = Extract repos section from manifest         │
 │                                                                 │
-│ 3. Spawn agent:                                                 │
-│    Task(                                                        │
-│      subagent_type: "general-purpose",                          │
-│      model: "sonnet",                                           │
-│      prompt: planner_prompt_with_context                        │
-│    )                                                            │
+│ 3. Invoke planner agent with rendered prompt                     │
 │                                                                 │
 │ 4. Parse output (YAML):                                         │
 │    proposed_items = parse_yaml(agent_output)                    │
 │                                                                 │
 │ 5. Present for approval:                                        │
-│    AskUserQuestion(                                             │
-│      "Review proposed work items",                              │
-│      options: ["Approve All", "Edit", "Re-plan"]                │
-│    )                                                            │
+│    Ask user: "Review proposed work items"                       │
+│    Options: Approve All / Edit / Re-plan                        │
 │                                                                 │
 │ 6. On approval:                                                 │
 │    - Create work item files in todo/                            │
@@ -127,12 +145,7 @@ Task(
 │ │    task_readme  = Read(task_readme_file)                    │ │
 │ │    prev_feedback = Read(feedback_file) if exists            │ │
 │ │                                                             │ │
-│ │ 3. Spawn agent:                                             │ │
-│ │    Task(                                                    │ │
-│ │      subagent_type: "general-purpose",                      │ │
-│ │      model: "sonnet",                                       │ │
-│ │      prompt: implementer_prompt_with_context                │ │
-│ │    )                                                        │ │
+│ │ 3. Invoke implementer agent with rendered prompt             │ │
 │ │                                                             │ │
 │ │ 4. Capture output:                                          │ │
 │ │    implementation_summary = agent_output                    │ │
@@ -156,12 +169,7 @@ Task(
 │ │    task_readme        = Read(task_readme_file)              │ │
 │ │    docs_patterns      = Read(.ai/docs/_shared/patterns.md)  │ │
 │ │                                                             │ │
-│ │ 4. Spawn agent:                                             │ │
-│ │    Task(                                                    │ │
-│ │      subagent_type: "general-purpose",                      │ │
-│ │      model: "sonnet",                                       │ │
-│ │      prompt: reviewer_prompt_with_context                   │ │
-│ │    )                                                        │ │
+│ │ 4. Invoke reviewer agent with rendered prompt                │ │
 │ │                                                             │ │
 │ │ 5. Parse verdict:                                           │ │
 │ │    If "NEEDS CHANGES":                                      │ │
@@ -197,18 +205,11 @@ Task(
 │    existing_docs    = Glob + Read relevant .ai/docs/ files      │
 │    completed_tasks_log = Read(_completed_tasks.md)              │
 │                                                                 │
-│ 4. Spawn agent:                                                 │
-│    Task(                                                        │
-│      subagent_type: "general-purpose",                          │
-│      model: "sonnet",                                           │
-│      prompt: documenter_prompt_with_context                     │
-│    )                                                            │
+│ 4. Invoke documenter agent with rendered prompt                  │
 │                                                                 │
 │ 5. Parse proposals and present:                                 │
-│    AskUserQuestion(                                             │
-│      "Documentation proposals ready",                           │
-│      options: ["Apply All", "Review Each", "Skip"]              │
-│    )                                                            │
+│    Ask user: "Documentation proposals ready"                    │
+│    Options: Apply All / Review Each / Skip                      │
 │                                                                 │
 │ 6. On approval:                                                 │
 │    - Apply each proposed change                                 │
@@ -236,12 +237,7 @@ Task(
 │    task_id         = current task ID                            │
 │    sync_trigger    = "task-start" | "task-work" | "task-done"   │
 │                                                                 │
-│ 5. Spawn agent:                                                 │
-│    Task(                                                        │
-│      subagent_type: "general-purpose",                          │
-│      model: "haiku",  # Lightweight                             │
-│      prompt: sync_prompt_with_context                           │
-│    )                                                            │
+│ 5. Invoke sync agent with rendered prompt                        │
 │                                                                 │
 │ 6. Agent executes git operations for .ai/ only                  │
 │                                                                 │

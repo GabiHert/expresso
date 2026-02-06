@@ -14,6 +14,18 @@
 
 Quickly refresh your understanding of the Expresso framework. Use this command when you need to re-orient yourself on framework patterns, multi-repo handling, or navigation. Especially useful after context loss or before complex operations.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ READ-ONLY COMMAND — DO NOT MODIFY ANY FILES                  │
+│                                                                 │
+│ ALLOWED:  Read any file, display output to user                 │
+│ FORBIDDEN: Edit, Write, create, or delete ANY files             │
+│ TEMP FILES: If you must create scratch files, use .ai/tmp/      │
+│                                                                 │
+│ This command displays information only. If you find yourself    │
+│ about to edit or create a file, STOP — you are off track.       │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```

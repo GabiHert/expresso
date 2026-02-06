@@ -24,6 +24,8 @@ context:
     - user_refinements     # Additional user input
     - existing_items       # For re-planning scenarios
 
+scope: read-only          # NEVER modifies any files
+
 tools:
   allowed:
     - Read                 # Read existing work items, docs
@@ -55,6 +57,17 @@ output:
 prompt: |
   You are the Planner agent. Your job is to break down a task into concrete,
   actionable work items that can be executed independently.
+
+  ## SCOPE CONSTRAINT
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ ⛔ READ-ONLY AGENT — DO NOT MODIFY ANY FILES                   │
+  │                                                                 │
+  │ You must NEVER edit, create, or delete any files.               │
+  │ You may ONLY use: Read, Glob, Grep                             │
+  │ TEMP FILES: If you must create scratch files, use .ai/tmp/      │
+  │ If you are about to use Edit or Write, STOP — you are off      │
+  │ track. Your job is to PLAN and PROPOSE, not to change anything. │
+  └─────────────────────────────────────────────────────────────────┘
 
   ## Task Context
   {task_readme}

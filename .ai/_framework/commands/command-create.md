@@ -14,6 +14,20 @@
 
 Create a new command with proper structure, ensuring consistency across the framework. This command gathers context through questions before creating the command skeleton.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ DO NOT EDIT APPLICATION CODE                                 │
+│                                                                 │
+│ ALLOWED:  Read any file. Write to .ai/, .claude/, .cursor/      │
+│ FORBIDDEN: Create, edit, or delete application source code      │
+│ TEMP FILES: Scratch/temporary output goes in .ai/tmp/           │
+│                                                                 │
+│ This command creates framework command definitions only.         │
+│ It must NEVER modify application source code, tests, or config. │
+│ If you find yourself editing code files, STOP — you are off     │
+│ track.                                                          │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```
@@ -391,7 +405,7 @@ Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 
 **If auto_sync is enabled:**
 
-Use the ai-sync agent (lightweight/Haiku) to commit and push changes:
+Use the ai-sync agent to commit and push changes:
 ```
 Use the ai-sync agent to sync the .ai folder changes
 ```

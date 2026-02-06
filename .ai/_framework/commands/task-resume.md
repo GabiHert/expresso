@@ -16,6 +16,18 @@ Orient to the current in-progress task at the start of a new session. Provides f
 
 This is the recommended command to run at the start of any new AI session when continuing work.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ READ-ONLY COMMAND — DO NOT MODIFY ANY FILES                  │
+│                                                                 │
+│ ALLOWED:  Read any file, display output to user                 │
+│ FORBIDDEN: Edit, Write, create, or delete ANY files             │
+│ TEMP FILES: If you must create scratch files, use .ai/tmp/      │
+│                                                                 │
+│ This command displays information only. If you find yourself    │
+│ about to edit or create a file, STOP — you are off track.       │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```

@@ -14,6 +14,18 @@
 
 Answer questions by searching the `.ai/` documentation first, before exploring code. This ensures curated knowledge is used before raw code exploration.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ READ-ONLY COMMAND — DO NOT MODIFY ANY FILES                  │
+│                                                                 │
+│ ALLOWED:  Read any file, display output to user                 │
+│ FORBIDDEN: Edit, Write, create, or delete ANY files             │
+│ TEMP FILES: If you must create scratch files, use .ai/tmp/      │
+│                                                                 │
+│ This command displays information only. If you find yourself    │
+│ about to edit or create a file, STOP — you are off track.       │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```

@@ -14,11 +14,6 @@
 
 Scan the codebase for `@expresso` inline task tags in code comments. List them for discussion or address them one by one to resolve.
 
-## TEMPORARY FILES
-Any scratch files, exploration notes, or temporary output created during
-execution MUST be placed in `.ai/tmp/`. Do NOT create temporary files
-in the project root or source directories.
-
 ## Usage
 
 ```
@@ -78,9 +73,27 @@ ADDRESS MODE:
    - Available repositories and paths
    - File extensions to scan
 
-2. **Extension Support**: This command supports compiled extensions
-   via `/command-extend expresso-tags --variant NAME`. If a compiled extension
-   exists, the stub already points to it — no runtime discovery needed.
+2. **EXTENSION CHECK (MANDATORY)**:
+   ```
+   ┌─────────────────────────────────────────────────────────────────┐
+   │ CHECK FOR PROJECT EXTENSION                                     │
+   │                                                                 │
+   │ Look for: .ai/_project/commands/expresso-tags.extend.md        │
+   │                                                                 │
+   │ If file EXISTS:                                                 │
+   │   1. Read the extension file completely                         │
+   │   2. Parse and extract these sections:                          │
+   │      • Context     → Add to orientation announcements           │
+   │      • Pre-Hooks   → Execute BEFORE Step 1                      │
+   │      • Step Overrides → Replace matching steps                  │
+   │      • Agents      → Use specified agents for phases            │
+   │      • Post-Hooks  → Execute AFTER final step                   │
+   │   3. Announce: "✓ Project Extension Active"                     │
+   │   4. FOLLOW ALL EXTENSION INSTRUCTIONS - they override defaults │
+   │                                                                 │
+   │ This check is NON-NEGOTIABLE. Extensions customize behavior.    │
+   └─────────────────────────────────────────────────────────────────┘
+   ```
 
 3. Announce:
 ```

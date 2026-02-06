@@ -14,6 +14,11 @@
 
 Work on a specific work item from the current task. This command guides you through the implementation steps defined in the work item file.
 
+## TEMPORARY FILES
+Any scratch files, exploration notes, or temporary output created during
+implementation MUST be placed in `.ai/tmp/`. Do NOT create temporary files
+in the project root or source directories.
+
 ## Usage
 
 ```
@@ -191,31 +196,27 @@ If user chooses 1, launch an Explore agent targeting the relevant files and patt
 
 ### Step 5: Invoke Implementer Agent
 
-**Spawn the Implementer agent** to execute this work item with clean context:
+**Invoke the implementer agent** to execute this work item with clean context.
+
+Provide the following context to the agent:
 
 ```
-Task(
-  subagent_type: "implementer",
-  model: "sonnet",
-  prompt: "
-    ## Task Context
-    {task README content}
+## Task Context
+{task README content}
 
-    ## Your Work Item
-    {work item file content}
+## Your Work Item
+{work item file content}
 
-    ## Previous Feedback (if re-running)
-    {feedback file content, if exists}
+## Previous Feedback (if re-running)
+{feedback file content, if exists}
 
-    ## Implementation Guidelines
-    - Implement ONLY what the work item specifies
-    - No git operations (orchestrator handles git)
-    - Must satisfy all acceptance criteria
-    - Follow existing code patterns
+## Implementation Guidelines
+- Implement ONLY what the work item specifies
+- No git operations (orchestrator handles git)
+- Must satisfy all acceptance criteria
+- Follow existing code patterns
 
-    Return an implementation summary when complete.
-  "
-)
+Return an implementation summary when complete.
 ```
 
 The Implementer agent will:
@@ -235,32 +236,28 @@ Capture the implementation summary for the Reviewer.
 git diff HEAD > /tmp/changes.diff
 ```
 
+**Invoke the reviewer agent** with the following context:
+
 ```
-Task(
-  subagent_type: "reviewer",
-  model: "sonnet",
-  prompt: "
-    ## Implementer Summary
-    {summary from implementer}
+## Implementer Summary
+{summary from implementer}
 
-    ## Git Diff
-    {contents of git diff}
+## Git Diff
+{contents of git diff}
 
-    ## Work Item Acceptance Criteria
-    {criteria from work item}
+## Work Item Acceptance Criteria
+{criteria from work item}
 
-    ## Task Context
-    {task README content}
+## Task Context
+{task README content}
 
-    ## Your Mission
-    Review this implementation:
-    1. Check all acceptance criteria are met
-    2. Check for bugs, security issues, code quality
-    3. Return verdict: APPROVED or NEEDS CHANGES
+## Your Mission
+Review this implementation:
+1. Check all acceptance criteria are met
+2. Check for bugs, security issues, code quality
+3. Return verdict: APPROVED or NEEDS CHANGES
 
-    Save feedback to: {task-path}/feedback/{work-item-id}-review.md
-  "
-)
+Save feedback to: {task-path}/feedback/{work-item-id}-review.md
 ```
 
 **If verdict is NEEDS CHANGES:**
@@ -460,7 +457,7 @@ Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 
 **If auto_sync is enabled:**
 
-Use the ai-sync agent (lightweight/Haiku) to commit and push changes:
+Use the ai-sync agent to commit and push changes:
 ```
 Use the ai-sync agent to sync the .ai folder changes
 ```
@@ -607,7 +604,7 @@ Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 
 **If auto_sync is enabled:**
 
-Use the ai-sync agent (lightweight/Haiku) to commit and push changes:
+Use the ai-sync agent to commit and push changes:
 ```
 Use the ai-sync agent to sync the .ai folder changes
 ```

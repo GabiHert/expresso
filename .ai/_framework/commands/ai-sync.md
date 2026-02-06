@@ -14,6 +14,20 @@
 
 Sync the `.ai/` folder with its git repository. Commits local changes, pushes to origin, pulls updates, and merges the main branch for framework updates.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ DO NOT EDIT APPLICATION CODE                                 │
+│                                                                 │
+│ ALLOWED:  Git operations on .ai/ folder ONLY                    │
+│ FORBIDDEN: Create, edit, or delete application source code      │
+│ FORBIDDEN: Git operations on files outside .ai/                 │
+│ TEMP FILES: Scratch/temporary output goes in .ai/tmp/           │
+│                                                                 │
+│ This command syncs the .ai/ folder with git only.               │
+│ It must NEVER modify or commit application source code.         │
+│ If you find yourself staging non-.ai/ files, STOP.              │
+└─────────────────────────────────────────────────────────────────┘
+
 This command supports two modes:
 - **Standalone mode**: `.ai-framework/` git repository with `.ai` as symlink
 - **Embedded mode**: `.ai/` as a regular directory within the main project repo

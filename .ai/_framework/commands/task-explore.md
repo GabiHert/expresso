@@ -14,6 +14,20 @@
 
 Explore the codebase to understand context for a task or question. Uses exploration agents to thoroughly investigate the code and report findings.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ READ-ONLY COMMAND — DO NOT MODIFY ANY FILES                  │
+│                                                                 │
+│ ALLOWED:  Read any file, display output to user                 │
+│ FORBIDDEN: Edit, Write, create, or delete ANY files             │
+│ TEMP FILES: If you must create scratch files, use .ai/tmp/      │
+│                                                                 │
+│ This command explores and reports findings only. It must NEVER   │
+│ modify application source code, tests, config, or any other     │
+│ files. If you find yourself about to edit a file, STOP — you    │
+│ are off track.                                                  │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```

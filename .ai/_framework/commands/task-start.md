@@ -14,6 +14,21 @@
 
 Start a task by moving it from todo to in_progress, reading the task context, and preparing to work on the first work item.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ DO NOT EDIT APPLICATION CODE                                 │
+│                                                                 │
+│ ALLOWED:  Read any file. Write ONLY inside .ai/ directory.      │
+│ FORBIDDEN: Create, edit, or delete files outside .ai/           │
+│ TEMP FILES: Scratch/temporary output goes in .ai/tmp/           │
+│                                                                 │
+│ This command manages task state and creates exploration notes.   │
+│ It must NEVER modify application source code, tests, or config. │
+│ If you find yourself editing code files, STOP — you are off     │
+│ track. Only .ai/tasks/, .ai/docs/, and .ai/context.md may be   │
+│ written to.                                                     │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```
@@ -217,24 +232,20 @@ APPROACH
 
 **Invoke the Explorer agent** to gather codebase context for this task:
 
+**Invoke the explorer agent** with the following context:
+
 ```
-Task(
-  subagent_type: "explorer",
-  model: "sonnet",
-  prompt: "
-    ## Task Context
-    {task README content}
+## Task Context
+{task README content}
 
-    ## Existing Documentation
-    {list of .ai/docs/ files}
+## Existing Documentation
+{list of .ai/docs/ files}
 
-    ## Your Mission
-    Explore the codebase to understand what needs to change for this task.
-    Focus on: affected files, existing patterns, dependencies, and risks.
+## Your Mission
+Explore the codebase to understand what needs to change for this task.
+Focus on: affected files, existing patterns, dependencies, and risks.
 
-    Save your findings to: .ai/tasks/in_progress/{task-id}/exploration.md
-  "
-)
+Save your findings to: .ai/tasks/in_progress/{task-id}/exploration.md
 ```
 
 The Explorer agent will:
@@ -251,27 +262,23 @@ Announce when complete:
 
 **If status.yaml shows 0 work items**, invoke the Planner agent:
 
+**Invoke the planner agent** with the following context:
+
 ```
-Task(
-  subagent_type: "planner",
-  model: "sonnet",
-  prompt: "
-    ## Task Context
-    {task README content}
+## Task Context
+{task README content}
 
-    ## Exploration Findings
-    {exploration.md content}
+## Exploration Findings
+{exploration.md content}
 
-    ## Project Repos
-    {repos from manifest.yaml}
+## Project Repos
+{repos from manifest.yaml}
 
-    ## Your Mission
-    Break this task into concrete work items.
-    CRITICAL: Each work item must affect only ONE repository.
+## Your Mission
+Break this task into concrete work items.
+CRITICAL: Each work item must affect only ONE repository.
 
-    Return proposed work items for user approval.
-  "
-)
+Return proposed work items for user approval.
 ```
 
 Present proposals to user:
@@ -371,26 +378,22 @@ Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 git status .ai/ --porcelain
 ```
 
+**Invoke the sync agent** with the following context:
+
 ```
-Task(
-  subagent_type: "sync",
-  model: "haiku",
-  prompt: "
-    ## .ai/ Folder Status
-    {git status output}
+## .ai/ Folder Status
+{git status output}
 
-    ## Task Context
-    Task ID: {task-id}
-    Trigger: task-start
+## Task Context
+Task ID: {task-id}
+Trigger: task-start
 
-    ## Your Mission
-    Commit changes to .ai/ folder using batched commits:
-    - tasks: Task moved to in_progress
-    - docs: Exploration notes (if created)
+## Your Mission
+Commit changes to .ai/ folder using batched commits:
+- tasks: Task moved to in_progress
+- docs: Exploration notes (if created)
 
-    Execute git operations and report results.
-  "
-)
+Execute git operations and report results.
 ```
 
 This ensures task status changes are tracked in version control automatically.

@@ -10,6 +10,8 @@ description: |
 
 model: haiku
 
+scope: ai-folder-only     # ONLY operates on .ai/ folder, never application code
+
 execution:
   blocking: false
   approval_required: false
@@ -63,6 +65,7 @@ prompt: |
   - ONLY commit files in .ai/ folder
   - NEVER touch files outside .ai/
   - If non-.ai/ files are staged, unstage them first
+  - Scratch/temporary files go in .ai/tmp/ (gitignored)
 
   ### Batch Types
   Group commits by change type:

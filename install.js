@@ -50,6 +50,7 @@ const DIRS_TO_CREATE = [
   ".ai/tasks/done",
   ".ai/cockpit/events",
   ".ai/docs",
+  ".ai/tmp",
 ];
 
 const VSCODE_EXTENSION = "vscode-extension/ai-cockpit.vsix";
@@ -611,6 +612,26 @@ ${colors.bright}╔════════════════════�
     if (!fs.existsSync(gitkeepPath)) {
       fs.writeFileSync(gitkeepPath, "");
     }
+  }
+
+  // Ensure .ai/tmp/ is gitignored
+  const gitignorePath = path.join(targetDir, ".gitignore");
+  const tmpIgnoreEntry = ".ai/tmp/";
+  let gitignoreContent = "";
+
+  if (fs.existsSync(gitignorePath)) {
+    gitignoreContent = fs.readFileSync(gitignorePath, "utf-8");
+  }
+
+  if (!gitignoreContent.split("\n").some((line) => line.trim() === tmpIgnoreEntry)) {
+    const separator = gitignoreContent.length > 0 && !gitignoreContent.endsWith("\n") ? "\n" : "";
+    const section = gitignoreContent.includes(tmpIgnoreEntry)
+      ? ""
+      : `${separator}\n# AI Framework temporary files\n${tmpIgnoreEntry}\n`;
+    fs.appendFileSync(gitignorePath, section);
+    logSuccess("Added .ai/tmp/ to .gitignore");
+  } else {
+    logInfo(".ai/tmp/ already in .gitignore");
   }
 
   // --------------------------------------------------------

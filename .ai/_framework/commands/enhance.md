@@ -14,6 +14,20 @@
 
 Grow the project setup with new knowledge. Add repos, update conventions, add MCPs, or modify project configuration.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ DO NOT EDIT APPLICATION CODE                                 │
+│                                                                 │
+│ ALLOWED:  Read any file. Write ONLY inside .ai/ directory.      │
+│ FORBIDDEN: Create, edit, or delete files outside .ai/           │
+│ TEMP FILES: Scratch/temporary output goes in .ai/tmp/           │
+│                                                                 │
+│ This command updates project configuration and documentation.    │
+│ It must NEVER modify application source code, tests, or config. │
+│ If you find yourself editing code files, STOP — you are off     │
+│ track.                                                          │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```

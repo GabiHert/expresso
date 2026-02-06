@@ -14,6 +14,20 @@
 
 Run code review on changes for a task. Analyzes all modified files across repositories and reports issues by severity.
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ DO NOT EDIT APPLICATION CODE                                 │
+│                                                                 │
+│ ALLOWED:  Read any file. Write ONLY to .ai/tasks/*/feedback/    │
+│ FORBIDDEN: Create, edit, or delete files outside .ai/           │
+│ TEMP FILES: Scratch/temporary output goes in .ai/tmp/           │
+│                                                                 │
+│ This command reviews code and reports findings. It must NEVER    │
+│ modify application source code, tests, or config. Code fixes    │
+│ happen in /task-work, not here. If you find yourself editing     │
+│ code files, STOP — you are off track.                           │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```

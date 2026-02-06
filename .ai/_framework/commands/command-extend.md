@@ -18,6 +18,20 @@ This enables a layered customization approach:
 - **Framework layer**: Generic commands (reusable across projects)
 - **Project layer**: Compiled variants with project-specific workflows (TDD, BDD, custom agents)
 
+## SCOPE CONSTRAINT
+┌─────────────────────────────────────────────────────────────────┐
+│ ⛔ DO NOT EDIT APPLICATION CODE                                 │
+│                                                                 │
+│ ALLOWED:  Read any file. Write to .ai/, .claude/, .cursor/      │
+│ FORBIDDEN: Create, edit, or delete application source code      │
+│ TEMP FILES: Scratch/temporary output goes in .ai/tmp/           │
+│                                                                 │
+│ This command manages framework command extensions only.          │
+│ It must NEVER modify application source code, tests, or config. │
+│ If you find yourself editing code files, STOP — you are off     │
+│ track.                                                          │
+└─────────────────────────────────────────────────────────────────┘
+
 ## Usage
 
 ```
@@ -37,8 +51,10 @@ This enables a layered customization approach:
 .ai/_project/commands/task-create.active.md           → compiled, authoritative (what AI reads)
 .ai/_project/commands/task-create.variant.tdd.md      → stored compiled variant
 .ai/_project/commands/task-create.source.tdd.yaml     → source overrides (for recompilation)
-.claude/commands/task-create.md                       → stub → points to active.md
-.claude/commands/task-create:tdd.md                   → stub → points to variant.tdd.md
+.claude/commands/task-create.md                       → stub → points to active.md  (Claude Code)
+.claude/commands/task-create:tdd.md                   → stub → points to variant    (Claude Code)
+.cursor/commands/task-create.md                       → stub → points to active.md  (Cursor)
+.cursor/commands/task-create:tdd.md                   → stub → points to variant    (Cursor)
 ```
 
 ## How It Works
@@ -51,7 +67,7 @@ When you run `/command-extend task-create --variant tdd`:
 4. Compiles a fully self-contained document with all steps inlined
 5. Writes compiled output to `.ai/_project/commands/task-create.variant.tdd.md`
 6. Activates: copies to `.ai/_project/commands/task-create.active.md`
-7. Updates stubs in `.claude/commands/` (and `.cursor/commands/` if exists)
+7. Updates stubs in `.claude/commands/` and `.cursor/commands/`
 
 When the user runs `/task-create`, the stub points directly to the compiled `active.md` — no runtime extension discovery needed.
 
@@ -265,12 +281,13 @@ Extensions are compiled into self-contained documents — no runtime merge neede
 **If `--activate NAME` flag:**
 - Validate that `.ai/_project/commands/{cmd}.variant.{NAME}.md` exists
 - Copy it to `.ai/_project/commands/{cmd}.active.md`
-- Update stub `.claude/commands/{cmd}.md` to point to `active.md`
-- Mirror to `.cursor/commands/` if directory exists
+- Update stub in `.claude/commands/{cmd}.md` to point to `active.md`
+- Update stub in `.cursor/commands/{cmd}.md` to point to `active.md`
 - Announce:
   ```
   ✓ Activated variant '{NAME}' for /{cmd}
     .claude/commands/{cmd}.md → .ai/_project/commands/{cmd}.active.md
+    .cursor/commands/{cmd}.md → .ai/_project/commands/{cmd}.active.md
   ```
 - Then stop.
 
@@ -800,21 +817,23 @@ Execute the Compilation Algorithm (see below).
 
 **10d. Update stubs:**
 
-Write `.claude/commands/{command}.md`:
+Write stubs in **both** `.claude/commands/` and `.cursor/commands/`:
+
+**`{ide}/commands/{command}.md`** (active variant):
 ```
 Follow the instructions in .ai/_project/commands/{command}.active.md
 
 Arguments: $ARGUMENTS
 ```
 
-Write `.claude/commands/{command}:{variant}.md`:
+**`{ide}/commands/{command}:{variant}.md`** (named variant):
 ```
 Follow the instructions in .ai/_project/commands/{command}.variant.{variant}.md
 
 Arguments: $ARGUMENTS
 ```
 
-If `.cursor/commands/` exists, mirror both stubs there.
+Where `{ide}` = `.claude` and `.cursor` (write to both directories).
 
 ### Compilation Algorithm
 
@@ -1002,6 +1021,8 @@ Created:
   ✓ .ai/_project/commands/{command}.active.md
   ✓ .claude/commands/{command}.md → points to active.md
   ✓ .claude/commands/{command}:{variant}.md → points to variant
+  ✓ .cursor/commands/{command}.md → points to active.md
+  ✓ .cursor/commands/{command}:{variant}.md → points to variant
 
 How It Works:
   Running /{command} now reads the compiled active.md directly.

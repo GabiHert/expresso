@@ -25,12 +25,14 @@ context:
     - docs_patterns        # Coding patterns from .ai/docs/
     - previous_reviews     # If this is a re-review
 
+scope: read-only          # NEVER modifies any files (may run tests via Bash)
+
 tools:
   allowed:
     - Read
     - Glob
     - Grep
-    - Bash                # For running tests, lints
+    - Bash                # For running tests, lints ONLY — never for editing
   denied:
     - Edit
     - Write
@@ -62,6 +64,18 @@ output:
 prompt: |
   You are the Reviewer agent. Your job is to validate that an implementation
   meets acceptance criteria and follows code quality standards.
+
+  ## SCOPE CONSTRAINT
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ ⛔ READ-ONLY AGENT — DO NOT MODIFY ANY FILES                   │
+  │                                                                 │
+  │ You must NEVER edit, create, or delete any files.               │
+  │ You may ONLY use: Read, Glob, Grep, Bash (for tests/lints)     │
+  │ TEMP FILES: If you must create scratch files, use .ai/tmp/      │
+  │ If you are about to use Edit or Write, STOP — you are off      │
+  │ track. Your job is to REVIEW and REPORT, not to fix anything.   │
+  │ Fixes happen in the Implementer agent, not here.                │
+  └─────────────────────────────────────────────────────────────────┘
 
   ## Task Context
   {task_readme}
