@@ -120,11 +120,6 @@ export async function activate(context: vscode.ExtensionContext) {
     showCollapseAll: true
   });
 
-  // Connect file watcher to status bar
-  fileWatcher.onActiveTaskChanged(task => {
-    statusBar?.updateStatusBar(task);
-  });
-
   // Start watching
   fileWatcher.start();
 
@@ -228,7 +223,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(refreshCommand, showPanelCommand);
 
-  // Register open terminal command - opens terminal with COCKPIT_TASK env var
+  // Register open terminal command
   const openTaskTerminal = vscode.commands.registerCommand(
     'aiCockpit.openTaskTerminal',
     async (item: { taskId?: string; task?: { taskId: string } }) => {
@@ -243,9 +238,6 @@ export async function activate(context: vscode.ExtensionContext) {
       const terminal = vscode.window.createTerminal({
         name: `Cockpit: ${taskId}`,
         color: taskColor ? new vscode.ThemeColor(taskColor) : undefined,
-        env: {
-          COCKPIT_TASK: taskId
-        }
       });
       terminal.show();
       terminal.sendText('claude --allow-dangerously-skip-permissions');

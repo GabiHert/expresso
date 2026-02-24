@@ -87,11 +87,6 @@ Start a task by moving it from todo to in_progress, reading the task context, an
    • List all work items by repo
    • Identify which are in todo/ vs done/
    • Recommend starting point
-
-5. ACTIVATE TRACKING
-   • Update cockpit active-task.json
-   • Enable edit tracking
-   • Include worktree info if created
 ```
 
 ## Implementation
@@ -176,20 +171,6 @@ If `--worktree` flag is provided:
    ```
 
 4. **If script fails**, stop and report the error. Do not proceed with task-start.
-
-5. **Update active-task.json** to include worktree info:
-   ```json
-   {
-     "taskId": "{task-id}",
-     "worktrees": [
-       {
-         "repo": "{repo-path}",
-         "path": "{repo-path}/.worktrees/{task-id}",
-         "branch": "task/{task-id}"
-       }
-     ]
-   }
-   ```
 
 ### Step 2: Move Task to In Progress
 

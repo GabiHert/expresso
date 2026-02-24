@@ -1,15 +1,11 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { ActiveTask, CockpitEvent } from '../types';
+import { CockpitEvent } from '../types';
 
 export class CockpitFileWatcher implements vscode.Disposable {
-  private activeTaskWatcher: vscode.FileSystemWatcher | undefined;
   private eventsWatcher: vscode.FileSystemWatcher | undefined;
   private disposables: vscode.Disposable[] = [];
-
-  private _onActiveTaskChanged = new vscode.EventEmitter<ActiveTask | null>();
-  readonly onActiveTaskChanged = this._onActiveTaskChanged.event;
 
   private _onEventAdded = new vscode.EventEmitter<CockpitEvent>();
   readonly onEventAdded = this._onEventAdded.event;
@@ -18,17 +14,6 @@ export class CockpitFileWatcher implements vscode.Disposable {
 
   start(): void {
     const cockpitPath = path.join(this.workspaceRoot, '.ai', 'cockpit');
-
-    // Watch active-task.json
-    const activeTaskPattern = new vscode.RelativePattern(
-      cockpitPath,
-      'active-task.json'
-    );
-    this.activeTaskWatcher = vscode.workspace.createFileSystemWatcher(activeTaskPattern);
-
-    this.activeTaskWatcher.onDidCreate(() => this.loadActiveTask());
-    this.activeTaskWatcher.onDidChange(() => this.loadActiveTask());
-    this.activeTaskWatcher.onDidDelete(() => this._onActiveTaskChanged.fire(null));
 
     // Watch events directory
     const eventsPattern = new vscode.RelativePattern(
@@ -39,32 +24,7 @@ export class CockpitFileWatcher implements vscode.Disposable {
 
     this.eventsWatcher.onDidCreate((uri) => this.loadEvent(uri.fsPath));
 
-    this.disposables.push(this.activeTaskWatcher, this.eventsWatcher);
-
-    // Load initial state
-    this.loadActiveTask();
-  }
-
-  private loadActiveTask(): void {
-    const activeTaskPath = path.join(
-      this.workspaceRoot,
-      '.ai',
-      'cockpit',
-      'active-task.json'
-    );
-
-    try {
-      if (fs.existsSync(activeTaskPath)) {
-        const content = fs.readFileSync(activeTaskPath, 'utf8');
-        const task = JSON.parse(content) as ActiveTask;
-        this._onActiveTaskChanged.fire(task);
-      } else {
-        this._onActiveTaskChanged.fire(null);
-      }
-    } catch (error) {
-      console.error('[AI Cockpit] Error loading active task:', error);
-      this._onActiveTaskChanged.fire(null);
-    }
+    this.disposables.push(this.eventsWatcher);
   }
 
   private loadEvent(eventPath: string): void {
@@ -116,28 +76,7 @@ export class CockpitFileWatcher implements vscode.Disposable {
     return this.workspaceRoot;
   }
 
-  getActiveTask(): ActiveTask | null {
-    const activeTaskPath = path.join(
-      this.workspaceRoot,
-      '.ai',
-      'cockpit',
-      'active-task.json'
-    );
-
-    try {
-      if (fs.existsSync(activeTaskPath)) {
-        const content = fs.readFileSync(activeTaskPath, 'utf8');
-        return JSON.parse(content) as ActiveTask;
-      }
-    } catch {
-      // Return null on error
-    }
-
-    return null;
-  }
-
   dispose(): void {
-    this._onActiveTaskChanged.dispose();
     this._onEventAdded.dispose();
     this.disposables.forEach(d => d.dispose());
   }

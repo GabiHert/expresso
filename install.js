@@ -48,20 +48,11 @@ const DIRS_TO_CREATE = [
   ".ai/tasks/todo",
   ".ai/tasks/in_progress",
   ".ai/tasks/done",
-  ".ai/cockpit/events",
   ".ai/docs",
   ".ai/tmp",
 ];
 
 const VSCODE_EXTENSION = "vscode-extension/ai-cockpit.vsix";
-
-const COCKPIT_CONFIG = {
-  version: "1.0.0",
-  serverPort: 9999,
-  eventStorage: "file",
-  gitBranchPattern: "([A-Z]+-\\d+)",
-  enabled: true,
-};
 
 // ============================================================
 // UTILITIES
@@ -589,22 +580,11 @@ ${colors.bright}╔════════════════════�
     }
   }
 
-  // Create cockpit config
-  const cockpitConfigPath = path.join(targetDir, ".ai/cockpit/config.json");
-  if (!fs.existsSync(cockpitConfigPath)) {
-    fs.writeFileSync(
-      cockpitConfigPath,
-      JSON.stringify(COCKPIT_CONFIG, null, 2)
-    );
-    logSuccess("Created .ai/cockpit/config.json");
-  }
-
   // Create .gitkeep files for empty directories
   const gitkeepDirs = [
     ".ai/tasks/todo",
     ".ai/tasks/in_progress",
     ".ai/tasks/done",
-    ".ai/cockpit/events",
   ];
 
   for (const dir of gitkeepDirs) {

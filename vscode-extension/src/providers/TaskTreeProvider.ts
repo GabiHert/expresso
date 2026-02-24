@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { ActiveTask, TaskColor, isValidTaskColor } from '../types';
+import { TaskColor, isValidTaskColor } from '../types';
 import { CockpitFileWatcher } from '../watchers/FileWatcher';
 import { CommentManager } from '../services/CommentManager';
 
@@ -27,7 +27,6 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
   private _onDidChangeTreeData = new vscode.EventEmitter<TreeItemType | undefined>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
-  private activeTask: ActiveTask | null = null;
   private workspaceRoot: string;
   private disposables: vscode.Disposable[] = [];
   private taskColors: Map<string, TaskColor> = new Map();
@@ -37,13 +36,6 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
     private commentManager?: CommentManager
   ) {
     this.workspaceRoot = fileWatcher.getWorkspaceRoot();
-
-    this.disposables.push(
-      fileWatcher.onActiveTaskChanged(task => {
-        this.activeTask = task;
-        this.refresh();
-      })
-    );
 
     // Refresh tree when comments change
     if (commentManager) {
@@ -162,12 +154,11 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TreeItemType>, 
         const task = await this.readFrameworkTask(taskId, section);
 
         if (task) {
-          const isActive = this.activeTask?.taskId === taskId;
           // Store task color
           if (task.color) {
             this.taskColors.set(taskId, task.color);
           }
-          items.push(new TaskItem(task, isActive));
+          items.push(new TaskItem(task));
         }
       }
     } catch {
@@ -311,8 +302,7 @@ class TaskItem extends vscode.TreeItem {
   public readonly taskId: string;
 
   constructor(
-    public readonly task: FrameworkTask,
-    public readonly isActive: boolean
+    public readonly task: FrameworkTask
   ) {
     super(task.title, vscode.TreeItemCollapsibleState.Collapsed);
 
@@ -333,8 +323,7 @@ class TaskItem extends vscode.TreeItem {
       if (task.color) {
         return new vscode.ThemeColor(task.color);
       }
-      // Fall back to status-based colors
-      if (isActive || task.status === 'in_progress') {
+      if (task.status === 'in_progress') {
         return new vscode.ThemeColor('charts.green');
       }
       return undefined;
@@ -342,23 +331,18 @@ class TaskItem extends vscode.TreeItem {
 
     const iconColor = getIconColor();
 
-    if (isActive) {
-      this.iconPath = new vscode.ThemeIcon('play-circle', iconColor);
-      this.tooltip += '\n(Active)';
-    } else {
-      switch (task.status) {
-        case 'done':
-          this.iconPath = new vscode.ThemeIcon('check', iconColor);
-          break;
-        case 'in_progress':
-          this.iconPath = new vscode.ThemeIcon('circle-large-outline', iconColor);
-          break;
-        default:
-          this.iconPath = new vscode.ThemeIcon('circle-outline', iconColor);
-      }
+    switch (task.status) {
+      case 'done':
+        this.iconPath = new vscode.ThemeIcon('check', iconColor);
+        break;
+      case 'in_progress':
+        this.iconPath = new vscode.ThemeIcon('circle-large-outline', iconColor);
+        break;
+      default:
+        this.iconPath = new vscode.ThemeIcon('circle-outline', iconColor);
     }
 
-    this.contextValue = isActive ? 'task-active' : `task-${task.status}`;
+    this.contextValue = `task-${task.status}`;
 
     // Click to open task README
     this.command = {

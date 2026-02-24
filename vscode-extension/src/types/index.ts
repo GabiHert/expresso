@@ -23,18 +23,10 @@ export function isValidTaskColor(value: unknown): value is TaskColor {
   return typeof value === 'string' && TASK_COLORS.includes(value as TaskColor);
 }
 
-export interface ActiveTask {
-  taskId: string;
-  title: string;
-  branch?: string;
-  frameworkPath: string;
-  startedAt: string;
-}
-
 export interface CockpitEvent {
   id: string;
   taskId: string;
-  taskIdSource: 'env-var' | 'active-task-file' | 'git-branch' | 'session-fallback';
+  taskIdSource: 'env-var' | 'git-branch' | 'session-fallback';
   tool: 'Edit' | 'Write' | 'TodoWrite';
   input: Record<string, unknown>;
   response?: string;

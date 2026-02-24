@@ -590,8 +590,7 @@ Quick Commands:
 If running in a Cockpit session that is unassigned, offer to link it to the new task:
 
 1. Check if there's an active unassigned session:
-   - Look for terminal with `COCKPIT_TERMINAL_ID` env var but no `COCKPIT_TASK`
-   - Or check `.ai/cockpit/sessions.json` for active sessions with `taskId: "_unassigned"`
+   - Check `.ai/cockpit/sessions.json` for active sessions with `taskId: "_unassigned"`
 
 2. If an unassigned session is found, ask:
    ```
