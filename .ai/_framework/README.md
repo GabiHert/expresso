@@ -39,6 +39,7 @@ A reusable, three-layer system for AI-assisted development workflows.
 | `/task-explore` | Explore codebase context |
 | `/document` | Create documentation |
 | `/help` | Show available commands |
+| `/task-orchestrate` | Orchestrate task with background agents and worktree isolation |
 | `/command-create` | Create new framework command |
 | `/command-extend` | Extend commands at project level |
 
@@ -93,7 +94,7 @@ Tasks contain work items organized by status:
 
 ## Status
 
-All 14 commands are fully implemented with step-by-step prompts that guide the AI through each workflow.
+All 15 commands are fully implemented with step-by-step prompts that guide the AI through each workflow.
 
 ## Implementation Checklist
 

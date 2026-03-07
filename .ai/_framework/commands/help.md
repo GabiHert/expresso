@@ -51,6 +51,7 @@ Display available commands grouped by category.
 ║   /task-done   Complete and log a task                           ║
 ║   /task-status View task dashboard                               ║
 ║   /task-review Run code review                                   ║
+║   /task-orchestrate Orchestrate WIs with background agents       ║
 ║                                                                   ║
 ║ EXPLORATION                                                       ║
 ║   /ask         Answer questions (docs first)                     ║
@@ -102,6 +103,7 @@ Output the following categorized command reference:
 ║   /task-done   Complete and log a task                           ║
 ║   /task-status View task dashboard                               ║
 ║   /task-review Run code review                                   ║
+║   /task-orchestrate Orchestrate WIs with background agents       ║
 ║                                                                   ║
 ║ EXPLORATION                                                       ║
 ║   /ask         Answer questions (docs first)                     ║
