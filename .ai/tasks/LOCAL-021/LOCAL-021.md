@@ -322,7 +322,7 @@ it('should emit onTaskSwitched when signal file changes', (done) => {
 4. Wait 1 second
 5. Check Cockpit sidebar → session should show under [[LOCAL-018]]
 6. Resume session → should open [[LOCAL-018]] task tree
-7. Check events are tagged to LOCAL-018
+7. Check events are tagged to [[LOCAL-018]]
 
 **Edge case: rapid switches**:
 1. Create session for [[LOCAL-019]]

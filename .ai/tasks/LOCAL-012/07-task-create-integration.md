@@ -68,6 +68,6 @@ In the "Next Steps" section at the end, add:
 
 ## Acceptance Criteria
 
-- [ ] task-create.md documents session linking workflow
+- [ ] [[task-create]].md documents session linking workflow
 - [ ] Clear instructions for manual linking fallback
 - [ ] Explains when automatic linking works vs manual

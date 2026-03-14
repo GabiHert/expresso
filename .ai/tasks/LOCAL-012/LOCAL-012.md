@@ -124,7 +124,7 @@ Session moves to task's Sessions section
 |------|------------|
 | Breaking getSessionsForTask() | Explicitly exclude "_unassigned" |
 | Confusion between session types | Different icons, clear labels |
-| /task-create integration complexity | UI fallback for manual linking |
+| /[[task-create]] integration complexity | UI fallback for manual linking |
 
 ## Testing Strategy
 

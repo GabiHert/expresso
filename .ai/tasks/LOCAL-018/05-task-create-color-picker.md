@@ -105,7 +105,7 @@ Use friendly display names in the picker:
 
 ## Acceptance Criteria
 
-- [ ] /task-create prompts for optional color selection
+- [ ] /[[task-create]] prompts for optional color selection
 - [ ] Selected color is written to status.yaml
 - [ ] "None" option skips color (uses default behavior)
 - [ ] Color is displayed in task creation summary

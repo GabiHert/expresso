@@ -20,6 +20,40 @@ const yaml = require('yaml');
 
 const OBSIDIAN_GIT_PLUGIN_ID = 'obsidian-git';
 
+const GRAPH_CONFIG = {
+  collapse: false,
+  search: '',
+  showTags: false,
+  showAttachments: false,
+  hideUnresolved: false,
+  showOrphans: true,
+  collapse: false,
+  localJumps: 1,
+  localBacklinks: true,
+  localForelinks: true,
+  localInterlinks: false,
+  showArrow: true,
+  textFadeMultiplier: 0,
+  nodeSizeMultiplier: 1,
+  lineSizeMultiplier: 1,
+  centerStrength: 0.5,
+  repelStrength: 10,
+  linkStrength: 1,
+  linkDistance: 250,
+  scale: 1,
+  close: false,
+  colorGroups: [
+    { query: 'tag:#manifest', color: { a: 1, rgb: 14701138 } },      // gold — manifest (root)
+    { query: 'tag:#task', color: { a: 1, rgb: 5571199 } },            // blue — tasks
+    { query: 'tag:#work-item', color: { a: 1, rgb: 5025616 } },       // teal — work items
+    { query: 'tag:#agent', color: { a: 1, rgb: 16744448 } },          // orange — agents
+    { query: 'tag:#command', color: { a: 1, rgb: 11141120 } },        // green — commands
+    { query: 'tag:#extension', color: { a: 1, rgb: 11801600 } },      // lime — extensions
+    { query: 'tag:#doc', color: { a: 1, rgb: 9109504 } },             // purple — docs
+    { query: 'tag:#pattern', color: { a: 1, rgb: 14188339 } },        // pink — patterns
+  ],
+};
+
 const OBSIDIAN_BASELINE = {
   'app.json': JSON.stringify({
     livePreview: true,
@@ -27,6 +61,7 @@ const OBSIDIAN_BASELINE = {
     foldHeading: true,
     foldIndent: true,
   }, null, 2),
+  'graph.json': JSON.stringify(GRAPH_CONFIG, null, 2),
   'appearance.json': JSON.stringify({
     baseFontSize: 16,
     interfaceFontSize: 14,

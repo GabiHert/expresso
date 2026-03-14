@@ -1,6 +1,6 @@
 ---
 type: migration-report
-generated: 2026-03-14T16:50:42.030Z
+generated: 2026-03-14T16:56:08.396Z
 total_issues: 372
 tags: [migration, vault]
 ---
@@ -13,59 +13,56 @@ These files contain references to the old filesystem-based structure and need
 to be updated to use vault-native patterns (frontmatter, mcpvault MCP tools).
 
 ### .ai/docs/_architecture/README.md
-- L18: cockpit/ reference
-- L36: cockpit/ reference
+- L21: cockpit/ reference
+- L39: cockpit/ reference
 
 ### .ai/docs/_architecture/active-task-schema.md
-- L165: manifest.yaml reference
-- L83: in_progress/ folder reference
-- L10: cockpit/ reference
-- L127: cockpit/ reference
-- L128: cockpit/ reference
-- L165: .yaml file reference
+- L168: manifest.yaml reference
+- L86: in_progress/ folder reference
+- L13: cockpit/ reference
+- L130: cockpit/ reference
+- L131: cockpit/ reference
+- L168: .yaml file reference
 
 ### .ai/docs/_architecture/ai-cockpit-mvp-v1.md
-- L281: status.yaml reference
-- L281: .yaml file reference
+- L284: status.yaml reference
+- L284: .yaml file reference
 
 ### .ai/docs/_architecture/ai-cockpit-mvp-v2.md
-- L130: todo/ folder reference
-- L163: todo/ folder reference
-- L131: in_progress/ folder reference
-- L147: in_progress/ folder reference
-- L168: in_progress/ folder reference
-- L216: in_progress/ folder reference
-- L188: done/ folder reference
-- L42: cockpit/ reference
-- L68: cockpit/ reference
-- L80: cockpit/ reference
-- L118: cockpit/ reference
-- L170: cockpit/ reference
-- L190: cockpit/ reference
-- L208: cockpit/ reference
-- L238: cockpit/ reference
-- L321: cockpit/ reference
-- L355: cockpit/ reference
-- L478: cockpit/ reference
-- L490: cockpit/ reference
-- L522: cockpit/ reference
-- L559: cockpit/ reference
-- L583: cockpit/ reference
-- L589: cockpit/ reference
-- L638: cockpit/ reference
-- L707: cockpit/ reference
-- L709: cockpit/ reference
+- L133: todo/ folder reference
+- L166: todo/ folder reference
+- L134: in_progress/ folder reference
+- L150: in_progress/ folder reference
+- L171: in_progress/ folder reference
+- L219: in_progress/ folder reference
+- L191: done/ folder reference
+- L45: cockpit/ reference
+- L71: cockpit/ reference
+- L83: cockpit/ reference
+- L121: cockpit/ reference
+- L173: cockpit/ reference
+- L193: cockpit/ reference
+- L211: cockpit/ reference
+- L241: cockpit/ reference
+- L324: cockpit/ reference
+- L358: cockpit/ reference
+- L481: cockpit/ reference
+- L493: cockpit/ reference
+- L525: cockpit/ reference
+- L562: cockpit/ reference
+- L586: cockpit/ reference
+- L592: cockpit/ reference
+- L641: cockpit/ reference
+- L710: cockpit/ reference
+- L712: cockpit/ reference
 
 ### .ai/docs/_architecture/shadow-copy-system.md
-- L51: cockpit/ reference
-- L75: cockpit/ reference
-- L269: cockpit/ reference
-- L313: cockpit/ reference
+- L54: cockpit/ reference
+- L78: cockpit/ reference
+- L272: cockpit/ reference
+- L316: cockpit/ reference
 
 ### .ai/docs/_completed_tasks.md
-- L13: done/ folder reference
-- L14: done/ folder reference
-- L15: done/ folder reference
 - L16: done/ folder reference
 - L17: done/ folder reference
 - L18: done/ folder reference
@@ -87,354 +84,357 @@ to be updated to use vault-native patterns (frontmatter, mcpvault MCP tools).
 - L34: done/ folder reference
 - L35: done/ folder reference
 - L36: done/ folder reference
+- L37: done/ folder reference
+- L38: done/ folder reference
+- L39: done/ folder reference
 
 ### .ai/docs/ai-framework/README.md
-- L20: manifest.yaml reference
-- L44: manifest.yaml reference
-- L31: todo/ folder reference
-- L31: in_progress/ folder reference
-- L20: .yaml file reference
-- L44: .yaml file reference
+- L23: manifest.yaml reference
+- L47: manifest.yaml reference
+- L34: todo/ folder reference
+- L34: in_progress/ folder reference
+- L23: .yaml file reference
+- L47: .yaml file reference
 
 ### .ai/docs/feedback-system.md
-- L24: in_progress/ folder reference
+- L27: in_progress/ folder reference
 
 ### .ai/docs/vscode-extension/README.md
-- L30: cockpit/ reference
-- L45: cockpit/ reference
-- L50: cockpit/ reference
+- L33: cockpit/ reference
+- L48: cockpit/ reference
+- L53: cockpit/ reference
 
 ### .ai/_framework/commands/ask.md
-- L78: manifest.yaml reference
-- L143: in_progress/ folder reference
-- L78: .yaml file reference
+- L81: manifest.yaml reference
+- L146: in_progress/ folder reference
+- L81: .yaml file reference
 
 ### .ai/_framework/commands/command-create.md
-- L212: status.yaml reference
-- L67: manifest.yaml reference
-- L210: manifest.yaml reference
-- L326: manifest.yaml reference
-- L404: manifest.yaml reference
-- L67: .yaml file reference
-- L210: .yaml file reference
-- L212: .yaml file reference
-- L326: .yaml file reference
-- L404: .yaml file reference
+- L215: status.yaml reference
+- L70: manifest.yaml reference
+- L213: manifest.yaml reference
+- L329: manifest.yaml reference
+- L407: manifest.yaml reference
+- L70: .yaml file reference
+- L213: .yaml file reference
+- L215: .yaml file reference
+- L329: .yaml file reference
+- L407: .yaml file reference
 
 ### .ai/_framework/commands/command-extend.md
-- L236: manifest.yaml reference
-- L53: .yaml file reference
-- L65: .yaml file reference
-- L131: .yaml file reference
-- L206: .yaml file reference
-- L236: .yaml file reference
-- L774: .yaml file reference
-- L909: .yaml file reference
-- L916: .yaml file reference
-- L1019: .yaml file reference
+- L239: manifest.yaml reference
+- L56: .yaml file reference
+- L68: .yaml file reference
+- L134: .yaml file reference
+- L209: .yaml file reference
+- L239: .yaml file reference
+- L777: .yaml file reference
+- L912: .yaml file reference
+- L919: .yaml file reference
+- L1022: .yaml file reference
 
 ### .ai/_framework/commands/ctx.md
-- L48: manifest.yaml reference
-- L58: manifest.yaml reference
-- L125: manifest.yaml reference
-- L275: manifest.yaml reference
-- L285: manifest.yaml reference
-- L357: manifest.yaml reference
-- L364: manifest.yaml reference
-- L295: todo/ folder reference
-- L65: in_progress/ folder reference
-- L104: in_progress/ folder reference
+- L51: manifest.yaml reference
+- L61: manifest.yaml reference
+- L128: manifest.yaml reference
+- L278: manifest.yaml reference
+- L288: manifest.yaml reference
+- L360: manifest.yaml reference
+- L367: manifest.yaml reference
+- L298: todo/ folder reference
+- L68: in_progress/ folder reference
 - L107: in_progress/ folder reference
-- L296: in_progress/ folder reference
-- L48: .yaml file reference
-- L58: .yaml file reference
-- L125: .yaml file reference
-- L231: .yaml file reference
-- L275: .yaml file reference
-- L285: .yaml file reference
-- L357: .yaml file reference
-- L364: .yaml file reference
+- L110: in_progress/ folder reference
+- L299: in_progress/ folder reference
+- L51: .yaml file reference
+- L61: .yaml file reference
+- L128: .yaml file reference
+- L234: .yaml file reference
+- L278: .yaml file reference
+- L288: .yaml file reference
+- L360: .yaml file reference
+- L367: .yaml file reference
 
 ### .ai/_framework/commands/document.md
-- L95: manifest.yaml reference
-- L145: manifest.yaml reference
-- L393: manifest.yaml reference
-- L95: .yaml file reference
-- L145: .yaml file reference
-- L393: .yaml file reference
+- L98: manifest.yaml reference
+- L148: manifest.yaml reference
+- L396: manifest.yaml reference
+- L98: .yaml file reference
+- L148: .yaml file reference
+- L396: .yaml file reference
 
 ### .ai/_framework/commands/enhance.md
-- L51: manifest.yaml reference
-- L52: manifest.yaml reference
-- L53: manifest.yaml reference
 - L54: manifest.yaml reference
-- L61: manifest.yaml reference
-- L75: manifest.yaml reference
-- L141: manifest.yaml reference
-- L192: manifest.yaml reference
-- L218: manifest.yaml reference
-- L261: manifest.yaml reference
-- L266: manifest.yaml reference
-- L278: manifest.yaml reference
-- L307: manifest.yaml reference
-- L315: manifest.yaml reference
-- L51: .yaml file reference
-- L52: .yaml file reference
-- L53: .yaml file reference
+- L55: manifest.yaml reference
+- L56: manifest.yaml reference
+- L57: manifest.yaml reference
+- L64: manifest.yaml reference
+- L78: manifest.yaml reference
+- L144: manifest.yaml reference
+- L195: manifest.yaml reference
+- L221: manifest.yaml reference
+- L264: manifest.yaml reference
+- L269: manifest.yaml reference
+- L281: manifest.yaml reference
+- L310: manifest.yaml reference
+- L318: manifest.yaml reference
 - L54: .yaml file reference
-- L61: .yaml file reference
-- L75: .yaml file reference
-- L141: .yaml file reference
-- L192: .yaml file reference
-- L218: .yaml file reference
-- L261: .yaml file reference
-- L266: .yaml file reference
-- L278: .yaml file reference
-- L307: .yaml file reference
-- L315: .yaml file reference
+- L55: .yaml file reference
+- L56: .yaml file reference
+- L57: .yaml file reference
+- L64: .yaml file reference
+- L78: .yaml file reference
+- L144: .yaml file reference
+- L195: .yaml file reference
+- L221: .yaml file reference
+- L264: .yaml file reference
+- L269: .yaml file reference
+- L281: .yaml file reference
+- L310: .yaml file reference
+- L318: .yaml file reference
 
 ### .ai/_framework/commands/expresso-tags.md
-- L77: manifest.yaml reference
-- L77: .yaml file reference
-- L116: .yaml file reference
+- L80: manifest.yaml reference
+- L80: .yaml file reference
+- L119: .yaml file reference
 
 ### .ai/_framework/commands/init.md
-- L59: manifest.yaml reference
-- L232: manifest.yaml reference
-- L236: manifest.yaml reference
-- L545: manifest.yaml reference
-- L585: manifest.yaml reference
-- L403: todo/ folder reference
-- L404: in_progress/ folder reference
-- L405: done/ folder reference
-- L59: .yaml file reference
-- L232: .yaml file reference
-- L236: .yaml file reference
-- L545: .yaml file reference
-- L585: .yaml file reference
+- L62: manifest.yaml reference
+- L235: manifest.yaml reference
+- L239: manifest.yaml reference
+- L548: manifest.yaml reference
+- L588: manifest.yaml reference
+- L406: todo/ folder reference
+- L407: in_progress/ folder reference
+- L408: done/ folder reference
+- L62: .yaml file reference
+- L235: .yaml file reference
+- L239: .yaml file reference
+- L548: .yaml file reference
+- L588: .yaml file reference
 
 ### .ai/_framework/commands/task-create.md
-- L65: status.yaml reference
-- L311: status.yaml reference
-- L351: status.yaml reference
-- L426: status.yaml reference
-- L472: status.yaml reference
-- L474: status.yaml reference
-- L79: manifest.yaml reference
-- L332: manifest.yaml reference
-- L617: manifest.yaml reference
-- L63: todo/ folder reference
+- L68: status.yaml reference
+- L314: status.yaml reference
+- L354: status.yaml reference
+- L429: status.yaml reference
+- L475: status.yaml reference
+- L477: status.yaml reference
+- L82: manifest.yaml reference
+- L335: manifest.yaml reference
+- L620: manifest.yaml reference
 - L66: todo/ folder reference
-- L67: todo/ folder reference
-- L316: todo/ folder reference
+- L69: todo/ folder reference
+- L70: todo/ folder reference
 - L319: todo/ folder reference
-- L329: todo/ folder reference
-- L334: todo/ folder reference
-- L335: todo/ folder reference
-- L451: todo/ folder reference
-- L462: todo/ folder reference
-- L534: todo/ folder reference
-- L558: todo/ folder reference
+- L322: todo/ folder reference
+- L332: todo/ folder reference
+- L337: todo/ folder reference
+- L338: todo/ folder reference
+- L454: todo/ folder reference
+- L465: todo/ folder reference
+- L537: todo/ folder reference
 - L561: todo/ folder reference
-- L578: todo/ folder reference
-- L66: in_progress/ folder reference
-- L320: in_progress/ folder reference
-- L471: in_progress/ folder reference
-- L471: old workflow instruction
+- L564: todo/ folder reference
+- L581: todo/ folder reference
+- L69: in_progress/ folder reference
+- L323: in_progress/ folder reference
+- L474: in_progress/ folder reference
 - L474: old workflow instruction
-- L472: status.yaml update instruction
-- L593: cockpit/ reference
-- L65: .yaml file reference
-- L79: .yaml file reference
-- L311: .yaml file reference
-- L332: .yaml file reference
-- L351: .yaml file reference
-- L426: .yaml file reference
-- L472: .yaml file reference
-- L474: .yaml file reference
-- L617: .yaml file reference
+- L477: old workflow instruction
+- L475: status.yaml update instruction
+- L596: cockpit/ reference
+- L68: .yaml file reference
+- L82: .yaml file reference
+- L314: .yaml file reference
+- L335: .yaml file reference
+- L354: .yaml file reference
+- L429: .yaml file reference
+- L475: .yaml file reference
+- L477: .yaml file reference
+- L620: .yaml file reference
 
 ### .ai/_framework/commands/task-done.md
-- L107: status.yaml reference
-- L70: manifest.yaml reference
-- L291: manifest.yaml reference
-- L48: todo/ folder reference
-- L43: in_progress/ folder reference
-- L48: in_progress/ folder reference
-- L88: in_progress/ folder reference
-- L94: in_progress/ folder reference
-- L162: in_progress/ folder reference
-- L55: done/ folder reference
-- L89: done/ folder reference
-- L154: done/ folder reference
-- L163: done/ folder reference
-- L167: done/ folder reference
-- L275: done/ folder reference
-- L70: .yaml file reference
-- L107: .yaml file reference
-- L291: .yaml file reference
+- L110: status.yaml reference
+- L73: manifest.yaml reference
+- L294: manifest.yaml reference
+- L51: todo/ folder reference
+- L46: in_progress/ folder reference
+- L51: in_progress/ folder reference
+- L91: in_progress/ folder reference
+- L97: in_progress/ folder reference
+- L165: in_progress/ folder reference
+- L58: done/ folder reference
+- L92: done/ folder reference
+- L157: done/ folder reference
+- L166: done/ folder reference
+- L170: done/ folder reference
+- L278: done/ folder reference
+- L73: .yaml file reference
+- L110: .yaml file reference
+- L294: .yaml file reference
 
 ### .ai/_framework/commands/task-explore.md
-- L94: manifest.yaml reference
-- L94: .yaml file reference
+- L97: manifest.yaml reference
+- L97: .yaml file reference
 
 ### .ai/_framework/commands/task-orchestrate.md
-- L45: status.yaml reference
-- L99: status.yaml reference
-- L113: status.yaml reference
-- L268: status.yaml reference
-- L385: status.yaml reference
-- L77: manifest.yaml reference
-- L487: manifest.yaml reference
-- L503: manifest.yaml reference
-- L267: todo/ folder reference
-- L44: in_progress/ folder reference
-- L87: in_progress/ folder reference
-- L267: in_progress/ folder reference
-- L268: status.yaml update instruction
-- L385: status.yaml update instruction
-- L45: .yaml file reference
-- L77: .yaml file reference
-- L99: .yaml file reference
-- L113: .yaml file reference
-- L268: .yaml file reference
-- L385: .yaml file reference
-- L487: .yaml file reference
-- L503: .yaml file reference
+- L48: status.yaml reference
+- L102: status.yaml reference
+- L116: status.yaml reference
+- L271: status.yaml reference
+- L388: status.yaml reference
+- L80: manifest.yaml reference
+- L490: manifest.yaml reference
+- L506: manifest.yaml reference
+- L270: todo/ folder reference
+- L47: in_progress/ folder reference
+- L90: in_progress/ folder reference
+- L270: in_progress/ folder reference
+- L271: status.yaml update instruction
+- L388: status.yaml update instruction
+- L48: .yaml file reference
+- L80: .yaml file reference
+- L102: .yaml file reference
+- L116: .yaml file reference
+- L271: .yaml file reference
+- L388: .yaml file reference
+- L490: .yaml file reference
+- L506: .yaml file reference
 
 ### .ai/_framework/commands/task-resume.md
-- L52: status.yaml reference
-- L111: status.yaml reference
-- L121: status.yaml reference
-- L72: manifest.yaml reference
-- L55: todo/ folder reference
-- L124: todo/ folder reference
-- L42: in_progress/ folder reference
-- L54: in_progress/ folder reference
-- L84: in_progress/ folder reference
-- L88: in_progress/ folder reference
-- L123: in_progress/ folder reference
+- L55: status.yaml reference
+- L114: status.yaml reference
+- L124: status.yaml reference
+- L75: manifest.yaml reference
+- L58: todo/ folder reference
+- L127: todo/ folder reference
+- L45: in_progress/ folder reference
+- L57: in_progress/ folder reference
+- L87: in_progress/ folder reference
+- L91: in_progress/ folder reference
 - L126: in_progress/ folder reference
-- L141: in_progress/ folder reference
-- L243: in_progress/ folder reference
-- L52: .yaml file reference
-- L72: .yaml file reference
-- L111: .yaml file reference
-- L121: .yaml file reference
+- L129: in_progress/ folder reference
+- L144: in_progress/ folder reference
+- L246: in_progress/ folder reference
+- L55: .yaml file reference
+- L75: .yaml file reference
+- L114: .yaml file reference
+- L124: .yaml file reference
 
 ### .ai/_framework/commands/task-review.md
-- L65: manifest.yaml reference
-- L77: in_progress/ folder reference
-- L77: done/ folder reference
-- L65: .yaml file reference
+- L68: manifest.yaml reference
+- L80: in_progress/ folder reference
+- L80: done/ folder reference
+- L68: .yaml file reference
 
 ### .ai/_framework/commands/task-start.md
-- L190: status.yaml reference
-- L253: status.yaml reference
-- L306: status.yaml reference
-- L310: status.yaml reference
-- L96: manifest.yaml reference
-- L276: manifest.yaml reference
-- L373: manifest.yaml reference
-- L66: todo/ folder reference
-- L75: todo/ folder reference
-- L88: todo/ folder reference
-- L114: todo/ folder reference
-- L120: todo/ folder reference
-- L178: todo/ folder reference
-- L305: todo/ folder reference
-- L75: in_progress/ folder reference
-- L115: in_progress/ folder reference
-- L179: in_progress/ folder reference
-- L183: in_progress/ folder reference
-- L238: in_progress/ folder reference
-- L248: in_progress/ folder reference
-- L349: in_progress/ folder reference
-- L306: status.yaml update instruction
-- L96: .yaml file reference
-- L190: .yaml file reference
-- L253: .yaml file reference
-- L276: .yaml file reference
-- L306: .yaml file reference
-- L310: .yaml file reference
-- L373: .yaml file reference
+- L193: status.yaml reference
+- L256: status.yaml reference
+- L309: status.yaml reference
+- L313: status.yaml reference
+- L99: manifest.yaml reference
+- L279: manifest.yaml reference
+- L376: manifest.yaml reference
+- L69: todo/ folder reference
+- L78: todo/ folder reference
+- L91: todo/ folder reference
+- L117: todo/ folder reference
+- L123: todo/ folder reference
+- L181: todo/ folder reference
+- L308: todo/ folder reference
+- L78: in_progress/ folder reference
+- L118: in_progress/ folder reference
+- L182: in_progress/ folder reference
+- L186: in_progress/ folder reference
+- L241: in_progress/ folder reference
+- L251: in_progress/ folder reference
+- L352: in_progress/ folder reference
+- L309: status.yaml update instruction
+- L99: .yaml file reference
+- L193: .yaml file reference
+- L256: .yaml file reference
+- L279: .yaml file reference
+- L309: .yaml file reference
+- L313: .yaml file reference
+- L376: .yaml file reference
 
 ### .ai/_framework/commands/task-status.md
-- L78: status.yaml reference
-- L146: status.yaml reference
-- L57: manifest.yaml reference
-- L40: todo/ folder reference
-- L74: todo/ folder reference
-- L135: todo/ folder reference
-- L155: todo/ folder reference
-- L40: in_progress/ folder reference
-- L75: in_progress/ folder reference
-- L135: in_progress/ folder reference
-- L155: in_progress/ folder reference
-- L76: done/ folder reference
-- L57: .yaml file reference
-- L78: .yaml file reference
-- L146: .yaml file reference
-
-### .ai/_framework/commands/task-work.md
-- L56: status.yaml reference
-- L60: status.yaml reference
 - L81: status.yaml reference
-- L128: status.yaml reference
-- L133: status.yaml reference
 - L149: status.yaml reference
-- L157: status.yaml reference
-- L322: status.yaml reference
-- L330: status.yaml reference
-- L549: status.yaml reference
-- L94: manifest.yaml reference
-- L106: manifest.yaml reference
-- L366: manifest.yaml reference
-- L368: manifest.yaml reference
-- L377: manifest.yaml reference
-- L386: manifest.yaml reference
-- L469: manifest.yaml reference
-- L478: manifest.yaml reference
-- L625: manifest.yaml reference
-- L58: todo/ folder reference
-- L139: todo/ folder reference
-- L144: todo/ folder reference
-- L146: todo/ folder reference
-- L528: todo/ folder reference
-- L52: in_progress/ folder reference
-- L59: in_progress/ folder reference
-- L117: in_progress/ folder reference
-- L137: in_progress/ folder reference
-- L147: in_progress/ folder reference
-- L154: in_progress/ folder reference
-- L319: in_progress/ folder reference
-- L544: in_progress/ folder reference
-- L320: done/ folder reference
-- L548: old workflow instruction
-- L60: status.yaml update instruction
-- L81: status.yaml update instruction
-- L149: status.yaml update instruction
-- L322: status.yaml update instruction
-- L549: status.yaml update instruction
-- L56: .yaml file reference
+- L60: manifest.yaml reference
+- L43: todo/ folder reference
+- L77: todo/ folder reference
+- L138: todo/ folder reference
+- L158: todo/ folder reference
+- L43: in_progress/ folder reference
+- L78: in_progress/ folder reference
+- L138: in_progress/ folder reference
+- L158: in_progress/ folder reference
+- L79: done/ folder reference
 - L60: .yaml file reference
 - L81: .yaml file reference
-- L94: .yaml file reference
-- L106: .yaml file reference
-- L128: .yaml file reference
-- L133: .yaml file reference
 - L149: .yaml file reference
-- L157: .yaml file reference
-- L322: .yaml file reference
-- L330: .yaml file reference
-- L366: .yaml file reference
-- L368: .yaml file reference
-- L377: .yaml file reference
-- L386: .yaml file reference
-- L469: .yaml file reference
-- L478: .yaml file reference
-- L549: .yaml file reference
-- L625: .yaml file reference
+
+### .ai/_framework/commands/task-work.md
+- L59: status.yaml reference
+- L63: status.yaml reference
+- L84: status.yaml reference
+- L131: status.yaml reference
+- L136: status.yaml reference
+- L152: status.yaml reference
+- L160: status.yaml reference
+- L325: status.yaml reference
+- L333: status.yaml reference
+- L552: status.yaml reference
+- L97: manifest.yaml reference
+- L109: manifest.yaml reference
+- L369: manifest.yaml reference
+- L371: manifest.yaml reference
+- L380: manifest.yaml reference
+- L389: manifest.yaml reference
+- L472: manifest.yaml reference
+- L481: manifest.yaml reference
+- L628: manifest.yaml reference
+- L61: todo/ folder reference
+- L142: todo/ folder reference
+- L147: todo/ folder reference
+- L149: todo/ folder reference
+- L531: todo/ folder reference
+- L55: in_progress/ folder reference
+- L62: in_progress/ folder reference
+- L120: in_progress/ folder reference
+- L140: in_progress/ folder reference
+- L150: in_progress/ folder reference
+- L157: in_progress/ folder reference
+- L322: in_progress/ folder reference
+- L547: in_progress/ folder reference
+- L323: done/ folder reference
+- L551: old workflow instruction
+- L63: status.yaml update instruction
+- L84: status.yaml update instruction
+- L152: status.yaml update instruction
+- L325: status.yaml update instruction
+- L552: status.yaml update instruction
+- L59: .yaml file reference
+- L63: .yaml file reference
+- L84: .yaml file reference
+- L97: .yaml file reference
+- L109: .yaml file reference
+- L131: .yaml file reference
+- L136: .yaml file reference
+- L152: .yaml file reference
+- L160: .yaml file reference
+- L325: .yaml file reference
+- L333: .yaml file reference
+- L369: .yaml file reference
+- L371: .yaml file reference
+- L380: .yaml file reference
+- L389: .yaml file reference
+- L472: .yaml file reference
+- L481: .yaml file reference
+- L552: .yaml file reference
+- L628: .yaml file reference
 
 ## What the AI agent should do
 
