@@ -3,3 +3,7 @@ cockpit/sessions.json
 cockpit/sessions.db
 cockpit/events/
 cockpit/shadows/
+
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache

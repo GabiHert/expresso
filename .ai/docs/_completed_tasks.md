@@ -1,3 +1,9 @@
+---
+type: internal-doc
+tags:
+  - doc
+---
+
 # Completed Tasks Log
 
 Tasks completed in this project, for reference and learning.

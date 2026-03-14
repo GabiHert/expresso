@@ -1,0 +1,12 @@
+{
+  "name": "ai-framework",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Expresso AI task framework",
+  "scripts": {
+    "migrate": "node migrate-to-vault.js"
+  },
+  "dependencies": {
+    "yaml": "^2.7.0"
+  }
+}

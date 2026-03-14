@@ -1,3 +1,9 @@
+---
+type: internal-doc
+tags:
+  - doc
+---
+
 # Architecture Documentation
 
 System-level architecture and design decisions for AI Cockpit.

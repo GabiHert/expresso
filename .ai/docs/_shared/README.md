@@ -1,3 +1,9 @@
+---
+type: internal-doc
+tags:
+  - doc
+---
+
 # Shared Documentation
 
 Cross-cutting patterns and conventions used across repositories.

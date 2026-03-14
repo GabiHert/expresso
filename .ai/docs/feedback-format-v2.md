@@ -1,3 +1,9 @@
+---
+type: doc
+tags:
+  - doc
+---
+
 # Feedback Format v2 Specification
 
 ## Overview

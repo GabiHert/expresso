@@ -1,3 +1,11 @@
+---
+type: doc
+tags:
+  - doc
+  - vscode-extension
+repo: vscode-extension
+---
+
 # vscode-extension Documentation
 
 ## Overview

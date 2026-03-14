@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "vault": {
+      "command": "npx",
+      "args": [
+        "@bitbonsai/mcpvault@latest",
+        "./.ai"
+      ]
+    }
+  }
+}

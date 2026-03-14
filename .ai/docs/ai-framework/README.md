@@ -1,3 +1,11 @@
+---
+type: doc
+tags:
+  - doc
+  - ai-framework
+repo: ai-framework
+---
+
 # ai-framework Documentation
 
 ## Overview

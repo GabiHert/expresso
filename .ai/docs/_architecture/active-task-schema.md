@@ -1,3 +1,9 @@
+---
+type: internal-doc
+tags:
+  - doc
+---
+
 # active-task.json Schema
 
 ## Location
