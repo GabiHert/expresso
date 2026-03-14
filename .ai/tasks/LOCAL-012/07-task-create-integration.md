@@ -18,7 +18,7 @@ tags:
 
 ## Objective
 
-Document how /task-create can link the current unassigned session to the new task.
+Document how /[[task-create]] can link the current unassigned session to the new task.
 
 ## Implementation Steps
 

@@ -104,3 +104,10 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 - Previous exploration in this conversation identified all relevant code locations
 - `registerSession()` uses upsert pattern - no risk of duplicates
+
+
+## Linked Work Items
+
+- [[01-import-session-method]] — Add importSession method to SessionManager (done)
+- [[02-uuid-detection-new-session]] — Add UUID detection to newSession command (done)
+- [[03-uuid-detection-start-session]] — Add UUID detection to startSession command (done)

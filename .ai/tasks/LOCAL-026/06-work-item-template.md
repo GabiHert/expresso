@@ -196,14 +196,14 @@ When reading old work items:
 
 ## Post-Implementation
 
-Verify template renders correctly and fields are populated during task-create.
+Verify template renders correctly and fields are populated during [[task-create]].
 
 ## Acceptance Criteria
 
 - [ ] Work-item template has repo_path, branch, protected fields
 - [ ] Header box shows git context clearly
 - [ ] task-create.md populates new fields
-- [ ] task-work.md reads and uses new fields
+- [ ] [[task-work]].md reads and uses new fields
 - [ ] Migration note handles old work items
 
 ## Testing

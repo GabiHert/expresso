@@ -1,6 +1,6 @@
 ---
 type: migration-report
-generated: 2026-03-14T15:50:37.455Z
+generated: 2026-03-14T16:08:07.939Z
 total_issues: 372
 tags: [migration, vault]
 ---

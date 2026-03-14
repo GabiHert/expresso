@@ -109,3 +109,8 @@ Use `/address-feedback` to discuss feedback with the agent.
 - Exploration from conversation: Full analysis of diff system architecture
 - `diff` package: https://www.npmjs.com/package/diff
 - `diff2html` library used for rendering
+
+
+## Linked Work Items
+
+- [[01-update-diff-generator]] — Update diff generator to use full file context (done)

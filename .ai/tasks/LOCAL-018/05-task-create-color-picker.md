@@ -18,7 +18,7 @@ tags:
 
 ## Objective
 
-Update the /task-create command to offer a color selection step, allowing users to assign a color when creating new tasks.
+Update the /[[task-create]] command to offer a color selection step, allowing users to assign a color when creating new tasks.
 
 ## Pre-Implementation
 

@@ -103,3 +103,10 @@ The user experience should be:
 
 - VSCode TreeView API: https://code.visualstudio.com/api/extension-guides/tree-view
 - Exploration findings from conversation on 2025-12-29
+
+
+## Linked Work Items
+
+- [[01-taskitem-click-description]] — Change TaskItem click to open description (done)
+- [[02-workitem-click-handler]] — Add WorkItemNode click handler (done)
+- [[03-register-openworkitem-command]] — Register openWorkItem command (done)

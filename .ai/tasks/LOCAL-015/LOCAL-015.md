@@ -129,3 +129,13 @@ Use `/address-feedback` to discuss feedback with the agent.
 - Exploration findings from /[[task-explore]] session
 - deleteSession pattern: extension.ts:540-577
 - Session context menus: package.json:246-264
+
+
+## Linked Work Items
+
+- [[01-command-definition]] — Add deleteTask command definition (done)
+- [[02-context-menu]] — Add context menu for delete action (done)
+- [[03-implement-command]] — Implement deleteTask command (done)
+- [[04-cleanup-service]] — Add cockpit cleanup service (done)
+- [[05-active-task-cleanup]] — Handle active task and panel cleanup (done)
+- [[06-tests]] — Add comprehensive tests (done)

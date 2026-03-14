@@ -100,7 +100,7 @@ echo ""
 After completing:
 1. Test manually: Create a session, run `/task-start TASK-B`, verify signal file created
 2. Check signal file format is valid JSON
-3. Verify signal file is NOT created on first task-start (no previous task)
+3. Verify signal file is NOT created on first [[task-start]] (no previous task)
 
 ## Acceptance Criteria
 

@@ -52,7 +52,7 @@ The solution:
 | 04 | Register startSession command | vscode-extension | todo |
 | 05 | Register linkSessionToTask command | vscode-extension | todo |
 | 06 | Add package.json contributions | vscode-extension | todo |
-| 07 | Update task-create.md integration | ai-framework | todo |
+| 07 | Update [[task-create]].md integration | ai-framework | todo |
 
 ## Branches
 
@@ -130,3 +130,14 @@ Session moves to task's Sessions section
 3. Link via /task-create → automatic linking
 4. Resume closed unassigned session → stays unassigned
 5. Task sessions don't show "_unassigned" ones
+
+
+## Linked Work Items
+
+- [[01-unassigned-constant]] — Add UNASSIGNED_TASK_ID constant (done)
+- [[02-session-manager-methods]] — Add SessionManager methods (done)
+- [[03-unassigned-tree-section]] — Add UnassignedSessionsSection to tree (done)
+- [[04-start-session-command]] — Register startSession command (done)
+- [[05-link-session-command]] — Register linkSessionToTask command (done)
+- [[06-package-json]] — Add package.json contributions (done)
+- [[07-task-create-integration]] — Update task-create.md integration (done)

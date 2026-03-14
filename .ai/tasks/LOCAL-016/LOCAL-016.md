@@ -132,3 +132,10 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 - Claude CLI documentation
 - VSCode Terminal API: https://code.visualstudio.com/api/references/vscode-api#Terminal
+
+
+## Linked Work Items
+
+- [[WI-01-claude-command-builder]] — Create Claude command builder helper (done)
+- [[WI-02-update-launch-points]] — Update all Claude launch points (done)
+- [[WI-03-verify-changes]] — Verify changes work correctly (done)

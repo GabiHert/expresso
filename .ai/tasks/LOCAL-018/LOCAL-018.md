@@ -113,3 +113,13 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 - VSCode ThemeColor API: https://code.visualstudio.com/api/references/theme-color
 - TreeItem iconPath with ThemeIcon: https://code.visualstudio.com/api/references/vscode-api#ThemeIcon
+
+
+## Linked Work Items
+
+- [[01-task-types-color]] — Add color property to Task types (done)
+- [[02-parse-color-yaml]] — Update status.yaml parsing for color (done)
+- [[03-taskitem-color]] — Apply task color to TaskItem icons (done)
+- [[04-session-inherit-color]] — Inherit color in SessionItem display (done)
+- [[05-task-create-color-picker]] — Add color picker to /task-create flow (done)
+- [[06-terminal-tab-color]] — Terminal tab color support (done)

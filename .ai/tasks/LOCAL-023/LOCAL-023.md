@@ -218,3 +218,12 @@ Use `/address-feedback` to discuss feedback with the agent.
 - Exploration analysis: Comprehensive state management audit
 - sql.js documentation: https://sql.js.org/
 - better-sqlite3 (alternative): https://github.com/WiseLibs/better-sqlite3
+
+
+## Linked Work Items
+
+- [[01-session-database]] — Create SessionDatabase abstraction layer (done)
+- [[02-refactor-session-manager]] — Refactor SessionManager to use database (done)
+- [[03-fix-cleanup-service]] — Refactor CockpitCleanupService to use SessionManager API (done)
+- [[04-extension-lifecycle]] — Update extension lifecycle (done)
+- [[05-update-tests]] — Update tests for database (done)

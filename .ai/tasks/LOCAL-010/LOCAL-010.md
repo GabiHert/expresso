@@ -128,3 +128,12 @@ interface CockpitSession {
 - Exploration findings from `/task-explore` session
 - SessionManager source: `vscode-extension/src/services/SessionManager.ts`
 - VSCode API: [TreeView](https://code.visualstudio.com/api/extension-guides/tree-view)
+
+
+## Linked Work Items
+
+- [[01-rename-session-method]] — Add renameSession method (done)
+- [[02-delete-session-method]] — Add deleteSession method (done)
+- [[03-rename-command]] — Register rename command (done)
+- [[04-delete-command]] — Register delete command (done)
+- [[05-package-json]] — Add package.json contributions (done)

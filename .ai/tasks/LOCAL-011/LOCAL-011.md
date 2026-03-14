@@ -101,3 +101,8 @@ This is a minimal change - just update 2 lines in `TaskTreeProvider.ts` to chang
 - DiffViewer implementation: `vscode-extension/src/services/DiffViewer.ts`
 - Command registration: `vscode-extension/src/extension.ts:617-641`
 - Context menu: `vscode-extension/package.json:154-167`
+
+
+## Linked Work Items
+
+- [[01-default-full-diff]] — Change default click command to showFullDiff (done)

@@ -143,3 +143,15 @@ Use `/address-feedback` to discuss feedback with the agent.
 - VSCode Decoration API: https://code.visualstudio.com/api/references/vscode-api#TextEditorDecorationType
 - Existing types: `vscode-extension/src/types/expresso.ts`
 - Existing decorator: `vscode-extension/src/services/ExpressoDecorator.ts`
+
+
+## Linked Work Items
+
+- [[01-add-keyword-styles]] — Add keyword styles to types (done)
+- [[02-create-keyword-decorations]] — Create keyword decoration types (done)
+- [[03-apply-keyword-decorations]] — Apply keyword decorations (done)
+- [[04-define-commands-list]] — Define valid commands list (done)
+- [[05-add-command-scanning]] — Add command scanning (done)
+- [[06-add-command-decoration]] — Add command decoration (done)
+- [[07-add-config-options]] — Add configuration options (done)
+- [[08-unit-tests]] — Unit tests (done)

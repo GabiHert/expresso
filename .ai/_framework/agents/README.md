@@ -198,3 +198,13 @@ Regardless of IDE, the orchestrator:
 ├── documenter.yaml     # Documenter agent definition
 └── sync.yaml           # Sync agent definition
 ```
+
+
+## Agent Notes
+
+- [[documenter]]
+- [[explorer]]
+- [[implementer]]
+- [[planner]]
+- [[reviewer]]
+- [[sync]]

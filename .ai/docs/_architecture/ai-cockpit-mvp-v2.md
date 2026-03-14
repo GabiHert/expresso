@@ -613,8 +613,8 @@ export class ActiveTaskProvider {
 | Feature | Priority | Status |
 |---------|----------|--------|
 | Active task file system | P0 | Planned |
-| /task-start cockpit integration | P0 | Planned |
-| /task-done cockpit cleanup | P0 | Planned |
+| /[[task-start]] cockpit integration | P0 | Planned |
+| /[[task-done]] cockpit cleanup | P0 | Planned |
 | Hook with task ID resolution | P0 | Planned |
 | Git branch fallback | P1 | Planned |
 | Session ID fallback | P1 | Planned |
@@ -715,8 +715,8 @@ describe('resolveTaskId', () => {
 
 ## Related Documentation
 
-- [MVP v1 Specification](./ai-cockpit-mvp-v1.md) - Base architecture
-- [Claude Code Hooks](../_shared/claude-code-hooks.md) - Hook reference
+- [MVP v1 Specification](./[[ai-cockpit-mvp-v1]].md) - Base architecture
+- [Claude Code Hooks](../_shared/[[claude-code-hooks]].md) - Hook reference
 - [ai-framework Docs](../ai-framework/README.md)
 
 ---

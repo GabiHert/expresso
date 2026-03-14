@@ -45,7 +45,10 @@ output:
 
     ### Code Quality
     | Severity | File | Line | Issue | Suggestion |
-    |----------|------|------|-------|------------|
+    |---
+
+> Index: [[README]] | Orchestration: [[orchestrator]]
+-------|------|------|-------|------------|
 
     ### Required Actions (if NEEDS CHANGES)
     1. Action item

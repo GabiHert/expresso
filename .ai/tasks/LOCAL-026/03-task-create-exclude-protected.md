@@ -133,7 +133,7 @@ Check each specified repo against manifest:
 
 ## Post-Implementation
 
-Verify the task-create command generates correct README with protected repos excluded from branches table.
+Verify the [[task-create]] command generates correct README with protected repos excluded from branches table.
 
 ## Acceptance Criteria
 

@@ -101,3 +101,10 @@ Tested successfully:
 - The script lives at the repository root for easy access
 - Works on macOS, Linux, and Windows (Node.js is cross-platform)
 - Creates `.gitkeep` files in empty directories for git tracking
+
+
+## Linked Work Items
+
+- [[01-install-script]] — Create install.js script (done)
+- [[02-install-docs]] — Create INSTALL.md documentation (done)
+- [[03-test-script]] — Test installation script (done)

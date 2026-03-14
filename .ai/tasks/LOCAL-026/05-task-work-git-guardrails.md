@@ -222,7 +222,7 @@ Add verification to autopilot execution:
 
 ## Post-Implementation
 
-Review the full task-work.md flow to ensure verification is called at all git touchpoints.
+Review the full [[task-work]].md flow to ensure verification is called at all git touchpoints.
 
 ## Acceptance Criteria
 

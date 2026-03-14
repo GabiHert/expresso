@@ -39,6 +39,9 @@ output:
       notes: optional notes
 ---
 
+> Index: [[README]] | Orchestration: [[orchestrator]]
+
+
 # sync Agent
 
 Handles git operations for the .ai/ folder. Commits changes in batches

@@ -40,7 +40,10 @@ output:
 
     ## Relevant Files
     | File | Purpose | Relevance |
-    |------|---------|-----------|
+    |---
+
+> Index: [[README]] | Orchestration: [[orchestrator]]
+---|---------|-----------|
     | path/to/file | What it does | Why it matters for this task |
 
     ## Patterns Identified

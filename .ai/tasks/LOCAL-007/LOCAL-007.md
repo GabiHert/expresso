@@ -96,3 +96,12 @@ The polling mechanism in `captureLatestSessionId` compares against `knownSession
 
 - LOCAL-006 implementation files
 - VS Code Extension API: Terminal.creationOptions
+
+
+## Linked Work Items
+
+- [[01-terminal-markers]] — Improve session capture with unique terminal markers (done)
+- [[02-async-io]] — Convert SessionManager to async I/O (done)
+- [[03-session-cleanup]] — Add session cleanup mechanism (done)
+- [[04-json-error-handling]] — Handle JSON parsing errors gracefully (done)
+- [[05-configurable-paths]] — Make Claude history path configurable (done)

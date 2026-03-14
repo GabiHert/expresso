@@ -101,3 +101,8 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 - Exploration findings from [[task-explore]] command
 - Related: Session management in SessionManager.ts
+
+
+## Linked Work Items
+
+- [[01-update-link-session-command]] — Update linkSessionToTask command (done)

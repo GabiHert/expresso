@@ -46,6 +46,9 @@ output:
     - entry for _completed_tasks.md
 ---
 
+> Index: [[README]] | Orchestration: [[orchestrator]]
+
+
 # documenter Agent
 
 Captures learnings from completed tasks and proposes documentation updates.

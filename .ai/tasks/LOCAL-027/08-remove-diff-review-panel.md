@@ -51,7 +51,7 @@ And remove them.
 
 - [ ] DiffReviewPanel.ts is deleted
 - [ ] [[diff-review]].css is deleted
-- [ ] diff-review.js is deleted
+- [ ] [[diff-review]].js is deleted
 - [ ] No compile errors after removal
 - [ ] Extension still loads correctly
 

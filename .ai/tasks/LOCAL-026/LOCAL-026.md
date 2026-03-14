@@ -139,10 +139,10 @@ repos:
 ## Implementation Approach
 
 1. **Schema first**: Define the new manifest and active-task.json schemas
-2. **Protection layer**: Implement protected repo checks in task-start
+2. **Protection layer**: Implement protected repo checks in [[task-start]]
 3. **Context persistence**: Store absolute paths at task start time
 4. **Guardrails**: Add verification step before git operations
-5. **Template updates**: Enhance work-item frontmatter
+5. **Template updates**: Enhance [[work-item]] frontmatter
 
 ## Architecture Diagram
 
@@ -206,3 +206,13 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 - Exploration findings from `/task-explore` on 2026-01-08
 - Agent confusion incident report (nested repo commit to wrong target)
+
+
+## Linked Work Items
+
+- [[01-manifest-protected-flag]] — Add protected flag to manifest schema (done)
+- [[02-task-start-branch-protection]] — Update task-start branch creation (done)
+- [[03-task-create-exclude-protected]] — Update task-create to exclude protected repos (done)
+- [[04-active-task-schema]] — Enhance active-task.json schema (done)
+- [[05-task-work-git-guardrails]] — Add git guardrails to task-work (done)
+- [[06-work-item-template]] — Update work-item template (done)

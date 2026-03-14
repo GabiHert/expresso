@@ -101,7 +101,7 @@ codeLines.forEach(el => {
 
 ### Phase 2: Integration (Work Items 03-04)
 - Update HTML template to load Prism assets
-- Add `highlightDiffCode()` function to diff-review.js
+- Add `highlightDiffCode()` function to [[diff-review]].js
 - Add language detection from file path
 
 ### Phase 3: Verification (Work Item 05)
@@ -133,3 +133,12 @@ Use `/address-feedback` to discuss feedback with the agent.
 - Prism.js: https://prismjs.com/
 - diff2html: https://diff2html.xyz/
 - VSCode Theme Colors: https://code.visualstudio.com/api/references/theme-color
+
+
+## Linked Work Items
+
+- [[01-add-prism-vendor]] — Add Prism.js vendor files (done)
+- [[02-prism-vscode-theme]] — Create VSCode-compatible Prism theme (done)
+- [[03-update-html-template]] — Update DiffReviewPanel HTML template (done)
+- [[04-implement-highlighting]] — Implement syntax highlighting in diff-review.js (done)
+- [[05-test-verify]] — Test and verify highlighting (done)

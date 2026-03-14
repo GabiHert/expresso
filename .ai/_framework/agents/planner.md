@@ -47,6 +47,9 @@ output:
         estimated_complexity: low | medium | high
 ---
 
+> Index: [[README]] | Orchestration: [[orchestrator]]
+
+
 # planner Agent
 
 Analyzes task requirements and exploration findings to create a structured

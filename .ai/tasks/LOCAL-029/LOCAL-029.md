@@ -185,3 +185,13 @@ Use `/address-feedback` to discuss feedback with the agent.
 - Extension activation: `vscode-extension/src/extension.ts`
 - Scanner: `vscode-extension/src/services/ExpressoScanner.ts`
 - Completion: `vscode-extension/src/providers/ExpressoCompletionProvider.ts`
+
+
+## Linked Work Items
+
+- [[01-create-command-registry]] — Create CommandRegistry service (done)
+- [[02-update-expresso-scanner]] — Update ExpressoScanner integration (done)
+- [[03-update-completion-provider]] — Update ExpressoCompletionProvider (done)
+- [[04-update-extension-activation]] — Update extension activation (done)
+- [[05-cleanup-deprecated-code]] — Cleanup deprecated code (done)
+- [[06-add-update-tests]] — Add/update tests (done)

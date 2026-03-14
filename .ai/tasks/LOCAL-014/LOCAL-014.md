@@ -209,3 +209,23 @@ Use `/address-feedback` to discuss feedback with the agent.
 - [diff2html documentation](https://diff2html.xyz/)
 - [VSCode Webview API](https://code.visualstudio.com/api/extension-guides/webview)
 - Existing shadow system: `.ai/docs/_architecture/shadow-copy-system.md`
+
+
+## Linked Work Items
+
+- [[01-enhanced-feedback-format]] — Enhanced feedback format design (done)
+- [[02-feedback-parsing-library]] — Feedback parsing library (done)
+- [[03-diff-review-panel-scaffold]] — DiffReviewPanel webview scaffold (done)
+- [[04-diff2html-integration]] — Integrate diff2html rendering (done)
+- [[05-comment-ui-overlay]] — Comment UI overlay system (done)
+- [[06-comment-manager-service]] — CommentManager service (done)
+- [[07-wire-tree-view]] — Wire tree view to webview (done)
+- [[08-styling-polish]] — Styling and polish (done)
+- [[09-fix-watcher-race-condition]] — Fix race condition in file watcher setup (done)
+- [[10-fix-circular-update-loop]] — Fix circular update loop in CommentManager (done)
+- [[11-fix-memory-leak-listeners]] — Fix memory leak in event listeners (done)
+- [[12-fix-xss-comment-rendering]] — Fix XSS vulnerability in comment rendering (done)
+- [[13-fix-path-traversal]] — Fix path traversal in work item opening (done)
+- [[14-add-ready-error-handling]] — Add error handling for webview ready message (done)
+- [[15-implement-cache-eviction]] — Implement cache eviction in CommentManager (done)
+- [[16-fix-type-guard-validation]] — Fix type guard for message validation (done)

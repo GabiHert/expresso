@@ -106,3 +106,11 @@ Click SessionItem →
 
 - Exploration from /[[task-explore]] (2025-12-29)
 - Related: [[LOCAL-007]] (session tracking fixes)
+
+
+## Linked Work Items
+
+- [[01-terminal-manager]] — Export terminalIdMap for terminal lookup (done)
+- [[02-focus-session]] — Add focusSession command for active sessions (done)
+- [[03-session-item-branching]] — Fix SessionItem click handler branching (done)
+- [[04-remove-auto-close]] — Remove auto-close of other active sessions (done)

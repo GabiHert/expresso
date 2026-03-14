@@ -327,3 +327,13 @@ prompt_append: |
 ```
 
 The orchestrator merges base + override before spawning.
+
+
+## Agent Notes
+
+- [[documenter]]
+- [[explorer]]
+- [[implementer]]
+- [[planner]]
+- [[reviewer]]
+- [[sync]]

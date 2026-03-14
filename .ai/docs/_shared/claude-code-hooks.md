@@ -746,7 +746,7 @@ See [AI Cockpit MVP v1](../_architecture/[[ai-cockpit-mvp-v1]].md) for integrati
 
 ## Related Documentation
 
-- [AI Cockpit MVP v1](../_architecture/ai-cockpit-mvp-v1.md)
+- [AI Cockpit MVP v1](../_architecture/[[ai-cockpit-mvp-v1]].md)
 - [Claude Code Official Docs](https://docs.anthropic.com/en/docs/claude-code)
 
 ---

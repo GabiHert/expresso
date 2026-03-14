@@ -158,3 +158,11 @@ Use `/address-feedback` to discuss feedback with the agent.
 - Exploration session: Session ID overwrite during task switching
 - Claude history file: `~/.claude/history.jsonl`
 - Session registry: `.ai/cockpit/sessions.json`
+
+
+## Linked Work Items
+
+- [[01-capture-queue]] — Add capture queue to extension.ts (done)
+- [[02-refresh-known-sessions]] — Refresh knownSessionIds at capture time (done)
+- [[03-terminal-task-context]] — Add task context to TerminalManager (done)
+- [[04-capture-tests]] — Add tests for session capture (done)

@@ -207,8 +207,8 @@ Verify the schema is valid JSON and can be parsed by VSCode extension.
 ## Acceptance Criteria
 
 - [ ] Schema documented in architecture docs
-- [ ] task-start.md writes new schema format
-- [ ] task-resume.md reads and announces repo context
+- [ ] [[task-start]].md writes new schema format
+- [ ] [[task-resume]].md reads and announces repo context
 - [ ] Backward compatibility maintained with `branch` field
 - [ ] Example shows nested repo scenario
 

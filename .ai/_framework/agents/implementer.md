@@ -43,7 +43,10 @@ output:
 
     ### Changes Made
     | File | Action | Description |
-    |------|--------|-------------|
+    |---
+
+> Index: [[README]] | Orchestration: [[orchestrator]]
+---|--------|-------------|
 
     ### Acceptance Criteria
     - [x] or [ ] Criterion with status

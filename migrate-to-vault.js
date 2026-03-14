@@ -918,6 +918,132 @@ function addParentBacklinks(dir) {
   return count;
 }
 
+// Scan task folders: if task note doesn't link to its work items, add them
+function addTaskToWorkItemLinks(aiDir) {
+  const tasksDir = path.join(aiDir, 'tasks');
+  if (!fs.existsSync(tasksDir)) return 0;
+
+  let count = 0;
+  const taskDirs = listDirs(tasksDir);
+
+  for (const taskId of taskDirs) {
+    const taskDir = path.join(tasksDir, taskId);
+    const taskFile = path.join(taskDir, `${taskId}.md`);
+    if (!fs.existsSync(taskFile)) continue;
+
+    let taskContent = readFile(taskFile);
+    if (!taskContent) continue;
+
+    // Find all work item files in this task folder
+    const wiFiles = listFiles(taskDir, '.md')
+      .filter(f => f !== `${taskId}.md`); // exclude the task note itself
+
+    if (wiFiles.length === 0) continue;
+
+    // Check which work items are already linked
+    const unlinked = wiFiles.filter(f => {
+      const wiName = f.replace('.md', '');
+      return !taskContent.includes(`[[${wiName}]]`);
+    });
+
+    if (unlinked.length === 0) continue;
+
+    // Read each unlinked work item to get its title
+    const links = unlinked.map(f => {
+      const wiPath = path.join(taskDir, f);
+      const wiContent = readFile(wiPath);
+      const { frontmatter } = parseFrontmatterAndBody(wiContent || '');
+      const title = frontmatter?.title || f.replace('.md', '');
+      const status = frontmatter?.status || '?';
+      return `- [[${f.replace('.md', '')}]] — ${title} (${status})`;
+    });
+
+    // Check if "Linked Work Items" section exists
+    if (taskContent.includes('## Linked Work Items')) {
+      // Append to existing section
+      taskContent = taskContent.replace(
+        '## Linked Work Items\n',
+        `## Linked Work Items\n${links.join('\n')}\n`
+      );
+    } else {
+      // Add new section at the end
+      taskContent += `\n\n## Linked Work Items\n\n${links.join('\n')}\n`;
+    }
+
+    fs.writeFileSync(taskFile, taskContent, 'utf8');
+    count += unlinked.length;
+  }
+  return count;
+}
+
+// Add links to/from agent files
+function addAgentLinks(aiDir) {
+  const agentsDir = path.join(aiDir, '_framework', 'agents');
+  if (!fs.existsSync(agentsDir)) return 0;
+
+  let count = 0;
+  const agentFiles = listFiles(agentsDir, '.md').filter(f => f !== 'README.md' && f !== 'orchestrator.md');
+  const readmePath = path.join(agentsDir, 'README.md');
+  const orchestratorPath = path.join(agentsDir, 'orchestrator.md');
+
+  // Add links from each agent to the README (index) and vice versa
+  for (const agentFile of agentFiles) {
+    const agentPath = path.join(agentsDir, agentFile);
+    let content = readFile(agentPath);
+    if (!content) continue;
+
+    const agentName = agentFile.replace('.md', '');
+
+    // Add link to README (agents index) if not present
+    if (!content.includes('[[README]]') && !content.includes('[[orchestrator]]')) {
+      const fmEnd = findFrontmatterEnd(content);
+      const fm = content.substring(0, fmEnd);
+      const body = content.substring(fmEnd);
+      content = `${fm}\n\n> Index: [[README]] | Orchestration: [[orchestrator]]\n${body}`;
+      fs.writeFileSync(agentPath, content, 'utf8');
+      count += 2;
+    }
+  }
+
+  // Add links from README to all agents
+  if (fs.existsSync(readmePath)) {
+    let readmeContent = readFile(readmePath);
+    if (readmeContent) {
+      const unlinkedAgents = agentFiles.filter(f => {
+        const name = f.replace('.md', '');
+        return !readmeContent.includes(`[[${name}]]`);
+      });
+
+      if (unlinkedAgents.length > 0) {
+        const links = unlinkedAgents.map(f => `- [[${f.replace('.md', '')}]]`).join('\n');
+        readmeContent += `\n\n## Agent Notes\n\n${links}\n`;
+        fs.writeFileSync(readmePath, readmeContent, 'utf8');
+        count += unlinkedAgents.length;
+      }
+    }
+  }
+
+  // Add links from orchestrator to all agents
+  if (fs.existsSync(orchestratorPath)) {
+    let orchContent = readFile(orchestratorPath);
+    if (orchContent) {
+      const unlinkedAgents = agentFiles.filter(f => {
+        const name = f.replace('.md', '');
+        return !orchContent.includes(`[[${name}]]`);
+      });
+
+      if (unlinkedAgents.length > 0) {
+        const links = unlinkedAgents.map(f => `- [[${f.replace('.md', '')}]]`).join('\n');
+        orchContent += `\n\n## Agent Notes\n\n${links}\n`;
+        fs.writeFileSync(orchestratorPath, orchContent, 'utf8');
+        count += unlinkedAgents.length;
+      }
+    }
+  }
+
+  return count;
+}
+
 function collectNoteNames(dir, names) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
   for (const entry of entries) {

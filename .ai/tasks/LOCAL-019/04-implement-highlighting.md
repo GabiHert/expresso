@@ -18,7 +18,7 @@ tags:
 
 ## Objective
 
-Add Prism.js syntax highlighting to the diff-review.js webview script, highlighting code lines after diff2html renders them.
+Add Prism.js syntax highlighting to the [[diff-review]].js webview script, highlighting code lines after diff2html renders them.
 
 ## Pre-Implementation
 

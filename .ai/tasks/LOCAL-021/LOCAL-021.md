@@ -314,10 +314,10 @@ it('should emit onTaskSwitched when signal file changes', (done) => {
 
 **Real VSCode scenario**:
 1. Open VSCode with AI Cockpit extension
-2. Create new session for LOCAL-019
+2. Create new session for [[LOCAL-019]]
 3. In Claude terminal: `/task-start LOCAL-018`
 4. Wait 1 second
-5. Check Cockpit sidebar → session should show under LOCAL-018
+5. Check Cockpit sidebar → session should show under [[LOCAL-018]]
 6. Resume session → should open LOCAL-018 task tree
 7. Check events are tagged to LOCAL-018
 
@@ -351,3 +351,13 @@ Use `/address-feedback` to discuss feedback with the agent.
 - Exploration report: agentId a0cc4ae (deep-dive analysis)
 - Claude history format: `~/.claude/history.jsonl`
 - VSCode FileSystemWatcher API: https://code.visualstudio.com/api/references/vscode-api#FileSystemWatcher
+
+
+## Linked Work Items
+
+- [[WI-01-signal-file-task-start]] — Add signal file write to /task-start (done)
+- [[WI-02-filewatcher-signal-monitor]] — Extend FileWatcher to monitor signal (done)
+- [[WI-03-session-update-method]] — Add session task update method (done)
+- [[WI-04-wire-signal-handler]] — Wire signal handler in extension (done)
+- [[WI-05-continuous-verification]] — Add continuous verification fallback (done)
+- [[WI-06-edge-cases-cleanup]] — Add edge case handling and cleanup (done)

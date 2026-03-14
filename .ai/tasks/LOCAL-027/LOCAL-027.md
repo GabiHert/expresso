@@ -205,3 +205,17 @@ Use `/address-feedback` to discuss feedback with the agent.
 - VSCode Decorations API: https://code.visualstudio.com/api/references/vscode-api#TextEditorDecorationType
 - VSCode CodeLens API: https://code.visualstudio.com/api/references/vscode-api#CodeLensProvider
 - Existing service patterns in this repo
+
+
+## Linked Work Items
+
+- [[01-type-definitions]] — Type Definitions for ExpressoTag (done)
+- [[02-expresso-scanner]] — ExpressoScanner Service (done)
+- [[03-expresso-decorator]] — ExpressoDecorator Service (done)
+- [[04-codelens-provider]] — ExpressoCodeLensProvider (done)
+- [[05-clipboard-toast]] — Clipboard and Toast Functionality (done)
+- [[06-framework-command]] — Framework Command /expresso (done)
+- [[07-integration-testing]] — Integration and Testing (done)
+- [[08-remove-diff-review-panel]] — Remove DiffReviewPanel (done)
+- [[09-remove-review-changes-command]] — Remove Review Changes Command (done)
+- [[10-update-treeview-context-menu]] — Update TreeView Context Menu (done)

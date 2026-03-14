@@ -99,3 +99,11 @@ The solution should be simple: store feedback as markdown in the task documentat
 
 - Exploration from /[[task-explore]] session on diff commenting
 - Shadow copy system docs: `.ai/docs/_architecture/shadow-copy-system.md`
+
+
+## Linked Work Items
+
+- [[01-feedback-storage-format]] — Feedback storage format (done)
+- [[02-address-feedback-command]] — Create /address-feedback command (done)
+- [[03-vscode-feedback-button]] — VSCode feedback button (done)
+- [[04-task-create-integration]] — Task-create integration (done)
