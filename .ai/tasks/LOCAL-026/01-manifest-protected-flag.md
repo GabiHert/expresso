@@ -11,6 +11,9 @@ tags:
   - ai-framework
 ---
 
+> Parent: [[LOCAL-026]]
+
+
 # Add Protected Flag to Manifest Schema
 
 ## Objective
@@ -99,7 +102,7 @@ Verify the manifest YAML is valid by checking syntax.
 - [ ] New fields documented in manifest schema
 - [ ] ai-framework repo marked as `protected: true` in manifest
 - [ ] `locked_branch` set to `project/ai-cockpit`
-- [ ] task-start.md references protected repos in orientation
+- [ ] [[task-start]].md references protected repos in orientation
 
 ## Testing
 

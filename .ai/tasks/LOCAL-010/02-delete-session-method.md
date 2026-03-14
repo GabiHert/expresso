@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-010]]
+
+
 # Add deleteSession Method to SessionManager
 
 ## Objective

@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-008]]
+
+
 # Export terminalIdMap for Terminal Lookup
 
 ## Objective

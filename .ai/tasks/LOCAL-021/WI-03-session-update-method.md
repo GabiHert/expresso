@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-021]]
+
+
 # Add Session Task Update Method to SessionManager
 
 ## Objective
@@ -105,7 +108,7 @@ async updateSessionTaskId(
  * ```typescript
  * const updated = await sessionManager.updateSessionTaskId(
  *   '2ca083d5-a144-4324-94d6-02f1e2e2d8b6',
- *   'LOCAL-018'
+ *   '[[LOCAL-018]]'
  * );
  * if (updated) {
  *   taskTreeProvider?.refresh();

@@ -24,7 +24,7 @@ Run code review on changes for a task. Analyzes all modified files across reposi
 │                                                                 │
 │ This command reviews code and reports findings. It must NEVER    │
 │ modify application source code, tests, or config. Code fixes    │
-│ happen in /task-work, not here. If you find yourself editing     │
+│ happen in /[[task-work]], not here. If you find yourself editing     │
 │ code files, STOP — you are off track.                           │
 └─────────────────────────────────────────────────────────────────┘
 

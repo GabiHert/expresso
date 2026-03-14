@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-008]]
+
+
 # Remove Auto-Close of Other Active Sessions
 
 ## Objective
@@ -148,4 +151,4 @@ After completing, run a **code review agent** to check for issues.
 
 - The auto-close was likely added to prevent orphaned sessions from accumulating
 - With proper terminal tracking (work item 01), we can detect closed terminals correctly
-- The cleanup command (from LOCAL-007) handles old sessions
+- The cleanup command (from [[LOCAL-007]]) handles old sessions

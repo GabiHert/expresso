@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-018]]
+
+
 # Terminal Tab Color Support
 
 ## Objective

@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-015]]
+
+
 # Add Context Menu for Delete Action
 
 ## Objective

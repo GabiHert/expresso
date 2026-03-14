@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-010]]
+
+
 # Register Delete Session Command
 
 ## Objective

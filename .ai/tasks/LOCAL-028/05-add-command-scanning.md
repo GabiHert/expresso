@@ -12,6 +12,9 @@ tags:
 branch: main
 ---
 
+> Parent: [[LOCAL-028]]
+
+
 # Add Command Scanning
 
 ## Objective

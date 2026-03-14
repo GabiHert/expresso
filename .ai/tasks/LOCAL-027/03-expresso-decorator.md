@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-027]]
+
+
 # ExpressoDecorator Service
 
 ## Objective

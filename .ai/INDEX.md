@@ -33,21 +33,21 @@
 |---------|----------|-------------|
 | /init | [commands/init.md](./_framework/commands/init.md) | Bootstrap project |
 | /enhance | [commands/enhance.md](./_framework/commands/enhance.md) | Evolve setup |
-| /task-create | [commands/task-create.md](./_framework/commands/task-create.md) | Create task |
-| /task-start | [commands/task-start.md](./_framework/commands/task-start.md) | Start task |
-| /task-resume | [commands/task-resume.md](./_framework/commands/task-resume.md) | Resume in-progress task |
-| /task-work | [commands/task-work.md](./_framework/commands/task-work.md) | Implement work |
-| /task-done | [commands/task-done.md](./_framework/commands/task-done.md) | Complete task |
-| /task-status | [commands/task-status.md](./_framework/commands/task-status.md) | View dashboard |
-| /task-review | [commands/task-review.md](./_framework/commands/task-review.md) | Code review |
-| /task-explore | [commands/task-explore.md](./_framework/commands/task-explore.md) | Explore code |
+| /[[task-create]] | [commands/task-create.md](./_framework/commands/task-create.md) | Create task |
+| /[[task-start]] | [commands/task-start.md](./_framework/commands/task-start.md) | Start task |
+| /[[task-resume]] | [commands/task-resume.md](./_framework/commands/task-resume.md) | Resume in-progress task |
+| /[[task-work]] | [commands/task-work.md](./_framework/commands/task-work.md) | Implement work |
+| /[[task-done]] | [commands/task-done.md](./_framework/commands/task-done.md) | Complete task |
+| /[[task-status]] | [commands/task-status.md](./_framework/commands/task-status.md) | View dashboard |
+| /[[task-review]] | [commands/task-review.md](./_framework/commands/task-review.md) | Code review |
+| /[[task-explore]] | [commands/task-explore.md](./_framework/commands/task-explore.md) | Explore code |
 | /ask | [commands/ask.md](./_framework/commands/ask.md) | Answer questions (docs first) |
 | /document | [commands/document.md](./_framework/commands/document.md) | Create docs |
 | /help | [commands/help.md](./_framework/commands/help.md) | Show available commands |
-| /command-create | [commands/command-create.md](./_framework/commands/command-create.md) | Create new framework command |
-| /command-extend | [commands/command-extend.md](./_framework/commands/command-extend.md) | Extend commands at project level |
-| /task-orchestrate | [commands/task-orchestrate.md](./_framework/commands/task-orchestrate.md) | Orchestrate task with background agents |
-| /ai-sync | [commands/ai-sync.md](./_framework/commands/ai-sync.md) | Sync .ai/ with git repo |
+| /[[command-create]] | [commands/command-create.md](./_framework/commands/command-create.md) | Create new framework command |
+| /[[command-extend]] | [commands/command-extend.md](./_framework/commands/command-extend.md) | Extend commands at project level |
+| /[[task-orchestrate]] | [commands/task-orchestrate.md](./_framework/commands/task-orchestrate.md) | Orchestrate task with background agents |
+| /[[ai-sync]] | [commands/ai-sync.md](./_framework/commands/ai-sync.md) | Sync .ai/ with git repo |
 
 ## Templates
 
@@ -55,17 +55,17 @@
 |----------|----------|-------------|
 | Context | [templates/context.md](./_framework/templates/context.md) | Project entry point |
 | Documentation | [templates/doc.md](./_framework/templates/doc.md) | Doc structure |
-| Task README | [templates/task-readme.md](./_framework/templates/task-readme.md) | Task folder |
+| Task README | [templates/[[task-readme]].md](./_framework/templates/task-readme.md) | Task folder |
 | Task Status | [templates/status.yaml](./_framework/templates/status.yaml) | Work items index |
-| Work Item | [templates/work-item.md](./_framework/templates/work-item.md) | Work item |
-| Repo README | [templates/repo-readme.md](./_framework/templates/repo-readme.md) | Repo docs |
+| Work Item | [templates/[[work-item]].md](./_framework/templates/work-item.md) | Work item |
+| Repo README | [templates/[[repo-readme]].md](./_framework/templates/repo-readme.md) | Repo docs |
 | Cursor Rules | [templates/cursorrules.md](./_framework/templates/cursorrules.md) | Cursor IDE config |
 
 ## Agent Configuration
 
 | Resource | Location | Description |
 |----------|----------|-------------|
-| Agent Behavior | [agent-behavior.md](./_framework/agent-behavior.md) | AI agent instructions |
+| Agent Behavior | [[[agent-behavior]].md](./_framework/agent-behavior.md) | AI agent instructions |
 
 ## Project Configuration
 
@@ -80,14 +80,14 @@
 | Topic | Location | Description |
 |-------|----------|-------------|
 | Overview | [docs/_architecture/README.md](./docs/_architecture/README.md) | System architecture and design |
-| AI Cockpit MVP v1 | [docs/_architecture/ai-cockpit-mvp-v1.md](./docs/_architecture/ai-cockpit-mvp-v1.md) | MVP v1 specification - task panel, diff tracking, hooks |
-| AI Cockpit MVP v2 | [docs/_architecture/ai-cockpit-mvp-v2.md](./docs/_architecture/ai-cockpit-mvp-v2.md) | MVP v2 specification - task ID propagation, active-task file |
+| AI Cockpit MVP v1 | [docs/_architecture/[[ai-cockpit-mvp-v1]].md](./docs/_architecture/ai-cockpit-mvp-v1.md) | MVP v1 specification - task panel, diff tracking, hooks |
+| AI Cockpit MVP v2 | [docs/_architecture/[[ai-cockpit-mvp-v2]].md](./docs/_architecture/ai-cockpit-mvp-v2.md) | MVP v2 specification - task ID propagation, active-task file |
 
 ### Shared Patterns
 | Pattern | Location | Description |
 |---------|----------|-------------|
 | Shared README | [docs/_shared/README.md](./docs/_shared/README.md) | Cross-cutting patterns |
-| Claude Code Hooks | [docs/_shared/claude-code-hooks.md](./docs/_shared/claude-code-hooks.md) | Complete hooks reference - events, input/output, examples |
+| Claude Code Hooks | [docs/_shared/[[claude-code-hooks]].md](./docs/_shared/claude-code-hooks.md) | Complete hooks reference - events, input/output, examples |
 
 ### Repository Documentation
 | Repo | Location | Description |

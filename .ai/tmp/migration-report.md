@@ -1,7 +1,7 @@
 ---
 type: migration-report
-generated: 2026-03-14T00:55:08.080Z
-total_issues: 509
+generated: 2026-03-14T15:50:37.455Z
+total_issues: 372
 tags: [migration, vault]
 ---
 
@@ -12,270 +12,57 @@ tags: [migration, vault]
 These files contain references to the old filesystem-based structure and need
 to be updated to use vault-native patterns (frontmatter, mcpvault MCP tools).
 
-### .ai/tasks/LOCAL-026/01-manifest-protected-flag.md
-- L9: manifest.yaml reference
-- L44: manifest.yaml reference
-- L73: manifest.yaml reference
-- L95: manifest.yaml reference
-- L9: .yaml file reference
-- L44: .yaml file reference
-- L73: .yaml file reference
-- L95: .yaml file reference
-
-### .ai/tasks/LOCAL-026/02-task-start-branch-protection.md
-- L27: manifest.yaml reference
-- L27: .yaml file reference
-
-### .ai/tasks/LOCAL-026/03-task-create-exclude-protected.md
-- L52: status.yaml reference
-- L127: status.yaml reference
-- L66: todo/ folder reference
-- L48: .yaml file reference
-- L52: .yaml file reference
-- L127: .yaml file reference
-
-### .ai/tasks/LOCAL-026/04-active-task-schema.md
-- L65: in_progress/ folder reference
-- L110: in_progress/ folder reference
-- L9: cockpit/ reference
-- L24: cockpit/ reference
-- L106: cockpit/ reference
-- L132: cockpit/ reference
-- L202: cockpit/ reference
-
-### .ai/tasks/LOCAL-026/05-task-work-git-guardrails.md
-- L199: status.yaml reference
-- L145: manifest.yaml reference
-- L193: in_progress/ folder reference
-- L199: status.yaml update instruction
-- L29: cockpit/ reference
-- L145: .yaml file reference
-- L199: .yaml file reference
-
-### .ai/tasks/LOCAL-026/06-work-item-template.md
-- L66: status.yaml reference
-- L68: status.yaml reference
-- L84: todo/ folder reference
-- L65: in_progress/ folder reference
-- L65: old workflow instruction
-- L68: old workflow instruction
-- L66: status.yaml update instruction
-- L66: .yaml file reference
-- L68: .yaml file reference
-
-### .ai/tasks/LOCAL-009/01-taskitem-click-description.md
-- L50: todo/ folder reference
-- L56: todo/ folder reference
-- L50: in_progress/ folder reference
-- L55: in_progress/ folder reference
-- L57: done/ folder reference
-
-### .ai/tasks/LOCAL-009/02-workitem-click-handler.md
-- L17: todo/ folder reference
-- L18: todo/ folder reference
-- L17: in_progress/ folder reference
-
-### .ai/tasks/LOCAL-009/03-register-openworkitem-command.md
-- L90: todo/ folder reference
-- L98: todo/ folder reference
-
-### .ai/tasks/LOCAL-010/02-delete-session-method.md
-- L58: cockpit/ reference
-
-### .ai/tasks/LOCAL-012/05-link-session-command.md
-- L26: status.yaml reference
-- L26: .yaml file reference
-
-### .ai/tasks/LOCAL-012/07-task-create-integration.md
-- L22: cockpit/ reference
-
-### .ai/tasks/LOCAL-013/04-task-create-integration.md
-- L17: todo/ folder reference
-- L28: todo/ folder reference
-- L49: todo/ folder reference
-- L18: in_progress/ folder reference
-
-### .ai/tasks/LOCAL-014/07-wire-tree-view.md
-- L45: todo/ folder reference
-
-### .ai/tasks/LOCAL-015/04-cleanup-service.md
-- L61: cockpit/ reference
-- L63: cockpit/ reference
-- L76: cockpit/ reference
-- L78: cockpit/ reference
-- L91: cockpit/ reference
-- L173: cockpit/ reference
-- L174: cockpit/ reference
-
-### .ai/tasks/LOCAL-015/05-active-task-cleanup.md
-- L21: cockpit/ reference
-
-### .ai/tasks/LOCAL-015/06-tests.md
-- L32: cockpit/ reference
-- L33: cockpit/ reference
-- L45: cockpit/ reference
-- L57: cockpit/ reference
-- L69: cockpit/ reference
-- L90: cockpit/ reference
-- L100: cockpit/ reference
-
-### .ai/tasks/LOCAL-018/02-parse-color-yaml.md
-- L5: status.yaml reference
-- L18: status.yaml reference
-- L23: status.yaml reference
-- L36: status.yaml reference
-- L38: status.yaml reference
-- L49: status.yaml reference
-- L56: status.yaml reference
-- L1: .yaml file reference
-- L5: .yaml file reference
-- L18: .yaml file reference
-- L23: .yaml file reference
-- L34: .yaml file reference
-- L36: .yaml file reference
-- L38: .yaml file reference
-- L49: .yaml file reference
-- L56: .yaml file reference
-
-### .ai/tasks/LOCAL-018/03-taskitem-color.md
-- L101: status.yaml reference
-- L101: .yaml file reference
-
-### .ai/tasks/LOCAL-018/05-task-create-color-picker.md
-- L41: status.yaml reference
-- L44: status.yaml reference
-- L49: status.yaml reference
-- L93: status.yaml reference
-- L101: status.yaml reference
-- L103: status.yaml reference
-- L44: status.yaml update instruction
-- L41: .yaml file reference
-- L44: .yaml file reference
-- L49: .yaml file reference
-- L93: .yaml file reference
-- L101: .yaml file reference
-- L103: .yaml file reference
-
-### .ai/tasks/LOCAL-018/06-terminal-tab-color.md
-- L59: status.yaml reference
-- L69: status.yaml reference
-- L59: .yaml file reference
-- L69: .yaml file reference
-
-### .ai/tasks/LOCAL-020/01-update-link-session-command.md
-- L5: todo/ folder reference
-- L5: in_progress/ folder reference
-
-### .ai/tasks/LOCAL-021/WI-01-signal-file-task-start.md
-- L25: cockpit/ reference
-- L38: cockpit/ reference
-- L39: cockpit/ reference
-- L49: cockpit/ reference
-- L59: cockpit/ reference
-- L103: cockpit/ reference
-- L112: cockpit/ reference
-
-### .ai/tasks/LOCAL-021/WI-02-filewatcher-signal-monitor.md
-- L183: cockpit/ reference
-- L209: cockpit/ reference
-
-### .ai/tasks/LOCAL-021/WI-03-session-update-method.md
-- L115: cockpit/ reference
-
-### .ai/tasks/LOCAL-021/WI-04-wire-signal-handler.md
-- L211: cockpit/ reference
-
-### .ai/tasks/LOCAL-021/WI-05-continuous-verification.md
-- L254: cockpit/ reference
-- L277: cockpit/ reference
-
-### .ai/tasks/LOCAL-021/WI-06-edge-cases-cleanup.md
-- L172: cockpit/ reference
-- L399: cockpit/ reference
-
-### .ai/tasks/LOCAL-023/02-refactor-session-manager.md
-- L35: cockpit/ reference
-
-### .ai/tasks/LOCAL-023/03-fix-cleanup-service.md
-- L17: cockpit/ reference
-- L78: cockpit/ reference
-
-### .ai/tasks/LOCAL-023/04-extension-lifecycle.md
-- L154: cockpit/ reference
-- L160: cockpit/ reference
-
-### .ai/tasks/LOCAL-023/05-update-tests.md
-- L23: cockpit/ reference
-
-### .ai/tasks/LOCAL-025/01-install-script.md
-- L34: cockpit/ reference
-- L36: cockpit/ reference
-
-### .ai/tasks/LOCAL-025/03-test-script.md
-- L32: cockpit/ reference
-- L33: cockpit/ reference
-
-### .ai/tasks/LOCAL-027/06-framework-command.md
-- L89: manifest.yaml reference
-- L89: .yaml file reference
-
 ### .ai/docs/_architecture/README.md
-- L12: cockpit/ reference
-- L30: cockpit/ reference
+- L18: cockpit/ reference
+- L36: cockpit/ reference
 
 ### .ai/docs/_architecture/active-task-schema.md
-- L159: manifest.yaml reference
-- L77: in_progress/ folder reference
-- L4: cockpit/ reference
-- L121: cockpit/ reference
-- L122: cockpit/ reference
-- L159: .yaml file reference
+- L165: manifest.yaml reference
+- L83: in_progress/ folder reference
+- L10: cockpit/ reference
+- L127: cockpit/ reference
+- L128: cockpit/ reference
+- L165: .yaml file reference
 
 ### .ai/docs/_architecture/ai-cockpit-mvp-v1.md
-- L275: status.yaml reference
-- L275: .yaml file reference
+- L281: status.yaml reference
+- L281: .yaml file reference
 
 ### .ai/docs/_architecture/ai-cockpit-mvp-v2.md
-- L124: todo/ folder reference
-- L157: todo/ folder reference
-- L125: in_progress/ folder reference
-- L141: in_progress/ folder reference
-- L162: in_progress/ folder reference
-- L210: in_progress/ folder reference
-- L182: done/ folder reference
-- L36: cockpit/ reference
-- L62: cockpit/ reference
-- L74: cockpit/ reference
-- L112: cockpit/ reference
-- L164: cockpit/ reference
-- L184: cockpit/ reference
-- L202: cockpit/ reference
-- L232: cockpit/ reference
-- L315: cockpit/ reference
-- L349: cockpit/ reference
-- L472: cockpit/ reference
-- L484: cockpit/ reference
-- L516: cockpit/ reference
-- L553: cockpit/ reference
-- L577: cockpit/ reference
+- L130: todo/ folder reference
+- L163: todo/ folder reference
+- L131: in_progress/ folder reference
+- L147: in_progress/ folder reference
+- L168: in_progress/ folder reference
+- L216: in_progress/ folder reference
+- L188: done/ folder reference
+- L42: cockpit/ reference
+- L68: cockpit/ reference
+- L80: cockpit/ reference
+- L118: cockpit/ reference
+- L170: cockpit/ reference
+- L190: cockpit/ reference
+- L208: cockpit/ reference
+- L238: cockpit/ reference
+- L321: cockpit/ reference
+- L355: cockpit/ reference
+- L478: cockpit/ reference
+- L490: cockpit/ reference
+- L522: cockpit/ reference
+- L559: cockpit/ reference
 - L583: cockpit/ reference
-- L632: cockpit/ reference
-- L701: cockpit/ reference
-- L703: cockpit/ reference
+- L589: cockpit/ reference
+- L638: cockpit/ reference
+- L707: cockpit/ reference
+- L709: cockpit/ reference
 
 ### .ai/docs/_architecture/shadow-copy-system.md
-- L45: cockpit/ reference
-- L69: cockpit/ reference
-- L263: cockpit/ reference
-- L307: cockpit/ reference
+- L51: cockpit/ reference
+- L75: cockpit/ reference
+- L269: cockpit/ reference
+- L313: cockpit/ reference
 
 ### .ai/docs/_completed_tasks.md
-- L7: done/ folder reference
-- L8: done/ folder reference
-- L9: done/ folder reference
-- L10: done/ folder reference
-- L11: done/ folder reference
-- L12: done/ folder reference
 - L13: done/ folder reference
 - L14: done/ folder reference
 - L15: done/ folder reference
@@ -294,22 +81,28 @@ to be updated to use vault-native patterns (frontmatter, mcpvault MCP tools).
 - L28: done/ folder reference
 - L29: done/ folder reference
 - L30: done/ folder reference
+- L31: done/ folder reference
+- L32: done/ folder reference
+- L33: done/ folder reference
+- L34: done/ folder reference
+- L35: done/ folder reference
+- L36: done/ folder reference
 
 ### .ai/docs/ai-framework/README.md
-- L12: manifest.yaml reference
-- L36: manifest.yaml reference
-- L23: todo/ folder reference
-- L23: in_progress/ folder reference
-- L12: .yaml file reference
-- L36: .yaml file reference
+- L20: manifest.yaml reference
+- L44: manifest.yaml reference
+- L31: todo/ folder reference
+- L31: in_progress/ folder reference
+- L20: .yaml file reference
+- L44: .yaml file reference
 
 ### .ai/docs/feedback-system.md
-- L18: in_progress/ folder reference
+- L24: in_progress/ folder reference
 
 ### .ai/docs/vscode-extension/README.md
-- L22: cockpit/ reference
-- L37: cockpit/ reference
-- L42: cockpit/ reference
+- L30: cockpit/ reference
+- L45: cockpit/ reference
+- L50: cockpit/ reference
 
 ### .ai/_framework/commands/ask.md
 - L78: manifest.yaml reference

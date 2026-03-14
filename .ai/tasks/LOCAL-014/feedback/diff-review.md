@@ -11,6 +11,6 @@ file_hashes:
 
 ---
 
-### /Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/in_progress/LOCAL-014/status.yaml:14
+### /Users/gabriel.herter/Documents/Personal/ai-framework/.ai/tasks/in_progress/[[LOCAL-014]]/status.yaml:14
 <!-- id: 8ddrud | status: open | created: 2025-12-30T15:04:02.338Z -->
 TEST

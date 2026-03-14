@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-027]]
+
+
 # Remove DiffReviewPanel
 
 ## Objective
@@ -47,7 +50,7 @@ And remove them.
 ## Acceptance Criteria
 
 - [ ] DiffReviewPanel.ts is deleted
-- [ ] diff-review.css is deleted
+- [ ] [[diff-review]].css is deleted
 - [ ] diff-review.js is deleted
 - [ ] No compile errors after removal
 - [ ] Extension still loads correctly

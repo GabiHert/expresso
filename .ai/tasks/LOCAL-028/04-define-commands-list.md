@@ -12,6 +12,9 @@ tags:
 branch: main
 ---
 
+> Parent: [[LOCAL-028]]
+
+
 # Define Valid Commands List
 
 ## Objective
@@ -21,10 +24,10 @@ Create constants for the list of valid Claude commands and the decoration style 
 ## Pre-Implementation
 
 Reference: Commands are defined in `.ai/_framework/commands/`:
-- /task-start, /task-work, /task-done, /task-explore, /task-status
-- /task-review, /task-resume, /task-create
-- /init, /help, /ask, /enhance, /document, /ai-sync
-- /address-feedback, /command-create, /command-extend, /expresso
+- /[[task-start]], /[[task-work]], /[[task-done]], /[[task-explore]], /[[task-status]]
+- /[[task-review]], /[[task-resume]], /[[task-create]]
+- /init, /help, /ask, /enhance, /document, /[[ai-sync]]
+- /address-feedback, /[[command-create]], /[[command-extend]], /expresso
 
 ## Implementation Steps
 

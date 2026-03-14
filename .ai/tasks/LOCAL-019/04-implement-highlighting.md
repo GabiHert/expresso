@@ -11,7 +11,10 @@ tags:
   - vscode-extension
 ---
 
-# Implement Syntax Highlighting in diff-review.js
+> Parent: [[LOCAL-019]]
+
+
+# Implement Syntax Highlighting in [[diff-review]].js
 
 ## Objective
 

@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-008]]
+
+
 # Fix SessionItem Click Handler Branching
 
 ## Objective

@@ -44,7 +44,7 @@ When multitasking with multiple concurrent tasks, it's difficult to visually dis
 | 02 | Update status.yaml parsing for color | vscode-extension | todo |
 | 03 | Apply task color to TaskItem icons | vscode-extension | todo |
 | 04 | Inherit color in SessionItem display | vscode-extension | todo |
-| 05 | Add color picker to /task-create flow | ai-framework | todo |
+| 05 | Add color picker to /[[task-create]] flow | ai-framework | todo |
 | 06 | Terminal tab color support | vscode-extension | todo |
 
 ## Branches

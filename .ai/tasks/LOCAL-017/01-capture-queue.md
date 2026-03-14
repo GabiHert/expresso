@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-017]]
+
+
 # Add Capture Queue to extension.ts
 
 ## Objective

@@ -11,11 +11,14 @@ tags:
   - ai-framework
 ---
 
+> Parent: [[LOCAL-026]]
+
+
 # Update Work-Item Template
 
 ## Objective
 
-Enhance the work-item template to include explicit repository path and branch information in the YAML frontmatter, so agents always have context about where to work.
+Enhance the [[work-item]] template to include explicit repository path and branch information in the YAML frontmatter, so agents always have context about where to work.
 
 ## Pre-Implementation
 
@@ -84,7 +87,7 @@ Add a visible reminder:
 -->
 ```
 
-### Step 3: Update task-create.md Work Item Generation
+### Step 3: Update [[task-create]].md Work Item Generation
 
 **File**: `.ai/_framework/commands/task-create.md`
 
@@ -121,7 +124,7 @@ protected: {true|false}
 ```
 ```
 
-### Step 4: Update task-work.md to Use New Fields
+### Step 4: Update [[task-work]].md to Use New Fields
 
 **File**: `.ai/_framework/commands/task-work.md`
 

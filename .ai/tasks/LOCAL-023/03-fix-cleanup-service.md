@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-023]]
+
+
 # Refactor CockpitCleanupService to Use SessionManager API
 
 ## Objective

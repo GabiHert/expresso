@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-007]]
+
+
 # Make Claude History Path Configurable
 
 ## Objective

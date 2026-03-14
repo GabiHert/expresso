@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-009]]
+
+
 # Add WorkItemNode click handler
 
 ## Objective

@@ -51,7 +51,7 @@ Persists the currently active task context, including all repository paths and g
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `taskId` | string | Yes | Task identifier (e.g., "LOCAL-026", "JIRA-123") |
+| `taskId` | string | Yes | Task identifier (e.g., "[[LOCAL-026]]", "JIRA-123") |
 | `title` | string | Yes | Human-readable task title |
 | `frameworkPath` | string | Yes | Relative path to task folder from project root |
 | `startedAt` | string | Yes | ISO 8601 timestamp when task was started |

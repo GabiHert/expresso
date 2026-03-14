@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-018]]
+
+
 # Update Status.yaml Parsing for Color
 
 ## Objective

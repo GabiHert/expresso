@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-014]]
+
+
 # Fix Path Traversal in Work Item Opening
 
 ## Objective

@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-011]]
+
+
 # Change Default Click Command to showFullDiff
 
 ## Objective

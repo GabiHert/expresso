@@ -82,7 +82,7 @@ This is the recommended command to run at the start of any new AI session when c
 
 **If task ID provided:**
 - Look for task in `.ai/tasks/in_progress/{task-id}/`
-- If not found, say: "Task {task-id} is not in progress. Use /task-status to see all tasks."
+- If not found, say: "Task {task-id} is not in progress. Use /[[task-status]] to see all tasks."
 
 **If no task ID provided:**
 - Scan `.ai/tasks/in_progress/`

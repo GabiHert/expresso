@@ -740,7 +740,7 @@ For AI Cockpit, the key hooks are:
 | SessionStart | Initialize cockpit task context |
 | Stop | Optionally validate all subtasks complete |
 
-See [AI Cockpit MVP v1](../_architecture/ai-cockpit-mvp-v1.md) for integration details.
+See [AI Cockpit MVP v1](../_architecture/[[ai-cockpit-mvp-v1]].md) for integration details.
 
 ---
 

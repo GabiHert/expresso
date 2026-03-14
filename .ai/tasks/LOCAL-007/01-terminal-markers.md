@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-007]]
+
+
 # Improve Session Capture with Unique Terminal Markers
 
 ## Objective

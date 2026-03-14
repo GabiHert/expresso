@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-009]]
+
+
 # Register openWorkItem command
 
 ## Objective

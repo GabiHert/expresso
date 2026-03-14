@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-009]]
+
+
 # Change TaskItem click to open description
 
 ## Objective

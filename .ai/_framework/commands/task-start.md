@@ -113,8 +113,8 @@ Start a task by moving it from todo to in_progress, reading the task context, an
 **If task ID provided:**
 - Look for task in `.ai/tasks/todo/{task-id}/`
 - If not found in todo, check `.ai/tasks/in_progress/{task-id}/`
-  - If found there, say: "Task {task-id} is already in progress. Use /task-resume to continue."
-- If not found anywhere, say: "Task {task-id} not found. Use /task-status to see available tasks."
+  - If found there, say: "Task {task-id} is already in progress. Use /[[task-resume]] to continue."
+- If not found anywhere, say: "Task {task-id} not found. Use /[[task-status]] to see available tasks."
 
 **If no task ID provided:**
 - List available tasks in todo/:

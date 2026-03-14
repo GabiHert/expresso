@@ -115,7 +115,7 @@ in the project root or source directories.
 
 3. Find the current task:
    - Look in `.ai/tasks/in_progress/`
-   - If no task found, say: "No task in progress. Use /task-start to begin a task."
+   - If no task found, say: "No task in progress. Use /[[task-start]] to begin a task."
    - If multiple tasks found, list them and ask which one to work on:
      ```
      Multiple tasks in progress:
@@ -137,7 +137,7 @@ in the project root or source directories.
 - Check for any items in in_progress/ first
   - If found, offer to continue: "Work item {id} is in progress. Continue with this? (y/n)"
 - If none in progress, pick the first item from todo/
-  - If no items in todo, say: "All work items complete! Use /task-done to finish the task."
+  - If no items in todo, say: "All work items complete! Use /[[task-done]] to finish the task."
 
 ### Step 2: Move to In Progress
 
@@ -479,7 +479,7 @@ Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 
 **If auto_sync is enabled:**
 
-Use the ai-sync agent to commit and push changes:
+Use the [[ai-sync]] agent to commit and push changes:
 ```
 Use the ai-sync agent to sync the .ai folder changes
 ```

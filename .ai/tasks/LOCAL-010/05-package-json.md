@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-010]]
+
+
 # Add Package.json Command and Menu Contributions
 
 ## Objective

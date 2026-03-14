@@ -851,6 +851,166 @@ ${Object.entries(grouped).map(([file, refs]) => {
   console.log(`\n📋 Full report written to: ${path.relative(projectRoot, reportPath)}`);
 }
 
+// Step 10: Auto-link pass
+// Scans all migrated .md files for plain-text references to known note names
+// and converts them to [[wikilinks]] where they aren't already linked.
+function autoLinkPass(aiDir) {
+  console.log('\n🔗 Step 10: Auto-link pass (convert plain references to wikilinks)');
+
+  // Build index of all note names (filename without .md)
+  const noteNames = new Set();
+  collectNoteNames(aiDir, noteNames);
+
+  // Sort by length descending so longer names match first (prevents partial matches)
+  const sortedNames = [...noteNames].sort((a, b) => b.length - a.length);
+
+  console.log(`  Found ${sortedNames.length} notes to cross-reference`);
+
+  // Scan all .md files and inject wikilinks
+  let totalLinksAdded = 0;
+  totalLinksAdded += linkFilesInDir(aiDir, sortedNames);
+
+  // Also add parent backlinks to any work-item that doesn't have one yet
+  const backlinksAdded = addParentBacklinks(aiDir);
+  totalLinksAdded += backlinksAdded;
+
+  console.log(`  Added ${totalLinksAdded} wikilinks (including ${backlinksAdded} parent backlinks)`);
+}
+
+function addParentBacklinks(dir) {
+  let count = 0;
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.name === '.obsidian' || entry.name === 'tmp') continue;
+
+    if (entry.isDirectory()) {
+      count += addParentBacklinks(fullPath);
+    } else if (entry.isFile() && entry.name.endsWith('.md')) {
+      const content = readFile(fullPath);
+      if (!content) continue;
+
+      const { frontmatter } = parseFrontmatterAndBody(content);
+      if (!frontmatter || frontmatter.type !== 'work-item' || !frontmatter.parent) continue;
+
+      // Check if backlink already exists
+      if (content.includes(`> Parent: [[${frontmatter.parent}]]`)) continue;
+
+      // Inject backlink after frontmatter
+      const fmEnd = findFrontmatterEnd(content);
+      const fm = content.substring(0, fmEnd);
+      const body = content.substring(fmEnd);
+      const linked = `${fm}\n\n> Parent: [[${frontmatter.parent}]]\n${body}`;
+
+      fs.writeFileSync(fullPath, linked, 'utf8');
+      count++;
+    }
+  }
+  return count;
+}
+
+function collectNoteNames(dir, names) {
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.name === '.obsidian' || entry.name === 'tmp') continue;
+    if (entry.isDirectory()) {
+      collectNoteNames(fullPath, names);
+    } else if (entry.isFile() && entry.name.endsWith('.md')) {
+      names.add(entry.name.replace('.md', ''));
+    }
+  }
+}
+
+// Words that are also note names but should NOT be auto-linked in prose
+const SKIP_AUTOLINK = new Set([
+  'context', 'document', 'manifest', 'help', 'init', 'ask', 'enhance',
+  'overview', 'README', 'INDEX', 'status',
+]);
+
+function linkFilesInDir(dir, noteNames) {
+  let count = 0;
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.name === '.obsidian' || entry.name === 'tmp') continue;
+
+    if (entry.isDirectory()) {
+      count += linkFilesInDir(fullPath, noteNames);
+    } else if (entry.isFile() && entry.name.endsWith('.md')) {
+      const content = readFile(fullPath);
+      if (!content) continue;
+
+      // Only replace in body, not in frontmatter
+      const fmEnd = findFrontmatterEnd(content);
+      const fm = content.substring(0, fmEnd);
+      let body = content.substring(fmEnd);
+      let fileLinks = 0;
+      const thisNote = entry.name.replace('.md', '');
+
+      // Strip code blocks before linking, restore after
+      const codeBlocks = [];
+      body = body.replace(/```[\s\S]*?```/g, (match) => {
+        codeBlocks.push(match);
+        return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
+      });
+      // Strip inline code
+      const inlineCode = [];
+      body = body.replace(/`[^`]+`/g, (match) => {
+        inlineCode.push(match);
+        return `__INLINE_CODE_${inlineCode.length - 1}__`;
+      });
+
+      for (const name of noteNames) {
+        if (name === thisNote) continue;
+        if (name.length < 6) continue;
+        if (SKIP_AUTOLINK.has(name)) continue;
+
+        // Only match task IDs (LOCAL-xxx, EEXPR-xxx) and hyphenated note names
+        if (!/^[A-Z]+-\d+/.test(name) && !/^[a-z]+-[a-z]/.test(name)) continue;
+
+        const regex = new RegExp(
+          `(?<!\\[\\[)\\b(${escapeRegex(name)})\\b(?!\\]\\])`,
+          'g'
+        );
+
+        let replaced = false;
+        body = body.replace(regex, (match) => {
+          if (replaced) return match;
+          replaced = true;
+          fileLinks++;
+          return `[[${match}]]`;
+        });
+      }
+
+      // Restore code blocks
+      body = body.replace(/__CODE_BLOCK_(\d+)__/g, (_, i) => codeBlocks[i]);
+      body = body.replace(/__INLINE_CODE_(\d+)__/g, (_, i) => inlineCode[i]);
+
+      if (fileLinks > 0) {
+        fs.writeFileSync(fullPath, fm + body, 'utf8');
+        count += fileLinks;
+      }
+    }
+  }
+  return count;
+}
+
+function findFrontmatterEnd(content) {
+  const trimmed = content.trimStart();
+  if (!trimmed.startsWith('---')) return 0;
+  const offset = content.length - trimmed.length;
+  const endIdx = trimmed.indexOf('---', 3);
+  if (endIdx === -1) return 0;
+  return offset + endIdx + 3;
+}
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 // ============================================================
 // MAIN
 // ============================================================
@@ -886,6 +1046,7 @@ function main() {
   initObsidian(aiDir);
   setupMcpJson(resolvedRoot, aiDir);
   scanFrameworkCommands(aiDir);
+  autoLinkPass(aiDir);
   printReport(resolvedRoot);
 
   console.log('\n✅ Migration complete!');

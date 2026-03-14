@@ -86,7 +86,7 @@ Orchestrate the execution of all work items in a task by launching isolated back
 3. Find the current task:
    - Look in `.ai/tasks/in_progress/`
    - If task ID provided as argument, find that specific task
-   - If no task found, say: "No task in progress. Use /task-start to begin a task."
+   - If no task found, say: "No task in progress. Use /[[task-start]] to begin a task."
    - If multiple tasks found, list them and ask which one:
      ```
      Multiple tasks in progress:
@@ -504,7 +504,7 @@ Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 
 **If auto_sync is enabled:**
 
-Use the ai-sync agent to commit and push changes:
+Use the [[ai-sync]] agent to commit and push changes:
 ```
 Use the ai-sync agent to sync the .ai folder changes
 ```

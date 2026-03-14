@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-008]]
+
+
 # Add focusSession Command for Active Sessions
 
 ## Objective

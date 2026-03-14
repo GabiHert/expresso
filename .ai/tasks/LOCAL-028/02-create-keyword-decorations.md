@@ -12,6 +12,9 @@ tags:
 branch: main
 ---
 
+> Parent: [[LOCAL-028]]
+
+
 # Create Keyword Decoration Types
 
 ## Objective

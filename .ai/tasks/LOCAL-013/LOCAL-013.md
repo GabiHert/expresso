@@ -80,7 +80,7 @@ The solution should be simple: store feedback as markdown in the task documentat
 1. Design a simple markdown format for feedback (file path + line + comment)
 2. Create framework command that reads feedback and formats for agent
 3. Add VSCode button that opens feedback file in editor
-4. Update task-create to include feedback folder in new tasks
+4. Update [[task-create]] to include feedback folder in new tasks
 
 ## Risks & Considerations
 
@@ -97,5 +97,5 @@ The solution should be simple: store feedback as markdown in the task documentat
 
 ## References
 
-- Exploration from /task-explore session on diff commenting
+- Exploration from /[[task-explore]] session on diff commenting
 - Shadow copy system docs: `.ai/docs/_architecture/shadow-copy-system.md`

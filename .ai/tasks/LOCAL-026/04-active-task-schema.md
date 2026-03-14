@@ -11,6 +11,9 @@ tags:
   - ai-framework
 ---
 
+> Parent: [[LOCAL-026]]
+
+
 # Enhance active-task.json Schema
 
 ## Objective
@@ -44,7 +47,7 @@ and git information needed for safe git operations.
 
 ```json
 {
-  "taskId": "string",           // Required: Task identifier (e.g., "LOCAL-026")
+  "taskId": "string",           // Required: Task identifier (e.g., "[[LOCAL-026]]")
   "title": "string",            // Required: Task title
   "frameworkPath": "string",    // Required: Path to task folder in .ai/tasks/
   "startedAt": "string",        // Required: ISO timestamp
@@ -103,7 +106,7 @@ Before any git operation:
 5. If `protected: true`, block the operation
 ```
 
-### Step 2: Update task-start.md to Write New Schema
+### Step 2: Update [[task-start]].md to Write New Schema
 
 **File**: `.ai/_framework/commands/task-start.md`
 
@@ -146,7 +149,7 @@ Replace the active-task.json writing logic:
    ```
 ```
 
-### Step 3: Update task-resume.md to Read New Schema
+### Step 3: Update [[task-resume]].md to Read New Schema
 
 **File**: `.ai/_framework/commands/task-resume.md`
 

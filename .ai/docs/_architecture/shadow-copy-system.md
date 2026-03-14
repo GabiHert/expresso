@@ -11,7 +11,7 @@ tags:
 ╠══════════════════════════════════════════════════════════════════╣
 ║ NAVIGATION:                                                      ║
 ║ • Parent: .ai/docs/_architecture/README.md                       ║
-║ • Related: ai-cockpit-mvp-v2.md                                  ║
+║ • Related: [[ai-cockpit-mvp-v2]].md                                  ║
 ║ • Index: .ai/INDEX.md                                           ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->

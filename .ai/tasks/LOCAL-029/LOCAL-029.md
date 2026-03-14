@@ -181,7 +181,7 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 ## References
 
-- Related task: LOCAL-028 (Enhanced @expresso Highlighting) - parent feature
+- Related task: [[LOCAL-028]] (Enhanced @expresso Highlighting) - parent feature
 - Extension activation: `vscode-extension/src/extension.ts`
 - Scanner: `vscode-extension/src/services/ExpressoScanner.ts`
 - Completion: `vscode-extension/src/providers/ExpressoCompletionProvider.ts`

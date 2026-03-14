@@ -405,7 +405,7 @@ Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
 
 **If auto_sync is enabled:**
 
-Use the ai-sync agent to commit and push changes:
+Use the [[ai-sync]] agent to commit and push changes:
 ```
 Use the ai-sync agent to sync the .ai folder changes
 ```

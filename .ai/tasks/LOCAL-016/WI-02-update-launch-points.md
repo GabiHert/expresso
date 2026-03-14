@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-016]]
+
+
 # Update All Claude Launch Points
 
 ## Objective

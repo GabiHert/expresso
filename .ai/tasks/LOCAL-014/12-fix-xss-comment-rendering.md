@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-014]]
+
+
 # Fix XSS Vulnerability in Comment Rendering
 
 ## Objective

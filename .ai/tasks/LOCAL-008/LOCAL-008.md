@@ -104,5 +104,5 @@ Click SessionItem →
 
 ## References
 
-- Exploration from /task-explore (2025-12-29)
-- Related: LOCAL-007 (session tracking fixes)
+- Exploration from /[[task-explore]] (2025-12-29)
+- Related: [[LOCAL-007]] (session tracking fixes)

@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-019]]
+
+
 # Test and Verify Syntax Highlighting
 
 ## Objective
@@ -23,7 +26,7 @@ Ensure all previous work items are complete:
 - [ ] Prism.js vendor file is in place
 - [ ] VSCode theme CSS is created
 - [ ] HTML template loads Prism assets
-- [ ] diff-review.js has highlighting logic
+- [ ] [[diff-review]].js has highlighting logic
 
 ## Testing Steps
 

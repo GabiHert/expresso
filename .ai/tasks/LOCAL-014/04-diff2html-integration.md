@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-014]]
+
+
 # Integrate diff2html Rendering
 
 ## Objective

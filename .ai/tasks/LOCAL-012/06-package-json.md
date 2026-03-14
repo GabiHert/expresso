@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-012]]
+
+
 # Add package.json Contributions
 
 ## Objective

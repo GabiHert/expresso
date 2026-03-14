@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-018]]
+
+
 # Apply Task Color to TaskItem Icons
 
 ## Objective

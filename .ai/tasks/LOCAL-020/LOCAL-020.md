@@ -99,5 +99,5 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 ## References
 
-- Exploration findings from task-explore command
+- Exploration findings from [[task-explore]] command
 - Related: Session management in SessionManager.ts

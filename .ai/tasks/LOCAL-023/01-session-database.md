@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-023]]
+
+
 # Create SessionDatabase Abstraction Layer
 
 ## Objective

@@ -11,6 +11,9 @@ tags:
   - ai-framework
 ---
 
+> Parent: [[LOCAL-025]]
+
+
 # Create INSTALL.md Documentation
 
 ## Objective

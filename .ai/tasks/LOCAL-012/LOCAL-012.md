@@ -39,7 +39,7 @@ The solution:
 - [ ] Sessions can be linked to tasks via context menu "Link to Task"
 - [ ] Quick pick shows available tasks when linking
 - [ ] Task sessions filter excludes "_unassigned" sessions
-- [ ] /task-create can link current unassigned session to new task
+- [ ] /[[task-create]] can link current unassigned session to new task
 
 ## Work Items
 

@@ -78,7 +78,7 @@ prompt as context for the agent to execute.
 
 ## Command Integration
 
-### /task-start Integration
+### /[[task-start]] Integration
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -127,7 +127,7 @@ prompt as context for the agent to execute.
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### /task-work Integration
+### /[[task-work]] Integration
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -185,7 +185,7 @@ prompt as context for the agent to execute.
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### /task-done Integration
+### /[[task-done]] Integration
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐

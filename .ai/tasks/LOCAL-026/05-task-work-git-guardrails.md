@@ -11,7 +11,10 @@ tags:
   - ai-framework
 ---
 
-# Add Git Guardrails to task-work
+> Parent: [[LOCAL-026]]
+
+
+# Add Git Guardrails to [[task-work]]
 
 ## Objective
 

@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-022]]
+
+
 # Update diff generator to use full file context
 
 ## Objective

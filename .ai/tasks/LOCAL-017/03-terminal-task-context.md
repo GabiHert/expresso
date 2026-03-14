@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-017]]
+
+
 # Add Task Context to TerminalManager
 
 ## Objective

@@ -11,6 +11,9 @@ tags:
   - ai-framework
 ---
 
+> Parent: [[LOCAL-013]]
+
+
 # Task-Create Integration
 
 ## Objective
@@ -19,7 +22,7 @@ Update the `/task-create` command to include the `feedback/` folder in newly cre
 
 ## Implementation Steps
 
-### Step 1: Update task-create command
+### Step 1: Update [[task-create]] command
 
 **File**: `.ai/_framework/commands/task-create.md`
 

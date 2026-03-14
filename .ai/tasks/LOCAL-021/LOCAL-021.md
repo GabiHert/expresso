@@ -36,7 +36,7 @@ When users run `/task-start TASK-B` within a Claude session that was created for
 **Real Example**:
 - Session `2ca083d5-a144-4324-94d6-02f1e2e2d8b6` ran `/task-start LOCAL-018`
 - Registry shows: `"taskId": "LOCAL-019"` (wrong!)
-- Resume LOCAL-018 → opens wrong session
+- Resume [[LOCAL-018]] → opens wrong session
 
 ## Acceptance Criteria
 
@@ -55,7 +55,7 @@ When users run `/task-start TASK-B` within a Claude session that was created for
 
 | ID | Name | Repo | Status |
 |----|------|------|--------|
-| WI-01 | Add signal file write to /task-start | ai-framework | todo |
+| WI-01 | Add signal file write to /[[task-start]] | ai-framework | todo |
 | WI-02 | Extend FileWatcher to monitor signal | vscode-extension | todo |
 | WI-03 | Add session task update method | vscode-extension | todo |
 | WI-04 | Wire signal handler in extension | vscode-extension | todo |
@@ -303,7 +303,7 @@ it('should emit onTaskSwitched when signal file changes', (done) => {
 ### Integration Tests
 
 **End-to-end signal flow**:
-1. Create session for LOCAL-019
+1. Create session for [[LOCAL-019]]
 2. Verify `sessions.json` shows `taskId: LOCAL-019`
 3. Write signal file: `LOCAL-019 → LOCAL-018`
 4. Wait 500ms for FileWatcher detection
@@ -347,7 +347,7 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 ## References
 
-- Previous fix: LOCAL-017 (session capture queue)
+- Previous fix: [[LOCAL-017]] (session capture queue)
 - Exploration report: agentId a0cc4ae (deep-dive analysis)
 - Claude history format: `~/.claude/history.jsonl`
 - VSCode FileSystemWatcher API: https://code.visualstudio.com/api/references/vscode-api#FileSystemWatcher

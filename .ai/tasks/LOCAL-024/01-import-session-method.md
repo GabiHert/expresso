@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-024]]
+
+
 # Add importSession Method to SessionManager
 
 ## Objective

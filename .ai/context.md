@@ -29,7 +29,7 @@
 
 | Status | Count | Details |
 |--------|-------|---------|
-| **In Progress** | 3 | LOCAL-022, LOCAL-023, LOCAL-026 |
+| **In Progress** | 3 | [[LOCAL-022]], [[LOCAL-023]], [[LOCAL-026]] |
 | **Todo** | 0 | - |
 | **Recently Done** | 21 | EPIC-001 + LOCAL-001..021: AI Cockpit MVP v2 + Task Colors + Syntax Highlighting + Session Sync |
 
@@ -71,7 +71,7 @@ Cost-optimized subagents using Haiku model (~70% savings):
 - `help` - Show available commands
 - `ai-sync` - Sync .ai/ folder with git
 
-Usage: "Use the task-status agent to show status"
+Usage: "Use the [[task-status]] agent to show status"
 
 ---
 

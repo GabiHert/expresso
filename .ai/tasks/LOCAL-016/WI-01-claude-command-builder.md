@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-016]]
+
+
 # Create Claude Command Builder Helper
 
 ## Objective

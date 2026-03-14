@@ -41,7 +41,7 @@ The diff review panel displays code without syntax highlighting. While diff2html
 | 01 | Add Prism.js vendor files | vscode-extension | todo |
 | 02 | Create VSCode-compatible Prism theme | vscode-extension | todo |
 | 03 | Update DiffReviewPanel HTML template | vscode-extension | todo |
-| 04 | Implement syntax highlighting in diff-review.js | vscode-extension | todo |
+| 04 | Implement syntax highlighting in [[diff-review]].js | vscode-extension | todo |
 | 05 | Test and verify highlighting | vscode-extension | todo |
 
 ## Branches

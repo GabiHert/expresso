@@ -132,7 +132,7 @@ Available variables for prompt templates:
 
 | Variable | Description |
 |----------|-------------|
-| `{task_id}` | Current task ID (e.g., LOCAL-028) |
+| `{task_id}` | Current task ID (e.g., [[LOCAL-028]]) |
 | `{task_readme}` | Contents of task README.md |
 | `{work_item}` | Current work item contents |
 | `{work_item_id}` | Work item identifier |

@@ -11,8 +11,8 @@ tags:
 ╠══════════════════════════════════════════════════════════════════╣
 ║ NAVIGATION:                                                      ║
 ║ • Parent: .ai/docs/_architecture/README.md                       ║
-║ • Previous: ai-cockpit-mvp-v1.md                                 ║
-║ • Related: claude-code-hooks.md                                  ║
+║ • Previous: [[ai-cockpit-mvp-v1]].md                                 ║
+║ • Related: [[claude-code-hooks]].md                                  ║
 ║ • Index: .ai/INDEX.md                                           ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
@@ -196,7 +196,7 @@ Each session's edits are routed independently to their specified task.
 
 ## Framework Command Updates
 
-### /task-start Enhancement
+### /[[task-start]] Enhancement
 
 Add cockpit integration to `/task-start`:
 
@@ -226,7 +226,7 @@ After moving task to in_progress:
    ```
 ```
 
-### /task-done Enhancement
+### /[[task-done]] Enhancement
 
 Add cockpit cleanup to `/task-done`:
 

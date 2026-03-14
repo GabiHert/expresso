@@ -11,6 +11,9 @@ tags:
   - vscode-extension
 ---
 
+> Parent: [[LOCAL-021]]
+
+
 # Wire Signal Handler in Extension
 
 ## Objective

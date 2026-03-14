@@ -12,7 +12,7 @@ Your comment here
 ### vscode-extension/src/services/SessionManager.ts:120
 Consider adding error handling for file system errors in the verification loop.
 
-### .ai/_framework/commands/task-start.md:300
+### .ai/_framework/commands/[[task-start]].md:300
 The signal file write might fail if the .ai/cockpit directory doesn't exist yet.
 
 ---

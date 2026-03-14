@@ -11,6 +11,9 @@ tags:
   - ai-framework
 ---
 
+> Parent: [[LOCAL-027]]
+
+
 # Framework Command /expresso
 
 ## Objective

@@ -59,11 +59,11 @@ What happened:
 | ID | Name | Repo | Status |
 |----|------|------|--------|
 | 01 | Add protected flag to manifest schema | ai-framework | todo |
-| 02 | Update task-start branch creation | ai-framework | todo |
-| 03 | Update task-create to exclude protected repos | ai-framework | todo |
+| 02 | Update [[task-start]] branch creation | ai-framework | todo |
+| 03 | Update [[task-create]] to exclude protected repos | ai-framework | todo |
 | 04 | Enhance active-task.json schema | ai-framework | todo |
-| 05 | Add git guardrails to task-work | ai-framework | todo |
-| 06 | Update work-item template | ai-framework | todo |
+| 05 | Add git guardrails to [[task-work]] | ai-framework | todo |
+| 06 | Update [[work-item]] template | ai-framework | todo |
 
 ## Branches
 

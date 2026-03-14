@@ -12,6 +12,9 @@ tags:
 branch: feature/command-registry
 ---
 
+> Parent: [[LOCAL-029]]
+
+
 # Create CommandRegistry Service
 
 ## Objective

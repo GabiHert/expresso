@@ -126,6 +126,6 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 ## References
 
-- Exploration findings from /task-explore session
+- Exploration findings from /[[task-explore]] session
 - deleteSession pattern: extension.ts:540-577
 - Session context menus: package.json:246-264
