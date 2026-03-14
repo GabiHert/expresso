@@ -74,6 +74,10 @@ const GITIGNORE_ENTRIES = [
   '.obsidian/cache',
 ];
 
+const ROOT_GITIGNORE_ENTRIES = [
+  'ai-vault',
+];
+
 // ============================================================
 // HELPERS
 // ============================================================
@@ -298,15 +302,27 @@ function migrateTask(aiDir, tasksDir, taskDir, taskId, status) {
     frontmatter.tags.push(...repos);
   }
 
-  // Build wikilinks for work items in the body
+  // Build wikilinks for work items
   const wiLinks = (statusData?.work_items || [])
-    .map(wi => `- [[${taskId}-${wi.id.includes('-') ? wi.id.split('-').pop() : wi.id}]] — ${wi.name} (${wi.status})`)
+    .map(wi => {
+      const wiFilename = wi.file
+        ? path.basename(wi.file, '.md')
+        : `${taskId}-${wi.id.includes('-') ? wi.id.split('-').pop() : wi.id}`;
+      return `- [[${wiFilename}]] — ${wi.name} (${wi.status})`;
+    })
     .join('\n');
 
+  // Replace "See status.yaml" references and inject wikilinked work item list
+  body = body.replace(/See `status\.yaml` for full index\.\n?/g, '');
+
+  // Try to replace existing work items table with wikilinked version
   if (wiLinks) {
-    // Replace the "See status.yaml for full index" or work items table
-    body = body.replace(/See `status\.yaml` for full index\.\n?/g, '');
+    // Append linked work items section at the end
+    body += `\n\n## Linked Work Items\n\n${wiLinks}\n`;
   }
+
+  // Add link to manifest
+  body = `> Project: [[manifest]]\n\n${body}`;
 
   // Write task note
   const destDir = path.join(tasksDir, taskId);
@@ -380,6 +396,10 @@ function migrateWorkItems(taskDir, destDir, taskId, statusData) {
       if (wiMatch?.depends_on?.length) wiFm.depends_on = wiMatch.depends_on;
       if (wiMatch?.bdd_feature) wiFm.bdd_feature = wiMatch.bdd_feature;
       if (existingFm?.branch) wiFm.branch = existingFm.branch;
+
+      // Add backlink to parent task at the top of body
+      const backlink = `> Parent: [[${taskId}]]\n\n`;
+      wiBody = backlink + wiBody;
 
       // Write to task root (not subfolder)
       const destPath = path.join(destDir, wiFile);
@@ -468,9 +488,10 @@ function migrateExtensions(aiDir) {
     if (data.post_hooks) frontmatter.post_hooks = data.post_hooks;
     if (data.agents) frontmatter.agents = data.agents;
 
+    const extendsLink = `> Extends: [[${data.extends}]]\n\n`;
     const body = data.context
-      ? `# ${data.extends}:${data.variant}\n\n${data.context}`
-      : `# ${data.extends}:${data.variant}\n`;
+      ? `${extendsLink}# ${data.extends}:${data.variant}\n\n${data.context}`
+      : `${extendsLink}# ${data.extends}:${data.variant}\n`;
 
     const outputPath = filePath.replace(/\.yaml$/, '.md');
     writeFile(outputPath, `${toFrontmatter(frontmatter)}\n\n${body}`);
@@ -570,8 +591,18 @@ function processDocsDir(baseDir, currentDir) {
       if (repo) frontmatter.repo = repo;
       if (domain) frontmatter.domain = domain;
 
-      writeFile(fullPath, `${toFrontmatter(frontmatter)}\n\n${content}`);
-      scanForOldPatterns(fullPath, content);
+      // Add links based on metadata
+      let linkedContent = content;
+      const links = [];
+      if (repo) links.push(`[[manifest]]`);
+      // Scan for references to other docs or tasks in the content
+      // and add a navigation footer
+      if (links.length > 0) {
+        linkedContent = `> ${links.join(' | ')}\n\n${linkedContent}`;
+      }
+
+      writeFile(fullPath, `${toFrontmatter(frontmatter)}\n\n${linkedContent}`);
+      scanForOldPatterns(fullPath, linkedContent);
     }
   }
 }
@@ -622,6 +653,34 @@ function initObsidian(aiDir) {
 
   if (modified) {
     writeFile(gitignorePath, gitignore.trim() + '\n');
+  }
+
+  // Create visible symlink for Obsidian (hidden .ai folder is not selectable in macOS file picker)
+  const projectRoot = path.dirname(aiDir);
+  const symlinkPath = path.join(projectRoot, 'ai-vault');
+  try {
+    if (!fs.existsSync(symlinkPath)) {
+      fs.symlinkSync(aiDir, symlinkPath);
+      console.log(`  🔗 created symlink: ai-vault → .ai/`);
+    } else {
+      console.log(`  ⏭  symlink ai-vault already exists`);
+    }
+  } catch (e) {
+    console.warn(`  ⚠️  Could not create symlink: ${e.message}`);
+  }
+
+  // Add symlink to project root .gitignore
+  const rootGitignorePath = path.join(projectRoot, '.gitignore');
+  let rootGitignore = readFile(rootGitignorePath) || '';
+  let rootModified = false;
+  for (const entry of ROOT_GITIGNORE_ENTRIES) {
+    if (!rootGitignore.includes(entry)) {
+      rootGitignore += `\n${entry}`;
+      rootModified = true;
+    }
+  }
+  if (rootModified) {
+    writeFile(rootGitignorePath, rootGitignore.trim() + '\n');
   }
 }
 
