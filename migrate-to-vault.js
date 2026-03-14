@@ -870,11 +870,19 @@ function autoLinkPass(aiDir) {
   let totalLinksAdded = 0;
   totalLinksAdded += linkFilesInDir(aiDir, sortedNames);
 
-  // Also add parent backlinks to any work-item that doesn't have one yet
+  // Add parent backlinks to any work-item that doesn't have one yet
   const backlinksAdded = addParentBacklinks(aiDir);
   totalLinksAdded += backlinksAdded;
 
-  console.log(`  Added ${totalLinksAdded} wikilinks (including ${backlinksAdded} parent backlinks)`);
+  // Ensure task notes link to all their work items (scan folder)
+  const taskLinksAdded = addTaskToWorkItemLinks(aiDir);
+  totalLinksAdded += taskLinksAdded;
+
+  // Add links between agents and the agents index
+  const agentLinksAdded = addAgentLinks(aiDir);
+  totalLinksAdded += agentLinksAdded;
+
+  console.log(`  Added ${totalLinksAdded} wikilinks (${backlinksAdded} parent backlinks, ${taskLinksAdded} task→WI links, ${agentLinksAdded} agent links)`);
 }
 
 function addParentBacklinks(dir) {
