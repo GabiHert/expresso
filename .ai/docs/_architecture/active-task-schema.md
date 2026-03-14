@@ -4,6 +4,9 @@ tags:
   - doc
 ---
 
+> Parent: [[manifest]]
+
+
 # active-task.json Schema
 
 ## Location

@@ -20,6 +20,9 @@ repos:
   - vscode-extension
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-021: Fix Session-Task Synchronization with Signal File System
 
 ## Problem Statement
@@ -318,11 +321,11 @@ it('should emit onTaskSwitched when signal file changes', (done) => {
 3. In Claude terminal: `/task-start LOCAL-018`
 4. Wait 1 second
 5. Check Cockpit sidebar → session should show under [[LOCAL-018]]
-6. Resume session → should open LOCAL-018 task tree
+6. Resume session → should open [[LOCAL-018]] task tree
 7. Check events are tagged to LOCAL-018
 
 **Edge case: rapid switches**:
-1. Create session for LOCAL-019
+1. Create session for [[LOCAL-019]]
 2. Run: `/task-start LOCAL-020`
 3. Immediately run: `/task-start LOCAL-021`
 4. Wait 2 seconds
@@ -355,7 +358,7 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 ## Linked Work Items
 
-- [[WI-01-signal-file-task-start]] — Add signal file write to /task-start (done)
+- [[WI-01-signal-file-task-start]] — Add signal file write to /[[task-start]] (done)
 - [[WI-02-filewatcher-signal-monitor]] — Extend FileWatcher to monitor signal (done)
 - [[WI-03-session-update-method]] — Add session task update method (done)
 - [[WI-04-wire-signal-handler]] — Wire signal handler in extension (done)

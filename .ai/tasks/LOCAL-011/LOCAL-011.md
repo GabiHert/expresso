@@ -18,6 +18,9 @@ repos:
   - vscode-extension
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-011: Change Default File Click to Full Diff
 
 ## Problem Statement

@@ -18,6 +18,9 @@ repos:
   - vscode-extension
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-029: Dynamic CommandRegistry for VSCode Extension
 
 ## Problem Statement

@@ -18,6 +18,9 @@ repos:
   - vscode-extension
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-010: Rename and Delete Claude Sessions
 
 ## Problem Statement

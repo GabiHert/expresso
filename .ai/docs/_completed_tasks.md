@@ -4,6 +4,9 @@ tags:
   - doc
 ---
 
+> Parent: [[manifest]]
+
+
 # Completed Tasks Log
 
 Tasks completed in this project, for reference and learning.
@@ -28,7 +31,7 @@ Tasks completed in this project, for reference and learning.
 | 2025-12-30 | [[[LOCAL-015]]](.ai/tasks/done/[[LOCAL-015]]/) | Delete Task Functionality - Context menu deletion with cleanup of events, shadows, sessions, and active task state |
 | 2025-12-30 | [[[LOCAL-016]]](.ai/tasks/done/[[LOCAL-016]]/) | Claude Permissions Flag - Added --allow-dangerously-skip-permissions to all Claude sessions with centralized command builder |
 | 2025-12-30 | [[[LOCAL-017]]](.ai/tasks/done/[[LOCAL-017]]/) | Session ID Race Condition Fix - Atomic captureAndRegisterSession() prevents concurrent captures from grabbing each other's IDs |
-| 2026-01-05 | [[[LOCAL-018]]](.ai/tasks/done/[[LOCAL-018]]/) | Task Color Support - Optional color palette for tasks (charts.red/orange/yellow/green/blue/purple), sessions inherit parent color, terminal tab colors, color picker in /task-create |
+| 2026-01-05 | [[[LOCAL-018]]](.ai/tasks/done/[[LOCAL-018]]/) | Task Color Support - Optional color palette for tasks (charts.red/orange/yellow/green/blue/purple), sessions inherit parent color, terminal tab colors, color picker in /[[task-create]] |
 | 2026-01-06 | [[[LOCAL-019]]](.ai/tasks/done/[[LOCAL-019]]/) | Syntax Highlighting - Added Prism.js syntax highlighting to diff review panel with support for TypeScript, JavaScript, Python, Go, JSON, YAML, CSS, Bash, SQL and more |
 | 2026-01-06 | [[[LOCAL-020]]](.ai/tasks/done/[[LOCAL-020]]/) | Session TODO Assignment - Allow assigning unassigned sessions to TODO tasks (not just in-progress), showing task status in quick pick |
 | 2026-01-06 | [[[LOCAL-021]]](.ai/tasks/done/[[LOCAL-021]]/) | Signal File Session Sync (abandoned) - Implemented signal file approach for session tracking but still had issues; pivoted to SQLite approach in [[LOCAL-023]] |

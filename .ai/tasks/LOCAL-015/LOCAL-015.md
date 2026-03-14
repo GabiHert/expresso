@@ -18,6 +18,9 @@ repos:
   - vscode-extension
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-015: Delete Task Functionality
 
 ## Problem Statement

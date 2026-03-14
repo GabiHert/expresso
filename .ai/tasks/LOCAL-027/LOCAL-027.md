@@ -20,6 +20,9 @@ repos:
   - ai-framework
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-027: Implement @expresso in-code task tags
 
 ## Problem Statement
@@ -208,6 +211,7 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 
 ## Linked Work Items
+- [[08-remove-diff-review-panel]] — Remove DiffReviewPanel (done)
 
 - [[01-type-definitions]] — Type Definitions for ExpressoTag (done)
 - [[02-expresso-scanner]] — ExpressoScanner Service (done)
@@ -216,6 +220,6 @@ Use `/address-feedback` to discuss feedback with the agent.
 - [[05-clipboard-toast]] — Clipboard and Toast Functionality (done)
 - [[06-framework-command]] — Framework Command /expresso (done)
 - [[07-integration-testing]] — Integration and Testing (done)
-- [[08-remove-diff-review-panel]] — Remove DiffReviewPanel (done)
+- [[08-remove-[[diff-review]]-panel]] — Remove DiffReviewPanel (done)
 - [[09-remove-review-changes-command]] — Remove Review Changes Command (done)
 - [[10-update-treeview-context-menu]] — Update TreeView Context Menu (done)

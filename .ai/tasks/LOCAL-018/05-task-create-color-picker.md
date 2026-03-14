@@ -22,7 +22,7 @@ Update the /[[task-create]] command to offer a color selection step, allowing us
 
 ## Pre-Implementation
 
-Review the /task-create command in `.ai/_framework/commands/task-create.md`.
+Review the /[[task-create]] command in `.ai/_framework/commands/task-create.md`.
 
 ## Implementation Steps
 

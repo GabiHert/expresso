@@ -5,6 +5,9 @@ model: haiku
 tools: Read, Glob, Bash
 ---
 
+> Parent: [[manifest]]
+
+
 Follow the instructions in .ai/_framework/commands/ai-sync.md
 
 Arguments: $ARGUMENTS

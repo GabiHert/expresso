@@ -18,6 +18,9 @@ repos:
   - vscode-extension
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-020: Allow Session Assignment to TODO Tasks
 
 ## Problem Statement

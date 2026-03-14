@@ -18,6 +18,9 @@ repos:
   - ai-framework
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-026: Git Context Persistence and Repo Protection
 
 ## Problem Statement
@@ -209,10 +212,14 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 
 ## Linked Work Items
-
-- [[01-manifest-protected-flag]] — Add protected flag to manifest schema (done)
 - [[02-task-start-branch-protection]] — Update task-start branch creation (done)
 - [[03-task-create-exclude-protected]] — Update task-create to exclude protected repos (done)
-- [[04-active-task-schema]] — Enhance active-task.json schema (done)
 - [[05-task-work-git-guardrails]] — Add git guardrails to task-work (done)
 - [[06-work-item-template]] — Update work-item template (done)
+
+- [[01-manifest-protected-flag]] — Add protected flag to manifest schema (done)
+- [[02-[[task-start]]-branch-protection]] — Update task-start branch creation (done)
+- [[03-[[task-create]]-exclude-protected]] — Update task-create to exclude protected repos (done)
+- [[04-active-task-schema]] — Enhance active-task.json schema (done)
+- [[05-[[task-work]]-git-guardrails]] — Add git guardrails to task-work (done)
+- [[06-[[work-item]]-template]] — Update work-item template (done)

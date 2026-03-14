@@ -4,6 +4,9 @@ tags:
   - doc
 ---
 
+> Parent: [[manifest]]
+
+
 # Shared Documentation
 
 Cross-cutting patterns and conventions used across repositories.

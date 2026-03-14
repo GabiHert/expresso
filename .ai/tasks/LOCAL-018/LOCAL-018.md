@@ -20,6 +20,9 @@ repos:
   - ai-framework
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-018: Add Task Color Support
 
 ## Problem Statement
@@ -116,10 +119,11 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 
 ## Linked Work Items
+- [[05-task-create-color-picker]] — Add color picker to /task-create flow (done)
 
 - [[01-task-types-color]] — Add color property to Task types (done)
 - [[02-parse-color-yaml]] — Update status.yaml parsing for color (done)
 - [[03-taskitem-color]] — Apply task color to TaskItem icons (done)
 - [[04-session-inherit-color]] — Inherit color in SessionItem display (done)
-- [[05-task-create-color-picker]] — Add color picker to /task-create flow (done)
+- [[05-[[task-create]]-color-picker]] — Add color picker to /task-create flow (done)
 - [[06-terminal-tab-color]] — Terminal tab color support (done)

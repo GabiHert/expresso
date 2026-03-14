@@ -18,6 +18,9 @@ repos:
   - ai-framework
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-025: Create installation script for easy ai-framework setup
 
 ## Problem Statement

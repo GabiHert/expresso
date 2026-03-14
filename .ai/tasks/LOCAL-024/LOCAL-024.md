@@ -18,6 +18,9 @@ repos:
   - vscode-extension
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-024: Add session import by UUID in creation flow
 
 ## Problem Statement

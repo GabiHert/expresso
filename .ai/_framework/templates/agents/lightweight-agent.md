@@ -1,3 +1,6 @@
+
+
+> Parent: [[manifest]]
 # Lightweight Agent Template
 #
 # Use this template to create a new lightweight agent that runs on a

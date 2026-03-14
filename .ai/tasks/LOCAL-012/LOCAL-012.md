@@ -20,6 +20,9 @@ repos:
   - ai-framework
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-012: Unassigned Sessions & Task Linking
 
 ## Problem Statement
@@ -113,7 +116,7 @@ Session moves to task's Sessions section
 4. Register `startSession` command (no COCKPIT_TASK env var)
 5. Register `linkSessionToTask` command with quick pick
 6. Add commands and menus to package.json
-7. Document integration in task-create.md
+7. Document integration in [[task-create]].md
 
 ## Risks & Considerations
 

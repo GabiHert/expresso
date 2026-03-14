@@ -18,6 +18,9 @@ repos:
   - vscode-extension
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-007: Fix Session Tracking Issues
 
 ## Problem Statement

@@ -1,3 +1,6 @@
+
+
+> Parent: [[manifest]]
 <!--
 ╔══════════════════════════════════════════════════════════════════╗
 ║ NAVIGATION HUB                                                   ║
@@ -33,21 +36,21 @@
 |---------|----------|-------------|
 | /init | [commands/init.md](./_framework/commands/init.md) | Bootstrap project |
 | /enhance | [commands/enhance.md](./_framework/commands/enhance.md) | Evolve setup |
-| /[[task-create]] | [commands/[[task-create]].md](./_framework/commands/task-create.md) | Create task |
-| /[[task-start]] | [commands/[[task-start]].md](./_framework/commands/task-start.md) | Start task |
-| /[[task-resume]] | [commands/[[task-resume]].md](./_framework/commands/task-resume.md) | Resume in-progress task |
-| /[[task-work]] | [commands/[[task-work]].md](./_framework/commands/task-work.md) | Implement work |
-| /[[task-done]] | [commands/[[task-done]].md](./_framework/commands/task-done.md) | Complete task |
-| /[[task-status]] | [commands/[[task-status]].md](./_framework/commands/task-status.md) | View dashboard |
-| /[[task-review]] | [commands/[[task-review]].md](./_framework/commands/task-review.md) | Code review |
-| /[[task-explore]] | [commands/[[task-explore]].md](./_framework/commands/task-explore.md) | Explore code |
+| /[[task-create]] | [commands/[[task-create]].md](./_framework/commands/[[task-create]].md) | Create task |
+| /[[task-start]] | [commands/[[task-start]].md](./_framework/commands/[[task-start]].md) | Start task |
+| /[[task-resume]] | [commands/[[task-resume]].md](./_framework/commands/[[task-resume]].md) | Resume in-progress task |
+| /[[task-work]] | [commands/[[task-work]].md](./_framework/commands/[[task-work]].md) | Implement work |
+| /[[task-done]] | [commands/[[task-done]].md](./_framework/commands/[[task-done]].md) | Complete task |
+| /[[task-status]] | [commands/[[task-status]].md](./_framework/commands/[[task-status]].md) | View dashboard |
+| /[[task-review]] | [commands/[[task-review]].md](./_framework/commands/[[task-review]].md) | Code review |
+| /[[task-explore]] | [commands/[[task-explore]].md](./_framework/commands/[[task-explore]].md) | Explore code |
 | /ask | [commands/ask.md](./_framework/commands/ask.md) | Answer questions (docs first) |
 | /document | [commands/document.md](./_framework/commands/document.md) | Create docs |
 | /help | [commands/help.md](./_framework/commands/help.md) | Show available commands |
-| /[[command-create]] | [commands/[[command-create]].md](./_framework/commands/command-create.md) | Create new framework command |
-| /[[command-extend]] | [commands/[[command-extend]].md](./_framework/commands/command-extend.md) | Extend commands at project level |
-| /[[task-orchestrate]] | [commands/[[task-orchestrate]].md](./_framework/commands/task-orchestrate.md) | Orchestrate task with background agents |
-| /[[ai-sync]] | [commands/[[ai-sync]].md](./_framework/commands/ai-sync.md) | Sync .ai/ with git repo |
+| /[[command-create]] | [commands/[[command-create]].md](./_framework/commands/[[command-create]].md) | Create new framework command |
+| /[[command-extend]] | [commands/[[command-extend]].md](./_framework/commands/[[command-extend]].md) | Extend commands at project level |
+| /[[task-orchestrate]] | [commands/[[task-orchestrate]].md](./_framework/commands/[[task-orchestrate]].md) | Orchestrate task with background agents |
+| /[[ai-sync]] | [commands/[[ai-sync]].md](./_framework/commands/[[ai-sync]].md) | Sync .ai/ with git repo |
 
 ## Templates
 

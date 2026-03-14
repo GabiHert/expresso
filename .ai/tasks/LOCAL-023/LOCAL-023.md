@@ -18,6 +18,9 @@ repos:
   - vscode-extension
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-023: Migrate SessionManager to SQLite
 
 ## Problem Statement

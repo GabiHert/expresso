@@ -4,6 +4,9 @@ tags:
   - doc
 ---
 
+> Parent: [[manifest]]
+
+
 # Architecture Documentation
 
 System-level architecture and design decisions for AI Cockpit.

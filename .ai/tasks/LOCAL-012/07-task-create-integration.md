@@ -22,7 +22,7 @@ Document how /[[task-create]] can link the current unassigned session to the new
 
 ## Implementation Steps
 
-### Step 1: Add session linking step to task-create.md
+### Step 1: Add session linking step to [[task-create]].md
 
 **File**: `.ai/_framework/commands/task-create.md`
 

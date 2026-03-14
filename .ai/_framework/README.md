@@ -1,3 +1,6 @@
+
+
+> Parent: [[manifest]]
 # AI Task Framework
 
 A reusable, three-layer system for AI-assisted development workflows.

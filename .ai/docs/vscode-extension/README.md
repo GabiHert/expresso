@@ -6,6 +6,9 @@ tags:
 repo: vscode-extension
 ---
 
+> Parent: [[manifest]]
+
+
 # vscode-extension Documentation
 
 ## Overview

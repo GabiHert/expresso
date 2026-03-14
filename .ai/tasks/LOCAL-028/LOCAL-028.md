@@ -18,6 +18,9 @@ repos:
   - vscode-extension
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-028: Enhanced @expresso Highlighting
 
 ## Problem Statement

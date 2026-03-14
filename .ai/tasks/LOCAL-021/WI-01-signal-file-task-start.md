@@ -113,7 +113,7 @@ After completing:
 
 ## Testing
 
-### Manual Test 1: First task-start (no signal)
+### Manual Test 1: First [[task-start]] (no signal)
 ```bash
 cd /path/to/project
 rm -f .ai/cockpit/active-task.json .ai/cockpit/task-switch-signal.json

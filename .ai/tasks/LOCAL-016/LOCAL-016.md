@@ -18,6 +18,9 @@ repos:
   - vscode-extension
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-016: Add --allow-dangerously-skip-permissions to Claude sessions
 
 ## Problem Statement

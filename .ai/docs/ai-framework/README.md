@@ -6,6 +6,9 @@ tags:
 repo: ai-framework
 ---
 
+> Parent: [[manifest]]
+
+
 # ai-framework Documentation
 
 ## Overview

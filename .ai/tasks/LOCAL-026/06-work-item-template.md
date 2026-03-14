@@ -202,7 +202,7 @@ Verify template renders correctly and fields are populated during [[task-create]
 
 - [ ] Work-item template has repo_path, branch, protected fields
 - [ ] Header box shows git context clearly
-- [ ] task-create.md populates new fields
+- [ ] [[task-create]].md populates new fields
 - [ ] [[task-work]].md reads and uses new fields
 - [ ] Migration note handles old work items
 

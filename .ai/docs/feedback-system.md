@@ -4,6 +4,9 @@ tags:
   - doc
 ---
 
+> Parent: [[manifest]]
+
+
 # Diff Feedback System
 
 The diff feedback system allows users to add review comments on task code changes that agents can read and address in any session.

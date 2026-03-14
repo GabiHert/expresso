@@ -20,6 +20,9 @@ repos:
   - vscode-extension
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-014: GitHub-style PR review diff viewer
 
 ## Problem Statement
@@ -212,10 +215,11 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 
 ## Linked Work Items
+- [[03-diff-review-panel-scaffold]] — DiffReviewPanel webview scaffold (done)
 
 - [[01-enhanced-feedback-format]] — Enhanced feedback format design (done)
 - [[02-feedback-parsing-library]] — Feedback parsing library (done)
-- [[03-diff-review-panel-scaffold]] — DiffReviewPanel webview scaffold (done)
+- [[03-[[diff-review]]-panel-scaffold]] — DiffReviewPanel webview scaffold (done)
 - [[04-diff2html-integration]] — Integrate diff2html rendering (done)
 - [[05-comment-ui-overlay]] — Comment UI overlay system (done)
 - [[06-comment-manager-service]] — CommentManager service (done)

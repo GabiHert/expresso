@@ -18,6 +18,9 @@ repos:
   - vscode-extension
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-019: Add Syntax Highlighting to Diff Review Panel
 
 ## Problem Statement
@@ -140,5 +143,5 @@ Use `/address-feedback` to discuss feedback with the agent.
 - [[01-add-prism-vendor]] — Add Prism.js vendor files (done)
 - [[02-prism-vscode-theme]] — Create VSCode-compatible Prism theme (done)
 - [[03-update-html-template]] — Update DiffReviewPanel HTML template (done)
-- [[04-implement-highlighting]] — Implement syntax highlighting in diff-review.js (done)
+- [[04-implement-highlighting]] — Implement syntax highlighting in [[diff-review]].js (done)
 - [[05-test-verify]] — Test and verify highlighting (done)

@@ -18,6 +18,9 @@ repos:
   - vscode-extension
 ---
 
+> Parent: [[manifest]]
+
+
 # LOCAL-009: Sidebar click behavior - show descriptions
 
 ## Problem Statement

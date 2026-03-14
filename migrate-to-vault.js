@@ -870,22 +870,80 @@ function autoLinkPass(aiDir) {
   let totalLinksAdded = 0;
   totalLinksAdded += linkFilesInDir(aiDir, sortedNames);
 
-  // Add parent backlinks to any work-item that doesn't have one yet
-  const backlinksAdded = addParentBacklinks(aiDir);
-  totalLinksAdded += backlinksAdded;
+  // Ensure EVERY file has a parent link
+  const parentLinksAdded = ensureAllParentLinks(aiDir);
+  totalLinksAdded += parentLinksAdded;
 
   // Ensure task notes link to all their work items (scan folder)
   const taskLinksAdded = addTaskToWorkItemLinks(aiDir);
   totalLinksAdded += taskLinksAdded;
 
-  // Add links between agents and the agents index
-  const agentLinksAdded = addAgentLinks(aiDir);
-  totalLinksAdded += agentLinksAdded;
-
-  console.log(`  Added ${totalLinksAdded} wikilinks (${backlinksAdded} parent backlinks, ${taskLinksAdded} task→WI links, ${agentLinksAdded} agent links)`);
+  console.log(`  Added ${totalLinksAdded} wikilinks (${parentLinksAdded} parent links, ${taskLinksAdded} task→WI links)`);
 }
 
-function addParentBacklinks(dir) {
+// Determine the correct parent for any note based on its type and location
+function resolveParent(filePath, frontmatter, aiDir) {
+  const type = frontmatter?.type;
+  const relPath = path.relative(aiDir, filePath);
+
+  // work-item → parent task
+  if (type === 'work-item' && frontmatter.parent) {
+    return frontmatter.parent;
+  }
+
+  // task → manifest
+  if (type === 'task') return 'manifest';
+
+  // agent → README (agents index)
+  if (type === 'agent') return 'README';
+
+  // extension-source → command it extends
+  if (type === 'extension-source' && frontmatter.extends) {
+    return frontmatter.extends;
+  }
+
+  // command → manifest
+  if (type === 'command') return 'manifest';
+
+  // manifest → null (it's the root)
+  if (type === 'manifest') return null;
+
+  // migration-report → null (temp file)
+  if (type === 'migration-report') return null;
+
+  // doc / pattern / internal-doc → manifest
+  if (type === 'doc' || type === 'pattern' || type === 'internal-doc') return 'manifest';
+
+  // Files in _framework/agents/ without type
+  if (relPath.startsWith('_framework/agents/')) return 'manifest';
+
+  // Files in _framework/commands/ without type
+  if (relPath.startsWith('_framework/commands/')) return 'manifest';
+
+  // Files in _framework/ (docs, templates, etc.)
+  if (relPath.startsWith('_framework/')) return 'manifest';
+
+  // Files in _project/
+  if (relPath.startsWith('_project/')) return 'manifest';
+
+  // Anything else in docs/
+  if (relPath.startsWith('docs/')) return 'manifest';
+
+  // Top-level files (context.md, INDEX.md)
+  if (!relPath.includes(path.sep)) return 'manifest';
+
+  // Default: link to manifest
+  return 'manifest';
+}
+
+// Ensure every .md file has a parent link
+function ensureAllParentLinks(aiDir) {
+  let count = 0;
+  count += ensureParentLinksInDir(aiDir, aiDir);
+  return count;
+}
+
+function ensureParentLinksInDir(dir, aiDir) {
   let count = 0;
   const entries = fs.readdirSync(dir, { withFileTypes: true });
 
@@ -894,22 +952,27 @@ function addParentBacklinks(dir) {
     if (entry.name === '.obsidian' || entry.name === 'tmp') continue;
 
     if (entry.isDirectory()) {
-      count += addParentBacklinks(fullPath);
+      count += ensureParentLinksInDir(fullPath, aiDir);
     } else if (entry.isFile() && entry.name.endsWith('.md')) {
       const content = readFile(fullPath);
       if (!content) continue;
 
       const { frontmatter } = parseFrontmatterAndBody(content);
-      if (!frontmatter || frontmatter.type !== 'work-item' || !frontmatter.parent) continue;
+      const parent = resolveParent(fullPath, frontmatter, aiDir);
 
-      // Check if backlink already exists
-      if (content.includes(`> Parent: [[${frontmatter.parent}]]`)) continue;
+      if (!parent) continue; // Root node (manifest) or temp files
 
-      // Inject backlink after frontmatter
+      // Check if any parent/navigation link already exists
+      if (content.includes(`> Parent: [[`)) continue;
+      if (content.includes(`> Project: [[`)) continue;
+      if (content.includes(`> Extends: [[`)) continue;
+      if (content.includes(`> Index: [[`)) continue;
+
+      // Inject parent link after frontmatter
       const fmEnd = findFrontmatterEnd(content);
       const fm = content.substring(0, fmEnd);
       const body = content.substring(fmEnd);
-      const linked = `${fm}\n\n> Parent: [[${frontmatter.parent}]]\n${body}`;
+      const linked = `${fm}\n\n> Parent: [[${parent}]]\n${body}`;
 
       fs.writeFileSync(fullPath, linked, 'utf8');
       count++;
@@ -973,74 +1036,6 @@ function addTaskToWorkItemLinks(aiDir) {
     fs.writeFileSync(taskFile, taskContent, 'utf8');
     count += unlinked.length;
   }
-  return count;
-}
-
-// Add links to/from agent files
-function addAgentLinks(aiDir) {
-  const agentsDir = path.join(aiDir, '_framework', 'agents');
-  if (!fs.existsSync(agentsDir)) return 0;
-
-  let count = 0;
-  const agentFiles = listFiles(agentsDir, '.md').filter(f => f !== 'README.md' && f !== 'orchestrator.md');
-  const readmePath = path.join(agentsDir, 'README.md');
-  const orchestratorPath = path.join(agentsDir, 'orchestrator.md');
-
-  // Add links from each agent to the README (index) and vice versa
-  for (const agentFile of agentFiles) {
-    const agentPath = path.join(agentsDir, agentFile);
-    let content = readFile(agentPath);
-    if (!content) continue;
-
-    const agentName = agentFile.replace('.md', '');
-
-    // Add link to README (agents index) if not present
-    if (!content.includes('[[README]]') && !content.includes('[[orchestrator]]')) {
-      const fmEnd = findFrontmatterEnd(content);
-      const fm = content.substring(0, fmEnd);
-      const body = content.substring(fmEnd);
-      content = `${fm}\n\n> Index: [[README]] | Orchestration: [[orchestrator]]\n${body}`;
-      fs.writeFileSync(agentPath, content, 'utf8');
-      count += 2;
-    }
-  }
-
-  // Add links from README to all agents
-  if (fs.existsSync(readmePath)) {
-    let readmeContent = readFile(readmePath);
-    if (readmeContent) {
-      const unlinkedAgents = agentFiles.filter(f => {
-        const name = f.replace('.md', '');
-        return !readmeContent.includes(`[[${name}]]`);
-      });
-
-      if (unlinkedAgents.length > 0) {
-        const links = unlinkedAgents.map(f => `- [[${f.replace('.md', '')}]]`).join('\n');
-        readmeContent += `\n\n## Agent Notes\n\n${links}\n`;
-        fs.writeFileSync(readmePath, readmeContent, 'utf8');
-        count += unlinkedAgents.length;
-      }
-    }
-  }
-
-  // Add links from orchestrator to all agents
-  if (fs.existsSync(orchestratorPath)) {
-    let orchContent = readFile(orchestratorPath);
-    if (orchContent) {
-      const unlinkedAgents = agentFiles.filter(f => {
-        const name = f.replace('.md', '');
-        return !orchContent.includes(`[[${name}]]`);
-      });
-
-      if (unlinkedAgents.length > 0) {
-        const links = unlinkedAgents.map(f => `- [[${f.replace('.md', '')}]]`).join('\n');
-        orchContent += `\n\n## Agent Notes\n\n${links}\n`;
-        fs.writeFileSync(orchestratorPath, orchContent, 'utf8');
-        count += unlinkedAgents.length;
-      }
-    }
-  }
-
   return count;
 }
 
