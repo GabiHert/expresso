@@ -630,19 +630,19 @@ function renameGenericFiles(aiDir) {
 
   renameInDir(aiDir, aiDir, genericNames, (filePath, fileName) => {
     const relDir = path.relative(aiDir, path.dirname(filePath));
-    const parts = relDir.split(path.sep).filter(p => p && !p.startsWith('_'));
+    const parts = relDir.split(path.sep).filter(p => p && !p.startsWith('_') && !p.startsWith('.'));
 
     // Build descriptive name from directory context
-    let prefix = '';
-    if (relDir === '.') {
+    if (relDir === '' || relDir === '.') {
       // Top-level files
       if (fileName === 'INDEX.md') return 'vault-navigation.md';
       if (fileName === 'context.md') return 'project-context.md';
       return null; // keep as-is
     }
 
-    // Use last meaningful directory parts
-    prefix = parts.length > 0 ? parts.join('-') : relDir.replace(/[/_]/g, '-').replace(/^-+/, '');
+    // Use all directory parts (including _ prefixed ones but clean them)
+    const allParts = relDir.split(path.sep).map(p => p.replace(/^_/, '')).filter(Boolean);
+    const prefix = allParts.join('-');
 
     if (fileName === 'README.md') return `${prefix}-overview.md`;
     if (fileName === 'context.md') return `${prefix}-context.md`;
@@ -787,7 +787,7 @@ ${docLinks.join('\n')}
   const agentsDir = path.join(aiDir, '_framework', 'agents');
   if (fs.existsSync(agentsDir)) {
     const agentFiles = listFiles(agentsDir, '.md')
-      .filter(f => f !== 'README.md' && f !== 'orchestrator.md' && f !== 'agents-index.md');
+      .filter(f => !f.includes('overview') && f !== 'orchestrator.md' && f !== 'agents-index.md' && f !== 'README.md');
 
     const agentLinks = agentFiles.map(f => {
       const content = readFile(path.join(agentsDir, f));
@@ -799,7 +799,11 @@ ${docLinks.join('\n')}
 
     // Also link README and orchestrator
     const extraLinks = [];
-    if (fs.existsSync(path.join(agentsDir, 'README.md'))) {
+    // Look for overview file (may have been renamed from README.md)
+    const overviewFile = listFiles(agentsDir, '.md').find(f => f.includes('overview'));
+    if (overviewFile) {
+      extraLinks.push(`- [[${overviewFile.replace('.md', '')}]] — Agent system overview`);
+    } else if (fs.existsSync(path.join(agentsDir, 'README.md'))) {
       extraLinks.push('- [[README]] — Agent system overview');
     }
     if (fs.existsSync(path.join(agentsDir, 'orchestrator.md'))) {

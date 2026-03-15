@@ -50,7 +50,7 @@ output:
 > Parent: [[agents-index]]
 
 
-> Index: [[README]] | Orchestration: [[orchestrator]]
+> Index: [[framework-agents-overview]] | Orchestration: [[orchestrator]]
 
 
 # planner Agent

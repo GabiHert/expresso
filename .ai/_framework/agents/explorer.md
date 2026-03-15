@@ -45,7 +45,7 @@ output:
 > Parent: [[agents-index]]
 
 
-> Index: [[README]] | Orchestration: [[orchestrator]]
+> Index: [[framework-agents-overview]] | Orchestration: [[orchestrator]]
 ---|---------|-----------|
     | path/to/file | What it does | Why it matters for this task |
 

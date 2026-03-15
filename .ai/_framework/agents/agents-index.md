@@ -17,5 +17,5 @@ tags: [index, agents]
 
 ## Guides
 
-- [[README]] — Agent system overview
+- [[agents-overview]] — Agent system overview
 - [[orchestrator]] — Agent orchestration guide

@@ -1,7 +1,7 @@
 ---
 type: migration-report
-generated: 2026-03-15T19:48:24.035Z
-total_issues: 418
+generated: 2026-03-15T19:51:31.548Z
+total_issues: 453
 tags: [migration, vault]
 ---
 
@@ -56,6 +56,10 @@ to be updated to use vault-native patterns (frontmatter, mcpvault MCP tools).
 - L710: cockpit/ reference
 - L712: cockpit/ reference
 
+### .ai/docs/_architecture/docs-overview.md
+- L21: cockpit/ reference
+- L39: cockpit/ reference
+
 ### .ai/docs/_architecture/shadow-copy-system.md
 - L54: cockpit/ reference
 - L78: cockpit/ reference
@@ -96,10 +100,49 @@ to be updated to use vault-native patterns (frontmatter, mcpvault MCP tools).
 - L23: .yaml file reference
 - L47: .yaml file reference
 
+### .ai/docs/ai-framework/docs-ai-framework-overview.md
+- L23: manifest.yaml reference
+- L47: manifest.yaml reference
+- L34: todo/ folder reference
+- L34: in_progress/ folder reference
+- L23: .yaml file reference
+- L47: .yaml file reference
+
+### .ai/docs/completed-tasks-log.md
+- L16: done/ folder reference
+- L17: done/ folder reference
+- L18: done/ folder reference
+- L19: done/ folder reference
+- L20: done/ folder reference
+- L21: done/ folder reference
+- L22: done/ folder reference
+- L23: done/ folder reference
+- L24: done/ folder reference
+- L25: done/ folder reference
+- L26: done/ folder reference
+- L27: done/ folder reference
+- L28: done/ folder reference
+- L29: done/ folder reference
+- L30: done/ folder reference
+- L31: done/ folder reference
+- L32: done/ folder reference
+- L33: done/ folder reference
+- L34: done/ folder reference
+- L35: done/ folder reference
+- L36: done/ folder reference
+- L37: done/ folder reference
+- L38: done/ folder reference
+- L39: done/ folder reference
+
 ### .ai/docs/feedback-system.md
 - L27: in_progress/ folder reference
 
 ### .ai/docs/vscode-extension/README.md
+- L33: cockpit/ reference
+- L48: cockpit/ reference
+- L53: cockpit/ reference
+
+### .ai/docs/vscode-extension/docs-vscode-extension-overview.md
 - L33: cockpit/ reference
 - L48: cockpit/ reference
 - L53: cockpit/ reference
@@ -214,19 +257,19 @@ to be updated to use vault-native patterns (frontmatter, mcpvault MCP tools).
 - L588: .yaml file reference
 
 ### .ai/_framework/commands/pr-comments.md
-- L147: status.yaml reference
-- L371: manifest.yaml reference
-- L146: in_progress/ folder reference
-- L147: in_progress/ folder reference
-- L147: .yaml file reference
-- L371: .yaml file reference
+- L150: status.yaml reference
+- L374: manifest.yaml reference
+- L149: in_progress/ folder reference
+- L150: in_progress/ folder reference
+- L150: .yaml file reference
+- L374: .yaml file reference
 
 ### .ai/_framework/commands/task-brief.md
-- L63: manifest.yaml reference
-- L29: todo/ folder reference
-- L243: todo/ folder reference
-- L300: todo/ folder reference
-- L63: .yaml file reference
+- L66: manifest.yaml reference
+- L32: todo/ folder reference
+- L246: todo/ folder reference
+- L303: todo/ folder reference
+- L66: .yaml file reference
 
 ### .ai/_framework/commands/task-create.md
 - L68: status.yaml reference
@@ -452,41 +495,41 @@ to be updated to use vault-native patterns (frontmatter, mcpvault MCP tools).
 - L628: .yaml file reference
 
 ### .ai/_framework/commands/wi-create.md
-- L45: status.yaml reference
-- L58: status.yaml reference
-- L68: status.yaml reference
-- L102: status.yaml reference
-- L151: status.yaml reference
-- L185: status.yaml reference
-- L187: status.yaml reference
-- L257: status.yaml reference
-- L78: manifest.yaml reference
-- L143: manifest.yaml reference
-- L317: manifest.yaml reference
-- L67: todo/ folder reference
-- L96: todo/ folder reference
-- L175: todo/ folder reference
-- L267: todo/ folder reference
-- L300: todo/ folder reference
-- L96: in_progress/ folder reference
-- L97: in_progress/ folder reference
-- L184: in_progress/ folder reference
-- L184: old workflow instruction
+- L48: status.yaml reference
+- L61: status.yaml reference
+- L71: status.yaml reference
+- L105: status.yaml reference
+- L154: status.yaml reference
+- L188: status.yaml reference
+- L190: status.yaml reference
+- L260: status.yaml reference
+- L81: manifest.yaml reference
+- L146: manifest.yaml reference
+- L320: manifest.yaml reference
+- L70: todo/ folder reference
+- L99: todo/ folder reference
+- L178: todo/ folder reference
+- L270: todo/ folder reference
+- L303: todo/ folder reference
+- L99: in_progress/ folder reference
+- L100: in_progress/ folder reference
+- L187: in_progress/ folder reference
 - L187: old workflow instruction
-- L68: status.yaml update instruction
-- L185: status.yaml update instruction
-- L257: status.yaml update instruction
-- L45: .yaml file reference
-- L58: .yaml file reference
-- L68: .yaml file reference
-- L78: .yaml file reference
-- L102: .yaml file reference
-- L143: .yaml file reference
-- L151: .yaml file reference
-- L185: .yaml file reference
-- L187: .yaml file reference
-- L257: .yaml file reference
-- L317: .yaml file reference
+- L190: old workflow instruction
+- L71: status.yaml update instruction
+- L188: status.yaml update instruction
+- L260: status.yaml update instruction
+- L48: .yaml file reference
+- L61: .yaml file reference
+- L71: .yaml file reference
+- L81: .yaml file reference
+- L105: .yaml file reference
+- L146: .yaml file reference
+- L154: .yaml file reference
+- L188: .yaml file reference
+- L190: .yaml file reference
+- L260: .yaml file reference
+- L320: .yaml file reference
 
 ## What the AI agent should do
 
