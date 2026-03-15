@@ -1,6 +1,6 @@
 
 
-> Parent: [[manifest]]
+> Parent: [[commands-index]]
 # AI Task Framework
 
 A reusable, three-layer system for AI-assisted development workflows.

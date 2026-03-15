@@ -1,6 +1,6 @@
 
 
-> Parent: [[manifest]]
+> Parent: [[commands-index]]
 <!--
 ╔══════════════════════════════════════════════════════════════════╗
 ║ WORK ITEM: {number}-{name}.md                                    ║

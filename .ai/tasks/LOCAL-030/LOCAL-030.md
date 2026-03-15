@@ -18,7 +18,7 @@ repos:
   - vscode-extension
 ---
 
-> Parent: [[manifest]]
+> Parent: [[task-index]]
 
 
 # LOCAL-030: Remove Session and Shadow File Tracking Feature

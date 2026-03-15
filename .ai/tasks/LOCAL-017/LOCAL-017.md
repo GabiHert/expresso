@@ -18,7 +18,7 @@ repos:
   - vscode-extension
 ---
 
-> Parent: [[manifest]]
+> Parent: [[task-index]]
 
 
 # LOCAL-017: Fix Session ID Race Condition on Task Switch

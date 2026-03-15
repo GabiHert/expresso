@@ -20,7 +20,7 @@ repos:
   - ai-framework
 ---
 
-> Parent: [[manifest]]
+> Parent: [[task-index]]
 
 
 # LOCAL-027: Implement @expresso in-code task tags
@@ -212,6 +212,7 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 ## Linked Work Items
 - [[08-remove-diff-review-panel]] — Remove DiffReviewPanel (done)
+- [[08-remove-[[diff-review]]-panel]] — Remove DiffReviewPanel (done)
 - [[08-remove-[[diff-review]]-panel]] — Remove DiffReviewPanel (done)
 - [[08-remove-[[diff-review]]-panel]] — Remove DiffReviewPanel (done)
 

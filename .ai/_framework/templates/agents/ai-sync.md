@@ -5,7 +5,7 @@ model: haiku
 tools: Read, Glob, Bash
 ---
 
-> Parent: [[manifest]]
+> Parent: [[commands-index]]
 
 
 Follow the instructions in .ai/_framework/commands/ai-sync.md

@@ -18,7 +18,7 @@ repos:
   - vscode-extension
 ---
 
-> Parent: [[manifest]]
+> Parent: [[task-index]]
 
 
 # LOCAL-022: Full-file diff as default view

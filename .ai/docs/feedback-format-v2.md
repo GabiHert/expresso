@@ -4,7 +4,7 @@ tags:
   - doc
 ---
 
-> Parent: [[manifest]]
+> Parent: [[docs-index]]
 
 
 # Feedback Format v2 Specification

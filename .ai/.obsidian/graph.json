@@ -1,81 +1,12 @@
 {
-  "collapse": false,
+  "collapse-filter": true,
   "search": "",
-  "showTags": false,
+  "showTags": true,
   "showAttachments": false,
   "hideUnresolved": false,
   "showOrphans": true,
-  "localJumps": 1,
-  "localBacklinks": true,
-  "localForelinks": true,
-  "localInterlinks": false,
-  "showArrow": true,
-  "textFadeMultiplier": 0,
-  "nodeSizeMultiplier": 1,
-  "lineSizeMultiplier": 1,
-  "centerStrength": 0.5,
-  "repelStrength": 10,
-  "linkStrength": 1,
-  "linkDistance": 250,
-  "scale": 1,
-  "close": false,
+  "collapse-color-groups": false,
   "colorGroups": [
-    {
-      "query": "tag:#manifest",
-      "color": {
-        "a": 1,
-        "rgb": 14701138
-      }
-    },
-    {
-      "query": "tag:#task",
-      "color": {
-        "a": 1,
-        "rgb": 5571199
-      }
-    },
-    {
-      "query": "tag:#work-item",
-      "color": {
-        "a": 1,
-        "rgb": 5025616
-      }
-    },
-    {
-      "query": "tag:#agent",
-      "color": {
-        "a": 1,
-        "rgb": 16744448
-      }
-    },
-    {
-      "query": "tag:#command",
-      "color": {
-        "a": 1,
-        "rgb": 11141120
-      }
-    },
-    {
-      "query": "tag:#extension",
-      "color": {
-        "a": 1,
-        "rgb": 11801600
-      }
-    },
-    {
-      "query": "tag:#doc",
-      "color": {
-        "a": 1,
-        "rgb": 9109504
-      }
-    },
-    {
-      "query": "tag:#pattern",
-      "color": {
-        "a": 1,
-        "rgb": 14188339
-      }
-    },
     {
       "query": "tag:#index",
       "color": {
@@ -83,5 +14,17 @@
         "rgb": 16777215
       }
     }
-  ]
+  ],
+  "collapse-display": false,
+  "showArrow": false,
+  "textFadeMultiplier": -1,
+  "nodeSizeMultiplier": 0.894548611111111,
+  "lineSizeMultiplier": 1,
+  "collapse-forces": false,
+  "centerStrength": 0.495052083333333,
+  "repelStrength": 8.82638888888889,
+  "linkStrength": 1,
+  "linkDistance": 69,
+  "scale": 0.6500743726875938,
+  "close": false
 }

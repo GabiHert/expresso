@@ -1,6 +1,6 @@
 
 
-> Parent: [[manifest]]
+> Parent: [[commands-index]]
 # Manifest Schema Reference
 
 ## Location

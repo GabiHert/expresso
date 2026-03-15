@@ -1,6 +1,6 @@
 
 
-> Parent: [[manifest]]
+> Parent: [[docs-index]]
 # Diff Feedback
 
 Use this file to add review comments on code changes. The `/address-feedback` command will read this file and present your feedback to the agent.

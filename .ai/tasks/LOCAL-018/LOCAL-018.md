@@ -20,7 +20,7 @@ repos:
   - ai-framework
 ---
 
-> Parent: [[manifest]]
+> Parent: [[task-index]]
 
 
 # LOCAL-018: Add Task Color Support
@@ -120,6 +120,7 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 ## Linked Work Items
 - [[05-task-create-color-picker]] — Add color picker to /task-create flow (done)
+- [[05-[[task-create]]-color-picker]] — Add color picker to /task-create flow (done)
 - [[05-[[task-create]]-color-picker]] — Add color picker to /task-create flow (done)
 - [[05-[[task-create]]-color-picker]] — Add color picker to /task-create flow (done)
 

@@ -18,7 +18,7 @@ repos:
   - vscode-extension
 ---
 
-> Parent: [[manifest]]
+> Parent: [[task-index]]
 
 
 # LOCAL-008: Fix Session Terminal Reuse and Multi-Session Status

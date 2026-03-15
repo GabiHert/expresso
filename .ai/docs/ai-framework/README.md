@@ -6,7 +6,7 @@ tags:
 repo: ai-framework
 ---
 
-> Parent: [[manifest]]
+> Parent: [[docs-index]]
 
 
 # ai-framework Documentation

@@ -1,6 +1,6 @@
 
 
-> Parent: [[manifest]]
+> Parent: [[docs-index]]
 # Diff Feedback
 
 Add your feedback below using the format:

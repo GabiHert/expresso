@@ -6,7 +6,7 @@ scope: reference
 tags: [command, vault, conventions]
 ---
 
-> Parent: [[manifest]]
+> Parent: [[commands-index]]
 
 # Vault Conventions
 
@@ -133,7 +133,7 @@ The vault has four **index nodes** that serve as hubs:
 | File type | Parent |
 |-----------|--------|
 | task | `[[task-index]]` |
-| work-item | `[[TASK-ID]]` (the parent task) |
+| [[work-item]] | `[[TASK-ID]]` (the parent task) |
 | agent | `[[agents-index]]` |
 | command | `[[commands-index]]` |
 | extension-source | `[[command-it-extends]]` |

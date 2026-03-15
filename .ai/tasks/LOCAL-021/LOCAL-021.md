@@ -20,7 +20,7 @@ repos:
   - vscode-extension
 ---
 
-> Parent: [[manifest]]
+> Parent: [[task-index]]
 
 
 # LOCAL-021: Fix Session-Task Synchronization with Signal File System

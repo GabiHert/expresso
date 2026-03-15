@@ -20,7 +20,7 @@ repos:
   - vscode-extension
 ---
 
-> Parent: [[manifest]]
+> Parent: [[task-index]]
 
 
 # LOCAL-013: Add diff feedback comments for agent review
@@ -106,6 +106,7 @@ The solution should be simple: store feedback as markdown in the task documentat
 
 ## Linked Work Items
 - [[04-task-create-integration]] — Task-create integration (done)
+- [[04-[[task-create]]-integration]] — Task-create integration (done)
 - [[04-[[task-create]]-integration]] — Task-create integration (done)
 - [[04-[[task-create]]-integration]] — Task-create integration (done)
 

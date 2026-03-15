@@ -43,14 +43,6 @@ const GRAPH_CONFIG = {
   scale: 1,
   close: false,
   colorGroups: [
-    { query: 'tag:#manifest', color: { a: 1, rgb: 14701138 } },      // gold — manifest (root)
-    { query: 'tag:#task', color: { a: 1, rgb: 5571199 } },            // blue — tasks
-    { query: 'tag:#work-item', color: { a: 1, rgb: 5025616 } },       // teal — work items
-    { query: 'tag:#agent', color: { a: 1, rgb: 16744448 } },          // orange — agents
-    { query: 'tag:#command', color: { a: 1, rgb: 11141120 } },        // green — commands
-    { query: 'tag:#extension', color: { a: 1, rgb: 11801600 } },      // lime — extensions
-    { query: 'tag:#doc', color: { a: 1, rgb: 9109504 } },             // purple — docs
-    { query: 'tag:#pattern', color: { a: 1, rgb: 14188339 } },        // pink — patterns
     { query: 'tag:#index', color: { a: 1, rgb: 16777215 } },          // white — index nodes
   ],
 };
@@ -1129,8 +1121,17 @@ function ensureParentLinksInDir(dir, aiDir) {
 
       if (!parent) continue; // Root node (manifest) or temp files
 
-      // Check if any parent/navigation link already exists
-      if (content.includes(`> Parent: [[`)) continue;
+      // Check if correct parent link already exists
+      if (content.includes(`> Parent: [[${parent}]]`)) continue;
+
+      // Replace incorrect parent link if present
+      const parentLinkRegex = /^> Parent: \[\[.+?\]\]\n?/m;
+      if (parentLinkRegex.test(content)) {
+        const updated = content.replace(parentLinkRegex, `> Parent: [[${parent}]]\n`);
+        fs.writeFileSync(fullPath, updated, 'utf8');
+        count++;
+        continue;
+      }
 
       // Inject parent link after frontmatter
       const fmEnd = findFrontmatterEnd(content);

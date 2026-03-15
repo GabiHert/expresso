@@ -5,7 +5,7 @@ model: haiku
 tools: Read, Glob
 ---
 
-> Parent: [[manifest]]
+> Parent: [[commands-index]]
 
 
 Follow the instructions in .ai/_framework/commands/help.md

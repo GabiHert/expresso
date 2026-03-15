@@ -18,7 +18,7 @@ repos:
   - ai-framework
 ---
 
-> Parent: [[manifest]]
+> Parent: [[task-index]]
 
 
 # LOCAL-026: Git Context Persistence and Repo Protection
@@ -216,6 +216,10 @@ Use `/address-feedback` to discuss feedback with the agent.
 - [[03-task-create-exclude-protected]] — Update task-create to exclude protected repos (done)
 - [[05-task-work-git-guardrails]] — Add git guardrails to task-work (done)
 - [[06-work-item-template]] — Update work-item template (done)
+- [[02-[[task-start]]-branch-protection]] — Update task-start branch creation (done)
+- [[03-[[task-create]]-exclude-protected]] — Update task-create to exclude protected repos (done)
+- [[05-[[task-work]]-git-guardrails]] — Add git guardrails to task-work (done)
+- [[06-[[work-item]]-template]] — Update work-item template (done)
 - [[02-[[task-start]]-branch-protection]] — Update task-start branch creation (done)
 - [[03-[[task-create]]-exclude-protected]] — Update task-create to exclude protected repos (done)
 - [[05-[[task-work]]-git-guardrails]] — Add git guardrails to task-work (done)

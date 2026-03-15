@@ -20,7 +20,7 @@ repos:
   - ai-framework
 ---
 
-> Parent: [[manifest]]
+> Parent: [[task-index]]
 
 
 # LOCAL-012: Unassigned Sessions & Task Linking
@@ -136,6 +136,7 @@ Session moves to task's Sessions section
 
 
 ## Linked Work Items
+- [[07-task-create-integration]] — Update task-create.md integration (done)
 
 - [[01-unassigned-constant]] — Add UNASSIGNED_TASK_ID constant (done)
 - [[02-session-manager-methods]] — Add SessionManager methods (done)
@@ -143,4 +144,4 @@ Session moves to task's Sessions section
 - [[04-start-session-command]] — Register startSession command (done)
 - [[05-link-session-command]] — Register linkSessionToTask command (done)
 - [[06-package-json]] — Add package.json contributions (done)
-- [[07-task-create-integration]] — Update task-create.md integration (done)
+- [[07-[[task-create]]-integration]] — Update task-create.md integration (done)

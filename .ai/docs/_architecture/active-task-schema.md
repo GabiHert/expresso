@@ -4,7 +4,7 @@ tags:
   - doc
 ---
 
-> Parent: [[manifest]]
+> Parent: [[docs-index]]
 
 
 # active-task.json Schema

@@ -20,7 +20,7 @@ repos:
   - vscode-extension
 ---
 
-> Parent: [[manifest]]
+> Parent: [[task-index]]
 
 
 # LOCAL-014: GitHub-style PR review diff viewer
@@ -216,6 +216,7 @@ Use `/address-feedback` to discuss feedback with the agent.
 
 ## Linked Work Items
 - [[03-diff-review-panel-scaffold]] — DiffReviewPanel webview scaffold (done)
+- [[03-[[diff-review]]-panel-scaffold]] — DiffReviewPanel webview scaffold (done)
 - [[03-[[diff-review]]-panel-scaffold]] — DiffReviewPanel webview scaffold (done)
 - [[03-[[diff-review]]-panel-scaffold]] — DiffReviewPanel webview scaffold (done)
 

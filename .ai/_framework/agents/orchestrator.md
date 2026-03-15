@@ -1,6 +1,6 @@
 
 
-> Parent: [[manifest]]
+> Parent: [[agents-index]]
 # Agent Orchestrator Guide
 
 ## Overview
