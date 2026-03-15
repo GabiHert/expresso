@@ -217,6 +217,7 @@ Use `/address-feedback` to discuss feedback with the agent.
 ## Linked Work Items
 - [[03-diff-review-panel-scaffold]] — DiffReviewPanel webview scaffold (done)
 - [[03-[[diff-review]]-panel-scaffold]] — DiffReviewPanel webview scaffold (done)
+- [[03-[[diff-review]]-panel-scaffold]] — DiffReviewPanel webview scaffold (done)
 
 - [[01-enhanced-feedback-format]] — Enhanced feedback format design (done)
 - [[02-feedback-parsing-library]] — Feedback parsing library (done)

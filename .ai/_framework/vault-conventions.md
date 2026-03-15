@@ -55,7 +55,7 @@ summary:
 tags: [task, <status>, <repos...>]
 ```
 
-#### work-item
+#### [[work-item]]
 ```yaml
 type: work-item
 id: TASK-ID-NN
@@ -124,16 +124,26 @@ frontmatter...
 
 ### Parent resolution
 
+The vault has four **index nodes** that serve as hubs:
+- `[[task-index]]` — all tasks
+- `[[docs-index]]` — all documentation
+- `[[agents-index]]` — all agent definitions
+- `[[commands-index]]` — all commands and extensions
+
 | File type | Parent |
 |-----------|--------|
-| task | `[[manifest]]` |
+| task | `[[task-index]]` |
 | work-item | `[[TASK-ID]]` (the parent task) |
-| agent | `[[README]]` (agents index) |
-| command | `[[manifest]]` |
+| agent | `[[agents-index]]` |
+| command | `[[commands-index]]` |
 | extension-source | `[[command-it-extends]]` |
-| doc | `[[manifest]]` |
-| pattern | `[[manifest]]` |
-| manifest | NONE (root node) |
+| doc | `[[docs-index]]` |
+| pattern | `[[docs-index]]` |
+| index | NONE (hub node) |
+| manifest | NONE (config node) |
+
+When creating a new note, also add a `[[wikilink]]` to the new note
+in its parent's body (e.g., add `[[TASK-01]]` to `task-index.md`).
 
 ## Rule 3: Wikilinks for relationships
 

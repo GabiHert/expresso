@@ -46,6 +46,9 @@ output:
     - entry for _completed_tasks.md
 ---
 
+> Parent: [[agents-index]]
+
+
 > Index: [[README]] | Orchestration: [[orchestrator]]
 
 

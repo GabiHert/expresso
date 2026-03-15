@@ -39,6 +39,9 @@ output:
       notes: optional notes
 ---
 
+> Parent: [[agents-index]]
+
+
 > Index: [[README]] | Orchestration: [[orchestrator]]
 
 

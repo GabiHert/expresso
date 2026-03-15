@@ -51,6 +51,7 @@ const GRAPH_CONFIG = {
     { query: 'tag:#extension', color: { a: 1, rgb: 11801600 } },      // lime — extensions
     { query: 'tag:#doc', color: { a: 1, rgb: 9109504 } },             // purple — docs
     { query: 'tag:#pattern', color: { a: 1, rgb: 14188339 } },        // pink — patterns
+    { query: 'tag:#index', color: { a: 1, rgb: 16777215 } },          // white — index nodes
   ],
 };
 
@@ -356,9 +357,6 @@ function migrateTask(aiDir, tasksDir, taskDir, taskId, status) {
     body += `\n\n## Linked Work Items\n\n${wiLinks}\n`;
   }
 
-  // Add link to manifest
-  body = `> Project: [[manifest]]\n\n${body}`;
-
   // Write task note
   const destDir = path.join(tasksDir, taskId);
   const destFile = path.join(destDir, `${taskId}.md`);
@@ -432,9 +430,7 @@ function migrateWorkItems(taskDir, destDir, taskId, statusData) {
       if (wiMatch?.bdd_feature) wiFm.bdd_feature = wiMatch.bdd_feature;
       if (existingFm?.branch) wiFm.branch = existingFm.branch;
 
-      // Add backlink to parent task at the top of body
-      const backlink = `> Parent: [[${taskId}]]\n\n`;
-      wiBody = backlink + wiBody;
+      // Parent link is added by the universal pass in step 10
 
       // Write to task root (not subfolder)
       const destPath = path.join(destDir, wiFile);
@@ -523,10 +519,10 @@ function migrateExtensions(aiDir) {
     if (data.post_hooks) frontmatter.post_hooks = data.post_hooks;
     if (data.agents) frontmatter.agents = data.agents;
 
-    const extendsLink = `> Extends: [[${data.extends}]]\n\n`;
+    // Parent link (Extends) is added by the universal pass in step 10
     const body = data.context
-      ? `${extendsLink}# ${data.extends}:${data.variant}\n\n${data.context}`
-      : `${extendsLink}# ${data.extends}:${data.variant}\n`;
+      ? `# ${data.extends}:${data.variant}\n\n${data.context}`
+      : `# ${data.extends}:${data.variant}\n`;
 
     const outputPath = filePath.replace(/\.yaml$/, '.md');
     writeFile(outputPath, `${toFrontmatter(frontmatter)}\n\n${body}`);
@@ -626,18 +622,8 @@ function processDocsDir(baseDir, currentDir) {
       if (repo) frontmatter.repo = repo;
       if (domain) frontmatter.domain = domain;
 
-      // Add links based on metadata
-      let linkedContent = content;
-      const links = [];
-      if (repo) links.push(`[[manifest]]`);
-      // Scan for references to other docs or tasks in the content
-      // and add a navigation footer
-      if (links.length > 0) {
-        linkedContent = `> ${links.join(' | ')}\n\n${linkedContent}`;
-      }
-
-      writeFile(fullPath, `${toFrontmatter(frontmatter)}\n\n${linkedContent}`);
-      scanForOldPatterns(fullPath, linkedContent);
+      writeFile(fullPath, `${toFrontmatter(frontmatter)}\n\n${content}`);
+      scanForOldPatterns(fullPath, content);
     }
   }
 }
@@ -650,6 +636,154 @@ function deleteCockpit(aiDir) {
     deleteDir(cockpitDir);
   } else {
     console.log('  ⏭  No cockpit/ directory found');
+  }
+}
+
+// Step 6b: Generate index nodes
+function generateIndexNodes(aiDir) {
+  console.log('\n📇 Step 6b: Generate index nodes');
+
+  // Task Index
+  const tasksDir = path.join(aiDir, 'tasks');
+  if (fs.existsSync(tasksDir)) {
+    const taskDirs = listDirs(tasksDir);
+    const taskLinks = taskDirs.map(id => {
+      const taskFile = path.join(tasksDir, id, `${id}.md`);
+      const content = readFile(taskFile);
+      if (!content) return `- [[${id}]]`;
+      const { frontmatter } = parseFrontmatterAndBody(content);
+      const status = frontmatter?.status || '?';
+      const title = frontmatter?.title || id;
+      return `- [[${id}]] — ${title} (${status})`;
+    });
+
+    const todoCount = taskLinks.filter(l => l.includes('(todo)')).length;
+    const ipCount = taskLinks.filter(l => l.includes('(in_progress)')).length;
+    const doneCount = taskLinks.filter(l => l.includes('(done)')).length;
+
+    writeFile(path.join(tasksDir, 'task-index.md'), `---
+type: index
+domain: tasks
+tags: [index, tasks]
+---
+
+# Task Index
+
+**${taskDirs.length} tasks** — ${todoCount} todo, ${ipCount} in progress, ${doneCount} done
+
+## All Tasks
+
+${taskLinks.join('\n')}
+`);
+  }
+
+  // Docs Index
+  const docsDir = path.join(aiDir, 'docs');
+  if (fs.existsSync(docsDir)) {
+    const docLinks = [];
+    collectDocLinks(docsDir, docsDir, docLinks);
+
+    writeFile(path.join(docsDir, 'docs-index.md'), `---
+type: index
+domain: docs
+tags: [index, docs]
+---
+
+# Documentation Index
+
+${docLinks.join('\n')}
+`);
+  }
+
+  // Agents Index
+  const agentsDir = path.join(aiDir, '_framework', 'agents');
+  if (fs.existsSync(agentsDir)) {
+    const agentFiles = listFiles(agentsDir, '.md')
+      .filter(f => f !== 'README.md' && f !== 'orchestrator.md' && f !== 'agents-index.md');
+
+    const agentLinks = agentFiles.map(f => {
+      const content = readFile(path.join(agentsDir, f));
+      const { frontmatter } = parseFrontmatterAndBody(content || '');
+      const name = frontmatter?.name || f.replace('.md', '');
+      const scope = frontmatter?.scope || '';
+      return `- [[${f.replace('.md', '')}]] — ${name} (${scope})`;
+    });
+
+    // Also link README and orchestrator
+    const extraLinks = [];
+    if (fs.existsSync(path.join(agentsDir, 'README.md'))) {
+      extraLinks.push('- [[README]] — Agent system overview');
+    }
+    if (fs.existsSync(path.join(agentsDir, 'orchestrator.md'))) {
+      extraLinks.push('- [[orchestrator]] — Agent orchestration guide');
+    }
+
+    writeFile(path.join(agentsDir, 'agents-index.md'), `---
+type: index
+domain: agents
+tags: [index, agents]
+---
+
+# Agents Index
+
+## Agents
+
+${agentLinks.join('\n')}
+
+## Guides
+
+${extraLinks.join('\n')}
+`);
+  }
+
+  // Commands Index
+  const cmdsDir = path.join(aiDir, '_framework', 'commands');
+  if (fs.existsSync(cmdsDir)) {
+    const cmdFiles = listFiles(cmdsDir, '.md')
+      .filter(f => f !== 'commands-index.md');
+
+    const cmdLinks = cmdFiles.map(f => `- [[${f.replace('.md', '')}]]`);
+
+    // Also link project extensions
+    const projCmdDir = path.join(aiDir, '_project', 'commands');
+    const extLinks = [];
+    if (fs.existsSync(projCmdDir)) {
+      const extFiles = listAllFiles(projCmdDir).filter(f => f.endsWith('.md'));
+      extFiles.forEach(f => {
+        extLinks.push(`- [[${f.replace('.md', '')}]]`);
+      });
+    }
+
+    writeFile(path.join(cmdsDir, 'commands-index.md'), `---
+type: index
+domain: commands
+tags: [index, commands]
+---
+
+# Commands Index
+
+## Framework Commands
+
+${cmdLinks.join('\n')}
+
+${extLinks.length > 0 ? `## Project Extensions\n\n${extLinks.join('\n')}` : ''}
+`);
+  }
+}
+
+function collectDocLinks(baseDir, currentDir, links) {
+  const entries = fs.readdirSync(currentDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.name.startsWith('.') || entry.name === 'docs-index.md') continue;
+    const fullPath = path.join(currentDir, entry.name);
+    const relPath = path.relative(baseDir, fullPath);
+
+    if (entry.isDirectory()) {
+      links.push(`\n### ${entry.name}`);
+      collectDocLinks(baseDir, fullPath, links);
+    } else if (entry.isFile() && entry.name.endsWith('.md')) {
+      links.push(`- [[${entry.name.replace('.md', '')}]]`);
+    }
   }
 }
 
@@ -920,55 +1054,53 @@ function autoLinkPass(aiDir) {
 function resolveParent(filePath, frontmatter, aiDir) {
   const type = frontmatter?.type;
   const relPath = path.relative(aiDir, filePath);
+  const fileName = path.basename(filePath, '.md');
+
+  // Index nodes are roots — no parent
+  if (['task-index', 'docs-index', 'agents-index', 'commands-index'].includes(fileName)) return null;
+
+  // manifest → null (root)
+  if (type === 'manifest') return null;
+
+  // migration-report → null (temp)
+  if (type === 'migration-report') return null;
 
   // work-item → parent task
   if (type === 'work-item' && frontmatter.parent) {
     return frontmatter.parent;
   }
 
-  // task → manifest
-  if (type === 'task') return 'manifest';
+  // task → task-index
+  if (type === 'task') return 'task-index';
 
-  // agent → README (agents index)
-  if (type === 'agent') return 'README';
+  // agent → agents-index
+  if (type === 'agent') return 'agents-index';
+  if (relPath.startsWith('_framework/agents/')) return 'agents-index';
 
   // extension-source → command it extends
   if (type === 'extension-source' && frontmatter.extends) {
     return frontmatter.extends;
   }
 
-  // command → manifest
-  if (type === 'command') return 'manifest';
+  // command → commands-index
+  if (type === 'command') return 'commands-index';
+  if (relPath.startsWith('_framework/commands/')) return 'commands-index';
 
-  // manifest → null (it's the root)
-  if (type === 'manifest') return null;
+  // doc / pattern / internal-doc → docs-index
+  if (type === 'doc' || type === 'pattern' || type === 'internal-doc') return 'docs-index';
+  if (relPath.startsWith('docs/')) return 'docs-index';
 
-  // migration-report → null (temp file)
-  if (type === 'migration-report') return null;
+  // Files in _framework/ (templates, etc.) → commands-index
+  if (relPath.startsWith('_framework/')) return 'commands-index';
 
-  // doc / pattern / internal-doc → manifest
-  if (type === 'doc' || type === 'pattern' || type === 'internal-doc') return 'manifest';
+  // Files in _project/ → commands-index
+  if (relPath.startsWith('_project/')) return 'commands-index';
 
-  // Files in _framework/agents/ without type
-  if (relPath.startsWith('_framework/agents/')) return 'manifest';
+  // Top-level files (context.md, INDEX.md) → null (they're navigation roots)
+  if (!relPath.includes(path.sep)) return null;
 
-  // Files in _framework/commands/ without type
-  if (relPath.startsWith('_framework/commands/')) return 'manifest';
-
-  // Files in _framework/ (docs, templates, etc.)
-  if (relPath.startsWith('_framework/')) return 'manifest';
-
-  // Files in _project/
-  if (relPath.startsWith('_project/')) return 'manifest';
-
-  // Anything else in docs/
-  if (relPath.startsWith('docs/')) return 'manifest';
-
-  // Top-level files (context.md, INDEX.md)
-  if (!relPath.includes(path.sep)) return 'manifest';
-
-  // Default: link to manifest
-  return 'manifest';
+  // Default: docs-index
+  return 'docs-index';
 }
 
 // Ensure every .md file has a parent link
@@ -999,9 +1131,6 @@ function ensureParentLinksInDir(dir, aiDir) {
 
       // Check if any parent/navigation link already exists
       if (content.includes(`> Parent: [[`)) continue;
-      if (content.includes(`> Project: [[`)) continue;
-      if (content.includes(`> Extends: [[`)) continue;
-      if (content.includes(`> Index: [[`)) continue;
 
       // Inject parent link after frontmatter
       const fmEnd = findFrontmatterEnd(content);
@@ -1207,6 +1336,7 @@ function main() {
   migrateAgents(aiDir);
   migrateDocs(aiDir);
   deleteCockpit(aiDir);
+  generateIndexNodes(aiDir);
   initObsidian(aiDir);
   setupMcpJson(resolvedRoot, aiDir);
   scanFrameworkCommands(aiDir);

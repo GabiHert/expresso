@@ -47,6 +47,9 @@ output:
     | Severity | File | Line | Issue | Suggestion |
     |---
 
+> Parent: [[agents-index]]
+
+
 > Index: [[README]] | Orchestration: [[orchestrator]]
 -------|------|------|-------|------------|
 

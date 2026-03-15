@@ -45,6 +45,9 @@ output:
     | File | Action | Description |
     |---
 
+> Parent: [[agents-index]]
+
+
 > Index: [[README]] | Orchestration: [[orchestrator]]
 ---|--------|-------------|
 

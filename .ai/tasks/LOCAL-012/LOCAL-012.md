@@ -130,7 +130,7 @@ Session moves to task's Sessions section
 
 1. Start session without task → appears in root Sessions
 2. Link via context menu → moves to task's sessions
-3. Link via /task-create → automatic linking
+3. Link via /[[task-create]] → automatic linking
 4. Resume closed unassigned session → stays unassigned
 5. Task sessions don't show "_unassigned" ones
 

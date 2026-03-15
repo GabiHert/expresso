@@ -42,6 +42,9 @@ output:
     | File | Purpose | Relevance |
     |---
 
+> Parent: [[agents-index]]
+
+
 > Index: [[README]] | Orchestration: [[orchestrator]]
 ---|---------|-----------|
     | path/to/file | What it does | Why it matters for this task |

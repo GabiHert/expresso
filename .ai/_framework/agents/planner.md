@@ -47,6 +47,9 @@ output:
         estimated_complexity: low | medium | high
 ---
 
+> Parent: [[agents-index]]
+
+
 > Index: [[README]] | Orchestration: [[orchestrator]]
 
 
