@@ -181,7 +181,7 @@ frontmatter. Prose goes in the body.
 
 ## Rule 6: No status folders
 
-Task/work-item status lives in frontmatter, NOT in folder structure.
+Task/[[work-item]] status lives in frontmatter, NOT in folder structure.
 There are no `todo/`, `in_progress/`, `done/` folders.
 
 - To change status: update frontmatter `status` field and the corresponding tag

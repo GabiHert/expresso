@@ -1,7 +1,7 @@
 ---
 type: migration-report
-generated: 2026-03-15T19:29:50.386Z
-total_issues: 372
+generated: 2026-03-15T19:48:24.035Z
+total_issues: 418
 tags: [migration, vault]
 ---
 
@@ -212,6 +212,21 @@ to be updated to use vault-native patterns (frontmatter, mcpvault MCP tools).
 - L239: .yaml file reference
 - L548: .yaml file reference
 - L588: .yaml file reference
+
+### .ai/_framework/commands/pr-comments.md
+- L147: status.yaml reference
+- L371: manifest.yaml reference
+- L146: in_progress/ folder reference
+- L147: in_progress/ folder reference
+- L147: .yaml file reference
+- L371: .yaml file reference
+
+### .ai/_framework/commands/task-brief.md
+- L63: manifest.yaml reference
+- L29: todo/ folder reference
+- L243: todo/ folder reference
+- L300: todo/ folder reference
+- L63: .yaml file reference
 
 ### .ai/_framework/commands/task-create.md
 - L68: status.yaml reference
@@ -435,6 +450,43 @@ to be updated to use vault-native patterns (frontmatter, mcpvault MCP tools).
 - L481: .yaml file reference
 - L552: .yaml file reference
 - L628: .yaml file reference
+
+### .ai/_framework/commands/wi-create.md
+- L45: status.yaml reference
+- L58: status.yaml reference
+- L68: status.yaml reference
+- L102: status.yaml reference
+- L151: status.yaml reference
+- L185: status.yaml reference
+- L187: status.yaml reference
+- L257: status.yaml reference
+- L78: manifest.yaml reference
+- L143: manifest.yaml reference
+- L317: manifest.yaml reference
+- L67: todo/ folder reference
+- L96: todo/ folder reference
+- L175: todo/ folder reference
+- L267: todo/ folder reference
+- L300: todo/ folder reference
+- L96: in_progress/ folder reference
+- L97: in_progress/ folder reference
+- L184: in_progress/ folder reference
+- L184: old workflow instruction
+- L187: old workflow instruction
+- L68: status.yaml update instruction
+- L185: status.yaml update instruction
+- L257: status.yaml update instruction
+- L45: .yaml file reference
+- L58: .yaml file reference
+- L68: .yaml file reference
+- L78: .yaml file reference
+- L102: .yaml file reference
+- L143: .yaml file reference
+- L151: .yaml file reference
+- L185: .yaml file reference
+- L187: .yaml file reference
+- L257: .yaml file reference
+- L317: .yaml file reference
 
 ## What the AI agent should do
 

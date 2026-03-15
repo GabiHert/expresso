@@ -109,6 +109,7 @@ The solution should be simple: store feedback as markdown in the task documentat
 - [[04-[[task-create]]-integration]] — Task-create integration (done)
 - [[04-[[task-create]]-integration]] — Task-create integration (done)
 - [[04-[[task-create]]-integration]] — Task-create integration (done)
+- [[04-[[task-create]]-integration]] — Task-create integration (done)
 
 - [[01-feedback-storage-format]] — Feedback storage format (done)
 - [[02-address-feedback-command]] — Create /address-feedback command (done)

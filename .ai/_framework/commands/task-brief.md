@@ -1,3 +1,6 @@
+
+
+> Parent: [[commands-index]]
 <!--
 ╔══════════════════════════════════════════════════════════════════╗
 ║ LAYER: FRAMEWORK                                                 ║
@@ -5,7 +8,7 @@
 ║ STATUS: Complete                                                 ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║ PURPOSE: Interactive pre-task scoping — explore, gap-fill,      ║
-║          brainstorm, and produce a brief ready for /task-create  ║
+║          brainstorm, and produce a brief ready for /[[task-create]]  ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
 

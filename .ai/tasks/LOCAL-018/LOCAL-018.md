@@ -123,6 +123,7 @@ Use `/address-feedback` to discuss feedback with the agent.
 - [[05-[[task-create]]-color-picker]] — Add color picker to /task-create flow (done)
 - [[05-[[task-create]]-color-picker]] — Add color picker to /task-create flow (done)
 - [[05-[[task-create]]-color-picker]] — Add color picker to /task-create flow (done)
+- [[05-[[task-create]]-color-picker]] — Add color picker to /task-create flow (done)
 
 - [[01-task-types-color]] — Add color property to Task types (done)
 - [[02-parse-color-yaml]] — Update status.yaml parsing for color (done)

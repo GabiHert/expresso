@@ -620,6 +620,102 @@ function processDocsDir(baseDir, currentDir) {
   }
 }
 
+// Step 5b: Rename generic files (README.md, INDEX.md, context.md)
+// In Obsidian, filenames are the node labels. "README" tells you nothing.
+function renameGenericFiles(aiDir) {
+  console.log('\n📛 Step 5b: Rename generic files to descriptive names');
+
+  const genericNames = ['README.md', 'INDEX.md', 'context.md'];
+  let count = 0;
+
+  renameInDir(aiDir, aiDir, genericNames, (filePath, fileName) => {
+    const relDir = path.relative(aiDir, path.dirname(filePath));
+    const parts = relDir.split(path.sep).filter(p => p && !p.startsWith('_'));
+
+    // Build descriptive name from directory context
+    let prefix = '';
+    if (relDir === '.') {
+      // Top-level files
+      if (fileName === 'INDEX.md') return 'vault-navigation.md';
+      if (fileName === 'context.md') return 'project-context.md';
+      return null; // keep as-is
+    }
+
+    // Use last meaningful directory parts
+    prefix = parts.length > 0 ? parts.join('-') : relDir.replace(/[/_]/g, '-').replace(/^-+/, '');
+
+    if (fileName === 'README.md') return `${prefix}-overview.md`;
+    if (fileName === 'context.md') return `${prefix}-context.md`;
+    if (fileName === 'INDEX.md') return `${prefix}-index.md`;
+    return null;
+  });
+
+  // Also rename _completed_tasks.md
+  const completedPath = path.join(aiDir, 'docs', '_completed_tasks.md');
+  if (fs.existsSync(completedPath)) {
+    const newPath = path.join(aiDir, 'docs', 'completed-tasks-log.md');
+    if (!fs.existsSync(newPath)) {
+      fs.renameSync(completedPath, newPath);
+      console.log(`  📛 _completed_tasks.md → completed-tasks-log.md`);
+      count++;
+    }
+  }
+}
+
+function renameInDir(baseDir, currentDir, genericNames, nameResolver) {
+  const entries = fs.readdirSync(currentDir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(currentDir, entry.name);
+    if (entry.name === '.obsidian' || entry.name === 'tmp') continue;
+
+    if (entry.isDirectory()) {
+      renameInDir(baseDir, fullPath, genericNames, nameResolver);
+    } else if (entry.isFile() && genericNames.includes(entry.name)) {
+      const newName = nameResolver(fullPath, entry.name);
+      if (!newName || newName === entry.name) continue;
+
+      const newPath = path.join(currentDir, newName);
+      if (fs.existsSync(newPath)) {
+        console.log(`  ⏭  ${newName} already exists, skipping rename of ${entry.name}`);
+        continue;
+      }
+
+      // Update any wikilinks in other files that reference the old name
+      const oldBaseName = entry.name.replace('.md', '');
+      const newBaseName = newName.replace('.md', '');
+
+      fs.renameSync(fullPath, newPath);
+      console.log(`  📛 ${path.relative(baseDir, fullPath)} → ${newName}`);
+
+      // Update wikilinks across the vault
+      updateWikilinks(baseDir, oldBaseName, newBaseName);
+    }
+  }
+}
+
+function updateWikilinks(dir, oldName, newName) {
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.name === '.obsidian' || entry.name === 'tmp') continue;
+
+    if (entry.isDirectory()) {
+      updateWikilinks(fullPath, oldName, newName);
+    } else if (entry.isFile() && entry.name.endsWith('.md')) {
+      const content = readFile(fullPath);
+      if (!content || !content.includes(`[[${oldName}]]`)) continue;
+
+      const updated = content.replace(
+        new RegExp(`\\[\\[${escapeRegex(oldName)}\\]\\]`, 'g'),
+        `[[${newName}]]`
+      );
+      fs.writeFileSync(fullPath, updated, 'utf8');
+    }
+  }
+}
+
 // Step 6: Delete cockpit
 function deleteCockpit(aiDir) {
   console.log('\n🗑  Step 6: Delete cockpit/');
@@ -1336,6 +1432,7 @@ function main() {
   migrateExtensions(aiDir);
   migrateAgents(aiDir);
   migrateDocs(aiDir);
+  renameGenericFiles(aiDir);
   deleteCockpit(aiDir);
   generateIndexNodes(aiDir);
   initObsidian(aiDir);
