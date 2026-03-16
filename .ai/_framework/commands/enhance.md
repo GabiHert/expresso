@@ -59,20 +59,20 @@ Grow the project setup with new knowledge. Add repos, update conventions, add MC
    • "Change JIRA prefix"
 
 2. DETERMINE WHAT TO CHANGE
-   • New repo? → Update manifest.yaml, create docs
-   • New convention? → Update manifest.yaml
-   • New MCP? → Update manifest.yaml
-   • Project identity? → Update manifest.yaml
+   • New repo? → Update manifest.md, create docs
+   • New convention? → Update manifest.md
+   • New MCP? → Update manifest.md
+   • Project identity? → Update manifest.md
 
 3. EXPLORE IF NEEDED
    • For new repos: explore to gather tech stack
    • For patterns: find examples in code
 
 4. UPDATE APPROPRIATELY
-   • Update _project/manifest.yaml
+   • Update _project/manifest.md frontmatter
    • Regenerate context.md
    • Create repo docs if adding repo
-   • Update INDEX.md (REQUIRED for new docs)
+   • Update docs-index.md (REQUIRED for new docs)
 
 5. OUTPUT SUMMARY
    • What was changed
@@ -83,8 +83,8 @@ Grow the project setup with new knowledge. Add repos, update conventions, add MC
 
 ### Step 0: Orientation
 
-1. Read `.ai/_project/manifest.yaml` to understand current configuration.
-2. Read `.ai/INDEX.md` to know existing documentation.
+1. Read `.ai/_project/manifest.md` using `get_frontmatter("_project/manifest.md")` to understand current configuration (fields: repos, conventions, mcps, etc.).
+2. Read `.ai/docs/docs-index.md` to know existing documentation.
 
 3. **Extension Support**: This command supports compiled extensions
    via `/command-extend enhance --variant NAME`. If a compiled extension
@@ -149,8 +149,8 @@ Explore {repo.path} to identify:
 - Test patterns
 ```
 
-**Update manifest.yaml:**
-Add new repo entry:
+**Update manifest.md frontmatter:**
+Use `update_frontmatter("_project/manifest.md", ...)` to add the new repo entry to the `repos` field:
 ```yaml
 repos:
   # ... existing repos ...
@@ -161,8 +161,15 @@ repos:
 ```
 
 **Create repo documentation:**
-Create `.ai/docs/{repo}/README.md`:
+Use `write_note` to create `.ai/docs/{repo}/README.md` with mandatory frontmatter and parent link:
 ```markdown
+---
+type: doc
+tags: [doc, {repo}]
+---
+
+> Parent: [[docs-index]]
+
 # {repo} Documentation
 
 ## Overview
@@ -182,10 +189,10 @@ Create `.ai/docs/{repo}/README.md`:
 {patterns identified}
 ```
 
-**Update INDEX.md:**
-Add entry in Documentation section:
+**Update docs-index.md:**
+Use `patch_note` to add a wikilink entry to `.ai/docs/docs-index.md`:
 ```markdown
-| {repo} | [docs/{repo}/README.md](./docs/{repo}/README.md) | {description} |
+[[{repo}-README]]
 ```
 
 #### 2b. Adding an MCP
@@ -200,8 +207,8 @@ Availability: (1) Always available, (2) Optional/sometimes available
 Any notes?: (e.g., "requires VPN")
 ```
 
-**Update manifest.yaml:**
-Add to appropriate section:
+**Update manifest.md frontmatter:**
+Use `update_frontmatter("_project/manifest.md", ...)` to add to the appropriate section:
 ```yaml
 mcps:
   available:  # or optional:
@@ -226,7 +233,7 @@ What would you like to update?
 Choice?
 ```
 
-For each choice, gather specifics and update manifest.yaml accordingly.
+For each choice, gather specifics and use `update_frontmatter("_project/manifest.md", ...)` to update the relevant convention fields.
 
 **Commit conventions:**
 ```yaml
@@ -269,15 +276,15 @@ What would you like to update?
 Choice?
 ```
 
-Update the appropriate section in manifest.yaml.
+Use `update_frontmatter("_project/manifest.md", ...)` to update the appropriate section.
 
 ### Step 3: Regenerate context.md
 
 After any manifest change, regenerate `.ai/context.md`:
-1. Read the updated manifest.yaml
+1. Read the updated `_project/manifest.md` using `get_frontmatter("_project/manifest.md")`
 2. Use the template from `_framework/templates/context.md`
 3. Fill in current values
-4. Update current state (task counts)
+4. Use `write_note` or `patch_note` to update `.ai/context.md`
 
 ### Step 4: Verify Changes
 
@@ -286,12 +293,12 @@ Show what was changed:
 VERIFICATION
 
 Changes made to:
-  ✓ .ai/_project/manifest.yaml
+  ✓ .ai/_project/manifest.md
     {show diff or summary of changes}
 
 {if repo added}
   ✓ .ai/docs/{repo}/README.md (created)
-  ✓ .ai/INDEX.md (updated)
+  ✓ .ai/docs/docs-index.md (updated)
 {/if}
 
   ✓ .ai/context.md (regenerated)
@@ -315,15 +322,15 @@ Changed:
 {list what was changed}
 
 Updated Files:
-  • .ai/_project/manifest.yaml
+  • .ai/_project/manifest.md
   • .ai/context.md
 {if applicable}
   • .ai/docs/{repo}/README.md
-  • .ai/INDEX.md
+  • .ai/docs/docs-index.md
 {/if}
 
 To verify:
-  • Check manifest: .ai/_project/manifest.yaml
+  • Check manifest: .ai/_project/manifest.md
   • Check context: .ai/context.md
 
 Next Steps:

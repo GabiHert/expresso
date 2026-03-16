@@ -85,9 +85,9 @@ ADDRESS MODE:
 
 ### Step 0: Orientation
 
-1. Read `.ai/_project/manifest.yaml` to understand:
-   - Available repositories and paths
-   - File extensions to scan
+1. Use `get_frontmatter("_project/manifest.md")` to read the manifest and understand:
+   - Available repositories and paths (`repos` field)
+   - File extensions to scan (`conventions` field)
 
 2. **Extension Support**: This command supports compiled extensions
    via `/command-extend expresso-tags --variant NAME`. If a compiled extension

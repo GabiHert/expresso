@@ -154,9 +154,9 @@ Before spawning explorer agents, gather the full context of what the PR is about
    - Branch name (often contains task ID)
    - List of all changed files in the PR
    - If a task ID is detected in the branch name, check for task docs:
-     - `.ai/tasks/in_progress/{task_id}/README.md`
-     - `.ai/tasks/in_progress/{task_id}/status.yaml`
-   - If task docs exist, read them and include a summary of the task's goal, acceptance criteria, and current status
+     - Read `tasks/{task_id}/{task_id}.md` directly (vault path)
+     - Use `get_frontmatter("tasks/{task_id}/{task_id}.md")` to get task status and summary counts
+   - If task docs exist, read them and include a summary of the task's goal, acceptance criteria, and current status (from frontmatter fields and note body)
 
 3. **Store as `{task_context}`** — this will be injected into every explorer agent prompt.
 
@@ -379,7 +379,7 @@ Then stop. Do not proceed further.
 
 ### Step 10: Auto-Sync (if enabled)
 
-Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
+Check `_project/manifest.md` for `auto_sync.enabled` using `get_frontmatter("_project/manifest.md")`.
 
 **If auto_sync is enabled:**
 Use the [[ai-sync]] agent to sync the .ai folder changes.

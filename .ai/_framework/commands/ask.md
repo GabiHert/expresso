@@ -61,11 +61,11 @@ Answer questions by searching the `.ai/` documentation first, before exploring c
    • Identify relevant areas (repos, features, patterns)
 
 2. SEARCH DOCUMENTATION (in order)
-   • context.md - Current project state
-   • INDEX.md - Find relevant doc links
+   • _project/manifest.md - Project overview and repos (get_frontmatter)
+   • docs/docs-index.md - Find relevant doc links
    • docs/ - Feature and repo documentation
-   • tasks/ - Current and completed task context
-   • _completed_tasks.md - Historical learnings
+   • search_notes("type: task status: in_progress") - Active task context
+   • search_notes("type: task status: done") - Historical learnings
 
 3. COMPILE FINDINGS
    • Gather all relevant documentation
@@ -86,7 +86,7 @@ Answer questions by searching the `.ai/` documentation first, before exploring c
 
 ### Step 0: Orientation
 
-1. Read `.ai/_project/manifest.yaml` to understand available repositories.
+1. Use `get_frontmatter("_project/manifest.md")` to understand available repositories (repos, conventions, mcps).
 
 2. **Extension Support**: This command supports compiled extensions
    via `/command-extend ask --variant NAME`. If a compiled extension
@@ -116,25 +116,25 @@ exploration if needed.
 Your question:
 ```
 
-### Step 2: Search context.md
+### Step 2: Read Project Manifest
 
-Read `.ai/context.md` for:
-- Project overview
-- Current focus areas
-- Active tasks that might be relevant
+Use `get_frontmatter("_project/manifest.md")` for:
+- Project overview and repo list
+- Conventions and active focus areas
+- Any active task references
 
 Note any relevant findings.
 
-### Step 3: Search INDEX.md
+### Step 3: Search docs-index
 
-Read `.ai/INDEX.md` to find:
+Read `.ai/docs/docs-index.md` to find:
 - Relevant documentation links
 - Which repos might have docs on this topic
 - Related patterns or architecture docs
 
 ### Step 4: Search docs/
 
-Based on INDEX.md findings, read relevant documentation:
+Based on docs-index findings, read relevant documentation:
 
 **Priority order:**
 1. Direct topic match (e.g., `docs/peo/hris_integration/` for HRIS questions)
@@ -146,19 +146,13 @@ Read up to 5 most relevant files.
 
 ### Step 5: Search tasks/
 
-Check for relevant tasks:
+Check for relevant tasks using vault search:
 
 **In Progress:**
-```bash
-# Look for task READMEs mentioning the topic
-.ai/tasks/in_progress/*/README.md
-```
+Use `search_notes("type: task status: in_progress")` to find active tasks related to the topic.
 
 **Completed:**
-```bash
-# Check completed tasks history
-.ai/docs/_completed_tasks.md
-```
+Use `search_notes("type: task status: done")` to find completed tasks with relevant historical learnings.
 
 ### Step 6: Compile and Present
 
@@ -259,7 +253,7 @@ SOURCES
 
 RELATED TASKS
 ══════════════════════════════════════════════════════════════════
-  • PEOCM-819 (in_progress) - Removing effectiveDate from HRIS sync
+  • [[PEOCM-819]] (status: in_progress) - Removing effectiveDate from HRIS sync
 
 ╚══════════════════════════════════════════════════════════════════╝
 

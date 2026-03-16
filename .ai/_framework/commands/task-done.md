@@ -23,7 +23,7 @@ tags:
 
 ## Description
 
-Mark a task as done, log it to history, and move it to the done folder. This preserves the task for future reference.
+Mark a task as done, log it to history, and update its status in the vault. This preserves the task for future reference.
 
 ## SCOPE CONSTRAINT
 ┌─────────────────────────────────────────────────────────────────┐
@@ -51,24 +51,24 @@ Mark a task as done, log it to history, and move it to the done folder. This pre
 
 ```
 1. IDENTIFY TASK
-   • Find task in in_progress/
+   • Find task with status: in_progress via frontmatter
    • Verify all work items are complete
 
 2. VERIFY COMPLETION
-   • Check all work items in done/
-   • If any in todo/ or in_progress/, warn user
+   • Check all work items' frontmatter status fields
+   • If any have status: todo or status: in_progress, warn user
 
 3. LOG TO HISTORY
    • Append to .ai/docs/_completed_tasks.md
    • Include: date, JIRA, summary, repos affected
 
-4. MOVE TO DONE
-   • Move task folder to .ai/tasks/done/
-   • Preserve all work items and README
+4. MARK AS DONE
+   • Update task note frontmatter: status → done
+   • Update tags to include done
 
 5. UPDATE DOCUMENTATION
    • If significant patterns learned, offer to document
-   • Update INDEX.md if new docs created
+   • Update docs-index if new docs created
 
 6. SEND NOTIFICATION
    • If notifications enabled, send Discord/Slack message
@@ -78,7 +78,7 @@ Mark a task as done, log it to history, and move it to the done folder. This pre
 
 ### Step 0: Orientation
 
-1. Read `.ai/_project/manifest.yaml` to understand:
+1. Use `get_frontmatter("_project/manifest.md")` to read the manifest and understand:
    - Notification settings
    - Available MCPs (for notifications)
 
@@ -96,13 +96,12 @@ Mark a task as done, log it to history, and move it to the done folder. This pre
 ### Step 1: Find Task
 
 **If task ID provided:**
-- Look for task in `.ai/tasks/in_progress/{task-id}/`
-- If not found, check `.ai/tasks/done/{task-id}/`
-  - If found there, say: "Task {task-id} is already marked as done."
-- If not found anywhere, say: "Task {task-id} not found."
+- Use `get_frontmatter("tasks/{task-id}/{task-id}.md")` to read the task note.
+- If `status` field is `done`, say: "Task {task-id} is already marked as done."
+- If not found, say: "Task {task-id} not found."
 
 **If no task ID provided:**
-- Look in `.ai/tasks/in_progress/`
+- Use `search_notes("type: task status: in_progress")` to find in-progress tasks.
 - If no tasks found, say: "No tasks in progress to complete."
 - If multiple tasks found, list them and ask:
   ```
@@ -115,9 +114,11 @@ Mark a task as done, log it to history, and move it to the done folder. This pre
 
 ### Step 2: Verify Completion
 
-1. Read the task's status.yaml.
+1. Scan the task folder `tasks/{task-id}/` using `Glob` for all `.md` files excluding the task note itself (i.e., all work item files).
 
-2. Check work item statuses:
+2. For each work item file, use `get_frontmatter("tasks/{task-id}/{filename}")` to read its `status` field.
+
+3. Display verification:
 ```
 VERIFICATION
 ══════════════════════════════════════════════════════════════════
@@ -130,7 +131,7 @@ Work Items:
   ▶ In Progress: {in_progress_count}
 ```
 
-3. If any items NOT in done/:
+4. If any items have status `todo` or `in_progress`:
 ```
 WARNING: Not all work items are complete.
 
@@ -162,25 +163,20 @@ Please provide a brief summary of what was accomplished:
 Append to `.ai/docs/_completed_tasks.md`:
 
 ```markdown
-| {YYYY-MM-DD} | [{task-id}](.ai/tasks/done/{task-id}/) | {summary} |
+| {YYYY-MM-DD} | [[{task-id}]] | {summary} |
 ```
 
 If the file has the placeholder row `| _No tasks completed yet_ | | |`, remove it first.
 
-### Step 5: Move Task to Done
+### Step 5: Mark Task as Done
 
-1. Move the entire task folder:
-   - From: `.ai/tasks/in_progress/{task-id}/`
-   - To: `.ai/tasks/done/{task-id}/`
+1. Update the task note's frontmatter using `update_frontmatter("tasks/{task-id}/{task-id}.md", { status: "done", tags: ["task", "done"] })`.
 
-2. Update the task's README.md header:
-```markdown
-║ LOCATION: .ai/tasks/done/{task-id}/                             ║
-```
+2. Update the task note's header block using `patch_note` to reflect the completed status.
 
 ### Step 6: Update Context
 
-Update `.ai/context.md`:
+Update `.ai/context.md` using `patch_note`:
 - Remove task from "In Progress" in Current State section
 - Add to "Recently Done" count
 
@@ -209,7 +205,7 @@ Provide the following context to the agent:
 
 ```
 ## Completed Task
-{task README content}
+{task note content}
 
 ## Work Items Completed
 {all work item files content}
@@ -283,7 +279,7 @@ Summary: {summary}
 
 Work Items: {done_count} completed
 
-Archived: .ai/tasks/done/{task-id}/
+Status: [[{task-id}]] marked as done
 
 History: Added to .ai/docs/_completed_tasks.md
 
@@ -299,7 +295,7 @@ Next Steps:
 
 ### Step 10: Invoke Sync Agent (if enabled)
 
-Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
+Check `auto_sync.enabled` in the manifest frontmatter read in Step 0.
 
 **If auto_sync is enabled:**
 
@@ -325,7 +321,6 @@ Commit changes to .ai/ folder using batched commits:
 - config: Configuration changes
 
 Execute git operations and report results.
-```
 ```
 
 The Sync agent will:

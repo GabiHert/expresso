@@ -102,7 +102,7 @@ Explore the codebase to understand context for a task or question. Uses explorat
 
 ### Step 0: Orientation
 
-1. Read `.ai/_project/manifest.yaml` to understand:
+1. Use `get_frontmatter("_project/manifest.md")` to read the manifest and understand:
    - Available repositories and paths
    - Agent preferences (exploration thoroughness)
 
@@ -120,8 +120,8 @@ Explore the codebase to understand context for a task or question. Uses explorat
 ### Step 1: Parse Query
 
 **If JIRA/task ID provided:**
-- Find the task in `.ai/tasks/` (any status folder)
-- Read the task's README.md for context
+- Find the task note at `tasks/TASK-ID/TASK-ID.md` (use `search_notes` if the exact ID is unknown)
+- Read the task note for context
 - Extract: problem statement, affected repos, technical context
 - Use this to focus the exploration
 

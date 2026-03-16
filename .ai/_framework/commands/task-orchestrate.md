@@ -52,8 +52,8 @@ Orchestrate the execution of all work items in a task by launching isolated back
 
 ```
 1. IDENTIFY TASK
-   • Find task in .ai/tasks/in_progress/
-   • Read README.md and status.yaml
+   • Find task with status: in_progress (search vault or check frontmatter)
+   • Read task note and work item files
    • Collect all work items
 
 2. ANALYZE DEPENDENCIES
@@ -85,7 +85,7 @@ Orchestrate the execution of all work items in a task by launching isolated back
 
 ### Step 0: Orientation
 
-1. Read `.ai/_project/manifest.yaml` to understand:
+1. Read `.ai/_project/manifest.md` using `get_frontmatter("_project/manifest.md")` to understand:
    - Available repositories
    - Protected repos
    - Commit conventions
@@ -95,8 +95,8 @@ Orchestrate the execution of all work items in a task by launching isolated back
    exists, the stub already points to it — no runtime discovery needed.
 
 3. Find the current task:
-   - Look in `.ai/tasks/in_progress/`
-   - If task ID provided as argument, find that specific task
+   - Use `search_notes("type: task status: in_progress")` to find in-progress tasks
+   - If task ID provided as argument, read `tasks/TASK-ID/TASK-ID.md` directly and verify its frontmatter `status` is `in_progress`
    - If no task found, say: "No task in progress. Use /[[task-start]] to begin a task."
    - If multiple tasks found, list them and ask which one:
      ```
@@ -107,7 +107,7 @@ Orchestrate the execution of all work items in a task by launching isolated back
      Which task? (Enter number or task ID)
      ```
 
-4. Read the task README.md and status.yaml fully.
+4. Read the task note `tasks/TASK-ID/TASK-ID.md` fully to get its content and frontmatter.
 
 5. Announce:
 ```
@@ -121,12 +121,12 @@ Mode: Background agents with worktree isolation
 
 ### Step 1: Collect Work Items
 
-1. Read status.yaml to get all work items.
-2. Filter to items with status `todo` or `in_progress`.
+1. Scan the task folder `tasks/TASK-ID/` using Glob for all `.md` files excluding the main task note (`TASK-ID.md`). These are work item files.
+2. Read the frontmatter of each work item using `get_frontmatter` and filter to items with `status: todo` or `status: in_progress`.
 3. Read each work item file to understand:
    - Objective and acceptance criteria
    - Target repo/files
-   - Any `depends_on` field (explicit dependency on other WI IDs)
+   - Any `depends_on` field in its frontmatter (explicit dependency on other WI IDs)
 
 If no work items remain:
 ```
@@ -139,7 +139,7 @@ Run /task-done to finish the task.
 Build a dependency graph from work items:
 
 **Explicit dependencies:**
-Check each work item for a `depends_on` field in its YAML frontmatter or content:
+Check each work item for a `depends_on` field in its frontmatter:
 ```yaml
 depends_on: ["01", "02"]  # This WI depends on WI-01 and WI-02
 ```
@@ -221,7 +221,7 @@ with precision and focus. You start with clean context - only what you
 need for this specific item.
 
 ## Task Context
-{task_readme_content}
+{task_note_content}
 
 ## Your Work Item
 {work_item_file_content}
@@ -272,11 +272,11 @@ When done, produce an implementation summary:
 - Blocker description
 ```
 
-#### 4b. Move WIs to in_progress
+#### 4b. Mark WIs as in_progress
 
 For each WI being executed:
-1. Move work item file from `todo/` to `in_progress/`
-2. Update status.yaml
+1. Use `update_frontmatter` on the work item note to set `status: in_progress` and update tags to include `in_progress`.
+2. Use `update_frontmatter` on the task note `tasks/TASK-ID/TASK-ID.md` to update the `summary` counts (increment `in_progress`, decrement `todo`).
 
 #### 4c. Wait for Agent Completion
 
@@ -342,7 +342,7 @@ completed work items.
 └─────────────────────────────────────────────────────────────────┘
 
 ## Task Context
-{task_readme_content}
+{task_note_content}
 
 ## Work Item Just Completed
 {work_item_content}
@@ -392,8 +392,8 @@ completed work items.
 ```
 WI-{id}: Coherence review passed
 ```
-- Move WI to `done/`
-- Update status.yaml
+- Use `update_frontmatter` on the work item note to set `status: done` and update tags to include `done`.
+- Use `update_frontmatter` on the task note to update the `summary` counts (increment `done`, decrement `in_progress`).
 - Continue to next group or WI
 
 **If verdict is NEEDS CORRECTION:**
@@ -419,7 +419,7 @@ Issues Found:
 - If **Fix**: Re-launch implementer agent with the coherence feedback
   appended as "Previous Feedback". Use worktree isolation again.
   Maximum 2 correction rounds per WI before escalating to user.
-- If **Override**: Mark as done, continue
+- If **Override**: Use `update_frontmatter` to set work item `status: done`, update task `summary` counts, continue.
 - If **Stop**: Pause orchestration, report progress
 
 ### Step 6: Group Transition
@@ -495,7 +495,7 @@ Next Steps:
 │ Before ANY git operation (add, commit, push, checkout):          │
 │                                                                  │
 │ 1. Read work item to get target repo                             │
-│ 2. Read manifest.yaml for repo path                              │
+│ 2. Read manifest.md frontmatter for repo path                    │
 │ 3. cd to the repo path                                           │
 │ 4. Verify: git rev-parse --show-toplevel                         │
 │ 5. Check: Is repo protected? If yes, STOP.                       │
@@ -511,7 +511,7 @@ If the repo is protected, inform the user but do not commit.
 
 ### Step 9: Auto-Sync (if enabled)
 
-Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
+Read `.ai/_project/manifest.md` using `get_frontmatter("_project/manifest.md")` and check the `auto_sync` field for `enabled: true`.
 
 **If auto_sync is enabled:**
 

@@ -60,15 +60,14 @@ in the project root or source directories.
 
 ```
 1. IDENTIFY CURRENT TASK
-   • Check .ai/tasks/in_progress/
+   • Use search_notes to find tasks with status: in_progress
    • If multiple, ask which one
 
 2. SELECT WORK ITEM
-   • Read status.yaml for quick overview
-   • If specified, find that item
-   • If not, pick next from todo/
-   • Move item to in_progress/
-   • Update status.yaml
+   • Read task note frontmatter for quick overview
+   • If specified, find that work item by scanning task folder
+   • If not, pick next work item with status: todo
+   • Update work item frontmatter status to in_progress
 
 3. READ WORK ITEM
    • Read full work item file
@@ -88,9 +87,9 @@ in the project root or source directories.
    • Address any issues found
 
 7. COMPLETE
-   • Move work item to done/
-   • Update status.yaml
-   • Update task README with learnings
+   • Update work item frontmatter status to done
+   • Update task note summary counts via update_frontmatter
+   • Update task note body with learnings
 ```
 
 ## Implementation
@@ -102,7 +101,7 @@ in the project root or source directories.
 │ Before ANY git operation (add, commit, push, checkout):         │
 │                                                                 │
 │ 1. Read work item to get target repo                            │
-│ 2. Read manifest.yaml for repo path                             │
+│ 2. Read manifest.md for repo path                               │
 │ 3. cd to the repo path                                          │
 │ 4. Verify: git rev-parse --show-toplevel                        │
 │ 5. Check: Is repo protected? If yes, STOP.                      │
@@ -114,7 +113,7 @@ in the project root or source directories.
 
 ### Step 0: Orientation
 
-1. Read `.ai/_project/manifest.yaml` to understand:
+1. Read `.ai/_project/manifest.md` (or use `get_frontmatter("_project/manifest.md")`) to understand:
    - Available repositories
    - **Protected repos (`protected: true`) - NEVER commit to these**
    - Commit conventions
@@ -125,7 +124,7 @@ in the project root or source directories.
    exists, the stub already points to it — no runtime discovery needed.
 
 3. Find the current task:
-   - Look in `.ai/tasks/in_progress/`
+   - Use `search_notes` with query `type: task status: in_progress`
    - If no task found, say: "No task in progress. Use /[[task-start]] to begin a task."
    - If multiple tasks found, list them and ask which one to work on:
      ```
@@ -136,36 +135,33 @@ in the project root or source directories.
      Which task? (Enter number or task ID)
      ```
 
-3. Read the task's status.yaml for work item overview.
+4. Read the task note's frontmatter (via `get_frontmatter("tasks/TASK-ID/TASK-ID.md")`) for work item overview — the `summary` field has `{total, todo, in_progress, done}` counts.
 
 ### Step 1: Select Work Item
 
 **If work item ID specified:**
-- Look for item matching the ID in status.yaml
+- Scan the task folder `tasks/TASK-ID/` for `.md` files and read their frontmatter to find the matching item
 - If not found, say: "Work item '{id}' not found. Available items: {list}"
 
 **If no work item specified:**
-- Check for any items in in_progress/ first
+- Scan the task folder for work item `.md` files; read each file's frontmatter and filter by `status: in_progress`
   - If found, offer to continue: "Work item {id} is in progress. Continue with this? (y/n)"
-- If none in progress, pick the first item from todo/
-  - If no items in todo, say: "All work items complete! Use /[[task-done]] to finish the task."
+- If none in progress, find the first work item with `status: todo`
+  - If no items with `status: todo` exist, say: "All work items complete! Use /[[task-done]] to finish the task."
 
 ### Step 2: Move to In Progress
 
-If item is in todo/:
-1. Move the work item file:
-   - From: `{task-path}/todo/{id}-{name}.md`
-   - To: `{task-path}/in_progress/{id}-{name}.md`
+If item has `status: todo`:
+1. Update the work item note's frontmatter:
+   - Use `update_frontmatter("tasks/TASK-ID/TASK-ID-{id}.md", {status: "in_progress"})`
+   - Also update tags to include `in_progress`
 
-2. Update status.yaml:
-   ```yaml
-   work_items:
-     - id: "{id}"
-       status: in_progress  # Changed from todo
-       file: "in_progress/{id}-{name}.md"  # Updated path
+2. Update the task note's `summary` counts:
    ```
-
-3. Update summary counts in status.yaml.
+   update_frontmatter("tasks/TASK-ID/TASK-ID.md", {
+     summary: { ..., todo: todo-1, in_progress: in_progress+1 }
+   })
+   ```
 
 ### Step 3: Read Work Item
 
@@ -224,7 +220,7 @@ Provide the following context to the agent:
 
 ```
 ## Task Context
-{task README content}
+{task note content}
 
 ## Your Work Item
 {work item file content}
@@ -282,7 +278,7 @@ git diff HEAD > /tmp/changes.diff
 {criteria from work item}
 
 ## Task Context
-{task README content}
+{task note content}
 
 ## Your Mission
 Review this implementation:
@@ -290,7 +286,7 @@ Review this implementation:
 2. Check for bugs, security issues, code quality
 3. Return verdict: APPROVED or NEEDS CHANGES
 
-Save feedback to: {task-path}/feedback/{work-item-id}-review.md
+Save feedback to: tasks/TASK-ID/feedback/{work-item-id}-review.md
 ```
 
 **If verdict is NEEDS CHANGES:**
@@ -326,21 +322,18 @@ Continue to Step 7.
 
 ### Step 7: Complete Work Item
 
-1. Move the work item file:
-   - From: `{task-path}/in_progress/{id}-{name}.md`
-   - To: `{task-path}/done/{id}-{name}.md`
+1. Update the work item note's frontmatter to mark it done:
+   - Use `update_frontmatter("tasks/TASK-ID/TASK-ID-{id}.md", {status: "done"})`
+   - Also update tags to include `done` and remove `in_progress`
 
-2. Update status.yaml:
-   ```yaml
-   work_items:
-     - id: "{id}"
-       status: done  # Changed from in_progress
-       file: "done/{id}-{name}.md"  # Updated path
+2. Update the task note's `summary` counts:
+   ```
+   update_frontmatter("tasks/TASK-ID/TASK-ID.md", {
+     summary: { ..., in_progress: in_progress-1, done: done+1 }
+   })
    ```
 
-3. Update summary counts in status.yaml.
-
-4. Add any learnings to the task README under "Technical Context" or "Notes".
+3. Add any learnings to the task note body under "Technical Context" or "Notes" using `patch_note`.
 
 ### Step 8: Output Summary
 
@@ -356,7 +349,7 @@ Progress:
   □ Todo: {todo_count}
   ▶ In Progress: {in_progress_count}
 
-{if more items in todo}
+{if more items with status: todo}
 Next Work Item:
   □ {next-id}. {next-name} ({repo})
 
@@ -372,12 +365,10 @@ Run /task-done to finish the task.
 Before any git operation, you MUST verify you're in the correct repository:
 
 **1. Identify target repo from current work item:**
-- Get `repo` from work item YAML frontmatter or content
+- Get `repo` from work item frontmatter or content
 
-**2. Read manifest.yaml for repo details:**
-```bash
-cat .ai/_project/manifest.yaml | grep -A5 "name: {repo}"
-```
+**2. Read manifest.md for repo details:**
+- Use `get_frontmatter("_project/manifest.md")` or Read `.ai/_project/manifest.md`
 - Get `path` for the repo
 - Check if `protected: true`
 
@@ -385,7 +376,7 @@ cat .ai/_project/manifest.yaml | grep -A5 "name: {repo}"
 ```
 ⛔ PROTECTED REPO - NO GIT OPERATIONS
 
-Repo '{repo}' is marked as protected in manifest.yaml.
+Repo '{repo}' is marked as protected in manifest.md.
 Commit manually after careful review.
 ```
 STOP and do not proceed with git operations.
@@ -394,7 +385,7 @@ STOP and do not proceed with git operations.
 ```
 ⛔ REPO NOT FOUND
 
-Repo '{repo}' is not in manifest.yaml.
+Repo '{repo}' is not in manifest.md.
 Add it to the manifest or check the repo name.
 ```
 STOP and do not proceed with git operations.
@@ -477,7 +468,7 @@ git commit -m "{message}"
 ```
 ⛔ COMMIT BLOCKED - PROTECTED REPO
 
-{repo} is marked as protected in manifest.yaml.
+{repo} is marked as protected in manifest.md.
 Changes cannot be committed to this repo via task workflow.
 
 If you need to make changes here, commit manually after
@@ -486,7 +477,7 @@ careful review.
 
 ### Step 10: Auto-Sync (if enabled)
 
-Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
+Check `.ai/_project/manifest.md` (via `get_frontmatter`) for `auto_sync.enabled`.
 
 **If auto_sync is enabled:**
 
@@ -536,14 +527,14 @@ Starting autopilot execution...
 
 ### Autopilot Step 2: Execute Loop
 
-For each work item in todo/ (sorted by id prefix):
+For each work item with `status: todo` in the task folder (sorted by id prefix):
 
 ```
 [1/{total}] {repo}: {id}-{name}.md
 ├── Running code-explorer for context...
 ├── Implementing work item...
 ├── Running code-reviewer...
-└── [DONE] Moving to done/
+└── [DONE] Updating work item status to done
 
 [2/{total}] {repo}: {id}-{name}.md
 ├── Running code-explorer for context...
@@ -552,12 +543,11 @@ For each work item in todo/ (sorted by id prefix):
 
 **Execution flow per item:**
 1. Launch code-explorer agent for context (non-optional in autopilot)
-2. Move work item to in_progress/
+2. Update work item frontmatter: `status: in_progress`
 3. Read and implement all steps from work item file
 4. Launch code-reviewer agent
 5. **If review finds critical issues**: STOP autopilot, report progress
-6. **If review passes**: Move to done/, continue to next item
-7. Update status.yaml after each item
+6. **If review passes**: Update work item frontmatter to `status: done`; update task note summary counts; continue to next item
 
 ### Autopilot Step 3: Handle Blockers
 
@@ -633,7 +623,7 @@ Next Steps:
 
 ### Autopilot Step 5: Auto-Sync (if enabled)
 
-Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
+Check `.ai/_project/manifest.md` (via `get_frontmatter`) for `auto_sync.enabled`.
 
 **If auto_sync is enabled:**
 

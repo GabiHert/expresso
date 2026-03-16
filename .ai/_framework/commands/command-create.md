@@ -75,16 +75,16 @@ Create a new command with proper structure, ensuring consistency across the fram
 
 5. CLARIFY DEPENDENCIES
    Ask: "What does this command read?"
-   • manifest.yaml?
+   • manifest.md (project config via get_frontmatter)?
    • context.md?
-   • Specific task files?
+   • Specific task notes?
    • Other commands' output?
 
 6. CLARIFY OUTPUTS
    Ask: "What does this command create or modify?"
    • New files?
    • Updates to existing files?
-   • Updates to INDEX.md?
+   • Updates to [[commands-index]]?
    • Updates to context.md?
 
 7. CLARIFY WORKFLOW STEPS
@@ -111,7 +111,7 @@ Create a new command with proper structure, ensuring consistency across the fram
    • Include proper header
 
 10. UPDATE INDEXES
-    • Add to INDEX.md command table
+    • Add [[{name}]] to [[commands-index]] body
     • Add to _framework/README.md command table
     • Add to /help output (in correct category)
 
@@ -218,9 +218,9 @@ DEPENDENCIES
 
 What does this command need to read?
 
-  [ ] manifest.yaml (project config)
+  [ ] manifest.md (project config via get_frontmatter)
   [ ] context.md (current state)
-  [ ] Task files (README.md, status.yaml)
+  [ ] Task notes (TASK-ID.md frontmatter)
   [ ] Documentation files
   [ ] Other: ___
 
@@ -236,7 +236,7 @@ What does this command create or modify?
 
   [ ] Creates new files
   [ ] Modifies existing files
-  [ ] Updates INDEX.md
+  [ ] Updates [[commands-index]] or other index notes
   [ ] Regenerates context.md
   [ ] Sends notifications
   [ ] Other: ___
@@ -299,6 +299,16 @@ If user says no or requests changes, iterate.
 Create `.ai/_framework/commands/{name}.md` with the following structure:
 
 ```markdown
+---
+type: command
+name: {name}
+layer: framework
+tags:
+  - command
+---
+
+> Parent: [[commands-index]]
+
 <!--
 ╔══════════════════════════════════════════════════════════════════╗
 ║ LAYER: FRAMEWORK                                                 ║
@@ -334,7 +344,7 @@ TODO: Implement the full /{name} command prompt.
 
 ### Step 0: Orientation
 
-Read `.ai/_project/manifest.yaml` to understand project context.
+Use `get_frontmatter("_project/manifest.md")` to read project config (repos, conventions, mcps, etc.).
 
 {additional orientation based on dependencies}
 
@@ -371,10 +381,10 @@ Then stop. Do not proceed further.
 
 ### Step 10: Update Indexes
 
-**Update INDEX.md:**
-Add entry in Commands table:
+**Update [[commands-index]]:**
+Use `patch_note("_framework/commands/commands-index.md", ...)` to add a wikilink entry:
 ```markdown
-| /{name} | [commands/{name}.md](./_framework/commands/{name}.md) | {description} |
+- [[{name}]] — {description}
 ```
 
 **Update _framework/README.md:**
@@ -397,7 +407,7 @@ Created:
   ✓ .ai/_framework/commands/{name}.md
 
 Updated:
-  ✓ .ai/INDEX.md - Added command entry
+  ✓ .ai/_framework/commands/commands-index.md - Added [[{name}]] wikilink
   ✓ .ai/_framework/README.md - Added to command table
   ✓ .ai/_framework/commands/help.md - Added to {category} section
 
@@ -412,7 +422,7 @@ View: .ai/_framework/commands/{name}.md
 
 ### Step 12: Auto-Sync (if enabled)
 
-Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
+Check `auto_sync.enabled` via `get_frontmatter("_project/manifest.md")`.
 
 **If auto_sync is enabled:**
 

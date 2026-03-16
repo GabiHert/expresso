@@ -73,9 +73,9 @@ Run code review on changes for a task. Analyzes all modified files across reposi
 
 ### Step 0: Orientation
 
-1. Read `.ai/_project/manifest.yaml` to understand:
-   - Available repositories and their paths
-   - Code conventions and patterns
+1. Read `.ai/_project/manifest.md` using `get_frontmatter("_project/manifest.md")` to understand:
+   - Available repositories and their paths (`repos` frontmatter field)
+   - Code conventions and patterns (`conventions` frontmatter field)
    - Available review agents
 
 2. **Extension Support**: This command supports compiled extensions
@@ -85,11 +85,11 @@ Run code review on changes for a task. Analyzes all modified files across reposi
 ### Step 1: Identify Task and Changes
 
 **If task ID provided:**
-- Find task in `.ai/tasks/in_progress/{task-id}/` or `.ai/tasks/done/{task-id}/`
-- Read task README.md to identify affected repos
+- Read the task note at `.ai/tasks/{task-id}/{task-id}.md` directly
+- Use `get_frontmatter("tasks/{task-id}/{task-id}.md")` to confirm it exists and read its `repos` field to identify affected repos
 
 **If no task ID provided:**
-- Look for current in_progress task
+- Search for an in-progress task using `search_notes("type: task status: in_progress")`
 - If none found, ask: "No task in progress. Would you like to review uncommitted changes? (y/n)"
 
 **Get changed files:**

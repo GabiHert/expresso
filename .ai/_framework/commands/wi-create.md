@@ -53,7 +53,7 @@ Quickly add one or more work items to an existing task. Unlike `/task-create` wh
 ```
 1. RESOLVE TASK
    • Find task by ID or use current in-progress task
-   • Read status.yaml to get current work item count and repo info
+   • Read task note frontmatter to get current work item count and repo info
 
 2. PARSE WORK ITEMS
    • Extract descriptions from arguments
@@ -66,7 +66,7 @@ Quickly add one or more work items to an existing task. Unlike `/task-create` wh
    • If task has multiple repos, ask which repo per item
 
 4. ASSIGN IDs
-   • Continue numbering from last work item in status.yaml
+   • Continue numbering from last work item in task folder
    • Format: {TASK-ID}-{NN} (2-digit, zero-padded)
 
 5. QUICK EXPLORATION (optional)
@@ -75,9 +75,9 @@ Quickly add one or more work items to an existing task. Unlike `/task-create` wh
    • Include file paths in implementation steps
 
 6. CREATE FILES
-   • Create work item .md files in todo/
-   • Update status.yaml with new entries
-   • Update summary counts
+   • Create work item .md files with frontmatter status: todo
+   • Update task note frontmatter summary counts
+   • Add wikilink to task note body
 
 7. OUTPUT SUMMARY
 ```
@@ -86,7 +86,7 @@ Quickly add one or more work items to an existing task. Unlike `/task-create` wh
 
 ### Step 0: Orientation
 
-1. Read `.ai/_project/manifest.yaml` to get repo list and paths.
+1. Read `.ai/_project/manifest.md` (or use `get_frontmatter("_project/manifest.md")`) to get repo list and paths.
 
 2. **Extension Support**: This command supports compiled extensions
    via `/command-extend wi-create --variant NAME`. If a compiled extension
@@ -104,18 +104,19 @@ Quickly add one or more work items to an existing task. Unlike `/task-create` wh
 **Parse arguments to find task ID:**
 
 1. Check if first argument matches a task ID pattern (e.g., `TASK-123`, `LOCAL-001`)
-2. If found, locate the task in `.ai/tasks/in_progress/{task-id}/` or `.ai/tasks/todo/{task-id}/`
-3. If NOT found in arguments, look for a single task in `.ai/tasks/in_progress/`
+2. If found, locate the task note at `.ai/tasks/{task-id}/{task-id}.md`
+3. If NOT found in arguments, use `search_notes("type: task status: in_progress")` to find in-progress tasks
    - If exactly one: use it automatically
    - If multiple: list them and ask which one
    - If none: error — "No task in progress and no task ID provided."
 
-4. Read the task's `status.yaml` to get:
-   - Current work item list (for numbering)
+4. Use `get_frontmatter("tasks/{task-id}/{task-id}.md")` to get:
+   - `summary` field: `{total, todo, in_progress, done}` counts
    - Repo paths and branch info
-   - Current summary counts
 
-5. Read the task's `README.md` to get branch naming pattern.
+5. Read the task note body to get branch naming pattern.
+
+6. Scan `tasks/{task-id}/` for existing work item `.md` files (excluding `{task-id}.md`) to determine current numbering.
 
 ### Step 2: Parse Work Item Descriptions
 
@@ -151,16 +152,16 @@ For each work item:
      Choice?
      ```
 
-4. **Get repo details from manifest.yaml:**
+4. **Get repo details from manifest.md:**
    - `repo_path`: resolve to absolute path
-   - `repo_protected`: check manifest for `protected: true`
+   - `repo_protected`: check manifest frontmatter for `protected: true`
 
-5. **Get branch from existing work items** in the same repo within this task.
+5. **Get branch from existing work items** in the same repo within this task — read frontmatter of existing work item `.md` files.
 
 ### Step 4: Assign IDs and Create Slugs
 
-1. Find the highest work item number in `status.yaml`:
-   - Parse all `id` fields: `TASK-44-34` → 34
+1. Find the highest work item number by scanning `tasks/{task-id}/` for `.md` files matching `{TASK-ID}-NN` pattern:
+   - Parse all filenames: `TASK-44-34-some-slug.md` → 34
    - Next ID starts at max + 1
 
 2. For each new work item:
@@ -183,35 +184,21 @@ Include any found file paths in the work item's Implementation Steps.
 
 ### Step 6: Create Work Item Files
 
-For each new work item, create `{task-path}/todo/{id}-{slug}.md`:
+For each new work item, create `tasks/{task-id}/{id}-{slug}.md` using `write_note`:
 
 ```markdown
-<!--
-╔══════════════════════════════════════════════════════════════════╗
-║ WORK ITEM: {id}-{slug}.md                                       ║
-║ TASK: {task-id}                                                 ║
-╠══════════════════════════════════════════════════════════════════╣
-║ WORKFLOW:                                                        ║
-║ 1. Move this file to in_progress/ when starting                 ║
-║ 2. Update status.yaml with new status                           ║
-║ 3. Complete ALL steps below                                      ║
-║ 4. Move to done/ when complete, update status.yaml              ║
-║ 5. Update task README with any learnings                        ║
-╚══════════════════════════════════════════════════════════════════╝
--->
-
 ---
+type: work-item
+tags: [work-item, todo, {repo}]
+status: todo
+task: {task-id}
 repo: {repo}
 repo_path: {absolute_path}
 branch: {branch_name}
 protected: {true|false}
-
-# Git Safety Reminder
-# Before any git operation:
-#   1. cd {repo_path}
-#   2. Verify: git rev-parse --show-toplevel
-#   3. Verify: git branch --show-current
 ---
+
+> Parent: [[{task-id}]]
 
 # {Work Item Title}
 
@@ -265,20 +252,9 @@ Verify by running relevant test suite for the affected area.
 Created via /wi-create — may need additional detail before implementation.
 ```
 
-### Step 7: Update status.yaml
+### Step 7: Update Task Note
 
-1. Add new work items to the `work_items` list:
-   ```yaml
-     - id: "{id}"
-       name: "{title}"
-       repo: "{repo}"
-       repo_path: "{absolute_path}"
-       repo_protected: {true|false}
-       status: todo
-       file: "todo/{id}-{slug}.md"
-   ```
-
-2. Update summary counts:
+1. Use `update_frontmatter` on `tasks/{task-id}/{task-id}.md` to update the `summary` field:
    ```yaml
    summary:
      total: {old_total + new_count}
@@ -287,13 +263,15 @@ Created via /wi-create — may need additional detail before implementation.
      done: {unchanged}
    ```
 
-3. Update `updated` date to today.
+2. Update the `updated` date to today using `update_frontmatter`.
 
-### Step 8: Update Task README
+3. Use `patch_note` to add `[[{id}-{slug}]]` wikilinks to the task note body (Work Items section).
 
-Add the new work items to the Work Items table in the task README.md:
+### Step 8: Update Task Note Body
+
+Add the new work items to the Work Items table in the task note body using `patch_note`:
 ```markdown
-| {id} | {name} | {repo} | todo |
+| [[{id}-{slug}]] | {name} | {repo} | todo |
 ```
 
 ### Step 9: Output Summary
@@ -308,7 +286,7 @@ Task: {task-id} - {title}
 Added {count} work item(s):
 {for each new item}
   {id}. {name} ({repo})
-    → todo/{id}-{slug}.md
+    → tasks/{task-id}/{id}-{slug}.md
 {/for}
 
 Task Progress:
@@ -325,7 +303,7 @@ Next:
 
 ### Step 10: Auto-Sync (if enabled)
 
-Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
+Check `_project/manifest.md` frontmatter for `auto_sync.enabled`.
 
 **If auto_sync is enabled:**
 

@@ -50,26 +50,27 @@ This is the recommended command to run at the start of any new AI session when c
 
 ```
 1. FIND IN-PROGRESS TASK
-   • Scan .ai/tasks/in_progress/
+   • Use search_notes("type: task status: in_progress") to find in-progress tasks
    • If none, inform user and suggest /task-start
    • If multiple, list them and ask which one
 
 2. READ TASK CONTEXT
-   • Read task README.md thoroughly
+   • Read task note (tasks/TASK-ID/TASK-ID.md) thoroughly
    • Identify problem statement and acceptance criteria
    • Note affected repositories
 
 3. CHECK WORK ITEM STATUS
-   • Read status.yaml for quick overview
-   • Identify completed items (done/)
-   • Identify current item (in_progress/)
-   • Identify remaining items (todo/)
+   • Scan task folder for work-item .md files
+   • Read frontmatter of each to get status field
+   • Identify completed items (status: done)
+   • Identify current item (status: in_progress)
+   • Identify remaining items (status: todo)
 
 4. ANNOUNCE ORIENTATION
    • State task name and objective
    • Summarize what's done vs remaining
    • Identify the current/next work item
-   • Note any blockers or considerations from README
+   • Note any blockers or considerations from task note
 
 5. OFFER NEXT STEPS
    • Suggest continuing current work item
@@ -80,7 +81,7 @@ This is the recommended command to run at the start of any new AI session when c
 
 ### Step 0: Orientation
 
-1. Read `.ai/_project/manifest.yaml` to understand:
+1. Use `get_frontmatter("_project/manifest.md")` to understand:
    - Available repositories
    - Commit conventions
    - Available MCPs
@@ -92,11 +93,11 @@ This is the recommended command to run at the start of any new AI session when c
 ### Step 1: Find In-Progress Task
 
 **If task ID provided:**
-- Look for task in `.ai/tasks/in_progress/{task-id}/`
-- If not found, say: "Task {task-id} is not in progress. Use /[[task-status]] to see all tasks."
+- Use `get_frontmatter("tasks/{task-id}/{task-id}.md")` and check that `status` is `in_progress`
+- If not found or status is not `in_progress`, say: "Task {task-id} is not in progress. Use /[[task-status]] to see all tasks."
 
 **If no task ID provided:**
-- Scan `.ai/tasks/in_progress/`
+- Use `search_notes("type: task status: in_progress")` to find in-progress tasks
 - If no tasks found:
   ```
   No tasks in progress.
@@ -118,8 +119,8 @@ This is the recommended command to run at the start of any new AI session when c
 
 ### Step 2: Read Task Context
 
-1. Read the task's README.md completely.
-2. Read the task's status.yaml for work item overview.
+1. Read the task note `tasks/{task-id}/{task-id}.md` completely.
+2. Use `get_frontmatter("tasks/{task-id}/{task-id}.md")` to get the `summary` field (`{total, todo, in_progress, done}` counts).
 3. Extract key information:
    - Problem statement
    - Acceptance criteria
@@ -129,12 +130,12 @@ This is the recommended command to run at the start of any new AI session when c
 
 ### Step 3: Analyze Work Item Status
 
-From status.yaml, categorize work items:
-- **Done**: Items in done/ folder
-- **In Progress**: Items in in_progress/ folder (currently being worked on)
-- **Todo**: Items in todo/ folder (not yet started)
+Scan the task folder `tasks/{task-id}/` for work-item `.md` files (files matching `{task-id}-*.md`). For each file, read its frontmatter to get the `status` field:
+- **Done**: work items with `status: done`
+- **In Progress**: work items with `status: in_progress` (currently being worked on)
+- **Todo**: work items with `status: todo` (not yet started)
 
-For any item in in_progress/, also read its file to understand:
+For any work item with `status: in_progress`, also read its body to understand:
 - Current objective
 - Which step was last worked on
 - Any notes added during implementation
@@ -149,7 +150,7 @@ Output a comprehensive orientation:
 ╚══════════════════════════════════════════════════════════════════╝
 
 Task: {task-id} - {title}
-Location: .ai/tasks/in_progress/{task-id}/
+Location: tasks/{task-id}/
 
 ══════════════════════════════════════════════════════════════════
 PROBLEM
@@ -185,13 +186,13 @@ Remaining ({todo_count}):
 ══════════════════════════════════════════════════════════════════
 CONTEXT
 ══════════════════════════════════════════════════════════════════
-{key technical context from README - bullets}
+{key technical context from task note - bullets}
 
 {if notes or warnings exist}
 ══════════════════════════════════════════════════════════════════
 NOTES
 ══════════════════════════════════════════════════════════════════
-{any notes or warnings from README}
+{any notes or warnings from task note}
 {/if}
 ```
 
@@ -251,7 +252,7 @@ Then stop. Wait for user to indicate what to do next.
 ╚══════════════════════════════════════════════════════════════════╝
 
 Task: JIRA-123 - Fix authentication bug
-Location: .ai/tasks/in_progress/JIRA-123/
+Location: tasks/JIRA-123/
 
 ══════════════════════════════════════════════════════════════════
 PROBLEM

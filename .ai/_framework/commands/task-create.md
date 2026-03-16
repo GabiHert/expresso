@@ -68,18 +68,17 @@ Create a new task with work items organized by repository. This command explores
 4. GENERATE DIAGRAMS (if multi-repo or complex)
    • Create sequence diagram showing data/request flow
    • Create component diagram showing service interactions
-   • Embed as Mermaid code blocks in README
+   • Embed as Mermaid code blocks in task note
 
 5. CREATE TASK STRUCTURE
-   • Create .ai/tasks/todo/{task-name}/
-   • Generate README.md from template (with diagrams)
-   • Generate status.yaml with work items index
-   • Create todo/, in_progress/, done/ folders
-   • Create work item files in todo/
+   • Create .ai/tasks/{ticket-id}/
+   • Generate {ticket-id}.md task note with frontmatter and diagrams
+   • Create work item notes with frontmatter status: todo
+   • Add [[{ticket-id}]] to task-index.md
 
 6. OUTPUT SUMMARY
    • Task location
-   • Work item count per repo
+   • Work item count
    • Suggested starting point
 ```
 
@@ -87,7 +86,7 @@ Create a new task with work items organized by repository. This command explores
 
 ### Step 0: Orientation
 
-1. Read `.ai/_project/manifest.yaml` to understand:
+1. Read `.ai/_project/manifest.md` using `get_frontmatter("_project/manifest.md")` to understand:
    - Available repositories
    - JIRA prefix and conventions
    - Commit message patterns
@@ -256,7 +255,7 @@ flowchart TB
     S1 --> T2
 ```
 
-**Note:** These diagrams use native Mermaid syntax and will be embedded directly in the task README.md. Many editors and viewers render Mermaid automatically.
+**Note:** These diagrams use native Mermaid syntax and will be embedded directly in the task note. Many editors and viewers render Mermaid automatically.
 
 ### Step 5b: Pre-Confirmation Checklist
 
@@ -319,31 +318,45 @@ Select a color for this task to help identify it and its sessions:
 Choice (1-7, default: 7):
 ```
 
-Store the selected color for use in status.yaml generation. If user presses Enter without selection, use "None" (no color).
+Store the selected color for use in task note frontmatter generation. If user presses Enter without selection, use "None" (no color).
 
 ### Step 7: Create Task Structure
 
-**7a. Create task directory:**
-`.ai/tasks/todo/{ticket-id}/`
+**7a. Create task note** `.ai/tasks/{ticket-id}/{ticket-id}.md` using `write_note`:
 
-**7b. Create sub-directories:**
-- `todo/`
-- `in_progress/`
-- `done/`
-- `feedback/`
-
-**7c. Create README.md** (from `_framework/templates/task-readme.md`, include diagrams from Step 5):
 ```markdown
+---
+type: task
+status: todo
+task: "{ticket-id}"
+title: "{title}"
+{if color selected}
+color: "{selected-color}"
+{/if}
+created: "{YYYY-MM-DD}"
+updated: "{YYYY-MM-DD}"
+summary:
+  total: {count}
+  todo: {count}
+  in_progress: 0
+  done: 0
+tags:
+  - task
+  - todo
+---
+
+> Parent: [[task-index]]
+
 <!--
 ╔══════════════════════════════════════════════════════════════════╗
 ║ LAYER: TASK                                                      ║
-║ LOCATION: .ai/tasks/todo/{ticket-id}/                           ║
+║ LOCATION: .ai/tasks/{ticket-id}/                                ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║ BEFORE WORKING ON THIS TASK:                                     ║
-║ 1. Read .ai/_project/manifest.yaml (know repos & MCPs)          ║
-║ 2. Read this entire README first                                 ║
-║ 3. Check which work items are in todo/ vs done/                 ║
-║ 4. Work on ONE item at a time from todo/                        ║
+║ 1. Read .ai/_project/manifest.md (know repos & MCPs)            ║
+║ 2. Read this entire note first                                   ║
+║ 3. Check work item frontmatter for status (todo/in_progress/done)║
+║ 4. Work on ONE item at a time                                    ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
 
@@ -359,12 +372,10 @@ Store the selected color for use in status.yaml generation. If user presses Ente
 
 ## Work Items
 
-See `status.yaml` for full index.
-
 | ID | Name | Repo | Status |
 |----|------|------|--------|
 {for each work item}
-| {id} | {name} | {repo} | todo |
+| [[{ticket-id}-{id}]] | {name} | {repo} | todo |
 {/for}
 
 ## Branches
@@ -426,7 +437,7 @@ Work will be done on existing branches in the protected repos.
 
 ## Feedback
 
-Review comments can be added to `feedback/diff-review.md`.
+Review comments can be added to [[{ticket-id}-diff-review]].
 Use `/address-feedback` to discuss feedback with the agent.
 
 ## References
@@ -434,72 +445,42 @@ Use `/address-feedback` to discuss feedback with the agent.
 - Related docs: ...
 ```
 
-**7d. Create status.yaml:**
-```yaml
-# Task Status Index
-task: "{ticket-id}"
-title: "{title}"
-{if color selected}
-color: "{selected-color}"  # e.g., charts.purple
-{/if}
-created: "{YYYY-MM-DD}"
-updated: "{YYYY-MM-DD}"
+**7b. Create work item notes** in `.ai/tasks/{ticket-id}/` using `write_note`.
 
-summary:
-  total: {count}
-  todo: {count}
-  in_progress: 0
-  done: 0
+For each work item, create `{ticket-id}-{id}.md`:
 
-work_items:
-{for each work item}
-  - id: "{id}"
-    name: "{name}"
-    repo: "{repo}"
-    repo_path: "{absolute_path}"
-    repo_protected: {true|false}
-    status: todo
-    file: "todo/{id}-{slug}.md"
-{/for}
-```
-
-**Path Validation:** Ensure `repo_path` is an absolute path before writing:
-- If manifest `path` is relative (starts with `./`): resolve against `project.root`
-- Verify the resolved path exists and contains a `.git` directory
-- Store the fully resolved absolute path, never a relative path
-
-**Note:** The `color` field is optional. Valid values are: `charts.red`, `charts.orange`, `charts.yellow`, `charts.green`, `charts.blue`, `charts.purple`. Only include the color field if the user selected one in Step 6b.
-
-**7e. Create work item files** in `todo/`:
-For each work item, create `{id}-{slug}.md`:
 ```markdown
+---
+type: work-item
+status: todo
+id: "{id}"
+task: "{ticket-id}"
+name: "{name}"
+repo: "{repo}"
+repo_path: "{absolute_path}"
+repo_protected: {true|false}
+branch: "{branch_name}"
+tags:
+  - work-item
+  - todo
+  - {repo}
+---
+
+> Parent: [[{ticket-id}]]
+
 <!--
 ╔══════════════════════════════════════════════════════════════════╗
-║ WORK ITEM: {id}-{slug}.md                                       ║
+║ WORK ITEM: {ticket-id}-{id}                                     ║
 ║ TASK: {ticket-id}                                               ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║ WORKFLOW:                                                        ║
-║ 1. Move this file to in_progress/ when starting                 ║
-║ 2. Update status.yaml with new status                           ║
-║ 3. Complete ALL steps below                                      ║
-║ 4. Move to done/ when complete, update status.yaml              ║
-║ 5. Update task README with any learnings                        ║
+║ 1. Update frontmatter status to in_progress when starting       ║
+║ 2. Complete ALL steps below                                      ║
+║ 3. Update frontmatter status to done when complete              ║
+║ 4. Update parent task note summary counts                       ║
+║ 5. Update task note with any learnings                          ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-
----
-# Repository Context (LOCAL-026)
-repo: {repo}
-repo_path: {absolute_path}
-branch: {branch_name}
-protected: {true|false}
-
-# Git Safety Reminder
-# Before any git operation:
-#   1. cd {repo_path}
-#   2. Verify: git rev-parse --show-toplevel
-#   3. Verify: git branch --show-current
----
 
 # {Work Item Title}
 
@@ -510,6 +491,13 @@ protected: {true|false}
 ## Pre-Implementation
 
 Before starting, consider running an **exploration agent** to gather context about the affected code areas.
+
+## Git Safety Reminder
+
+Before any git operation:
+1. `cd {repo_path}`
+2. Verify: `git rev-parse --show-toplevel`
+3. Verify: `git branch --show-current`
 
 ## Implementation Steps
 
@@ -539,14 +527,28 @@ After completing, run a **code review agent** to check for issues.
 {any additional context or warnings}
 ```
 
-**7f. Create feedback file:**
-Copy the feedback template to the task's feedback folder:
-```
-.ai/_framework/templates/feedback-template.md → .ai/tasks/todo/{ticket-id}/feedback/diff-review.md
-```
+**Path Validation:** Ensure `repo_path` is an absolute path before writing:
+- If manifest `path` is relative (starts with `./`): resolve against `project.root`
+- Verify the resolved path exists and contains a `.git` directory
+- Store the fully resolved absolute path, never a relative path
 
-If the template doesn't exist, create a minimal feedback file:
+**Note:** The `color` field is optional. Valid values are: `charts.red`, `charts.orange`, `charts.yellow`, `charts.green`, `charts.blue`, `charts.purple`. Only include the color field if the user selected one in Step 6b.
+
+**7c. Create feedback note** `.ai/tasks/{ticket-id}/{ticket-id}-diff-review.md` using `write_note`:
+
+If a feedback template exists at `.ai/_framework/templates/feedback-template.md`, read it and use its content. Otherwise create a minimal feedback note:
+
 ```markdown
+---
+type: feedback
+task: "{ticket-id}"
+tags:
+  - feedback
+  - {ticket-id}
+---
+
+> Parent: [[{ticket-id}]]
+
 # Diff Feedback
 
 Add your feedback below using the format:
@@ -554,6 +556,8 @@ Add your feedback below using the format:
 ### path/to/file.ts:42
 Your comment here
 ```
+
+**7d. Update task-index.md** — add `[[{ticket-id}]]` to `.ai/tasks/task-index.md` body using `patch_note`.
 
 ### Step 8: Update Context
 
@@ -566,10 +570,10 @@ Update `.ai/context.md` to reflect the new task in "Current State" section.
 ║ TASK CREATED                                                     ║
 ╚══════════════════════════════════════════════════════════════════╝
 
-Location: .ai/tasks/todo/{ticket-id}/
+Location: .ai/tasks/{ticket-id}/
 
 Work Items:
-  📋 {count} items in todo/
+  📋 {count} items created (status: todo)
 
   {list each work item with id and name}
 
@@ -586,46 +590,18 @@ Protected (no branches):
 {/if}
 
 Next Steps:
-  1. Review the task README: .ai/tasks/todo/{ticket-id}/README.md
+  1. Review the task note: .ai/tasks/{ticket-id}/{ticket-id}.md
   2. Run /task-start {ticket-id} to begin working
   3. Or run /task-status to see all tasks
-  • If session is unassigned, use "Link to Task" in Cockpit sidebar
 
 Quick Commands:
   • /task-start {ticket-id}     Begin this task
   • /task-status                View dashboard
 ```
 
-### Step 9.5: Link Current Session (if applicable)
-
-If running in a Cockpit session that is unassigned, offer to link it to the new task:
-
-1. Check if there's an active unassigned session:
-   - Check `.ai/cockpit/sessions.json` for active sessions with `taskId: "_unassigned"`
-
-2. If an unassigned session is found, ask:
-   ```
-   LINK SESSION
-
-   You're working in an unassigned session. Link it to {ticket-id}?
-
-   This will associate your current session history with the new task.
-
-   Link session? (y/n)
-   ```
-
-3. If yes, update the session:
-   - Update session's taskId from "_unassigned" to new task ID
-   - Refresh the Cockpit tree view
-
-4. If no, continue without linking.
-
-**Note**: This step requires the AI Cockpit VSCode extension. When running outside
-VSCode or without the extension, this step is skipped silently.
-
 ### Step 10: Auto-Sync (if enabled)
 
-Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
+Read `.ai/_project/manifest.md` frontmatter using `get_frontmatter("_project/manifest.md")` and check the `auto_sync.enabled` field.
 
 **If auto_sync is enabled:**
 

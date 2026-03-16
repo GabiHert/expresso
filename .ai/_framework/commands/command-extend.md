@@ -61,7 +61,7 @@ This enables a layered customization approach:
 .ai/_framework/commands/task-create.md                → base (never modified by project)
 .ai/_project/commands/task-create.active.md           → compiled, authoritative (what AI reads)
 .ai/_project/commands/task-create.variant.tdd.md      → stored compiled variant
-.ai/_project/commands/task-create.source.tdd.yaml     → source overrides (for recompilation)
+.ai/_project/commands/task-create.source.tdd.md      → source overrides (for recompilation)
 .claude/commands/task-create.md                       → stub → points to active.md  (Claude Code)
 .claude/commands/task-create:tdd.md                   → stub → points to variant    (Claude Code)
 .cursor/commands/task-create.md                       → stub → points to active.md  (Cursor)
@@ -73,7 +73,7 @@ This enables a layered customization approach:
 When you run `/command-extend task-create --variant tdd`:
 
 1. Gathers customization details (context, agents, hooks, step overrides)
-2. Saves source as `.ai/_project/commands/task-create.source.tdd.yaml`
+2. Saves source as `.ai/_project/commands/task-create.source.tdd.md`
 3. Reads the full base command from `.ai/_framework/commands/task-create.md`
 4. Compiles a fully self-contained document with all steps inlined
 5. Writes compiled output to `.ai/_project/commands/task-create.variant.tdd.md`
@@ -82,52 +82,72 @@ When you run `/command-extend task-create --variant tdd`:
 
 When the user runs `/task-create`, the stub points directly to the compiled `active.md` — no runtime extension discovery needed.
 
-## Source YAML Format
+## Source Format
 
-```yaml
+Extension source files are `.md` files with YAML frontmatter (no separate `.yaml` files exist in the vault).
+
+```markdown
+---
 variant: tdd
 extends: task-create
 created: 2026-01-23
-context: |
-  This project uses TDD with BDD-style specs.
-pre_hooks:
-  - name: "Check for specs"
-    content: |
-      1. Search for .feature files
-      2. Include in task context if found
-step_overrides:
-  3:
-    name: "Explore (TDD)"
-    content: |
-      1. Find existing test files
-      2. Identify test patterns
-  7:
-    name: "Create Task Structure (TDD)"
-    content: |
-      For each work item: Red → Green → Refactor
-post_hooks:
-  - name: "Generate test skeletons"
-    content: |
-      1. Create test file placeholders
 agents:
   exploration: "feature-dev:code-explorer"
   review: "feature-dev:code-reviewer"
-step_injections:
-  4:
-    position: start
-    content: |
-      ⚠️ MANDATORY: Each work item MUST begin with BDD scenario creation.
-      Do NOT design work items that start with "implement" without
-      defining expected behavior FIRST.
-  6:
-    position: start
-    content: |
-      Before confirming, verify constraint compliance.
-validation_checklist:
-  step: 6
-  items:
-    - "Each work item begins with scenario/spec creation"
-    - "Implementation steps follow (not precede) behavior definition"
+---
+
+> Parent: [[commands-index]]
+
+## context
+
+This project uses TDD with BDD-style specs.
+
+## pre_hooks
+
+- name: "Check for specs"
+  content: |
+    1. Search for .feature files
+    2. Include in task context if found
+
+## step_overrides
+
+- step: 3
+  name: "Explore (TDD)"
+  content: |
+    1. Find existing test files
+    2. Identify test patterns
+
+- step: 7
+  name: "Create Task Structure (TDD)"
+  content: |
+    For each work item: Red → Green → Refactor
+
+## post_hooks
+
+- name: "Generate test skeletons"
+  content: |
+    1. Create test file placeholders
+
+## step_injections
+
+- step: 4
+  position: start
+  content: |
+    ⚠️ MANDATORY: Each work item MUST begin with BDD scenario creation.
+    Do NOT design work items that start with "implement" without
+    defining expected behavior FIRST.
+
+- step: 6
+  position: start
+  content: |
+    Before confirming, verify constraint compliance.
+
+## validation_checklist
+
+step: 6
+items:
+  - "Each work item begins with scenario/spec creation"
+  - "Implementation steps follow (not precede) behavior definition"
 ```
 
 ## Compiled Output Format
@@ -139,9 +159,9 @@ validation_checklist:
 ║ Base: .ai/_framework/commands/{cmd}.md                           ║
 ║ Variant: {variant}                                               ║
 ║ Compiled: {YYYY-MM-DD}                                           ║
-║ Source: .ai/_project/commands/{cmd}.source.{variant}.yaml        ║
+║ Source: .ai/_project/commands/{cmd}.source.{variant}.md          ║
 ║                                                                   ║
-║ To modify: Edit source YAML then run                             ║
+║ To modify: Edit source .md then run                              ║
 ║   /command-extend {cmd} --recompile                              ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
@@ -154,7 +174,7 @@ instruction set. Do NOT look for .extend.md files or fall back to
 default framework behavior. Follow ONLY what is written here.
 
 ## Mandatory Constraints
-{injected context from source YAML - these are NOT optional guidelines}
+{injected context from source .md - these are NOT optional guidelines}
 
 ## Description
 {from base}
@@ -213,8 +233,8 @@ Before proceeding, verify:
    • Ask about step overrides (replace steps)
    • Ask about post-hooks (after workflow)
 
-3. SAVE SOURCE YAML
-   • Write source overrides to .ai/_project/commands/{cmd}.source.{variant}.yaml
+3. SAVE SOURCE
+   • Write source overrides to .ai/_project/commands/{cmd}.source.{variant}.md
 
 4. COMPILE
    • Read base command, apply transformations, produce compiled document
@@ -244,7 +264,7 @@ Use markdown prompts and wait for free-form user responses.
 
 ### Step 0: Orientation
 
-1. Read `.ai/_project/manifest.yaml` to understand project context.
+1. Read `.ai/_project/manifest.md` (use `get_frontmatter("_project/manifest.md")`) to understand project context.
 
 2. Verify we're in a project with the framework:
    - Check that `.ai/_framework/` exists
@@ -780,41 +800,57 @@ AskUserQuestion:
 
 If confirmed, proceed to compilation:
 
-**10a. Save Source YAML:**
+**10a. Save Source:**
 
-Write `.ai/_project/commands/{command}.source.{variant}.yaml`:
-```yaml
+Write `.ai/_project/commands/{command}.source.{variant}.md` using `write_note` with vault-native frontmatter and body:
+```markdown
+---
 variant: {variant_name}
 extends: {command}
 created: {YYYY-MM-DD}
-context: |
-  {user's context - will become "Mandatory Constraints" section}
-pre_hooks:
-  - name: "{hook name}"
-    content: |
-      {hook content}
-step_overrides:
-  {step_number}:
-    name: "{step name}"
-    content: |
-      {override content}
-step_injections:
-  {step_number}:
-    position: start|end
-    content: |
-      {constraint reminder to inject}
-validation_checklist:
-  step: {step_number}
-  items:
-    - "{item 1}"
-    - "{item 2}"
-post_hooks:
-  - name: "{hook name}"
-    content: |
-      {hook content}
 agents:
   exploration: "{agent}"
   review: "{agent}"
+---
+
+> Parent: [[commands-index]]
+
+## context
+
+{user's context - will become "Mandatory Constraints" section}
+
+## pre_hooks
+
+- name: "{hook name}"
+  content: |
+    {hook content}
+
+## step_overrides
+
+- step: {step_number}
+  name: "{step name}"
+  content: |
+    {override content}
+
+## step_injections
+
+- step: {step_number}
+  position: start|end
+  content: |
+    {constraint reminder to inject}
+
+## validation_checklist
+
+step: {step_number}
+items:
+  - "{item 1}"
+  - "{item 2}"
+
+## post_hooks
+
+- name: "{hook name}"
+  content: |
+    {hook content}
 ```
 
 **10b. Compile the variant:**
@@ -917,14 +953,14 @@ Given a base command file and a source YAML, produce a compiled document:
 When `--recompile [NAME]` is specified:
 
 1. If NAME provided, recompile only that variant:
-   - Read `.ai/_project/commands/{cmd}.source.{NAME}.yaml`
+   - Read `.ai/_project/commands/{cmd}.source.{NAME}.md`
    - Read the base command
    - Run Compilation Algorithm
    - Write to `.ai/_project/commands/{cmd}.variant.{NAME}.md`
    - If this was the active variant, update `active.md` too
 
 2. If no NAME, recompile all variants for the command:
-   - Scan for `.ai/_project/commands/{cmd}.source.*.yaml`
+   - Scan for `.ai/_project/commands/{cmd}.source.*.md` (use `Glob` pattern)
    - For each, run Compilation Algorithm
    - Update `active.md` if the active variant was recompiled
 
@@ -967,28 +1003,44 @@ When `--migrate` is specified:
       - Validation Checklist section (if present)
       - Post-Hooks section
 
-   b. **Generate** source YAML from parsed sections:
-      ```yaml
+   b. **Generate** source `.md` from parsed sections and write using `write_note`:
+      ```markdown
+      ---
       variant: default
       extends: {command}
       created: {YYYY-MM-DD}
       migrated_from: "{command}.extend.md"
-      context: |
-        {extracted context}
-      pre_hooks:
-        {extracted pre-hooks}
-      step_overrides:
-        {extracted step overrides, keyed by step number}
-      step_injections:
-        {extracted step injections, keyed by step number}
-      validation_checklist:
-        step: {step number if found}
-        items: {extracted items}
-      post_hooks:
-        {extracted post-hooks}
       agents:
         exploration: "{extracted agent or null}"
         review: "{extracted agent or null}"
+      ---
+
+      > Parent: [[commands-index]]
+
+      ## context
+
+      {extracted context}
+
+      ## pre_hooks
+
+      {extracted pre-hooks}
+
+      ## step_overrides
+
+      {extracted step overrides, each with step number}
+
+      ## step_injections
+
+      {extracted step injections, each with step number}
+
+      ## validation_checklist
+
+      step: {step number if found}
+      items: {extracted items}
+
+      ## post_hooks
+
+      {extracted post-hooks}
       ```
 
    c. **Compile** the variant using the Compilation Algorithm
@@ -1027,7 +1079,7 @@ After successful compilation:
 ╚══════════════════════════════════════════════════════════════════╝
 
 Created:
-  ✓ .ai/_project/commands/{command}.source.{variant}.yaml
+  ✓ .ai/_project/commands/{command}.source.{variant}.md
   ✓ .ai/_project/commands/{command}.variant.{variant}.md
   ✓ .ai/_project/commands/{command}.active.md
   ✓ .claude/commands/{command}.md → points to active.md
@@ -1044,7 +1096,7 @@ Manage:
   • /command-extend {command} --activate X    Switch active variant
   • /command-extend {command} --recompile     Recompile after framework update
   • /command-extend {command} --variant new   Create another variant
-  • Edit source YAML directly, then --recompile
+  • Edit source .md directly, then --recompile
 
 View: .ai/_project/commands/{command}.active.md
 ```

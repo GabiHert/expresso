@@ -37,7 +37,7 @@ Use `--quick` to skip the dialogue and get a passive investigation report only
 ┌─────────────────────────────────────────────────────────────────┐
 │ READ + WRITE TO .ai/ ONLY                                       │
 │                                                                 │
-│ ALLOWED:  Read any file. Write only to .ai/tasks/todo/ and      │
+│ ALLOWED:  Read any file. Write only to .ai/tasks/ and           │
 │           .ai/tmp/                                              │
 │ FORBIDDEN: Edit application source code, tests, or config       │
 └─────────────────────────────────────────────────────────────────┘
@@ -71,7 +71,7 @@ Use `--quick` to skip the dialogue and get a passive investigation report only
 
 ### Step 0: Orientation
 
-Read `.ai/_project/manifest.yaml` to understand available repos and paths.
+Read `.ai/_project/manifest.md` (or use `get_frontmatter("_project/manifest.md")`) to understand available repos and paths. Manifest data is in frontmatter fields.
 
 ### Step 1: Parse Input
 
@@ -251,17 +251,23 @@ Task name:
 
 Save the brief to:
 ```
-.ai/tasks/todo/{slugified-task-name}/brief.md
+.ai/tasks/{TASK-ID}/{TASK-ID}-brief.md
 ```
 
-Brief file format:
+where `{TASK-ID}` is the slugified task name (e.g., `TASK-add-cancellation-flow`).
+
+Create the brief file using `write_note`. Brief file format:
 ```markdown
 ---
+type: brief
 title: "{task name}"
 source: "{JIRA-ID or description}"
 created: "{YYYY-MM-DD}"
 status: brief
+tags: [brief]
 ---
+
+> Parent: [[{TASK-ID}]]
 
 ## Problem
 
@@ -308,16 +314,16 @@ Then offer:
 ║ BRIEF SAVED                                                      ║
 ╠══════════════════════════════════════════════════════════════════╣
 
-Saved to: .ai/tasks/todo/{task-name}/brief.md
+Saved to: .ai/tasks/{TASK-ID}/{TASK-ID}-brief.md
 
 What next?
-  1. Create work items now  →  /task-create {task-name}
+  1. Create work items now  →  /task-create {TASK-ID}
   2. Review the brief first →  open the file
   3. Done for now
 ```
 
-If user picks 1, instruct them to run `/task-create {task-name}` —
-`/task-create` will detect the `brief.md` and use it as input.
+If user picks 1, instruct them to run `/task-create {TASK-ID}` —
+`/task-create` will detect the brief note and use it as input.
 
 ---
 

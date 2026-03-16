@@ -36,7 +36,7 @@ Create or update documentation in the domain layer. Documentation helps future A
 │ This command creates and updates documentation files.            │
 │ It must NEVER modify application source code, tests, or config. │
 │ If you find yourself editing code files, STOP — you are off     │
-│ track. Only .ai/docs/ and .ai/INDEX.md may be written to.      │
+│ track. Only .ai/docs/ and .ai/docs/docs-index.md may be written to. │
 └─────────────────────────────────────────────────────────────────┘
 
 ## Usage
@@ -94,7 +94,7 @@ When no repository is specified, the command automatically:
    • If architecture: .ai/docs/_architecture/
 
 5. UPDATE INDEX (REQUIRED)
-   • Add entry to INDEX.md under appropriate section
+   • Add [[wikilink]] to docs-index.md
    • Link from related docs
    • This step is MANDATORY - do not skip
 ```
@@ -103,11 +103,11 @@ When no repository is specified, the command automatically:
 
 ### Step 0: Orientation
 
-1. Read `.ai/_project/manifest.yaml` to understand:
-   - Available repositories
+1. Read `.ai/_project/manifest.md` (or use `get_frontmatter("_project/manifest.md")`) to understand:
+   - Available repositories (frontmatter field `repos`)
    - Project structure
 
-2. Read `.ai/INDEX.md` to see existing documentation and avoid duplicates.
+2. Read `.ai/docs/docs-index.md` to see existing documentation and avoid duplicates.
 
 3. **Extension Support**: This command supports compiled extensions
    via `/command-extend document --variant NAME`. If a compiled extension
@@ -153,7 +153,7 @@ Follow up with:
 
 **If no repository was specified in the request**, perform comprehensive analysis:
 
-1. **Search ALL repositories** in manifest.yaml:
+1. **Search ALL repositories** listed in `manifest.md` frontmatter (`repos` field):
    - For each repo, search for files related to the topic
    - Count occurrences and file types
    - Identify primary vs secondary implementations
@@ -226,11 +226,13 @@ Proceed with this structure? (y/n/adjust)
 
 ### Step 3: Check for Existing Documentation
 
-Search existing docs for overlap:
-```bash
+Search existing docs for overlap using vault search:
+```
 # Check if similar doc exists
-ls .ai/docs/**/*.md
-grep -l "{topic keywords}" .ai/docs/**/*.md
+search_notes("type: doc {topic keywords}")
+# Or use Glob/Grep for pattern matching:
+Glob(".ai/docs/**/*.md")
+Grep("{topic keywords}", glob="*.md", path=".ai/docs/")
 ```
 
 If similar doc found:
@@ -273,17 +275,12 @@ Create the documentation file using the template from `_framework/templates/doc.
 **Fill in template sections:**
 
 ```markdown
-<!--
-╔══════════════════════════════════════════════════════════════════╗
-║ LAYER: DOMAIN                                                    ║
-║ STATUS: Current                                                  ║
-╠══════════════════════════════════════════════════════════════════╣
-║ NAVIGATION:                                                      ║
-║ • Parent: {parent directory README}                              ║
-║ • Related: {related docs}                                        ║
-║ • Index: .ai/INDEX.md                                           ║
-╚══════════════════════════════════════════════════════════════════╝
--->
+---
+type: doc
+tags: [doc, {topic-kebab-case}]
+---
+
+> Parent: [[docs-index]]
 
 # {Topic Name}
 
@@ -343,7 +340,7 @@ Create the documentation file using the template from `_framework/templates/doc.
 
 ## Related Documentation
 
-- [{related topic}]({path})
+- [[{related-note-name}]]
 
 ---
 
@@ -351,25 +348,23 @@ _Created: {YYYY-MM-DD}_
 _Last Updated: {YYYY-MM-DD}_
 ```
 
-### Step 6: Update INDEX.md (MANDATORY)
+### Step 6: Update docs-index.md (MANDATORY)
 
-Add the new documentation to `.ai/INDEX.md`.
+Add the new documentation to `.ai/docs/docs-index.md` using `patch_note` or `write_note`.
 
-**Find the appropriate section** in INDEX.md under "## Documentation"
-
-**Add a new row** to the documentation table:
+**Add a wikilink** to the new doc in the docs-index body:
 ```markdown
-| {Topic} | [{path}]({path}) | {Brief description} |
+- [[{topic-kebab-case}]] — {Brief description}
 ```
 
-If no Documentation section exists, create one:
+If no Documentation list exists in `docs-index.md`, append one:
 ```markdown
 ## Documentation
 
-| Topic | Location | Description |
-|-------|----------|-------------|
-| {Topic} | [{path}]({path}) | {description} |
+- [[{topic-kebab-case}]] — {description}
 ```
+
+Use `patch_note("docs/docs-index.md", content_to_append)` to add the wikilink without overwriting existing entries.
 
 ### Step 7: Output Summary
 
@@ -390,7 +385,7 @@ Sections:
   ✓ Common Pitfalls
 
 Updated:
-  ✓ .ai/INDEX.md - Added documentation entry
+  ✓ .ai/docs/docs-index.md - Added [[wikilink]] entry
 
 Related Docs:
   • {related doc 1}
@@ -401,7 +396,7 @@ View: .ai/docs/{location}/{filename}.md
 
 ### Step 8: Auto-Sync (if enabled)
 
-Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
+Use `get_frontmatter("_project/manifest.md")` and check the `auto_sync` field for `enabled: true`.
 
 **If auto_sync is enabled:**
 

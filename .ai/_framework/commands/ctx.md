@@ -56,7 +56,7 @@ Quickly refresh your understanding of the Expresso framework. Use this command w
 ## Workflow
 
 ```
-1. READ manifest.yaml for project structure
+1. READ manifest.md frontmatter for project structure
 2. CHECK for active task context
 3. DISPLAY relevant context based on argument
 4. REMIND critical safety rules
@@ -66,14 +66,14 @@ Quickly refresh your understanding of the Expresso framework. Use this command w
 
 ### Step 0: Orientation
 
-1. Read `.ai/_project/manifest.yaml` for:
+1. Use `get_frontmatter("_project/manifest.md")` for:
    - Project name and root path
    - Repository list and paths
    - Protected repo flags
    - Conventions
 
 2. Check for tasks in progress:
-   - List tasks in `.ai/tasks/in_progress/`
+   - Use `search_notes("type: task status: in_progress")` to find active tasks
    - Note which repos are affected by current tasks
 
 3. **Extension Support**: This command supports compiled extensions
@@ -112,12 +112,12 @@ REPOSITORIES
     {if repo.is_framework}📦 Framework repo{/if}
 {/for}
 
-{if tasks in in_progress/}
+{if tasks with status: in_progress}
 TASKS IN PROGRESS
 ══════════════════════════════════════════════════════════════════
-{for each task in .ai/tasks/in_progress/}
+{for each task found via search_notes("type: task status: in_progress")}
   • {task-id}: {title}
-    Work items: {done}/{total} complete
+    Work items: {summary.done}/{summary.total} complete
 {/for}
 {/if}
 
@@ -131,9 +131,12 @@ CRITICAL RULES
 
 NAVIGATION
 ══════════════════════════════════════════════════════════════════
-Start: .ai/context.md
-Index: .ai/INDEX.md
-Config: .ai/_project/manifest.yaml
+Start: [[context]]
+Tasks: [[task-index]]
+Docs: [[docs-index]]
+Agents: [[agents-index]]
+Commands: [[commands-index]]
+Config: .ai/_project/manifest.md
 
 QUICK COMMANDS
 ══════════════════════════════════════════════════════════════════
@@ -195,7 +198,7 @@ FORBIDDEN WITHOUT APPROVAL
 
 PROTECTED REPOSITORIES
 ══════════════════════════════════════════════════════════════════
-{for each repo where protected: true}
+{for each repo in manifest.md frontmatter where protected: true}
   ⛔ {repo.name}: {repo.path}
      DO NOT: create branches, commit, push
      Locked to branch: {repo.locked_branch}
@@ -216,7 +219,7 @@ Extensions are COMPILED into self-contained documents.
 The stub points directly to the compiled file — no runtime
 discovery or merging needed.
 
-  1. Source YAML defines overrides (context, hooks, step replacements)
+  1. Source .md (frontmatter) defines overrides (context, hooks, step replacements)
   2. Compilation merges source + base into single authoritative document
   3. Stub points to compiled file directly
   4. AI reads ONLY the compiled file — it IS the command
@@ -227,7 +230,7 @@ WHEN A COMPILED EXTENSION IS ACTIVE
   The compiled .active.md file is the COMPLETE instruction set.
   It contains:
     • Authority Notice (confirms it's the authoritative source)
-    • Project Context (injected from source YAML)
+    • Project Context (injected from source .md frontmatter)
     • All steps inlined (base + overrides merged)
     • Pre-hooks and post-hooks included
     • Agent configuration embedded
@@ -239,7 +242,7 @@ FILE LOCATIONS
 ══════════════════════════════════════════════════════════════════
   .ai/_project/commands/{cmd}.active.md          <- what AI reads
   .ai/_project/commands/{cmd}.variant.{name}.md  <- stored variants
-  .ai/_project/commands/{cmd}.source.{name}.yaml <- source overrides
+  .ai/_project/commands/{cmd}.source.{name}.md   <- source overrides (frontmatter)
 
 MANAGEMENT COMMANDS
 ══════════════════════════════════════════════════════════════════
@@ -261,51 +264,57 @@ MANAGEMENT COMMANDS
 PRIORITY ORDER (check in this order):
 ══════════════════════════════════════════════════════════════════
 
-  1. .ai/context.md
+  1. [[context]]
      → Current project state, quick reference
 
-  2. .ai/INDEX.md
-     → Find any documentation ("What is X?")
+  2. [[task-index]]
+     → All tasks with status in frontmatter
 
-  3. .ai/docs/
+  3. [[docs-index]]
      → Repository and feature documentation
 
-  4. .ai/tasks/
-     → Current and past task context
+  4. [[agents-index]]
+     → Available agents and their definitions
 
-  5. .ai/docs/_completed_tasks.md
-     → Historical learnings and decisions
+  5. [[commands-index]]
+     → Available commands
 
   6. ONLY THEN explore code
      → If documentation is insufficient
 
 KEY FILES
 ══════════════════════════════════════════════════════════════════
-  .ai/context.md              - Start here (entry point)
-  .ai/INDEX.md                - Navigation hub
-  .ai/_project/manifest.yaml  - Project configuration
-  .ai/_framework/README.md    - Framework overview
-  .ai/_framework/agent-behavior.md - AI guidelines
+  .ai/context.md                          - Start here (entry point)
+  .ai/tasks/task-index.md                 - All tasks hub ([[task-index]])
+  .ai/docs/docs-index.md                  - Documentation hub ([[docs-index]])
+  .ai/_framework/agents/agents-index.md   - Agents hub ([[agents-index]])
+  .ai/_framework/commands/commands-index.md - Commands hub ([[commands-index]])
+  .ai/_project/manifest.md               - Project configuration (frontmatter)
+  .ai/_framework/README.md               - Framework overview
+  .ai/_framework/agent-behavior.md       - AI guidelines
 
 DOCUMENTATION STRUCTURE
 ══════════════════════════════════════════════════════════════════
   .ai/
   ├── context.md              # Entry point
-  ├── INDEX.md                # Navigation
   ├── _project/
-  │   ├── manifest.yaml       # Config (source of truth)
+  │   ├── manifest.md         # Config (source of truth, frontmatter fields)
   │   └── commands/           # Project extensions
   ├── _framework/
   │   ├── commands/           # Framework commands
+  │   │   └── commands-index.md  # [[commands-index]]
+  │   ├── agents/             # Agent definitions (.md with frontmatter)
+  │   │   └── agents-index.md    # [[agents-index]]
   │   ├── templates/          # Document templates
   │   └── docs/               # Framework docs
   ├── docs/
-  │   ├── _completed_tasks.md # Historical learnings
+  │   ├── docs-index.md       # [[docs-index]]
   │   └── {repo}/             # Per-repo docs
   └── tasks/
-      ├── todo/               # Pending tasks
-      ├── in_progress/        # Active tasks
-      └── done/               # Completed tasks
+      ├── task-index.md       # [[task-index]]
+      └── TASK-ID/            # Each task in its own folder
+          ├── TASK-ID.md      # Task note (status in frontmatter)
+          └── TASK-ID-01.md   # Work items (status in frontmatter)
 ```
 
 #### Commands Focus (`/ctx commands`)
@@ -345,11 +354,11 @@ META
   /ai-sync           - Sync .ai/ folder with git
   /expresso-tags     - Execute inline @expresso tasks
 
-{Scan .ai/_project/commands/*.variant.*.md and display if any exist:}
+{Scan .ai/_project/commands/*.variant.*.md and display if any exist — read frontmatter for description:}
 
 PROJECT VARIANTS
 ══════════════════════════════════════════════════════════════════
-  /{cmd}:{variant1}     [active] {description from source YAML}
+  /{cmd}:{variant1}     [active] {description from source .md frontmatter}
   /{cmd}:{variant2}
 
   Switch: /command-extend {cmd} --activate {variant}
@@ -365,14 +374,14 @@ REMEMBER
   🛑 NEVER commit or push without user approval
   🛑 COMPILED EXTENSIONS: If stub points to active.md, follow ONLY that
   ⚠ Git commands: Run in correct repo directory
-  ⚠ Protected repos: Don't modify (check manifest.yaml)
-  ⚠ Extensions: Check for .extend.md files
-  ⚠ Docs first: Check documentation before exploring code
+  ⚠ Protected repos: Don't modify (check manifest.md frontmatter)
+  ⚠ Extensions: source overrides are .source.{name}.md files
+  ⚠ Docs first: Check [[task-index]], [[docs-index]] before exploring code
 ```
 
 ## Error Handling
 
-If manifest.yaml doesn't exist:
+If `_project/manifest.md` doesn't exist or has no frontmatter:
 ```
 ⚠ No manifest found. Run /init to set up the framework.
 ```

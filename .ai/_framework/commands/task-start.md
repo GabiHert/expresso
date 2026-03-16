@@ -74,7 +74,7 @@ Start a task by moving it from todo to in_progress, reading the task context, an
 
 ```
 1. FIND TASK
-   • Search in .ai/tasks/todo/
+   • Search vault for tasks with status: todo
    • Validate task exists
 
 1.5. CREATE WORKTREE (if --worktree provided)
@@ -83,11 +83,11 @@ Start a task by moving it from todo to in_progress, reading the task context, an
    • Never run git worktree add manually
 
 2. MOVE TO IN_PROGRESS
-   • Move folder from todo/ to in_progress/
-   • Update any status markers
+   • Update task note frontmatter: status → in_progress
+   • Update tags to reflect new status
 
 3. READ AND ORIENT
-   • Read task README thoroughly
+   • Read task note thoroughly
    • Announce understanding of:
      - Problem statement
      - Acceptance criteria
@@ -96,7 +96,7 @@ Start a task by moving it from todo to in_progress, reading the task context, an
 
 4. CHECK WORK ITEMS
    • List all work items by repo
-   • Identify which are in todo/ vs done/
+   • Identify which have status: todo vs status: done
    • Recommend starting point
 ```
 
@@ -104,7 +104,7 @@ Start a task by moving it from todo to in_progress, reading the task context, an
 
 ### Step 0: Orientation
 
-1. Read `.ai/_project/manifest.yaml` to understand:
+1. Use `get_frontmatter("_project/manifest.md")` to read project manifest and understand:
    - Available repositories
    - Commit conventions
 
@@ -122,13 +122,13 @@ Start a task by moving it from todo to in_progress, reading the task context, an
 ### Step 1: Parse Arguments
 
 **If task ID provided:**
-- Look for task in `.ai/tasks/todo/{task-id}/`
-- If not found in todo, check `.ai/tasks/in_progress/{task-id}/`
-  - If found there, say: "Task {task-id} is already in progress. Use /[[task-resume]] to continue."
+- Use `search_notes("type: task status: todo")` and filter for the given task ID, or read `tasks/{task-id}/{task-id}.md` directly and check its frontmatter
+- If frontmatter shows `status: todo`, proceed
+- If frontmatter shows `status: in_progress`, say: "Task {task-id} is already in progress. Use /[[task-resume]] to continue."
 - If not found anywhere, say: "Task {task-id} not found. Use /[[task-status]] to see available tasks."
 
 **If no task ID provided:**
-- List available tasks in todo/:
+- Use `search_notes("type: task status: todo")` to list available tasks:
 ```
 Available tasks in todo:
 
@@ -185,20 +185,15 @@ If `--worktree` flag is provided:
 
 ### Step 2: Move Task to In Progress
 
-Move the entire task folder:
-- From: `.ai/tasks/todo/{task-id}/`
-- To: `.ai/tasks/in_progress/{task-id}/`
+Update the task note's frontmatter using `update_frontmatter("tasks/{task-id}/{task-id}.md", {status: "in_progress"})`.
 
-Update the task's README.md header to reflect new location:
-```markdown
-║ LOCATION: .ai/tasks/in_progress/{task-id}/                      ║
-```
+Also update the tags in the frontmatter to include `in_progress` and remove `todo`.
 
 ### Step 3: Read and Orient
 
-1. Read the task's README.md completely.
+1. Read the task note `tasks/{task-id}/{task-id}.md` completely.
 
-2. Read the task's status.yaml for work item overview.
+2. Use `get_frontmatter("tasks/{task-id}/{task-id}.md")` to read the `summary` field for work item overview (fields: total, todo, in_progress, done).
 
 3. Announce understanding:
 ```
@@ -237,31 +232,31 @@ APPROACH
 
 ```
 ## Task Context
-{task README content}
+{task note content}
 
 ## Existing Documentation
-{list of .ai/docs/ files}
+{list of notes under docs/ from search_notes("type: doc")}
 
 ## Your Mission
 Explore the codebase to understand what needs to change for this task.
 Focus on: affected files, existing patterns, dependencies, and risks.
 
-Save your findings to: .ai/tasks/in_progress/{task-id}/exploration.md
+Save your findings to: tasks/{task-id}/exploration.md
 ```
 
 The Explorer agent will:
 - Search for relevant files and patterns
 - Identify dependencies and risks
-- Document findings in `exploration.md`
+- Document findings in `exploration.md` (vault note at `tasks/{task-id}/exploration.md`)
 
 Announce when complete:
 ```
-✓ Exploration complete: .ai/tasks/in_progress/{task-id}/exploration.md
+✓ Exploration complete: tasks/{task-id}/exploration.md
 ```
 
 ### Step 3.6: Run Planner Agent (If No Work Items)
 
-**If status.yaml shows 0 work items:**
+**If the task's `summary` frontmatter shows 0 total work items (scan `tasks/{task-id}/` for work item `.md` files to confirm):**
 
 ┌─────────────────────────────────────────────────────────────────┐
 │ ⚠️  MANDATORY: INVOKE PLANNER AGENT                             │
@@ -278,13 +273,13 @@ Announce when complete:
 
 ```
 ## Task Context
-{task README content}
+{task note content}
 
 ## Exploration Findings
 {exploration.md content}
 
 ## Project Repos
-{repos from manifest.yaml}
+{repos from manifest.md frontmatter}
 
 ## Your Mission
 Break this task into concrete work items.
@@ -313,12 +308,13 @@ Present proposals to user:
 ```
 
 On approval:
-- Create work item files in `todo/` folder
-- Update status.yaml with new items
+- Create work item notes in `tasks/{task-id}/` using `write_note` with frontmatter `status: todo`
+- Update the task note's `summary` frontmatter via `update_frontmatter` with updated counts
+- Add `[[work-item-note]]` wikilinks to the task note's body via `patch_note`
 
 ### Step 4: Check Work Items
 
-Read status.yaml and list work items by status:
+Scan `tasks/{task-id}/` for work item `.md` files (files matching `{task-id}-*.md`). For each, use `get_frontmatter` to read its `status` field. List work items grouped by status:
 
 ```
 WORK ITEMS
@@ -346,7 +342,7 @@ This is the first item and has no dependencies.
 
 ### Step 5: Update Context
 
-Update `.ai/context.md`:
+Update `.ai/context.md` via `patch_note`:
 - Move task from "Todo" to "In Progress" in Current State section
 
 ### Step 6: Output Summary
@@ -357,7 +353,7 @@ Update `.ai/context.md`:
 ╚══════════════════════════════════════════════════════════════════╝
 
 Task: {task-id} - {title}
-Location: .ai/tasks/in_progress/{task-id}/
+Location: tasks/{task-id}/
 
 {if worktree was created}
 Worktree: {repo-path}/.worktrees/{task-id}/
@@ -381,7 +377,7 @@ Quick Commands:
 
 ### Step 7: Invoke Sync Agent (if enabled)
 
-Check `.ai/_project/manifest.yaml` for `auto_sync.enabled`.
+Use `get_frontmatter("_project/manifest.md")` to check the `auto_sync` field for `enabled`.
 
 **If auto_sync is enabled:**
 
