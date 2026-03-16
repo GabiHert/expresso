@@ -140,6 +140,7 @@ Session moves to task's Sessions section
 - [[07-[[task-create]]-integration]] — Update task-create.md integration (done)
 - [[07-[[task-create]]-integration]] — Update task-create.md integration (done)
 - [[07-[[task-create]]-integration]] — Update task-create.md integration (done)
+- [[07-[[task-create]]-integration]] — Update task-create.md integration (done)
 
 - [[01-unassigned-constant]] — Add UNASSIGNED_TASK_ID constant (done)
 - [[02-session-manager-methods]] — Add SessionManager methods (done)

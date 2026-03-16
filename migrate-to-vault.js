@@ -765,11 +765,25 @@ ${taskLinks.join('\n')}
 `);
   }
 
-  // Docs Index
+  // Docs Index (absorbs overview files from subdirs)
   const docsDir = path.join(aiDir, 'docs');
   if (fs.existsSync(docsDir)) {
     const docLinks = [];
     collectDocLinks(docsDir, docsDir, docLinks);
+
+    // Absorb any overview files in docs root
+    let docsOverview = '';
+    const docsOverviewFiles = listFiles(docsDir, '.md')
+      .filter(f => f.includes('overview') || f === 'README.md');
+    for (const ovFile of docsOverviewFiles) {
+      const ovPath = path.join(docsDir, ovFile);
+      const raw = readFile(ovPath);
+      if (raw) {
+        const { body } = parseFrontmatterAndBody(raw);
+        docsOverview += (body || raw).replace(/^> Parent:.*\n?/m, '').trim() + '\n\n';
+        deleteFile(ovPath);
+      }
+    }
 
     writeFile(path.join(docsDir, 'docs-index.md'), `---
 type: index
@@ -780,14 +794,21 @@ tags: [index, docs]
 # Documentation Index
 
 ${docLinks.join('\n')}
+
+${docsOverview ? `---\n\n${docsOverview}` : ''}
 `);
   }
 
-  // Agents Index
+  // Agents Index (absorbs overview content)
   const agentsDir = path.join(aiDir, '_framework', 'agents');
   if (fs.existsSync(agentsDir)) {
+    const skipFiles = new Set(['agents-index.md', 'README.md']);
+    // Find and absorb overview files
+    const overviewFiles = listFiles(agentsDir, '.md').filter(f => f.includes('overview') || f === 'README.md');
+    overviewFiles.forEach(f => skipFiles.add(f));
+
     const agentFiles = listFiles(agentsDir, '.md')
-      .filter(f => !f.includes('overview') && f !== 'orchestrator.md' && f !== 'agents-index.md' && f !== 'README.md');
+      .filter(f => !skipFiles.has(f));
 
     const agentLinks = agentFiles.map(f => {
       const content = readFile(path.join(agentsDir, f));
@@ -797,17 +818,17 @@ ${docLinks.join('\n')}
       return `- [[${f.replace('.md', '')}]] — ${name} (${scope})`;
     });
 
-    // Also link README and orchestrator
-    const extraLinks = [];
-    // Look for overview file (may have been renamed from README.md)
-    const overviewFile = listFiles(agentsDir, '.md').find(f => f.includes('overview'));
-    if (overviewFile) {
-      extraLinks.push(`- [[${overviewFile.replace('.md', '')}]] — Agent system overview`);
-    } else if (fs.existsSync(path.join(agentsDir, 'README.md'))) {
-      extraLinks.push('- [[README]] — Agent system overview');
-    }
-    if (fs.existsSync(path.join(agentsDir, 'orchestrator.md'))) {
-      extraLinks.push('- [[orchestrator]] — Agent orchestration guide');
+    // Absorb overview content
+    let overviewContent = '';
+    for (const ovFile of overviewFiles) {
+      const ovPath = path.join(agentsDir, ovFile);
+      const raw = readFile(ovPath);
+      if (raw) {
+        const { body } = parseFrontmatterAndBody(raw);
+        // Strip parent links from absorbed content
+        overviewContent += (body || raw).replace(/^> Parent:.*\n?/m, '').trim() + '\n\n';
+        deleteFile(ovPath);
+      }
     }
 
     writeFile(path.join(agentsDir, 'agents-index.md'), `---
@@ -822,13 +843,11 @@ tags: [index, agents]
 
 ${agentLinks.join('\n')}
 
-## Guides
-
-${extraLinks.join('\n')}
+${overviewContent ? `---\n\n${overviewContent}` : ''}
 `);
   }
 
-  // Commands Index
+  // Commands Index (absorbs framework overview)
   const cmdsDir = path.join(aiDir, '_framework', 'commands');
   if (fs.existsSync(cmdsDir)) {
     const cmdFiles = listFiles(cmdsDir, '.md')
@@ -846,6 +865,20 @@ ${extraLinks.join('\n')}
       });
     }
 
+    // Absorb framework README/overview
+    let frameworkOverview = '';
+    const fwOverviewFiles = ['README.md', 'framework-overview.md']
+      .map(f => path.join(aiDir, '_framework', f))
+      .filter(f => fs.existsSync(f));
+    for (const ovPath of fwOverviewFiles) {
+      const raw = readFile(ovPath);
+      if (raw) {
+        const { body } = parseFrontmatterAndBody(raw);
+        frameworkOverview += (body || raw).replace(/^> Parent:.*\n?/m, '').trim() + '\n\n';
+        deleteFile(ovPath);
+      }
+    }
+
     writeFile(path.join(cmdsDir, 'commands-index.md'), `---
 type: index
 domain: commands
@@ -859,6 +892,8 @@ tags: [index, commands]
 ${cmdLinks.join('\n')}
 
 ${extLinks.length > 0 ? `## Project Extensions\n\n${extLinks.join('\n')}` : ''}
+
+${frameworkOverview ? `---\n\n${frameworkOverview}` : ''}
 `);
   }
 }
