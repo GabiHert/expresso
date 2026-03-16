@@ -1,3 +1,11 @@
+---
+type: command
+name: command-extend
+layer: framework
+tags:
+  - command
+---
+
 
 
 > Parent: [[commands-index]]

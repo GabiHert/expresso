@@ -1216,27 +1216,40 @@ function ensureParentLinksInDir(dir, aiDir) {
       const content = readFile(fullPath);
       if (!content) continue;
 
-      const { frontmatter } = parseFrontmatterAndBody(content);
+      let currentContent = content;
+      let { frontmatter } = parseFrontmatterAndBody(currentContent);
+
+      // Add frontmatter to files that don't have it
+      if (!frontmatter && hasFrontmatter(currentContent) === false) {
+        const relPath = path.relative(aiDir, fullPath);
+        const inferredFm = inferFrontmatter(relPath, entry.name);
+        if (inferredFm) {
+          currentContent = `${toFrontmatter(inferredFm)}\n\n${currentContent}`;
+          fs.writeFileSync(fullPath, currentContent, 'utf8');
+          frontmatter = inferredFm;
+        }
+      }
+
       const parent = resolveParent(fullPath, frontmatter, aiDir);
 
       if (!parent) continue; // Root node (manifest) or temp files
 
       // Check if correct parent link already exists
-      if (content.includes(`> Parent: [[${parent}]]`)) continue;
+      if (currentContent.includes(`> Parent: [[${parent}]]`)) continue;
 
       // Replace incorrect parent link if present
       const parentLinkRegex = /^> Parent: \[\[.+?\]\]\n?/m;
-      if (parentLinkRegex.test(content)) {
-        const updated = content.replace(parentLinkRegex, `> Parent: [[${parent}]]\n`);
+      if (parentLinkRegex.test(currentContent)) {
+        const updated = currentContent.replace(parentLinkRegex, `> Parent: [[${parent}]]\n`);
         fs.writeFileSync(fullPath, updated, 'utf8');
         count++;
         continue;
       }
 
       // Inject parent link after frontmatter
-      const fmEnd = findFrontmatterEnd(content);
-      const fm = content.substring(0, fmEnd);
-      const body = content.substring(fmEnd);
+      const fmEnd = findFrontmatterEnd(currentContent);
+      const fm = currentContent.substring(0, fmEnd);
+      const body = currentContent.substring(fmEnd);
       const linked = `${fm}\n\n> Parent: [[${parent}]]\n${body}`;
 
       fs.writeFileSync(fullPath, linked, 'utf8');
@@ -1302,6 +1315,29 @@ function addTaskToWorkItemLinks(aiDir) {
     count += unlinked.length;
   }
   return count;
+}
+
+// Infer frontmatter for files that don't have any, based on location
+function inferFrontmatter(relPath, fileName) {
+  if (relPath.startsWith('_framework/agents/')) {
+    return { type: 'agent', name: fileName.replace('.md', ''), scope: 'unknown', tags: ['agent'] };
+  }
+  if (relPath.startsWith('_framework/commands/')) {
+    return { type: 'command', name: fileName.replace('.md', ''), layer: 'framework', tags: ['command'] };
+  }
+  if (relPath.startsWith('_framework/')) {
+    return { type: 'doc', tags: ['doc', 'framework'] };
+  }
+  if (relPath.startsWith('_project/')) {
+    return { type: 'doc', tags: ['doc', 'project'] };
+  }
+  if (relPath.startsWith('docs/')) {
+    return { type: 'doc', tags: ['doc'] };
+  }
+  if (relPath.startsWith('tasks/')) {
+    return { type: 'doc', tags: ['doc', 'tasks'] };
+  }
+  return { type: 'doc', tags: ['doc'] };
 }
 
 function collectNoteNames(dir, names) {

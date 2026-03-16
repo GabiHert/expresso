@@ -217,6 +217,7 @@ Use `/address-feedback` to discuss feedback with the agent.
 - [[08-remove-[[diff-review]]-panel]] — Remove DiffReviewPanel (done)
 - [[08-remove-[[diff-review]]-panel]] — Remove DiffReviewPanel (done)
 - [[08-remove-[[diff-review]]-panel]] — Remove DiffReviewPanel (done)
+- [[08-remove-[[diff-review]]-panel]] — Remove DiffReviewPanel (done)
 
 - [[01-type-definitions]] — Type Definitions for ExpressoTag (done)
 - [[02-expresso-scanner]] — ExpressoScanner Service (done)

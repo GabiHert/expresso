@@ -1,3 +1,11 @@
+---
+type: command
+name: pr-comments
+layer: framework
+tags:
+  - command
+---
+
 
 
 > Parent: [[commands-index]]

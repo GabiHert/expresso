@@ -1,6 +1,12 @@
+---
+type: doc
+tags:
+  - doc
+---
 
 
-> Parent: [[manifest]]
+
+> Parent: [[docs-index]]
 <!--
 ╔══════════════════════════════════════════════════════════════════╗
 ║ NAVIGATION HUB                                                   ║

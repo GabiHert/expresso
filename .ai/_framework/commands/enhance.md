@@ -1,3 +1,11 @@
+---
+type: command
+name: enhance
+layer: framework
+tags:
+  - command
+---
+
 
 
 > Parent: [[commands-index]]

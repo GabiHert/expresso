@@ -1,7 +1,7 @@
 ---
 type: migration-report
-generated: 2026-03-15T19:51:31.548Z
-total_issues: 453
+generated: 2026-03-16T11:46:17.470Z
+total_issues: 429
 tags: [migration, vault]
 ---
 
@@ -11,10 +11,6 @@ tags: [migration, vault]
 
 These files contain references to the old filesystem-based structure and need
 to be updated to use vault-native patterns (frontmatter, mcpvault MCP tools).
-
-### .ai/docs/_architecture/README.md
-- L21: cockpit/ reference
-- L39: cockpit/ reference
 
 ### .ai/docs/_architecture/active-task-schema.md
 - L168: manifest.yaml reference
@@ -56,6 +52,10 @@ to be updated to use vault-native patterns (frontmatter, mcpvault MCP tools).
 - L710: cockpit/ reference
 - L712: cockpit/ reference
 
+### .ai/docs/_architecture/docs-architecture-overview.md
+- L21: cockpit/ reference
+- L39: cockpit/ reference
+
 ### .ai/docs/_architecture/docs-overview.md
 - L21: cockpit/ reference
 - L39: cockpit/ reference
@@ -65,32 +65,6 @@ to be updated to use vault-native patterns (frontmatter, mcpvault MCP tools).
 - L78: cockpit/ reference
 - L272: cockpit/ reference
 - L316: cockpit/ reference
-
-### .ai/docs/_completed_tasks.md
-- L16: done/ folder reference
-- L17: done/ folder reference
-- L18: done/ folder reference
-- L19: done/ folder reference
-- L20: done/ folder reference
-- L21: done/ folder reference
-- L22: done/ folder reference
-- L23: done/ folder reference
-- L24: done/ folder reference
-- L25: done/ folder reference
-- L26: done/ folder reference
-- L27: done/ folder reference
-- L28: done/ folder reference
-- L29: done/ folder reference
-- L30: done/ folder reference
-- L31: done/ folder reference
-- L32: done/ folder reference
-- L33: done/ folder reference
-- L34: done/ folder reference
-- L35: done/ folder reference
-- L36: done/ folder reference
-- L37: done/ folder reference
-- L38: done/ folder reference
-- L39: done/ folder reference
 
 ### .ai/docs/ai-framework/README.md
 - L23: manifest.yaml reference

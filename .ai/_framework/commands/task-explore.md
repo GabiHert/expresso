@@ -1,3 +1,11 @@
+---
+type: command
+name: task-explore
+layer: framework
+tags:
+  - command
+---
+
 
 
 > Parent: [[commands-index]]

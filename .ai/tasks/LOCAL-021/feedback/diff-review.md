@@ -1,3 +1,10 @@
+---
+type: doc
+tags:
+  - doc
+  - tasks
+---
+
 
 
 > Parent: [[docs-index]]

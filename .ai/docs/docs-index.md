@@ -14,7 +14,6 @@ tags: [index, docs]
 - [[docs-architecture-overview]]
 - [[docs-overview]]
 - [[shadow-copy-system]]
-- [[_completed_tasks]]
 
 ### _shared
 - [[claude-code-hooks]]

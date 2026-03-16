@@ -1,3 +1,11 @@
+---
+type: command
+name: init
+layer: framework
+tags:
+  - command
+---
+
 
 
 > Parent: [[commands-index]]

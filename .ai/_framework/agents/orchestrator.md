@@ -1,3 +1,11 @@
+---
+type: agent
+name: orchestrator
+scope: unknown
+tags:
+  - agent
+---
+
 
 
 > Parent: [[agents-index]]

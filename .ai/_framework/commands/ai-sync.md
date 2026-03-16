@@ -1,3 +1,11 @@
+---
+type: command
+name: ai-sync
+layer: framework
+tags:
+  - command
+---
+
 
 
 > Parent: [[commands-index]]

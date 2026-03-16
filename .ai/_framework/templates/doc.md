@@ -1,6 +1,13 @@
+---
+type: doc
+tags:
+  - doc
+  - framework
+---
 
 
-> Parent: [[commands-index]]
+
+> Parent: [[docs-index]]
 <!--
 ╔══════════════════════════════════════════════════════════════════╗
 ║ LAYER: DOMAIN                                                    ║

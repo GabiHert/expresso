@@ -1,3 +1,11 @@
+---
+type: agent
+name: framework-agents-overview
+scope: unknown
+tags:
+  - agent
+---
+
 
 
 > Parent: [[agents-index]]

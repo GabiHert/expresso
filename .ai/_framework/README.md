@@ -1,6 +1,13 @@
+---
+type: doc
+tags:
+  - doc
+  - framework
+---
 
 
-> Parent: [[commands-index]]
+
+> Parent: [[docs-index]]
 # AI Task Framework
 
 A reusable, three-layer system for AI-assisted development workflows.

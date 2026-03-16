@@ -1,3 +1,11 @@
+---
+type: command
+name: wi-create
+layer: framework
+tags:
+  - command
+---
+
 
 
 > Parent: [[commands-index]]

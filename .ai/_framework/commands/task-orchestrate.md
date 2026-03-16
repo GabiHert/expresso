@@ -1,3 +1,11 @@
+---
+type: command
+name: task-orchestrate
+layer: framework
+tags:
+  - command
+---
+
 
 
 > Parent: [[commands-index]]
