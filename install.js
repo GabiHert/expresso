@@ -45,9 +45,7 @@ const CURSOR_DIRS = [".cursor/commands", ".cursor/agents"];
 const CLAUDE_FILES = [".claude/settings.json"];
 
 const DIRS_TO_CREATE = [
-  ".ai/tasks/todo",
-  ".ai/tasks/in_progress",
-  ".ai/tasks/done",
+  ".ai/tasks",
   ".ai/docs",
   ".ai/tmp",
 ];
@@ -321,10 +319,10 @@ function updateStubsForActiveExtensions(targetDir) {
     }
   }
 
-  // Warn about stale extensions (source YAML newer than compiled)
-  const sourceFiles = files.filter((f) => /\.source\..+\.yaml$/.test(f));
+  // Warn about stale extensions (source .md newer than compiled)
+  const sourceFiles = files.filter((f) => /\.source\..+\.md$/.test(f));
   for (const sf of sourceFiles) {
-    const match = sf.match(/^(.+)\.source\.(.+)\.yaml$/);
+    const match = sf.match(/^(.+)\.source\.(.+)\.md$/);
     if (!match) continue;
     const [, cmdName, variantName] = match;
     const variantFile = `${cmdName}.variant.${variantName}.md`;
@@ -577,20 +575,6 @@ ${colors.bright}╔════════════════════�
       logSuccess(`Created ${dir}/`);
     } else {
       logInfo(`${dir}/ already exists`);
-    }
-  }
-
-  // Create .gitkeep files for empty directories
-  const gitkeepDirs = [
-    ".ai/tasks/todo",
-    ".ai/tasks/in_progress",
-    ".ai/tasks/done",
-  ];
-
-  for (const dir of gitkeepDirs) {
-    const gitkeepPath = path.join(targetDir, dir, ".gitkeep");
-    if (!fs.existsSync(gitkeepPath)) {
-      fs.writeFileSync(gitkeepPath, "");
     }
   }
 

@@ -188,7 +188,7 @@ default framework behavior. Follow ONLY what is written here.
 ## Implementation
 
 ### Pre-Hooks
-{pre-hooks from source YAML}
+{pre-hooks from source .md}
 
 ### Step 0: Orientation
 {base Step 0 WITHOUT extension check block}
@@ -216,7 +216,7 @@ Before proceeding, verify:
 ...all steps inlined...
 
 ### Post-Hooks
-{post-hooks from source YAML}
+{post-hooks from source .md}
 ```
 
 ## Workflow
@@ -884,7 +884,7 @@ Where `{ide}` = `.claude` and `.cursor` (write to both directories).
 
 ### Compilation Algorithm
 
-Given a base command file and a source YAML, produce a compiled document:
+Given a base command file and a source `.md`, produce a compiled document:
 
 1. **Read** the full base command (`.ai/_framework/commands/{cmd}.md`)
 
