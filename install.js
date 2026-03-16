@@ -20,6 +20,8 @@
  *   - .claude/settings.json    Configuration settings
  *   - .cursor/commands/        Cursor IDE slash commands (same format as Claude)
  *   - .cursor/agents/          Cursor IDE agents (same format as Claude)
+ *   - .mcp.json                mcpvault MCP server configuration
+ *   - ai-vault                 Symlink for Obsidian vault access
  *   - AI Cockpit VSCode extension (optional)
  */
 
@@ -390,7 +392,7 @@ ${colors.bright}╔════════════════════�
   // --------------------------------------------------------
   // Step 1: Validate target directory
   // --------------------------------------------------------
-  logStep("1/7", "Validating target directory");
+  logStep("1/8", "Validating target directory");
 
   if (!fs.existsSync(targetDir)) {
     if (nonInteractive) {
@@ -413,7 +415,7 @@ ${colors.bright}╔════════════════════�
   // --------------------------------------------------------
   // Step 2: Check for existing installation
   // --------------------------------------------------------
-  logStep("2/7", "Checking for existing installation");
+  logStep("2/8", "Checking for existing installation");
 
   const aiExists = fs.existsSync(path.join(targetDir, ".ai"));
   const claudeExists = fs.existsSync(path.join(targetDir, ".claude"));
@@ -455,7 +457,7 @@ ${colors.bright}╔════════════════════�
   // --------------------------------------------------------
   // Step 3: Copy framework files
   // --------------------------------------------------------
-  logStep("3/7", "Installing framework files");
+  logStep("3/8", "Installing framework files");
 
   for (const dir of FRAMEWORK_DIRS) {
     const src = path.join(SCRIPT_DIR, dir);
@@ -494,7 +496,7 @@ ${colors.bright}╔════════════════════�
   // --------------------------------------------------------
   // Step 4: Copy Claude integration files
   // --------------------------------------------------------
-  logStep("4/7", "Installing Claude Code integration");
+  logStep("4/8", "Installing Claude Code integration");
 
   for (const dir of CLAUDE_DIRS) {
     const src = path.join(SCRIPT_DIR, dir);
@@ -529,7 +531,7 @@ ${colors.bright}╔════════════════════�
   // --------------------------------------------------------
   // Step 5: Install Cursor integration
   // --------------------------------------------------------
-  logStep("5/7", "Installing Cursor IDE integration");
+  logStep("5/8", "Installing Cursor IDE integration");
 
   // Cursor uses same format as Claude - copy corresponding directories
   const cursorMappings = [
@@ -566,7 +568,7 @@ ${colors.bright}╔════════════════════�
   // --------------------------------------------------------
   // Step 6: Create directory structure
   // --------------------------------------------------------
-  logStep("6/7", "Creating directory structure");
+  logStep("6/8", "Creating directory structure");
 
   for (const dir of DIRS_TO_CREATE) {
     const fullPath = path.join(targetDir, dir);
@@ -599,9 +601,76 @@ ${colors.bright}╔════════════════════�
   }
 
   // --------------------------------------------------------
+  // Step 6b: Setup vault integration (mcpvault + Obsidian symlink)
+  // --------------------------------------------------------
+  logStep("6b", "Setting up vault integration");
+
+  // Create/merge .mcp.json with mcpvault server
+  const mcpJsonPath = path.join(targetDir, ".mcp.json");
+  let mcpConfig = {};
+
+  if (fs.existsSync(mcpJsonPath)) {
+    try {
+      mcpConfig = JSON.parse(fs.readFileSync(mcpJsonPath, "utf-8"));
+    } catch (e) {
+      logWarning("Existing .mcp.json is invalid, backing up");
+      fs.copyFileSync(mcpJsonPath, mcpJsonPath + ".bak");
+    }
+  }
+
+  if (!mcpConfig.mcpServers) mcpConfig.mcpServers = {};
+
+  mcpConfig.mcpServers.vault = {
+    command: "npx",
+    args: ["@bitbonsai/mcpvault@latest", "./.ai"],
+  };
+
+  fs.writeFileSync(mcpJsonPath, JSON.stringify(mcpConfig, null, 2));
+  logSuccess("Configured mcpvault in .mcp.json");
+
+  // Create ai-vault symlink (Obsidian can't browse hidden .ai/ folder)
+  const symlinkPath = path.join(targetDir, "ai-vault");
+  try {
+    if (!fs.existsSync(symlinkPath)) {
+      fs.symlinkSync(path.join(targetDir, ".ai"), symlinkPath);
+      logSuccess("Created ai-vault symlink → .ai/");
+    } else {
+      logInfo("ai-vault symlink already exists");
+    }
+  } catch (e) {
+    logWarning(`Could not create symlink: ${e.message}`);
+  }
+
+  // Add vault entries to .gitignore
+  const vaultIgnoreEntries = [
+    "ai-vault",
+    ".ai/.obsidian/workspace.json",
+    ".ai/.obsidian/workspace-mobile.json",
+    ".ai/.obsidian/cache",
+  ];
+
+  let currentGitignore = "";
+  if (fs.existsSync(gitignorePath)) {
+    currentGitignore = fs.readFileSync(gitignorePath, "utf-8");
+  }
+
+  let vaultIgnoreAdded = false;
+  for (const entry of vaultIgnoreEntries) {
+    if (!currentGitignore.includes(entry)) {
+      currentGitignore += `\n${entry}`;
+      vaultIgnoreAdded = true;
+    }
+  }
+
+  if (vaultIgnoreAdded) {
+    fs.writeFileSync(gitignorePath, currentGitignore.trim() + "\n");
+    logSuccess("Added vault entries to .gitignore");
+  }
+
+  // --------------------------------------------------------
   // Step 7: Install VSCode extension
   // --------------------------------------------------------
-  logStep("7/7", "VSCode extension");
+  logStep("7/8", "VSCode extension");
 
   if (skipExtension) {
     logInfo("Skipped (--no-extension flag)");
